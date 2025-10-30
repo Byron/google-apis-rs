@@ -185,6 +185,7 @@
                             "type": "integer"
                         },
                         "mine": {
+                            "deprecated": true,
                             "location": "query",
                             "type": "boolean"
                         },
@@ -936,6 +937,11 @@
                             "location": "query",
                             "repeated": true,
                             "required": true,
+                            "type": "string"
+                        },
+                        "postId": {
+                            "description": "Returns the comment threads of the specified post.",
+                            "location": "query",
                             "type": "string"
                         },
                         "searchTerms": {
@@ -1757,7 +1763,7 @@
                         },
                         "maxResults": {
                             "default": "500",
-                            "description": "The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.",
+                            "description": "The *maxResults* parameter specifies the maximum number of items that should be returned in the result set. Not used in the streaming RPC.",
                             "format": "uint32",
                             "location": "query",
                             "maximum": "2000",
@@ -1770,7 +1776,7 @@
                             "type": "string"
                         },
                         "part": {
-                            "description": "The *part* parameter specifies the liveChatComment resource parts that the API response will include. Supported values are id and snippet.",
+                            "description": "The *part* parameter specifies the liveChatComment resource parts that the API response will include. Supported values are id, snippet, and authorDetails.",
                             "location": "query",
                             "repeated": true,
                             "required": true,
@@ -3610,6 +3616,34 @@
                 }
             }
         },
+        "videoTrainability": {
+            "methods": {
+                "get": {
+                    "description": "Returns the trainability status of a video.",
+                    "flatPath": "youtube/v3/videoTrainability",
+                    "httpMethod": "GET",
+                    "id": "youtube.videoTrainability.get",
+                    "parameterOrder": [],
+                    "parameters": {
+                        "id": {
+                            "description": "The ID of the video to retrieve.",
+                            "location": "query",
+                            "type": "string"
+                        }
+                    },
+                    "path": "youtube/v3/videoTrainability",
+                    "response": {
+                        "$ref": "VideoTrainability"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/youtube",
+                        "https://www.googleapis.com/auth/youtube.force-ssl",
+                        "https://www.googleapis.com/auth/youtube.readonly",
+                        "https://www.googleapis.com/auth/youtubepartner"
+                    ]
+                }
+            }
+        },
         "videos": {
             "methods": {
                 "delete": {
@@ -4067,12 +4101,78 @@
                                 "$ref": "CommentThread"
                             }
                         }
+                    },
+                    "resources": {
+                        "liveChat": {
+                            "resources": {
+                                "messages": {
+                                    "methods": {
+                                        "stream": {
+                                            "description": "Allows a user to load live chat through a server-streamed RPC.",
+                                            "flatPath": "youtube/v3/liveChat/messages/stream",
+                                            "httpMethod": "GET",
+                                            "id": "youtube.youtube.v3.liveChat.messages.stream",
+                                            "parameterOrder": [],
+                                            "parameters": {
+                                                "hl": {
+                                                    "description": "Specifies the localization language in which the system messages should be returned.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "liveChatId": {
+                                                    "description": "The id of the live chat for which comments should be returned.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "maxResults": {
+                                                    "default": "500",
+                                                    "description": "The *maxResults* parameter specifies the maximum number of items that should be returned in the result set. Not used in the streaming RPC.",
+                                                    "format": "uint32",
+                                                    "location": "query",
+                                                    "maximum": "2000",
+                                                    "minimum": "200",
+                                                    "type": "integer"
+                                                },
+                                                "pageToken": {
+                                                    "description": "The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken property identify other pages that could be retrieved.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "part": {
+                                                    "description": "The *part* parameter specifies the liveChatComment resource parts that the API response will include. Supported values are id, snippet, and authorDetails.",
+                                                    "location": "query",
+                                                    "repeated": true,
+                                                    "type": "string"
+                                                },
+                                                "profileImageSize": {
+                                                    "description": "Specifies the size of the profile image that should be returned for each user.",
+                                                    "format": "uint32",
+                                                    "location": "query",
+                                                    "maximum": "720",
+                                                    "minimum": "16",
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "path": "youtube/v3/liveChat/messages/stream",
+                                            "response": {
+                                                "$ref": "LiveChatMessageListResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/youtube",
+                                                "https://www.googleapis.com/auth/youtube.force-ssl",
+                                                "https://www.googleapis.com/auth/youtube.readonly"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     },
-    "revision": "20240626",
+    "revision": "20251029",
     "rootUrl": "https://youtube.googleapis.com/",
     "schemas": {
         "AbuseReport": {
@@ -5500,6 +5600,10 @@
             "description": "JSON template for the status part of a channel.",
             "id": "ChannelStatus",
             "properties": {
+                "isChannelMonetizationEnabled": {
+                    "description": "Whether the channel is considered ypp monetization enabled. See go/yppornot for more details.",
+                    "type": "boolean"
+                },
                 "isLinked": {
                     "description": "If true, then the user is linked to either a YouTube username or G+ account. Otherwise, the user doesn't have a public YouTube identity.",
                     "type": "boolean"
@@ -5551,6 +5655,10 @@
                     "$ref": "ChannelToStoreLinkDetailsBillingDetails",
                     "description": "Information specific to billing (read-only)."
                 },
+                "merchantAffiliateProgramDetails": {
+                    "$ref": "ChannelToStoreLinkDetailsMerchantAffiliateProgramDetails",
+                    "description": "Information specific to merchant affiliate program (read-only)."
+                },
                 "merchantId": {
                     "description": "Google Merchant Center id of the store.",
                     "format": "uint64",
@@ -5584,6 +5692,29 @@
                         "",
                         "",
                         ""
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ChannelToStoreLinkDetailsMerchantAffiliateProgramDetails": {
+            "description": "Information specific to merchant affiliate program.",
+            "id": "ChannelToStoreLinkDetailsMerchantAffiliateProgramDetails",
+            "properties": {
+                "status": {
+                    "description": "The current merchant affiliate program status.",
+                    "enum": [
+                        "merchantAffiliateProgramStatusUnspecified",
+                        "merchantAffiliateProgramStatusEligible",
+                        "merchantAffiliateProgramStatusActive",
+                        "merchantAffiliateProgramStatusPaused"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified status.",
+                        "Merchant is eligible for the merchant affiliate program.",
+                        "Merchant affiliate program is active.",
+                        "Merchant affiliate program is paused."
                     ],
                     "type": "string"
                 }
@@ -5704,7 +5835,7 @@
                     "type": "boolean"
                 },
                 "channelId": {
-                    "description": "The id of the corresponding YouTube channel. In case of a channel comment this is the channel the comment refers to. In case of a video comment it's the video's channel.",
+                    "description": "The id of the corresponding YouTube channel. In case of a channel comment this is the channel the comment refers to. In case of a video or post comment it's the video/post's channel.",
                     "type": "string"
                 },
                 "likeCount": {
@@ -5729,7 +5860,11 @@
                     "type": "string"
                 },
                 "parentId": {
-                    "description": "The unique id of the parent comment, only set for replies.",
+                    "description": "The unique id of the top-level comment, only set for replies.",
+                    "type": "string"
+                },
+                "postId": {
+                    "description": "The ID of the post the comment refers to, if any.",
                     "type": "string"
                 },
                 "publishedAt": {
@@ -5772,10 +5907,11 @@
             "type": "object"
         },
         "CommentSnippetAuthorChannelId": {
-            "description": "The id of the author's YouTube channel, if any.",
+            "description": "Contains the id of the author's YouTube channel, if any.",
             "id": "CommentSnippetAuthorChannelId",
             "properties": {
                 "value": {
+                    "description": "The id of the author's YouTube channel.",
                     "type": "string"
                 }
             },
@@ -5876,12 +6012,16 @@
                     "type": "boolean"
                 },
                 "channelId": {
-                    "description": "The YouTube channel the comments in the thread refer to or the channel with the video the comments refer to. If video_id isn't set the comments refer to the channel itself.",
+                    "description": "The YouTube channel the comments in the thread refer to or the channel with the video the comments refer to. If neither video_id nor post_id is set the comments refer to the channel itself.",
                     "type": "string"
                 },
                 "isPublic": {
                     "description": "Whether the thread (and therefore all its comments) is visible to all YouTube users.",
                     "type": "boolean"
+                },
+                "postId": {
+                    "description": "The ID of the post the comments refer to, if any.",
+                    "type": "string"
                 },
                 "topLevelComment": {
                     "$ref": "Comment",
@@ -5893,7 +6033,7 @@
                     "type": "integer"
                 },
                 "videoId": {
-                    "description": "The ID of the video the comments refer to, if any. No video_id implies a channel discussion comment.",
+                    "description": "The ID of the video the comments refer to, if any.",
                     "type": "string"
                 }
             },
@@ -6431,7 +6571,11 @@
                             "djctqIllegalDrugs",
                             "djctqInappropriateLanguage",
                             "djctqCriminalActs",
-                            "djctqImpactingContent"
+                            "djctqImpactingContent",
+                            "djctqFear",
+                            "djctqMedicalProcedures",
+                            "djctqSensitiveTopics",
+                            "djctqFantasyViolence"
                         ],
                         "enumDescriptions": [
                             "",
@@ -6446,7 +6590,11 @@
                             "Drogas Il\u00edcitas (Illegal drugs)",
                             "Linguagem Impr\u00f3pria (Inappropriate language)",
                             "Atos Criminosos (Criminal Acts)",
-                            "Conte\u00fado Impactante (Impacting content)"
+                            "Conte\u00fado Impactante (Impacting content)",
+                            "Temer (Fear)",
+                            "Procedimentos m\u00e9dicos (Medical Procedures)",
+                            "T\u00f3picos sens\u00edveis (Sensitive Topics)",
+                            "Fantasia Viol\u00eancia (Fantasy Violence)"
                         ],
                         "type": "string"
                     },
@@ -8057,7 +8205,7 @@
             "type": "object"
         },
         "InvideoBranding": {
-            "description": "LINT.IfChange Describes an invideo branding.",
+            "description": "Describes an invideo branding.",
             "id": "InvideoBranding",
             "properties": {
                 "imageBytes": {
@@ -8071,6 +8219,7 @@
                 },
                 "position": {
                     "$ref": "InvideoPosition",
+                    "deprecated": true,
                     "description": "The spatial position within the video where the branding watermark will be displayed."
                 },
                 "targetChannelId": {
@@ -10014,7 +10163,7 @@
                 },
                 "kind": {
                     "default": "youtube#playlistItemListResponse",
-                    "description": "Identifies what kind of resource this is. Value: the fixed string \"youtube#playlistItemListResponse\". Etag of this resource.",
+                    "description": "Identifies what kind of resource this is. Value: the fixed string \"youtube#playlistItemListResponse\".",
                     "type": "string"
                 },
                 "nextPageToken": {
@@ -10259,6 +10408,18 @@
         "PlaylistStatus": {
             "id": "PlaylistStatus",
             "properties": {
+                "podcastStatus": {
+                    "description": "The playlist's podcast status.",
+                    "enum": [
+                        "enabled",
+                        "disabled"
+                    ],
+                    "enumDescriptions": [
+                        "",
+                        ""
+                    ],
+                    "type": "string"
+                },
                 "privacyStatus": {
                     "description": "The playlist's privacy status.",
                     "enum": [
@@ -10561,10 +10722,6 @@
                     "description": "The ID that YouTube uses to uniquely identify the subscriber's channel.",
                     "type": "string"
                 },
-                "channelTitle": {
-                    "description": "Channel title for the channel that the subscription belongs to.",
-                    "type": "string"
-                },
                 "description": {
                     "description": "The subscription's details.",
                     "type": "string"
@@ -10754,6 +10911,10 @@
         "TestItem": {
             "id": "TestItem",
             "properties": {
+                "etag": {
+                    "description": "Etag for the resource. See https://en.wikipedia.org/wiki/HTTP_ETag.",
+                    "type": "string"
+                },
                 "featuredPart": {
                     "type": "boolean"
                 },
@@ -11003,6 +11164,9 @@
                 "monetizationDetails": {
                     "$ref": "VideoMonetizationDetails",
                     "description": "The monetizationDetails object encapsulates information about the monetization status of the video."
+                },
+                "paidProductPlacementDetails": {
+                    "$ref": "VideoPaidProductPlacementDetails"
                 },
                 "player": {
                     "$ref": "VideoPlayer",
@@ -11628,7 +11792,7 @@
                     "type": "string"
                 },
                 "scheduledEndTime": {
-                    "description": "The time that the broadcast is scheduled to end. If the value is empty or the property is not present, then the broadcast is scheduled to contiue indefinitely.",
+                    "description": "The time that the broadcast is scheduled to end. If the value is empty or the property is not present, then the broadcast is scheduled to continue indefinitely.",
                     "format": "date-time",
                     "type": "string"
                 },
@@ -11662,6 +11826,17 @@
                 "access": {
                     "$ref": "AccessPolicy",
                     "description": "The value of access indicates whether the video can be monetized or not."
+                }
+            },
+            "type": "object"
+        },
+        "VideoPaidProductPlacementDetails": {
+            "description": "Details about paid content, such as paid product placement, sponsorships or endorsement, contained in a YouTube video and a method to inform viewers of paid promotion. This data can only be retrieved by the video owner.",
+            "id": "VideoPaidProductPlacementDetails",
+            "properties": {
+                "hasPaidProductPlacement": {
+                    "description": "This boolean represents whether the video contains Paid Product Placement, Studio equivalent: https://screenshot.googleplex.com/4Me79DE6AfT2ktp.png",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -11927,9 +12102,13 @@
             "type": "object"
         },
         "VideoStatus": {
-            "description": "Basic details about a video category, such as its localized title. Next Id: 18",
+            "description": "Basic details about a video category, such as its localized title. Next Id: 19",
             "id": "VideoStatus",
             "properties": {
+                "containsSyntheticMedia": {
+                    "description": "Indicates if the video contains altered or synthetic media.",
+                    "type": "boolean"
+                },
                 "embeddable": {
                     "description": "This value indicates if the video can be embedded on another website. @mutable youtube.videos.insert youtube.videos.update",
                     "type": "boolean"
@@ -12161,7 +12340,7 @@
             "type": "object"
         },
         "VideoSuggestionsTagSuggestion": {
-            "description": "A single tag suggestion with it's relevance information.",
+            "description": "A single tag suggestion with its relevance information.",
             "id": "VideoSuggestionsTagSuggestion",
             "properties": {
                 "categoryRestricts": {
@@ -12202,6 +12381,33 @@
                         "type": "string"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "VideoTrainability": {
+            "description": "Specifies who is allowed to train on the video.",
+            "id": "VideoTrainability",
+            "properties": {
+                "etag": {
+                    "description": "Etag of this resource.",
+                    "type": "string"
+                },
+                "kind": {
+                    "default": "youtube#videoTrainability",
+                    "description": "Identifies what kind of resource this is. Value: the fixed string \"youtube#videoTrainability\".",
+                    "type": "string"
+                },
+                "permitted": {
+                    "description": "Specifies who is allowed to train on the video. Valid values are: - a single string \"all\" - a single string \"none\" - a list of allowed parties",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "videoId": {
+                    "description": "The ID of the video.",
+                    "type": "string"
                 }
             },
             "type": "object"

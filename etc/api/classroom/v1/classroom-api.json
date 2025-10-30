@@ -2,6 +2,12 @@
     "auth": {
         "oauth2": {
             "scopes": {
+                "https://www.googleapis.com/auth/classroom.addons.student": {
+                    "description": "See and update its own attachments to posts in Google Classroom"
+                },
+                "https://www.googleapis.com/auth/classroom.addons.teacher": {
+                    "description": "See, create, and update its own attachments to posts in classes you teach in Google Classroom"
+                },
                 "https://www.googleapis.com/auth/classroom.announcements": {
                     "description": "View and manage announcements in Google Classroom"
                 },
@@ -76,7 +82,7 @@
     "batchPath": "batch",
     "description": "Manages classes, rosters, and invitations in Google Classroom.",
     "discoveryVersion": "v1",
-    "documentationLink": "https://developers.google.com/classroom/",
+    "documentationLink": "https://developers.google.com/workspace/classroom/",
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -170,7 +176,7 @@
         "courses": {
             "methods": {
                 "create": {
-                    "description": "Creates a course. The user specified in `ownerId` is the owner of the created course and added as a teacher. A non-admin requesting user can only create a course with themselves as the owner. Domain admins can create courses owned by any user within their domain. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create courses or for access errors. * `NOT_FOUND` if the primary teacher is not a valid user. * `FAILED_PRECONDITION` if the course owner's account is disabled or for the following request errors: * UserCannotOwnCourse * UserGroupsMembershipLimitReached * `ALREADY_EXISTS` if an alias was specified in the `id` and already exists.",
+                    "description": "Creates a course. The user specified in `ownerId` is the owner of the created course and added as a teacher. A non-admin requesting user can only create a course with themselves as the owner. Domain admins can create courses owned by any user within their domain. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create courses or for access errors. * `NOT_FOUND` if the primary teacher is not a valid user. * `FAILED_PRECONDITION` if the course owner's account is disabled or for the following request errors: * UserCannotOwnCourse * UserGroupsMembershipLimitReached * CourseTitleCannotContainUrl * `ALREADY_EXISTS` if an alias was specified in the `id` and already exists.",
                     "flatPath": "v1/courses",
                     "httpMethod": "POST",
                     "id": "classroom.courses.create",
@@ -230,6 +236,31 @@
                     "path": "v1/courses/{id}",
                     "response": {
                         "$ref": "Course"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/classroom.courses",
+                        "https://www.googleapis.com/auth/classroom.courses.readonly"
+                    ]
+                },
+                "getGradingPeriodSettings": {
+                    "description": "Returns the grading period settings in a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user isn't permitted to access the grading period settings in the requested course or for access errors. * `NOT_FOUND` if the requested course does not exist.",
+                    "flatPath": "v1/courses/{courseId}/gradingPeriodSettings",
+                    "httpMethod": "GET",
+                    "id": "classroom.courses.getGradingPeriodSettings",
+                    "parameterOrder": [
+                        "courseId"
+                    ],
+                    "parameters": {
+                        "courseId": {
+                            "description": "Required. The identifier of the course.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1/courses/{courseId}/gradingPeriodSettings",
+                    "response": {
+                        "$ref": "GradingPeriodSettings"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/classroom.courses",
@@ -297,7 +328,7 @@
                     ]
                 },
                 "patch": {
-                    "description": "Updates one or more fields in a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to modify the requested course or for access errors. * `NOT_FOUND` if no course exists with the requested ID. * `INVALID_ARGUMENT` if invalid fields are specified in the update mask or if no update mask is supplied. * `FAILED_PRECONDITION` for the following request errors: * CourseNotModifiable * InactiveCourseOwner * IneligibleOwner",
+                    "description": "Updates one or more fields in a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to modify the requested course or for access errors. * `NOT_FOUND` if no course exists with the requested ID. * `INVALID_ARGUMENT` if invalid fields are specified in the update mask or if no update mask is supplied. * `FAILED_PRECONDITION` for the following request errors: * CourseNotModifiable * InactiveCourseOwner * IneligibleOwner * CourseTitleCannotContainUrl",
                     "flatPath": "v1/courses/{id}",
                     "httpMethod": "PATCH",
                     "id": "classroom.courses.patch",
@@ -330,7 +361,7 @@
                     ]
                 },
                 "update": {
-                    "description": "Updates a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to modify the requested course or for access errors. * `NOT_FOUND` if no course exists with the requested ID. * `FAILED_PRECONDITION` for the following request errors: * CourseNotModifiable",
+                    "description": "Updates a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to modify the requested course or for access errors. * `NOT_FOUND` if no course exists with the requested ID. * `FAILED_PRECONDITION` for the following request errors: * CourseNotModifiable * CourseTitleCannotContainUrl",
                     "flatPath": "v1/courses/{id}",
                     "httpMethod": "PUT",
                     "id": "classroom.courses.update",
@@ -351,6 +382,39 @@
                     },
                     "response": {
                         "$ref": "Course"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/classroom.courses"
+                    ]
+                },
+                "updateGradingPeriodSettings": {
+                    "description": "Updates grading period settings of a course. Individual grading periods can be added, removed, or modified using this method. The requesting user and course owner must be eligible to modify Grading Periods. For details, see [licensing requirements](https://developers.google.com/workspace/classroom/grading-periods/manage-grading-periods#licensing_requirements). This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to modify the grading period settings in a course or for access errors: * UserIneligibleToUpdateGradingPeriodSettings * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.",
+                    "flatPath": "v1/courses/{courseId}/gradingPeriodSettings",
+                    "httpMethod": "PATCH",
+                    "id": "classroom.courses.updateGradingPeriodSettings",
+                    "parameterOrder": [
+                        "courseId"
+                    ],
+                    "parameters": {
+                        "courseId": {
+                            "description": "Required. The identifier of the course.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "updateMask": {
+                            "description": "Mask that identifies which fields in the GradingPeriodSettings to update. The GradingPeriodSettings `grading_periods` list will be fully replaced by the grading periods specified in the update request. For example: * Grading periods included in the list without an ID are considered additions, and a new ID will be assigned when the request is made. * Grading periods that currently exist, but are missing from the request will be considered deletions. * Grading periods with an existing ID and modified data are considered edits. Unmodified data will be left as is. * Grading periods included with an unknown ID will result in an error. The following fields may be specified: * `grading_periods` * `apply_to_existing_coursework`",
+                            "format": "google-fieldmask",
+                            "location": "query",
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1/courses/{courseId}/gradingPeriodSettings",
+                    "request": {
+                        "$ref": "GradingPeriodSettings"
+                    },
+                    "response": {
+                        "$ref": "GradingPeriodSettings"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/classroom.courses"
@@ -549,7 +613,7 @@
                             ]
                         },
                         "getAddOnContext": {
-                            "description": "Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
+                            "description": "Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/workspace/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
                             "flatPath": "v1/courses/{courseId}/announcements/{itemId}/addOnContext",
                             "httpMethod": "GET",
                             "id": "classroom.courses.announcements.getAddOnContext",
@@ -564,7 +628,7 @@
                                     "type": "string"
                                 },
                                 "attachmentId": {
-                                    "description": "Optional. The identifier of the attachment. This field is required for student users and optional for teacher users. If not provided in the student case, an error is returned.",
+                                    "description": "Optional. The identifier of the attachment. This field is required for all requests except when the user is in the [Attachment Discovery iframe](https://developers.google.com/workspace/classroom/add-ons/get-started/iframes/attachment-discovery-iframe).",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -575,14 +639,14 @@
                                     "type": "string"
                                 },
                                 "itemId": {
-                                    "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                    "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                     "location": "path",
                                     "required": true,
                                     "type": "string"
                                 },
                                 "postId": {
                                     "deprecated": true,
-                                    "description": "Optional. Deprecated, use item_id instead.",
+                                    "description": "Optional. Deprecated, use `item_id` instead.",
                                     "location": "query",
                                     "type": "string"
                                 }
@@ -590,7 +654,11 @@
                             "path": "v1/courses/{courseId}/announcements/{itemId}/addOnContext",
                             "response": {
                                 "$ref": "AddOnContext"
-                            }
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/classroom.addons.student",
+                                "https://www.googleapis.com/auth/classroom.addons.teacher"
+                            ]
                         },
                         "list": {
                             "description": "Returns a list of announcements that the requester is permitted to view. Course students may only view `PUBLISHED` announcements. Course teachers and domain administrators may view all announcements. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.",
@@ -652,7 +720,7 @@
                             ]
                         },
                         "modifyAssignees": {
-                            "description": "Modifies assignee mode and options of an announcement. Only a teacher of the course that contains the announcement may call this method. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course or course work does not exist.",
+                            "description": "Modifies assignee mode and options of an announcement. Only a teacher of the course that contains the announcement may call this method. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course or course work does not exist. * `FAILED_PRECONDITION` for the following request error: * EmptyAssignees",
                             "flatPath": "v1/courses/{courseId}/announcements/{id}:modifyAssignees",
                             "httpMethod": "POST",
                             "id": "classroom.courses.announcements.modifyAssignees",
@@ -751,14 +819,14 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -769,7 +837,10 @@
                                     },
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "delete": {
                                     "description": "Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -795,14 +866,14 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -810,7 +881,10 @@
                                     "path": "v1/courses/{courseId}/announcements/{itemId}/addOnAttachments/{attachmentId}",
                                     "response": {
                                         "$ref": "Empty"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "get": {
                                     "description": "Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -836,14 +910,14 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -851,7 +925,11 @@
                                     "path": "v1/courses/{courseId}/announcements/{itemId}/addOnAttachments/{attachmentId}",
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.student",
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "list": {
                                     "description": "Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -870,7 +948,7 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
@@ -888,7 +966,7 @@
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead.",
+                                            "description": "Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -896,7 +974,11 @@
                                     "path": "v1/courses/{courseId}/announcements/{itemId}/addOnAttachments",
                                     "response": {
                                         "$ref": "ListAddOnAttachmentsResponse"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.student",
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "patch": {
                                     "description": "Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -945,7 +1027,10 @@
                                     },
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 }
                             }
                         }
@@ -1046,7 +1131,7 @@
                             ]
                         },
                         "getAddOnContext": {
-                            "description": "Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
+                            "description": "Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/workspace/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
                             "flatPath": "v1/courses/{courseId}/courseWork/{itemId}/addOnContext",
                             "httpMethod": "GET",
                             "id": "classroom.courses.courseWork.getAddOnContext",
@@ -1061,7 +1146,7 @@
                                     "type": "string"
                                 },
                                 "attachmentId": {
-                                    "description": "Optional. The identifier of the attachment. This field is required for student users and optional for teacher users. If not provided in the student case, an error is returned.",
+                                    "description": "Optional. The identifier of the attachment. This field is required for all requests except when the user is in the [Attachment Discovery iframe](https://developers.google.com/workspace/classroom/add-ons/get-started/iframes/attachment-discovery-iframe).",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -1072,14 +1157,14 @@
                                     "type": "string"
                                 },
                                 "itemId": {
-                                    "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                    "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                     "location": "path",
                                     "required": true,
                                     "type": "string"
                                 },
                                 "postId": {
                                     "deprecated": true,
-                                    "description": "Optional. Deprecated, use item_id instead.",
+                                    "description": "Optional. Deprecated, use `item_id` instead.",
                                     "location": "query",
                                     "type": "string"
                                 }
@@ -1087,7 +1172,11 @@
                             "path": "v1/courses/{courseId}/courseWork/{itemId}/addOnContext",
                             "response": {
                                 "$ref": "AddOnContext"
-                            }
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/classroom.addons.student",
+                                "https://www.googleapis.com/auth/classroom.addons.teacher"
+                            ]
                         },
                         "list": {
                             "description": "Returns a list of course work that the requester is permitted to view. Course students may only view `PUBLISHED` course work. Course teachers and domain administrators may view all course work. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.",
@@ -1151,7 +1240,7 @@
                             ]
                         },
                         "modifyAssignees": {
-                            "description": "Modifies assignee mode and options of a coursework. Only a teacher of the course that contains the coursework may call this method. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course or course work does not exist.",
+                            "description": "Modifies assignee mode and options of a coursework. Only a teacher of the course that contains the coursework may call this method. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or course work or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course or course work does not exist. * `FAILED_PRECONDITION` for the following request error: * EmptyAssignees",
                             "flatPath": "v1/courses/{courseId}/courseWork/{id}:modifyAssignees",
                             "httpMethod": "POST",
                             "id": "classroom.courses.courseWork.modifyAssignees",
@@ -1185,7 +1274,7 @@
                             ]
                         },
                         "patch": {
-                            "description": "Updates one or more fields of a course work. See google.classroom.v1.CourseWork for details of which fields may be updated and who may change them. This request must be made by the Developer Console project of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the corresponding course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting developer project did not create the corresponding course work, if the user is not permitted to make the requested modification to the student submission, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `FAILED_PRECONDITION` if the requested course work has already been deleted. * `NOT_FOUND` if the requested course, course work, or student submission does not exist.",
+                            "description": "Updates one or more fields of a course work. See google.classroom.v1.CourseWork for details of which fields may be updated and who may change them. This request must be made by the Developer Console project of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the corresponding course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting developer project did not create the corresponding course work, if the user is not permitted to make the requested modification to the student submission, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `FAILED_PRECONDITION` if the requested course work has already been deleted. * `NOT_FOUND` if the requested course or course work does not exist.",
                             "flatPath": "v1/courses/{courseId}/courseWork/{id}",
                             "httpMethod": "PATCH",
                             "id": "classroom.courses.courseWork.patch",
@@ -1207,7 +1296,7 @@
                                     "type": "string"
                                 },
                                 "updateMask": {
-                                    "description": "Mask that identifies which fields on the course work to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `CourseWork` object. If a field that does not support empty values is included in the update mask and not set in the `CourseWork` object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `description` * `state` * `due_date` * `due_time` * `max_points` * `scheduled_time` * `submission_modification_mode` * `topic_id`",
+                                    "description": "Mask that identifies which fields on the course work to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `CourseWork` object. If a field that does not support empty values is included in the update mask and not set in the `CourseWork` object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `description` * `state` * `due_date` * `due_time` * `max_points` * `scheduled_time` * `submission_modification_mode` * `topic_id` * `grading_period_id`",
                                     "format": "google-fieldmask",
                                     "location": "query",
                                     "type": "string"
@@ -1219,6 +1308,51 @@
                             },
                             "response": {
                                 "$ref": "CourseWork"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/classroom.coursework.students"
+                            ]
+                        },
+                        "updateRubric": {
+                            "description": "Updates a rubric. See google.classroom.v1.Rubric for details of which fields can be updated. Rubric update capabilities are [limited](/classroom/rubrics/limitations) once grading has started. The requesting user and course owner must have rubrics creation capabilities. For details, see [licensing requirements](https://developers.google.com/workspace/classroom/rubrics/limitations#license-requirements). This request must be made by the Google Cloud console of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the parent course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting developer project didn't create the corresponding course work, if the user isn't permitted to make the requested modification to the rubric, or for access errors. This error code is also returned if grading has already started on the rubric. * `INVALID_ARGUMENT` if the request is malformed and for the following request error: * `RubricCriteriaInvalidFormat` * `NOT_FOUND` if the requested course, course work, or rubric doesn't exist or if the user doesn't have access to the corresponding course work. * `INTERNAL` if grading has already started on the rubric.",
+                            "flatPath": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubric",
+                            "httpMethod": "PATCH",
+                            "id": "classroom.courses.courseWork.updateRubric",
+                            "parameterOrder": [
+                                "courseId",
+                                "courseWorkId"
+                            ],
+                            "parameters": {
+                                "courseId": {
+                                    "description": "Required. Identifier of the course.",
+                                    "location": "path",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "courseWorkId": {
+                                    "description": "Required. Identifier of the course work.",
+                                    "location": "path",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "id": {
+                                    "description": "Optional. Identifier of the rubric.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "updateMask": {
+                                    "description": "Optional. Mask that identifies which fields on the rubric to update. This field is required to do an update. The update fails if invalid fields are specified. There are multiple options to define the criteria of a rubric: the `source_spreadsheet_id` and the `criteria` list. Only one of these can be used at a time to define a rubric. The rubric `criteria` list is fully replaced by the rubric criteria specified in the update request. For example, if a criterion or level is missing from the request, it is deleted. New criteria and levels are added and an ID is assigned. Existing criteria and levels retain the previously assigned ID if the ID is specified in the request. The following fields can be specified by teachers: * `criteria` * `source_spreadsheet_id`",
+                                    "format": "google-fieldmask",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubric",
+                            "request": {
+                                "$ref": "Rubric"
+                            },
+                            "response": {
+                                "$ref": "Rubric"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/classroom.coursework.students"
@@ -1250,14 +1384,14 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -1268,7 +1402,10 @@
                                     },
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "delete": {
                                     "description": "Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -1294,14 +1431,14 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -1309,7 +1446,10 @@
                                     "path": "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments/{attachmentId}",
                                     "response": {
                                         "$ref": "Empty"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "get": {
                                     "description": "Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -1335,14 +1475,14 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -1350,7 +1490,11 @@
                                     "path": "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments/{attachmentId}",
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.student",
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "list": {
                                     "description": "Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -1369,7 +1513,7 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
@@ -1387,7 +1531,7 @@
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead.",
+                                            "description": "Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -1395,7 +1539,11 @@
                                     "path": "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments",
                                     "response": {
                                         "$ref": "ListAddOnAttachmentsResponse"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.student",
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "patch": {
                                     "description": "Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -1444,7 +1592,10 @@
                                     },
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 }
                             },
                             "resources": {
@@ -1475,14 +1626,14 @@
                                                     "type": "string"
                                                 },
                                                 "itemId": {
-                                                    "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                                    "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                                     "location": "path",
                                                     "required": true,
                                                     "type": "string"
                                                 },
                                                 "postId": {
                                                     "deprecated": true,
-                                                    "description": "Optional. Deprecated, use item_id instead.",
+                                                    "description": "Optional. Deprecated, use `item_id` instead.",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
@@ -1498,6 +1649,8 @@
                                                 "$ref": "AddOnAttachmentStudentSubmission"
                                             },
                                             "scopes": [
+                                                "https://www.googleapis.com/auth/classroom.addons.student",
+                                                "https://www.googleapis.com/auth/classroom.addons.teacher",
                                                 "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly"
                                             ]
                                         },
@@ -1526,14 +1679,14 @@
                                                     "type": "string"
                                                 },
                                                 "itemId": {
-                                                    "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                                    "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                                     "location": "path",
                                                     "required": true,
                                                     "type": "string"
                                                 },
                                                 "postId": {
                                                     "deprecated": true,
-                                                    "description": "Optional. Deprecated, use item_id instead.",
+                                                    "description": "Optional. Deprecated, use `item_id` instead.",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
@@ -1556,9 +1709,221 @@
                                             },
                                             "response": {
                                                 "$ref": "AddOnAttachmentStudentSubmission"
-                                            }
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                            ]
                                         }
                                     }
+                                }
+                            }
+                        },
+                        "rubrics": {
+                            "methods": {
+                                "create": {
+                                    "description": "Creates a rubric. The requesting user and course owner must have rubrics creation capabilities. For details, see [licensing requirements](https://developers.google.com/workspace/classroom/rubrics/limitations#license-requirements). For further details, see [Rubrics structure and known limitations](/classroom/rubrics/limitations). This request must be made by the Google Cloud console of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the parent course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user isn't permitted to create rubrics for course work in the requested course. * `INTERNAL` if the request has insufficient OAuth scopes. * `INVALID_ARGUMENT` if the request is malformed and for the following request error: * `RubricCriteriaInvalidFormat` * `NOT_FOUND` if the requested course or course work don't exist or the user doesn't have access to the course or course work. * `FAILED_PRECONDITION` for the following request error: * `AttachmentNotVisible`",
+                                    "flatPath": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics",
+                                    "httpMethod": "POST",
+                                    "id": "classroom.courses.courseWork.rubrics.create",
+                                    "parameterOrder": [
+                                        "courseId",
+                                        "courseWorkId"
+                                    ],
+                                    "parameters": {
+                                        "courseId": {
+                                            "description": "Required. Identifier of the course.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "courseWorkId": {
+                                            "description": "Required. Identifier of the course work.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics",
+                                    "request": {
+                                        "$ref": "Rubric"
+                                    },
+                                    "response": {
+                                        "$ref": "Rubric"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.coursework.students"
+                                    ]
+                                },
+                                "delete": {
+                                    "description": "Deletes a rubric. The requesting user and course owner must have rubrics creation capabilities. For details, see [licensing requirements](https://developers.google.com/workspace/classroom/rubrics/limitations#license-requirements). This request must be made by the Google Cloud console of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the corresponding rubric. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting developer project didn't create the corresponding rubric, or if the requesting user isn't permitted to delete the requested rubric. * `NOT_FOUND` if no rubric exists with the requested ID or the user does not have access to the course, course work, or rubric. * `INVALID_ARGUMENT` if grading has already started on the rubric.",
+                                    "flatPath": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics/{id}",
+                                    "httpMethod": "DELETE",
+                                    "id": "classroom.courses.courseWork.rubrics.delete",
+                                    "parameterOrder": [
+                                        "courseId",
+                                        "courseWorkId",
+                                        "id"
+                                    ],
+                                    "parameters": {
+                                        "courseId": {
+                                            "description": "Required. Identifier of the course.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "courseWorkId": {
+                                            "description": "Required. Identifier of the course work.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "id": {
+                                            "description": "Required. Identifier of the rubric.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics/{id}",
+                                    "response": {
+                                        "$ref": "Empty"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.coursework.students"
+                                    ]
+                                },
+                                "get": {
+                                    "description": "Returns a rubric. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course, course work, or rubric doesn't exist or if the user doesn't have access to the corresponding course work.",
+                                    "flatPath": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics/{id}",
+                                    "httpMethod": "GET",
+                                    "id": "classroom.courses.courseWork.rubrics.get",
+                                    "parameterOrder": [
+                                        "courseId",
+                                        "courseWorkId",
+                                        "id"
+                                    ],
+                                    "parameters": {
+                                        "courseId": {
+                                            "description": "Required. Identifier of the course.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "courseWorkId": {
+                                            "description": "Required. Identifier of the course work.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "id": {
+                                            "description": "Required. Identifier of the rubric.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics/{id}",
+                                    "response": {
+                                        "$ref": "Rubric"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.coursework.me",
+                                        "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
+                                        "https://www.googleapis.com/auth/classroom.coursework.students",
+                                        "https://www.googleapis.com/auth/classroom.coursework.students.readonly"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Returns a list of rubrics that the requester is permitted to view. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course or course work doesn't exist or if the user doesn't have access to the corresponding course work.",
+                                    "flatPath": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics",
+                                    "httpMethod": "GET",
+                                    "id": "classroom.courses.courseWork.rubrics.list",
+                                    "parameterOrder": [
+                                        "courseId",
+                                        "courseWorkId"
+                                    ],
+                                    "parameters": {
+                                        "courseId": {
+                                            "description": "Required. Identifier of the course.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "courseWorkId": {
+                                            "description": "Required. Identifier of the course work.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "pageSize": {
+                                            "description": "The maximum number of rubrics to return. If unspecified, at most 1 rubric is returned. The maximum value is 1; values above 1 are coerced to 1.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "nextPageToken value returned from a previous list call, indicating that the subsequent page of results should be returned. The list request must be otherwise identical to the one that resulted in this token.",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics",
+                                    "response": {
+                                        "$ref": "ListRubricsResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.coursework.me",
+                                        "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
+                                        "https://www.googleapis.com/auth/classroom.coursework.students",
+                                        "https://www.googleapis.com/auth/classroom.coursework.students.readonly"
+                                    ]
+                                },
+                                "patch": {
+                                    "description": "Updates a rubric. See google.classroom.v1.Rubric for details of which fields can be updated. Rubric update capabilities are [limited](/classroom/rubrics/limitations) once grading has started. The requesting user and course owner must have rubrics creation capabilities. For details, see [licensing requirements](https://developers.google.com/workspace/classroom/rubrics/limitations#license-requirements). This request must be made by the Google Cloud console of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to create the parent course work item. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting developer project didn't create the corresponding course work, if the user isn't permitted to make the requested modification to the rubric, or for access errors. This error code is also returned if grading has already started on the rubric. * `INVALID_ARGUMENT` if the request is malformed and for the following request error: * `RubricCriteriaInvalidFormat` * `NOT_FOUND` if the requested course, course work, or rubric doesn't exist or if the user doesn't have access to the corresponding course work. * `INTERNAL` if grading has already started on the rubric.",
+                                    "flatPath": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics/{id}",
+                                    "httpMethod": "PATCH",
+                                    "id": "classroom.courses.courseWork.rubrics.patch",
+                                    "parameterOrder": [
+                                        "courseId",
+                                        "courseWorkId",
+                                        "id"
+                                    ],
+                                    "parameters": {
+                                        "courseId": {
+                                            "description": "Required. Identifier of the course.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "courseWorkId": {
+                                            "description": "Required. Identifier of the course work.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "id": {
+                                            "description": "Optional. Identifier of the rubric.",
+                                            "location": "path",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Optional. Mask that identifies which fields on the rubric to update. This field is required to do an update. The update fails if invalid fields are specified. There are multiple options to define the criteria of a rubric: the `source_spreadsheet_id` and the `criteria` list. Only one of these can be used at a time to define a rubric. The rubric `criteria` list is fully replaced by the rubric criteria specified in the update request. For example, if a criterion or level is missing from the request, it is deleted. New criteria and levels are added and an ID is assigned. Existing criteria and levels retain the previously assigned ID if the ID is specified in the request. The following fields can be specified by teachers: * `criteria` * `source_spreadsheet_id`",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/courses/{courseId}/courseWork/{courseWorkId}/rubrics/{id}",
+                                    "request": {
+                                        "$ref": "Rubric"
+                                    },
+                                    "response": {
+                                        "$ref": "Rubric"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.coursework.students"
+                                    ]
                                 }
                             }
                         },
@@ -2006,7 +2371,7 @@
                             ]
                         },
                         "getAddOnContext": {
-                            "description": "Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
+                            "description": "Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/workspace/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
                             "flatPath": "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnContext",
                             "httpMethod": "GET",
                             "id": "classroom.courses.courseWorkMaterials.getAddOnContext",
@@ -2021,7 +2386,7 @@
                                     "type": "string"
                                 },
                                 "attachmentId": {
-                                    "description": "Optional. The identifier of the attachment. This field is required for student users and optional for teacher users. If not provided in the student case, an error is returned.",
+                                    "description": "Optional. The identifier of the attachment. This field is required for all requests except when the user is in the [Attachment Discovery iframe](https://developers.google.com/workspace/classroom/add-ons/get-started/iframes/attachment-discovery-iframe).",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -2032,14 +2397,14 @@
                                     "type": "string"
                                 },
                                 "itemId": {
-                                    "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                    "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                     "location": "path",
                                     "required": true,
                                     "type": "string"
                                 },
                                 "postId": {
                                     "deprecated": true,
-                                    "description": "Optional. Deprecated, use item_id instead.",
+                                    "description": "Optional. Deprecated, use `item_id` instead.",
                                     "location": "query",
                                     "type": "string"
                                 }
@@ -2047,7 +2412,11 @@
                             "path": "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnContext",
                             "response": {
                                 "$ref": "AddOnContext"
-                            }
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/classroom.addons.student",
+                                "https://www.googleapis.com/auth/classroom.addons.teacher"
+                            ]
                         },
                         "list": {
                             "description": "Returns a list of course work material that the requester is permitted to view. Course students may only view `PUBLISHED` course work material. Course teachers and domain administrators may view all course work material. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.",
@@ -2184,14 +2553,14 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -2202,7 +2571,10 @@
                                     },
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "delete": {
                                     "description": "Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -2228,14 +2600,14 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -2243,7 +2615,10 @@
                                     "path": "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnAttachments/{attachmentId}",
                                     "response": {
                                         "$ref": "Empty"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "get": {
                                     "description": "Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -2269,14 +2644,14 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -2284,7 +2659,11 @@
                                     "path": "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnAttachments/{attachmentId}",
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.student",
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "list": {
                                     "description": "Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -2303,7 +2682,7 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
@@ -2321,7 +2700,7 @@
                                         },
                                         "postId": {
                                             "deprecated": true,
-                                            "description": "Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead.",
+                                            "description": "Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use `item_id` instead.",
                                             "location": "query",
                                             "type": "string"
                                         }
@@ -2329,7 +2708,11 @@
                                     "path": "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnAttachments",
                                     "response": {
                                         "$ref": "ListAddOnAttachmentsResponse"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.student",
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "patch": {
                                     "description": "Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -2378,7 +2761,10 @@
                                     },
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 }
                             }
                         }
@@ -2387,7 +2773,7 @@
                 "posts": {
                     "methods": {
                         "getAddOnContext": {
-                            "description": "Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
+                            "description": "Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/workspace/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
                             "flatPath": "v1/courses/{courseId}/posts/{postId}/addOnContext",
                             "httpMethod": "GET",
                             "id": "classroom.courses.posts.getAddOnContext",
@@ -2402,7 +2788,7 @@
                                     "type": "string"
                                 },
                                 "attachmentId": {
-                                    "description": "Optional. The identifier of the attachment. This field is required for student users and optional for teacher users. If not provided in the student case, an error is returned.",
+                                    "description": "Optional. The identifier of the attachment. This field is required for all requests except when the user is in the [Attachment Discovery iframe](https://developers.google.com/workspace/classroom/add-ons/get-started/iframes/attachment-discovery-iframe).",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -2413,12 +2799,12 @@
                                     "type": "string"
                                 },
                                 "itemId": {
-                                    "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                    "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                     "location": "query",
                                     "type": "string"
                                 },
                                 "postId": {
-                                    "description": "Optional. Deprecated, use item_id instead.",
+                                    "description": "Optional. Deprecated, use `item_id` instead.",
                                     "location": "path",
                                     "required": true,
                                     "type": "string"
@@ -2427,7 +2813,11 @@
                             "path": "v1/courses/{courseId}/posts/{postId}/addOnContext",
                             "response": {
                                 "$ref": "AddOnContext"
-                            }
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/classroom.addons.student",
+                                "https://www.googleapis.com/auth/classroom.addons.teacher"
+                            ]
                         }
                     },
                     "resources": {
@@ -2455,12 +2845,12 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "postId": {
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
@@ -2472,7 +2862,10 @@
                                     },
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "delete": {
                                     "description": "Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -2498,12 +2891,12 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "postId": {
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
@@ -2512,7 +2905,10 @@
                                     "path": "v1/courses/{courseId}/posts/{postId}/addOnAttachments/{attachmentId}",
                                     "response": {
                                         "$ref": "Empty"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "get": {
                                     "description": "Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -2538,12 +2934,12 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "postId": {
-                                            "description": "Optional. Deprecated, use item_id instead.",
+                                            "description": "Optional. Deprecated, use `item_id` instead.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
@@ -2552,7 +2948,11 @@
                                     "path": "v1/courses/{courseId}/posts/{postId}/addOnAttachments/{attachmentId}",
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.student",
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "list": {
                                     "description": "Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -2571,7 +2971,7 @@
                                             "type": "string"
                                         },
                                         "itemId": {
-                                            "description": "Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.",
+                                            "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -2587,7 +2987,7 @@
                                             "type": "string"
                                         },
                                         "postId": {
-                                            "description": "Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead.",
+                                            "description": "Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use `item_id` instead.",
                                             "location": "path",
                                             "required": true,
                                             "type": "string"
@@ -2596,7 +2996,11 @@
                                     "path": "v1/courses/{courseId}/posts/{postId}/addOnAttachments",
                                     "response": {
                                         "$ref": "ListAddOnAttachmentsResponse"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.student",
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 },
                                 "patch": {
                                     "description": "Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.",
@@ -2645,7 +3049,10 @@
                                     },
                                     "response": {
                                         "$ref": "AddOnAttachment"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                    ]
                                 }
                             },
                             "resources": {
@@ -2676,12 +3083,12 @@
                                                     "type": "string"
                                                 },
                                                 "itemId": {
-                                                    "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                                    "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
                                                 "postId": {
-                                                    "description": "Optional. Deprecated, use item_id instead.",
+                                                    "description": "Optional. Deprecated, use `item_id` instead.",
                                                     "location": "path",
                                                     "required": true,
                                                     "type": "string"
@@ -2698,6 +3105,8 @@
                                                 "$ref": "AddOnAttachmentStudentSubmission"
                                             },
                                             "scopes": [
+                                                "https://www.googleapis.com/auth/classroom.addons.student",
+                                                "https://www.googleapis.com/auth/classroom.addons.teacher",
                                                 "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly"
                                             ]
                                         },
@@ -2726,12 +3135,12 @@
                                                     "type": "string"
                                                 },
                                                 "itemId": {
-                                                    "description": "Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
+                                                    "description": "Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
                                                 "postId": {
-                                                    "description": "Optional. Deprecated, use item_id instead.",
+                                                    "description": "Optional. Deprecated, use `item_id` instead.",
                                                     "location": "path",
                                                     "required": true,
                                                     "type": "string"
@@ -2755,7 +3164,10 @@
                                             },
                                             "response": {
                                                 "$ref": "AddOnAttachmentStudentSubmission"
-                                            }
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/classroom.addons.teacher"
+                                            ]
                                         }
                                     }
                                 }
@@ -2766,7 +3178,7 @@
                 "students": {
                     "methods": {
                         "create": {
-                            "description": "Adds a user as a student of a course. Domain administrators are permitted to [directly add](https://developers.google.com/classroom/guides/manage-users) users within their domain as students to courses within their domain. Students are permitted to add themselves to a course using an enrollment code. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create students in this course or for access errors. * `NOT_FOUND` if the requested course ID does not exist. * `FAILED_PRECONDITION` if the requested user's account is disabled, for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * UserGroupsMembershipLimitReached * InactiveCourseOwner * `ALREADY_EXISTS` if the user is already a student or teacher in the course.",
+                            "description": "Adds a user as a student of a course. Domain administrators are permitted to [directly add](https://developers.google.com/workspace/classroom/guides/manage-users) users within their domain as students to courses within their domain. Students are permitted to add themselves to a course using an enrollment code. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create students in this course or for access errors. * `NOT_FOUND` if the requested course ID does not exist. * `FAILED_PRECONDITION` if the requested user's account is disabled, for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * UserGroupsMembershipLimitReached * InactiveCourseOwner * `ALREADY_EXISTS` if the user is already a student or teacher in the course.",
                             "flatPath": "v1/courses/{courseId}/students",
                             "httpMethod": "POST",
                             "id": "classroom.courses.students.create",
@@ -2907,7 +3319,7 @@
                 "teachers": {
                     "methods": {
                         "create": {
-                            "description": "Creates a teacher of a course. Domain administrators are permitted to [directly add](https://developers.google.com/classroom/guides/manage-users) users within their domain as teachers to courses within their domain. Non-admin users should send an Invitation instead. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create teachers in this course or for access errors. * `NOT_FOUND` if the requested course ID does not exist. * `FAILED_PRECONDITION` if the requested user's account is disabled, for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * CourseTeacherLimitReached * UserGroupsMembershipLimitReached * InactiveCourseOwner * `ALREADY_EXISTS` if the user is already a teacher or student in the course.",
+                            "description": "Creates a teacher of a course. Domain administrators are permitted to [directly add](https://developers.google.com/workspace/classroom/guides/manage-users) users within their domain as teachers to courses within their domain. Non-admin users should send an Invitation instead. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create teachers in this course or for access errors. * `NOT_FOUND` if the requested course ID does not exist. * `FAILED_PRECONDITION` if the requested user's account is disabled, for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * CourseTeacherLimitReached * UserGroupsMembershipLimitReached * InactiveCourseOwner * `ALREADY_EXISTS` if the user is already a teacher or student in the course.",
                             "flatPath": "v1/courses/{courseId}/teachers",
                             "httpMethod": "POST",
                             "id": "classroom.courses.teachers.create",
@@ -3043,7 +3455,7 @@
                 "topics": {
                     "methods": {
                         "create": {
-                            "description": "Creates a topic. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, create a topic in the requested course, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.",
+                            "description": "Creates a topic. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, create a topic in the requested course, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `ALREADY_EXISTS` if there exists a topic in the course with the same name. * `FAILED_PRECONDITION` for the following request error: * CourseTopicLimitReached * `NOT_FOUND` if the requested course does not exist.",
                             "flatPath": "v1/courses/{courseId}/topics",
                             "httpMethod": "POST",
                             "id": "classroom.courses.topics.create",
@@ -3169,7 +3581,7 @@
                             ]
                         },
                         "patch": {
-                            "description": "Updates one or more fields of a topic. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting developer project did not create the corresponding topic or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course or topic does not exist",
+                            "description": "Updates one or more fields of a topic. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting developer project did not create the corresponding topic or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `FAILED_PRECONDITION` if there exists a topic in the course with the same name. * `NOT_FOUND` if the requested course or topic does not exist",
                             "flatPath": "v1/courses/{courseId}/topics/{id}",
                             "httpMethod": "PATCH",
                             "id": "classroom.courses.topics.patch",
@@ -3695,7 +4107,7 @@
             }
         }
     },
-    "revision": "20240617",
+    "revision": "20251027",
     "rootUrl": "https://classroom.googleapis.com/",
     "schemas": {
         "AddOnAttachment": {
@@ -3727,7 +4139,7 @@
                     "type": "string"
                 },
                 "itemId": {
-                    "description": "Immutable. Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. Unique per course.",
+                    "description": "Immutable. Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached. Unique per course.",
                     "type": "string"
                 },
                 "maxPoints": {
@@ -3737,20 +4149,20 @@
                 },
                 "postId": {
                     "deprecated": true,
-                    "description": "Immutable. Deprecated, use item_id instead.",
+                    "description": "Immutable. Deprecated, use `item_id` instead.",
                     "type": "string"
                 },
                 "studentViewUri": {
                     "$ref": "EmbedUri",
-                    "description": "Required. URI to show the student view of the attachment. The URI will be opened in an iframe with the `courseId`, `postId`, and `attachmentId` query parameters set."
+                    "description": "Required. URI to show the student view of the attachment. The URI will be opened in an iframe with the `courseId`, `itemId`, `itemType`, and `attachmentId` query parameters set."
                 },
                 "studentWorkReviewUri": {
                     "$ref": "EmbedUri",
-                    "description": "URI for the teacher to see student work on the attachment, if applicable. The URI will be opened in an iframe with the `courseId`, `postId`, `attachmentId`, and `submissionId` query parameters set. This is the same `submissionId` returned by google.classroom.AddOns.GetAddOnContext when a student views the attachment. If the URI is omitted or removed, `max_points` will also be discarded."
+                    "description": "URI for the teacher to see student work on the attachment, if applicable. The URI will be opened in an iframe with the `courseId`, `itemId`, `itemType`, `attachmentId`, and `submissionId` query parameters set. This is the same `submissionId` returned in the [`AddOnContext.studentContext`](//devsite.google.com/classroom/reference/rest/v1/AddOnContext#StudentContext) field when a student views the attachment. If the URI is omitted or removed, `max_points` will also be discarded."
                 },
                 "teacherViewUri": {
                     "$ref": "EmbedUri",
-                    "description": "Required. URI to show the teacher view of the attachment. The URI will be opened in an iframe with the `courseId`, `postId`, and `attachmentId` query parameters set."
+                    "description": "Required. URI to show the teacher view of the attachment. The URI will be opened in an iframe with the `courseId`, `itemId`, `itemType`, and `attachmentId` query parameters set."
                 },
                 "title": {
                     "description": "Required. Title of this attachment. The title must be between 1 and 1000 characters.",
@@ -3800,12 +4212,12 @@
                     "type": "string"
                 },
                 "itemId": {
-                    "description": "Immutable. Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached.",
+                    "description": "Immutable. Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached.",
                     "type": "string"
                 },
                 "postId": {
                     "deprecated": true,
-                    "description": "Immutable. Deprecated, use item_id instead.",
+                    "description": "Immutable. Deprecated, use `item_id` instead.",
                     "type": "string"
                 },
                 "studentContext": {
@@ -3978,12 +4390,12 @@
                     "type": "string"
                 },
                 "itemId": {
-                    "description": "Immutable. Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached.",
+                    "description": "Immutable. Identifier of the `Announcement`, `CourseWork`, or `CourseWorkMaterial` under which the attachment is attached.",
                     "type": "string"
                 },
                 "postId": {
                     "deprecated": true,
-                    "description": "Immutable. Deprecated, use item_id instead.",
+                    "description": "Immutable. Deprecated, use `item_id` instead.",
                     "type": "string"
                 }
             },
@@ -4052,7 +4464,7 @@
                 },
                 "gradebookSettings": {
                     "$ref": "GradebookSettings",
-                    "description": "The gradebook settings that specify how a student's overall grade for the course will be calculated and who it will be displayed to. Read-only"
+                    "description": "The gradebook settings that specify how a student's overall grade for the course will be calculated and who it will be displayed to. Read-only."
                 },
                 "guardiansEnabled": {
                     "description": "Whether or not guardian notifications are enabled for this course. Read-only.",
@@ -4215,6 +4627,10 @@
                 "gradeCategory": {
                     "$ref": "GradeCategory",
                     "description": "The category that this coursework's grade contributes to. Present only when a category has been chosen for the coursework. May be used in calculating the overall grade. Read-only."
+                },
+                "gradingPeriodId": {
+                    "description": "Identifier of the grading period associated with the coursework. * At creation, if unspecified, the grading period ID will be set based on the `dueDate` (or `scheduledTime` if no `dueDate` is set). * To indicate no association to any grading period, set this field to an empty string (\"\"). * If specified, it must match an existing grading period ID in the course.",
+                    "type": "string"
                 },
                 "id": {
                     "description": "Classroom-assigned identifier of this course work, unique per course. Read-only.",
@@ -4409,6 +4825,32 @@
             },
             "type": "object"
         },
+        "Criterion": {
+            "description": "A rubric criterion. Each criterion is a dimension on which performance is rated.",
+            "id": "Criterion",
+            "properties": {
+                "description": {
+                    "description": "The description of the criterion.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "The criterion ID. On creation, an ID is assigned.",
+                    "type": "string"
+                },
+                "levels": {
+                    "description": "The list of levels within this criterion.",
+                    "items": {
+                        "$ref": "Level"
+                    },
+                    "type": "array"
+                },
+                "title": {
+                    "description": "The title of the criterion.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Date": {
             "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
             "id": "Date",
@@ -4544,6 +4986,25 @@
             },
             "type": "object"
         },
+        "GeminiGem": {
+            "description": "Gemini Gem link.",
+            "id": "GeminiGem",
+            "properties": {
+                "id": {
+                    "description": "Gems resource id.",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Title of the Gem. Read-only.",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "URL that can be used to access the Gem. Read-only.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GlobalPermission": {
             "description": "Global user permission description.",
             "id": "GlobalPermission",
@@ -4674,6 +5135,48 @@
             },
             "type": "object"
         },
+        "GradingPeriod": {
+            "description": "An individual grading period. Grading periods must not have overlapping date ranges and must be listed in chronological order. For example, if the end_date of a grading period is 2024-01-25, then the start_date of the next grading period must be 2024-01-26 or later. Each grading period must have a unique title within a course.",
+            "id": "GradingPeriod",
+            "properties": {
+                "endDate": {
+                    "$ref": "Date",
+                    "description": "Required. End date, in UTC, of the grading period. Inclusive."
+                },
+                "id": {
+                    "description": "Output only. System generated grading period ID. Read-only.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "startDate": {
+                    "$ref": "Date",
+                    "description": "Required. Start date, in UTC, of the grading period. Inclusive."
+                },
+                "title": {
+                    "description": "Required. Title of the grading period. For example, \u201cSemester 1\u201d.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GradingPeriodSettings": {
+            "description": "Grading period settings that include all the individual grading periods in a course.",
+            "id": "GradingPeriodSettings",
+            "properties": {
+                "applyToExistingCoursework": {
+                    "description": "Supports toggling the application of grading periods on existing stream items. Once set, this value is persisted meaning that it does not need to be set in every request to update `GradingPeriodSettings`. If not previously set, the default is False.",
+                    "type": "boolean"
+                },
+                "gradingPeriods": {
+                    "description": "The list of grading periods in a specific course. Grading periods must not have overlapping date ranges and must be listed in chronological order. Each grading period must have a unique title within a course.",
+                    "items": {
+                        "$ref": "GradingPeriod"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "Guardian": {
             "description": "Association between a student and a guardian of that student. The guardian may receive information about the student's course work.",
             "id": "Guardian",
@@ -4779,6 +5282,30 @@
                 },
                 "userId": {
                     "description": "Identifier of the invited user. When specified as a parameter of a request, this identifier can be set to one of the following: * the numeric identifier for the user * the email address of the user * the string literal `\"me\"`, indicating the requesting user",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Level": {
+            "description": "A level of the criterion.",
+            "id": "Level",
+            "properties": {
+                "description": {
+                    "description": "The description of the level.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "The level ID. On creation, an ID is assigned.",
+                    "type": "string"
+                },
+                "points": {
+                    "description": "Optional points associated with this level. If set, all levels within the rubric must specify points and the value must be distinct across all levels within a single criterion. 0 is distinct from no points.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "title": {
+                    "description": "The title of the level. If the level has no points set, title must be set.",
                     "type": "string"
                 }
             },
@@ -4965,6 +5492,24 @@
             },
             "type": "object"
         },
+        "ListRubricsResponse": {
+            "description": "Response when listing rubrics.",
+            "id": "ListRubricsResponse",
+            "properties": {
+                "nextPageToken": {
+                    "description": "Token identifying the next page of results to return. If empty, no further results are available.",
+                    "type": "string"
+                },
+                "rubrics": {
+                    "description": "Rubrics that match the request.",
+                    "items": {
+                        "$ref": "Rubric"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "ListStudentSubmissionsResponse": {
             "description": "Response when listing student submissions.",
             "id": "ListStudentSubmissionsResponse",
@@ -5038,7 +5583,7 @@
             "type": "object"
         },
         "Material": {
-            "description": "Material attached to course work. When creating attachments, setting the `form` field is not supported.",
+            "description": "Material attached to course work. When creating attachments, setting the `form`, `gem`, or `notebook` field is not supported.",
             "id": "Material",
             "properties": {
                 "driveFile": {
@@ -5047,11 +5592,19 @@
                 },
                 "form": {
                     "$ref": "Form",
-                    "description": "Google Forms material."
+                    "description": "Google Forms material. Read-only."
+                },
+                "gem": {
+                    "$ref": "GeminiGem",
+                    "description": "Gemini Gem material. Read-only."
                 },
                 "link": {
                     "$ref": "Link",
                     "description": "Link material. On creation, this is upgraded to a more appropriate type if possible, and this is reflected in the response."
+                },
+                "notebook": {
+                    "$ref": "NotebookLmNotebook",
+                    "description": "NotebookLM Notebook material. Read-only."
                 },
                 "youtubeVideo": {
                     "$ref": "YouTubeVideo",
@@ -5189,6 +5742,25 @@
             },
             "type": "object"
         },
+        "NotebookLmNotebook": {
+            "description": "NotebookLM Notebook link.",
+            "id": "NotebookLmNotebook",
+            "properties": {
+                "id": {
+                    "description": "Notebook resource id.",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Title of the Notebook. Read-only.",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "URL that can be used to access the Notebook. Read-only.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "ReclaimStudentSubmissionRequest": {
             "description": "Request to reclaim a student submission.",
             "id": "ReclaimStudentSubmissionRequest",
@@ -5223,6 +5795,68 @@
             "description": "Request to return a student submission.",
             "id": "ReturnStudentSubmissionRequest",
             "properties": {},
+            "type": "object"
+        },
+        "Rubric": {
+            "description": "The rubric of the course work. A rubric is a scoring guide used to evaluate student work and give feedback. For further details, see [Rubrics structure and known limitations](/classroom/rubrics/limitations).",
+            "id": "Rubric",
+            "properties": {
+                "courseId": {
+                    "description": "Identifier of the course. Read-only.",
+                    "type": "string"
+                },
+                "courseWorkId": {
+                    "description": "Identifier for the course work this corresponds to. Read-only.",
+                    "type": "string"
+                },
+                "creationTime": {
+                    "description": "Output only. Timestamp when this rubric was created. Read-only.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "criteria": {
+                    "description": "List of criteria. Each criterion is a dimension on which performance is rated.",
+                    "items": {
+                        "$ref": "Criterion"
+                    },
+                    "type": "array"
+                },
+                "id": {
+                    "description": "Classroom-assigned identifier for the rubric. This is unique among rubrics for the relevant course work. Read-only.",
+                    "type": "string"
+                },
+                "sourceSpreadsheetId": {
+                    "description": "Input only. Immutable. Google Sheets ID of the spreadsheet. This spreadsheet must contain formatted rubric settings. See [Create or reuse a rubric for an assignment](https://support.google.com/edu/classroom/answer/9335069). Use of this field requires the `https://www.googleapis.com/auth/spreadsheets.readonly` or `https://www.googleapis.com/auth/spreadsheets` scope.",
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. Timestamp of the most recent change to this rubric. Read-only.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "RubricGrade": {
+            "description": "A rubric grade set for the student submission. There is at most one entry per rubric criterion.",
+            "id": "RubricGrade",
+            "properties": {
+                "criterionId": {
+                    "description": "Optional. Criterion ID.",
+                    "type": "string"
+                },
+                "levelId": {
+                    "description": "Optional. Optional level ID of the selected level. If empty, no level was selected.",
+                    "type": "string"
+                },
+                "points": {
+                    "description": "Optional. Optional points assigned for this criterion, typically based on the level. Levels might or might not have points. If unset, no points were set for this criterion.",
+                    "format": "double",
+                    "type": "number"
+                }
+            },
             "type": "object"
         },
         "SharedDriveFile": {
@@ -5346,6 +5980,13 @@
                     "format": "double",
                     "type": "number"
                 },
+                "assignedRubricGrades": {
+                    "additionalProperties": {
+                        "$ref": "RubricGrade"
+                    },
+                    "description": "Assigned rubric grades based on the rubric's Criteria. This map is empty if there is no rubric attached to this course work or if a rubric is attached, but no grades have been set on any Criteria. Entries are only populated for grades that have been set. Key: The rubric's criterion ID. Read-only.",
+                    "type": "object"
+                },
                 "assignmentSubmission": {
                     "$ref": "AssignmentSubmission",
                     "description": "Submission content when course_work_type is ASSIGNMENT. Students can modify this content using ModifyAttachments."
@@ -5387,6 +6028,13 @@
                     "description": "Optional pending grade. If unset, no grade was set. This value must be non-negative. Decimal (that is, non-integer) values are allowed, but are rounded to two decimal places. This is only visible to and modifiable by course teachers.",
                     "format": "double",
                     "type": "number"
+                },
+                "draftRubricGrades": {
+                    "additionalProperties": {
+                        "$ref": "RubricGrade"
+                    },
+                    "description": "Pending rubric grades based on the rubric's criteria. This map is empty if there is no rubric attached to this course work or if a rubric is attached, but no grades have been set on any criteria. Entries are only populated for grades that have been set. Key: The rubric's criterion ID. Read-only.",
+                    "type": "object"
                 },
                 "id": {
                     "description": "Classroom-assigned Identifier for the student submission. This is unique among submissions for the relevant course work. Read-only.",
@@ -5488,22 +6136,22 @@
             "id": "TimeOfDay",
             "properties": {
                 "hours": {
-                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+                    "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "minutes": {
-                    "description": "Minutes of hour of day. Must be from 0 to 59.",
+                    "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "nanos": {
-                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+                    "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "seconds": {
-                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.",
+                    "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
                     "format": "int32",
                     "type": "integer"
                 }

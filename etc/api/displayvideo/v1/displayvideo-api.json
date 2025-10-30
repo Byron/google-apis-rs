@@ -307,7 +307,7 @@
                             "type": "string"
                         },
                         "orderBy": {
-                            "description": "Field by which to sort the list. Acceptable values are: * `displayName` (default) * `entityStatus` * `updateTime` The default sorting order is ascending. To specify descending order for a field, a suffix \"desc\" should be added to the field name. For example, `displayName desc`.",
+                            "description": "Field by which to sort the list. Acceptable values are: * `advertiserId` (default) * `displayName` * `entityStatus` * `updateTime` The default sorting order is ascending. To specify descending order for a field, a suffix \"desc\" should be added to the field name. For example, `displayName desc`.",
                             "location": "query",
                             "type": "string"
                         },
@@ -625,6 +625,62 @@
                             "scopes": [
                                 "https://www.googleapis.com/auth/display-video",
                                 "https://www.googleapis.com/auth/display-video-mediaplanning"
+                            ]
+                        },
+                        "listAssignedTargetingOptions": {
+                            "description": "Lists assigned targeting options of a campaign across targeting types.",
+                            "flatPath": "v1/advertisers/{advertisersId}/campaigns/{campaignsId}:listAssignedTargetingOptions",
+                            "httpMethod": "GET",
+                            "id": "displayvideo.advertisers.campaigns.listAssignedTargetingOptions",
+                            "parameterOrder": [
+                                "advertiserId",
+                                "campaignId"
+                            ],
+                            "parameters": {
+                                "advertiserId": {
+                                    "description": "Required. The ID of the advertiser the campaign belongs to.",
+                                    "format": "int64",
+                                    "location": "path",
+                                    "pattern": "^[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "campaignId": {
+                                    "description": "Required. The ID of the campaign to list assigned targeting options for.",
+                                    "format": "int64",
+                                    "location": "path",
+                                    "pattern": "^[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "filter": {
+                                    "description": "Allows filtering by assigned targeting option fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the `OR` logical operator. * A restriction has the form of `{field} {operator} {value}`. * All fields must use the `EQUALS (=)` operator. Supported fields: * `targetingType` * `inheritance` Examples: * `AssignedTargetingOption` resources of targeting type `TARGETING_TYPE_LANGUAGE` or `TARGETING_TYPE_GENDER`: `targetingType=\"TARGETING_TYPE_LANGUAGE\" OR targetingType=\"TARGETING_TYPE_GENDER\"` * `AssignedTargetingOption` resources with inheritance status of `NOT_INHERITED` or `INHERITED_FROM_PARTNER`: `inheritance=\"NOT_INHERITED\" OR inheritance=\"INHERITED_FROM_PARTNER\"` The length of this field should be no more than 500 characters. Reference our [filter `LIST` requests](/display-video/api/guides/how-tos/filters) guide for more information.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "orderBy": {
+                                    "description": "Field by which to sort the list. Acceptable values are: * `targetingType` (default) The default sorting order is ascending. To specify descending order for a field, a suffix \"desc\" should be added to the field name. Example: `targetingType desc`.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "pageSize": {
+                                    "description": "Requested page size. The size must be an integer between `1` and `5000`. If unspecified, the default is `5000`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "A token that lets the client fetch the next page of results. Typically, this is the value of next_page_token returned from the previous call to `BulkListCampaignAssignedTargetingOptions` method. If not specified, the first page of results will be returned.",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/advertisers/{+advertiserId}/campaigns/{+campaignId}:listAssignedTargetingOptions",
+                            "response": {
+                                "$ref": "BulkListCampaignAssignedTargetingOptionsResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/display-video"
                             ]
                         },
                         "patch": {
@@ -1804,6 +1860,62 @@
                                 "https://www.googleapis.com/auth/display-video"
                             ]
                         },
+                        "listAssignedTargetingOptions": {
+                            "description": "Lists assigned targeting options of an insertion order across targeting types.",
+                            "flatPath": "v1/advertisers/{advertisersId}/insertionOrders/{insertionOrdersId}:listAssignedTargetingOptions",
+                            "httpMethod": "GET",
+                            "id": "displayvideo.advertisers.insertionOrders.listAssignedTargetingOptions",
+                            "parameterOrder": [
+                                "advertiserId",
+                                "insertionOrderId"
+                            ],
+                            "parameters": {
+                                "advertiserId": {
+                                    "description": "Required. The ID of the advertiser the insertion order belongs to.",
+                                    "format": "int64",
+                                    "location": "path",
+                                    "pattern": "^[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "filter": {
+                                    "description": "Allows filtering by assigned targeting option fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * All fields must use the `EQUALS (=)` operator. Supported fields: * `targetingType` * `inheritance` Examples: * `AssignedTargetingOption` resources of targeting type `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` or `TARGETING_TYPE_CHANNEL`: `targetingType=\"TARGETING_TYPE_PROXIMITY_LOCATION_LIST\" OR targetingType=\"TARGETING_TYPE_CHANNEL\"` * `AssignedTargetingOption` resources with inheritance status of `NOT_INHERITED` or `INHERITED_FROM_PARTNER`: `inheritance=\"NOT_INHERITED\" OR inheritance=\"INHERITED_FROM_PARTNER\"` The length of this field should be no more than 500 characters. Reference our [filter `LIST` requests](/display-video/api/guides/how-tos/filters) guide for more information.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "insertionOrderId": {
+                                    "description": "Required. The ID of the insertion order to list assigned targeting options for.",
+                                    "format": "int64",
+                                    "location": "path",
+                                    "pattern": "^[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "orderBy": {
+                                    "description": "Field by which to sort the list. Acceptable values are: * `targetingType` (default) The default sorting order is ascending. To specify descending order for a field, a suffix \"desc\" should be added to the field name. Example: `targetingType desc`.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "pageSize": {
+                                    "description": "Requested page size. The size must be an integer between `1` and `5000`. If unspecified, the default is `5000`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "A token that lets the client fetch the next page of results. Typically, this is the value of next_page_token returned from the previous call to `BulkListInsertionOrderAssignedTargetingOptions` method. If not specified, the first page of results will be returned.",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/advertisers/{+advertiserId}/insertionOrders/{+insertionOrderId}:listAssignedTargetingOptions",
+                            "response": {
+                                "$ref": "BulkListInsertionOrderAssignedTargetingOptionsResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/display-video"
+                            ]
+                        },
                         "patch": {
                             "description": "Updates an existing insertion order. Returns the updated insertion order if successful.",
                             "flatPath": "v1/advertisers/{advertisersId}/insertionOrders/{insertionOrdersId}",
@@ -1854,6 +1966,295 @@
                             "resources": {
                                 "assignedTargetingOptions": {
                                     "methods": {
+                                        "create": {
+                                            "description": "Assigns a targeting option to an insertion order. Returns the assigned targeting option if successful. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`",
+                                            "flatPath": "v1/advertisers/{advertisersId}/insertionOrders/{insertionOrdersId}/targetingTypes/{targetingTypesId}/assignedTargetingOptions",
+                                            "httpMethod": "POST",
+                                            "id": "displayvideo.advertisers.insertionOrders.targetingTypes.assignedTargetingOptions.create",
+                                            "parameterOrder": [
+                                                "advertiserId",
+                                                "insertionOrderId",
+                                                "targetingType"
+                                            ],
+                                            "parameters": {
+                                                "advertiserId": {
+                                                    "description": "Required. The ID of the advertiser the insertion order belongs to.",
+                                                    "format": "int64",
+                                                    "location": "path",
+                                                    "pattern": "^[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "insertionOrderId": {
+                                                    "description": "Required. The ID of the insertion order the assigned targeting option will belong to.",
+                                                    "format": "int64",
+                                                    "location": "path",
+                                                    "pattern": "^[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "targetingType": {
+                                                    "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`",
+                                                    "enum": [
+                                                        "TARGETING_TYPE_UNSPECIFIED",
+                                                        "TARGETING_TYPE_CHANNEL",
+                                                        "TARGETING_TYPE_APP_CATEGORY",
+                                                        "TARGETING_TYPE_APP",
+                                                        "TARGETING_TYPE_URL",
+                                                        "TARGETING_TYPE_DAY_AND_TIME",
+                                                        "TARGETING_TYPE_AGE_RANGE",
+                                                        "TARGETING_TYPE_REGIONAL_LOCATION_LIST",
+                                                        "TARGETING_TYPE_PROXIMITY_LOCATION_LIST",
+                                                        "TARGETING_TYPE_GENDER",
+                                                        "TARGETING_TYPE_VIDEO_PLAYER_SIZE",
+                                                        "TARGETING_TYPE_USER_REWARDED_CONTENT",
+                                                        "TARGETING_TYPE_PARENTAL_STATUS",
+                                                        "TARGETING_TYPE_CONTENT_INSTREAM_POSITION",
+                                                        "TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION",
+                                                        "TARGETING_TYPE_DEVICE_TYPE",
+                                                        "TARGETING_TYPE_AUDIENCE_GROUP",
+                                                        "TARGETING_TYPE_BROWSER",
+                                                        "TARGETING_TYPE_HOUSEHOLD_INCOME",
+                                                        "TARGETING_TYPE_ON_SCREEN_POSITION",
+                                                        "TARGETING_TYPE_THIRD_PARTY_VERIFIER",
+                                                        "TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION",
+                                                        "TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION",
+                                                        "TARGETING_TYPE_ENVIRONMENT",
+                                                        "TARGETING_TYPE_CARRIER_AND_ISP",
+                                                        "TARGETING_TYPE_OPERATING_SYSTEM",
+                                                        "TARGETING_TYPE_DEVICE_MAKE_MODEL",
+                                                        "TARGETING_TYPE_KEYWORD",
+                                                        "TARGETING_TYPE_NEGATIVE_KEYWORD_LIST",
+                                                        "TARGETING_TYPE_VIEWABILITY",
+                                                        "TARGETING_TYPE_CATEGORY",
+                                                        "TARGETING_TYPE_INVENTORY_SOURCE",
+                                                        "TARGETING_TYPE_LANGUAGE",
+                                                        "TARGETING_TYPE_AUTHORIZED_SELLER_STATUS",
+                                                        "TARGETING_TYPE_GEO_REGION",
+                                                        "TARGETING_TYPE_INVENTORY_SOURCE_GROUP",
+                                                        "TARGETING_TYPE_EXCHANGE",
+                                                        "TARGETING_TYPE_SUB_EXCHANGE",
+                                                        "TARGETING_TYPE_POI",
+                                                        "TARGETING_TYPE_BUSINESS_CHAIN",
+                                                        "TARGETING_TYPE_CONTENT_DURATION",
+                                                        "TARGETING_TYPE_CONTENT_STREAM_TYPE",
+                                                        "TARGETING_TYPE_NATIVE_CONTENT_POSITION",
+                                                        "TARGETING_TYPE_OMID",
+                                                        "TARGETING_TYPE_AUDIO_CONTENT_TYPE",
+                                                        "TARGETING_TYPE_CONTENT_GENRE"
+                                                    ],
+                                                    "enumDescriptions": [
+                                                        "Default value when type is not specified or is unknown in this version.",
+                                                        "Target a channel (a custom group of related websites or apps).",
+                                                        "Target an app category (for example, education or puzzle games).",
+                                                        "Target a specific app (for example, Angry Birds).",
+                                                        "Target a specific url (for example, quora.com).",
+                                                        "Target ads during a chosen time period on a specific day.",
+                                                        "Target ads to a specific age range (for example, 18-24).",
+                                                        "Target ads to the specified regions on a regional location list.",
+                                                        "Target ads to the specified points of interest on a proximity location list.",
+                                                        "Target ads to a specific gender (for example, female or male).",
+                                                        "Target a specific video player size for video ads.",
+                                                        "Target user rewarded content for video ads.",
+                                                        "Target ads to a specific parental status (for example, parent or not a parent).",
+                                                        "Target video or audio ads in a specific content instream position (for example, pre-roll, mid-roll, or post-roll).",
+                                                        "Target ads in a specific content outstream position.",
+                                                        "Target ads to a specific device type (for example, tablet or connected TV).",
+                                                        "Target ads to an audience or groups of audiences. Singleton field, at most one can exist on a single Lineitem at a time.",
+                                                        "Target ads to specific web browsers (for example, Chrome).",
+                                                        "Target ads to a specific household income range (for example, top 10%).",
+                                                        "Target ads in a specific on screen position.",
+                                                        "Filter web sites through third party verification (for example, IAS or DoubleVerify).",
+                                                        "Filter web sites by specific digital content label ratings (for example, DL-MA: suitable only for mature audiences).",
+                                                        "Filter website content by sensitive categories (for example, adult).",
+                                                        "Target ads to a specific environment (for example, web or app).",
+                                                        "Target ads to a specific network carrier or internet service provider (ISP) (for example, Comcast or Orange).",
+                                                        "Target ads to a specific operating system (for example, macOS).",
+                                                        "Target ads to a specific device make or model (for example, Roku or Samsung).",
+                                                        "Target ads to a specific keyword (for example, dog or retriever).",
+                                                        "Target ads to a specific negative keyword list.",
+                                                        "Target ads to a specific viewability (for example, 80% viewable).",
+                                                        "Target ads to a specific content category (for example, arts & entertainment).",
+                                                        "Purchase impressions from specific deals and auction packages.",
+                                                        "Target ads to a specific language (for example, English or Japanese).",
+                                                        "Target ads to ads.txt authorized sellers. If no targeting option of this type is assigned, the resource uses the \"Authorized Direct Sellers and Resellers\" option by default.",
+                                                        "Target ads to a specific regional location (for example, a city or state).",
+                                                        "Purchase impressions from a group of deals and auction packages.",
+                                                        "Purchase impressions from specific exchanges.",
+                                                        "Purchase impressions from specific sub-exchanges.",
+                                                        "Target ads around a specific point of interest, such as a notable building, a street address, or latitude/longitude coordinates.",
+                                                        "Target ads around locations of a business chain within a specific geo region.",
+                                                        "Target ads to a specific video content duration.",
+                                                        "Target ads to a specific video content stream type.",
+                                                        "Target ads to a specific native content position.",
+                                                        "Target ads in an Open Measurement enabled inventory.",
+                                                        "Target ads to a specific audio content type.",
+                                                        "Target ads to a specific content genre."
+                                                    ],
+                                                    "location": "path",
+                                                    "pattern": "^[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/advertisers/{+advertiserId}/insertionOrders/{+insertionOrderId}/targetingTypes/{+targetingType}/assignedTargetingOptions",
+                                            "request": {
+                                                "$ref": "AssignedTargetingOption"
+                                            },
+                                            "response": {
+                                                "$ref": "AssignedTargetingOption"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/display-video"
+                                            ]
+                                        },
+                                        "delete": {
+                                            "description": "Deletes an assigned targeting option from an insertion order. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`",
+                                            "flatPath": "v1/advertisers/{advertisersId}/insertionOrders/{insertionOrdersId}/targetingTypes/{targetingTypesId}/assignedTargetingOptions/{assignedTargetingOptionsId}",
+                                            "httpMethod": "DELETE",
+                                            "id": "displayvideo.advertisers.insertionOrders.targetingTypes.assignedTargetingOptions.delete",
+                                            "parameterOrder": [
+                                                "advertiserId",
+                                                "insertionOrderId",
+                                                "targetingType",
+                                                "assignedTargetingOptionId"
+                                            ],
+                                            "parameters": {
+                                                "advertiserId": {
+                                                    "description": "Required. The ID of the advertiser the insertion order belongs to.",
+                                                    "format": "int64",
+                                                    "location": "path",
+                                                    "pattern": "^[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "assignedTargetingOptionId": {
+                                                    "description": "Required. The ID of the assigned targeting option to delete.",
+                                                    "location": "path",
+                                                    "pattern": "^[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "insertionOrderId": {
+                                                    "description": "Required. The ID of the insertion order the assigned targeting option belongs to.",
+                                                    "format": "int64",
+                                                    "location": "path",
+                                                    "pattern": "^[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "targetingType": {
+                                                    "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`",
+                                                    "enum": [
+                                                        "TARGETING_TYPE_UNSPECIFIED",
+                                                        "TARGETING_TYPE_CHANNEL",
+                                                        "TARGETING_TYPE_APP_CATEGORY",
+                                                        "TARGETING_TYPE_APP",
+                                                        "TARGETING_TYPE_URL",
+                                                        "TARGETING_TYPE_DAY_AND_TIME",
+                                                        "TARGETING_TYPE_AGE_RANGE",
+                                                        "TARGETING_TYPE_REGIONAL_LOCATION_LIST",
+                                                        "TARGETING_TYPE_PROXIMITY_LOCATION_LIST",
+                                                        "TARGETING_TYPE_GENDER",
+                                                        "TARGETING_TYPE_VIDEO_PLAYER_SIZE",
+                                                        "TARGETING_TYPE_USER_REWARDED_CONTENT",
+                                                        "TARGETING_TYPE_PARENTAL_STATUS",
+                                                        "TARGETING_TYPE_CONTENT_INSTREAM_POSITION",
+                                                        "TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION",
+                                                        "TARGETING_TYPE_DEVICE_TYPE",
+                                                        "TARGETING_TYPE_AUDIENCE_GROUP",
+                                                        "TARGETING_TYPE_BROWSER",
+                                                        "TARGETING_TYPE_HOUSEHOLD_INCOME",
+                                                        "TARGETING_TYPE_ON_SCREEN_POSITION",
+                                                        "TARGETING_TYPE_THIRD_PARTY_VERIFIER",
+                                                        "TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION",
+                                                        "TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION",
+                                                        "TARGETING_TYPE_ENVIRONMENT",
+                                                        "TARGETING_TYPE_CARRIER_AND_ISP",
+                                                        "TARGETING_TYPE_OPERATING_SYSTEM",
+                                                        "TARGETING_TYPE_DEVICE_MAKE_MODEL",
+                                                        "TARGETING_TYPE_KEYWORD",
+                                                        "TARGETING_TYPE_NEGATIVE_KEYWORD_LIST",
+                                                        "TARGETING_TYPE_VIEWABILITY",
+                                                        "TARGETING_TYPE_CATEGORY",
+                                                        "TARGETING_TYPE_INVENTORY_SOURCE",
+                                                        "TARGETING_TYPE_LANGUAGE",
+                                                        "TARGETING_TYPE_AUTHORIZED_SELLER_STATUS",
+                                                        "TARGETING_TYPE_GEO_REGION",
+                                                        "TARGETING_TYPE_INVENTORY_SOURCE_GROUP",
+                                                        "TARGETING_TYPE_EXCHANGE",
+                                                        "TARGETING_TYPE_SUB_EXCHANGE",
+                                                        "TARGETING_TYPE_POI",
+                                                        "TARGETING_TYPE_BUSINESS_CHAIN",
+                                                        "TARGETING_TYPE_CONTENT_DURATION",
+                                                        "TARGETING_TYPE_CONTENT_STREAM_TYPE",
+                                                        "TARGETING_TYPE_NATIVE_CONTENT_POSITION",
+                                                        "TARGETING_TYPE_OMID",
+                                                        "TARGETING_TYPE_AUDIO_CONTENT_TYPE",
+                                                        "TARGETING_TYPE_CONTENT_GENRE"
+                                                    ],
+                                                    "enumDescriptions": [
+                                                        "Default value when type is not specified or is unknown in this version.",
+                                                        "Target a channel (a custom group of related websites or apps).",
+                                                        "Target an app category (for example, education or puzzle games).",
+                                                        "Target a specific app (for example, Angry Birds).",
+                                                        "Target a specific url (for example, quora.com).",
+                                                        "Target ads during a chosen time period on a specific day.",
+                                                        "Target ads to a specific age range (for example, 18-24).",
+                                                        "Target ads to the specified regions on a regional location list.",
+                                                        "Target ads to the specified points of interest on a proximity location list.",
+                                                        "Target ads to a specific gender (for example, female or male).",
+                                                        "Target a specific video player size for video ads.",
+                                                        "Target user rewarded content for video ads.",
+                                                        "Target ads to a specific parental status (for example, parent or not a parent).",
+                                                        "Target video or audio ads in a specific content instream position (for example, pre-roll, mid-roll, or post-roll).",
+                                                        "Target ads in a specific content outstream position.",
+                                                        "Target ads to a specific device type (for example, tablet or connected TV).",
+                                                        "Target ads to an audience or groups of audiences. Singleton field, at most one can exist on a single Lineitem at a time.",
+                                                        "Target ads to specific web browsers (for example, Chrome).",
+                                                        "Target ads to a specific household income range (for example, top 10%).",
+                                                        "Target ads in a specific on screen position.",
+                                                        "Filter web sites through third party verification (for example, IAS or DoubleVerify).",
+                                                        "Filter web sites by specific digital content label ratings (for example, DL-MA: suitable only for mature audiences).",
+                                                        "Filter website content by sensitive categories (for example, adult).",
+                                                        "Target ads to a specific environment (for example, web or app).",
+                                                        "Target ads to a specific network carrier or internet service provider (ISP) (for example, Comcast or Orange).",
+                                                        "Target ads to a specific operating system (for example, macOS).",
+                                                        "Target ads to a specific device make or model (for example, Roku or Samsung).",
+                                                        "Target ads to a specific keyword (for example, dog or retriever).",
+                                                        "Target ads to a specific negative keyword list.",
+                                                        "Target ads to a specific viewability (for example, 80% viewable).",
+                                                        "Target ads to a specific content category (for example, arts & entertainment).",
+                                                        "Purchase impressions from specific deals and auction packages.",
+                                                        "Target ads to a specific language (for example, English or Japanese).",
+                                                        "Target ads to ads.txt authorized sellers. If no targeting option of this type is assigned, the resource uses the \"Authorized Direct Sellers and Resellers\" option by default.",
+                                                        "Target ads to a specific regional location (for example, a city or state).",
+                                                        "Purchase impressions from a group of deals and auction packages.",
+                                                        "Purchase impressions from specific exchanges.",
+                                                        "Purchase impressions from specific sub-exchanges.",
+                                                        "Target ads around a specific point of interest, such as a notable building, a street address, or latitude/longitude coordinates.",
+                                                        "Target ads around locations of a business chain within a specific geo region.",
+                                                        "Target ads to a specific video content duration.",
+                                                        "Target ads to a specific video content stream type.",
+                                                        "Target ads to a specific native content position.",
+                                                        "Target ads in an Open Measurement enabled inventory.",
+                                                        "Target ads to a specific audio content type.",
+                                                        "Target ads to a specific content genre."
+                                                    ],
+                                                    "location": "path",
+                                                    "pattern": "^[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/advertisers/{+advertiserId}/insertionOrders/{+insertionOrderId}/targetingTypes/{+targetingType}/assignedTargetingOptions/{+assignedTargetingOptionId}",
+                                            "response": {
+                                                "$ref": "Empty"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/display-video"
+                                            ]
+                                        },
                                         "get": {
                                             "description": "Gets a single targeting option assigned to an insertion order.",
                                             "flatPath": "v1/advertisers/{advertisersId}/insertionOrders/{insertionOrdersId}/targetingTypes/{targetingTypesId}/assignedTargetingOptions/{assignedTargetingOptionsId}",
@@ -2907,7 +3308,7 @@
                                                     "type": "string"
                                                 },
                                                 "targetingType": {
-                                                    "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)",
+                                                    "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_INVENTORY_MODE` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)",
                                                     "enum": [
                                                         "TARGETING_TYPE_UNSPECIFIED",
                                                         "TARGETING_TYPE_CHANNEL",
@@ -3067,7 +3468,7 @@
                                                     "type": "string"
                                                 },
                                                 "targetingType": {
-                                                    "description": "Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)",
+                                                    "description": "Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_INVENTORY_MODE` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)",
                                                     "enum": [
                                                         "TARGETING_TYPE_UNSPECIFIED",
                                                         "TARGETING_TYPE_CHANNEL",
@@ -4173,7 +4574,7 @@
                                             "type": "string"
                                         },
                                         "targetingType": {
-                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`",
+                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`",
                                             "enum": [
                                                 "TARGETING_TYPE_UNSPECIFIED",
                                                 "TARGETING_TYPE_CHANNEL",
@@ -4314,7 +4715,7 @@
                                             "type": "string"
                                         },
                                         "targetingType": {
-                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`",
+                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`",
                                             "enum": [
                                                 "TARGETING_TYPE_UNSPECIFIED",
                                                 "TARGETING_TYPE_CHANNEL",
@@ -4452,7 +4853,7 @@
                                             "type": "string"
                                         },
                                         "targetingType": {
-                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`",
+                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_CONTENT_THEME_EXCLUSION`",
                                             "enum": [
                                                 "TARGETING_TYPE_UNSPECIFIED",
                                                 "TARGETING_TYPE_CHANNEL",
@@ -4603,7 +5004,7 @@
                                             "type": "string"
                                         },
                                         "targetingType": {
-                                            "description": "Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`",
+                                            "description": "Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_CONTENT_THEME_EXCLUSION`",
                                             "enum": [
                                                 "TARGETING_TYPE_UNSPECIFIED",
                                                 "TARGETING_TYPE_CHANNEL",
@@ -4919,7 +5320,7 @@
                     ]
                 },
                 "patch": {
-                    "description": "Updates an existing custom bidding algorithm. Returns the updated custom bidding algorithm if successful.",
+                    "description": "Updates an existing custom bidding algorithm. Returns the updated custom bidding algorithm if successful. Requests updating a custom bidding algorithm assigned to a line item will return an error.",
                     "flatPath": "v1/customBiddingAlgorithms/{customBiddingAlgorithmsId}",
                     "httpMethod": "PATCH",
                     "id": "displayvideo.customBiddingAlgorithms.patch",
@@ -4996,7 +5397,7 @@
                 "scripts": {
                     "methods": {
                         "create": {
-                            "description": "Creates a new custom bidding script. Returns the newly created script if successful.",
+                            "description": "Creates a new custom bidding script. Returns the newly created script if successful. Requests creating a custom bidding script under an algorithm assigned to a line item will return an error.",
                             "flatPath": "v1/customBiddingAlgorithms/{customBiddingAlgorithmsId}/scripts",
                             "httpMethod": "POST",
                             "id": "displayvideo.customBiddingAlgorithms.scripts.create",
@@ -5213,192 +5614,6 @@
                     "path": "v1/customLists",
                     "response": {
                         "$ref": "ListCustomListsResponse"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/display-video"
-                    ]
-                }
-            }
-        },
-        "firstAndThirdPartyAudiences": {
-            "methods": {
-                "create": {
-                    "description": "Creates a FirstAndThirdPartyAudience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`",
-                    "flatPath": "v1/firstAndThirdPartyAudiences",
-                    "httpMethod": "POST",
-                    "id": "displayvideo.firstAndThirdPartyAudiences.create",
-                    "parameterOrder": [],
-                    "parameters": {
-                        "advertiserId": {
-                            "description": "Required. The ID of the advertiser under whom the FirstAndThirdPartyAudience will be created.",
-                            "format": "int64",
-                            "location": "query",
-                            "type": "string"
-                        }
-                    },
-                    "path": "v1/firstAndThirdPartyAudiences",
-                    "request": {
-                        "$ref": "FirstAndThirdPartyAudience"
-                    },
-                    "response": {
-                        "$ref": "FirstAndThirdPartyAudience"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/display-video"
-                    ]
-                },
-                "editCustomerMatchMembers": {
-                    "description": "Updates the member list of a Customer Match audience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`",
-                    "flatPath": "v1/firstAndThirdPartyAudiences/{firstAndThirdPartyAudiencesId}:editCustomerMatchMembers",
-                    "httpMethod": "POST",
-                    "id": "displayvideo.firstAndThirdPartyAudiences.editCustomerMatchMembers",
-                    "parameterOrder": [
-                        "firstAndThirdPartyAudienceId"
-                    ],
-                    "parameters": {
-                        "firstAndThirdPartyAudienceId": {
-                            "description": "Required. The ID of the Customer Match FirstAndThirdPartyAudience whose members will be edited.",
-                            "format": "int64",
-                            "location": "path",
-                            "pattern": "^[^/]+$",
-                            "required": true,
-                            "type": "string"
-                        }
-                    },
-                    "path": "v1/firstAndThirdPartyAudiences/{+firstAndThirdPartyAudienceId}:editCustomerMatchMembers",
-                    "request": {
-                        "$ref": "EditCustomerMatchMembersRequest"
-                    },
-                    "response": {
-                        "$ref": "EditCustomerMatchMembersResponse"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/display-video"
-                    ]
-                },
-                "get": {
-                    "description": "Gets a first and third party audience.",
-                    "flatPath": "v1/firstAndThirdPartyAudiences/{firstAndThirdPartyAudiencesId}",
-                    "httpMethod": "GET",
-                    "id": "displayvideo.firstAndThirdPartyAudiences.get",
-                    "parameterOrder": [
-                        "firstAndThirdPartyAudienceId"
-                    ],
-                    "parameters": {
-                        "advertiserId": {
-                            "description": "The ID of the advertiser that has access to the fetched first and third party audience.",
-                            "format": "int64",
-                            "location": "query",
-                            "type": "string"
-                        },
-                        "firstAndThirdPartyAudienceId": {
-                            "description": "Required. The ID of the first and third party audience to fetch.",
-                            "format": "int64",
-                            "location": "path",
-                            "pattern": "^[^/]+$",
-                            "required": true,
-                            "type": "string"
-                        },
-                        "partnerId": {
-                            "description": "The ID of the partner that has access to the fetched first and third party audience.",
-                            "format": "int64",
-                            "location": "query",
-                            "type": "string"
-                        }
-                    },
-                    "path": "v1/firstAndThirdPartyAudiences/{+firstAndThirdPartyAudienceId}",
-                    "response": {
-                        "$ref": "FirstAndThirdPartyAudience"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/display-video"
-                    ]
-                },
-                "list": {
-                    "description": "Lists first and third party audiences. The order is defined by the order_by parameter.",
-                    "flatPath": "v1/firstAndThirdPartyAudiences",
-                    "httpMethod": "GET",
-                    "id": "displayvideo.firstAndThirdPartyAudiences.list",
-                    "parameterOrder": [],
-                    "parameters": {
-                        "advertiserId": {
-                            "description": "The ID of the advertiser that has access to the fetched first and third party audiences.",
-                            "format": "int64",
-                            "location": "query",
-                            "type": "string"
-                        },
-                        "filter": {
-                            "description": "Allows filtering by first and third party audience fields. Supported syntax: * Filter expressions for first and third party audiences can only contain at most one restriction. * A restriction has the form of `{field} {operator} {value}`. * All fields must use the `HAS (:)` operator. Supported fields: * `displayName` Examples: * All first and third party audiences for which the display name contains \"Google\": `displayName:\"Google\"`. The length of this field should be no more than 500 characters. Reference our [filter `LIST` requests](/display-video/api/guides/how-tos/filters) guide for more information.",
-                            "location": "query",
-                            "type": "string"
-                        },
-                        "orderBy": {
-                            "description": "Field by which to sort the list. Acceptable values are: * `firstAndThirdPartyAudienceId` (default) * `displayName` The default sorting order is ascending. To specify descending order for a field, a suffix \"desc\" should be added to the field name. Example: `displayName desc`.",
-                            "location": "query",
-                            "type": "string"
-                        },
-                        "pageSize": {
-                            "description": "Requested page size. Must be between `1` and `200`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.",
-                            "format": "int32",
-                            "location": "query",
-                            "type": "integer"
-                        },
-                        "pageToken": {
-                            "description": "A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListFirstAndThirdPartyAudiences` method. If not specified, the first page of results will be returned.",
-                            "location": "query",
-                            "type": "string"
-                        },
-                        "partnerId": {
-                            "description": "The ID of the partner that has access to the fetched first and third party audiences.",
-                            "format": "int64",
-                            "location": "query",
-                            "type": "string"
-                        }
-                    },
-                    "path": "v1/firstAndThirdPartyAudiences",
-                    "response": {
-                        "$ref": "ListFirstAndThirdPartyAudiencesResponse"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/display-video"
-                    ]
-                },
-                "patch": {
-                    "description": "Updates an existing FirstAndThirdPartyAudience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`",
-                    "flatPath": "v1/firstAndThirdPartyAudiences/{firstAndThirdPartyAudiencesId}",
-                    "httpMethod": "PATCH",
-                    "id": "displayvideo.firstAndThirdPartyAudiences.patch",
-                    "parameterOrder": [
-                        "firstAndThirdPartyAudienceId"
-                    ],
-                    "parameters": {
-                        "advertiserId": {
-                            "description": "Required. The ID of the owner advertiser of the updated FirstAndThirdPartyAudience.",
-                            "format": "int64",
-                            "location": "query",
-                            "type": "string"
-                        },
-                        "firstAndThirdPartyAudienceId": {
-                            "description": "Output only. The unique ID of the first and third party audience. Assigned by the system.",
-                            "format": "int64",
-                            "location": "path",
-                            "pattern": "^[^/]+$",
-                            "required": true,
-                            "type": "string"
-                        },
-                        "updateMask": {
-                            "description": "Required. The mask to control which fields to update. Updates are only supported for the following fields: * `displayName` * `description` * `membershipDurationDays`",
-                            "format": "google-fieldmask",
-                            "location": "query",
-                            "type": "string"
-                        }
-                    },
-                    "path": "v1/firstAndThirdPartyAudiences/{+firstAndThirdPartyAudienceId}",
-                    "request": {
-                        "$ref": "FirstAndThirdPartyAudience"
-                    },
-                    "response": {
-                        "$ref": "FirstAndThirdPartyAudience"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/display-video"
@@ -7504,7 +7719,7 @@
         "sdfdownloadtasks": {
             "methods": {
                 "create": {
-                    "description": "Creates an SDF Download Task. Returns an Operation. An SDF Download Task is a long-running, asynchronous operation. The metadata type of this operation is SdfDownloadTaskMetadata. If the request is successful, the response type of the operation is SdfDownloadTask. The response will not include the download files, which must be retrieved with media.download. The state of operation can be retrieved with sdfdownloadtask.operations.get. Any errors can be found in the error.message. Note that error.details is expected to be empty.",
+                    "description": "Creates an SDF Download Task. Returns an Operation. An SDF Download Task is a long-running, asynchronous operation. The metadata type of this operation is SdfDownloadTaskMetadata. If the request is successful, the response type of the operation is SdfDownloadTask. The response will not include the download files, which must be retrieved with media.download. The state of operation can be retrieved with `sdfdownloadtasks.operations.get`. Any errors can be found in the error.message. Note that error.details is expected to be empty.",
                     "flatPath": "v1/sdfdownloadtasks",
                     "httpMethod": "POST",
                     "id": "displayvideo.sdfdownloadtasks.create",
@@ -8146,7 +8361,7 @@
             }
         }
     },
-    "revision": "20240620",
+    "revision": "20251027",
     "rootUrl": "https://displayvideo.googleapis.com/",
     "schemas": {
         "ActivateManualTriggerRequest": {
@@ -8271,11 +8486,11 @@
             "type": "object"
         },
         "Adloox": {
-            "description": "Details of Adloox settings.",
+            "description": "Details of Scope3 (previously known as Adloox) brand safety settings.",
             "id": "Adloox",
             "properties": {
                 "excludedAdlooxCategories": {
-                    "description": "Adloox's brand safety settings.",
+                    "description": "Scope3 categories to exclude.",
                     "items": {
                         "enum": [
                             "ADLOOX_UNSPECIFIED",
@@ -8289,7 +8504,7 @@
                             "FRAUD"
                         ],
                         "enumDescriptions": [
-                            "This enum is only a placeholder and it doesn't specify any Adloox option.",
+                            "Default value when a Scope3 category is not specified or is unknown in this version.",
                             "Adult content (hard).",
                             "Adult content (soft).",
                             "Illegal content.",
@@ -8318,6 +8533,20 @@
                     "description": "Output only. The unique ID of the advertiser. Assigned by the system.",
                     "format": "int64",
                     "readOnly": true,
+                    "type": "string"
+                },
+                "containsEuPoliticalAds": {
+                    "description": "Optional. Whether this advertiser contains line items that serve European Union political ads. If this field is set to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING`, then the following will happen: * Any new line items created under this advertiser will be assigned `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` if not otherwise specified. * Any existing line items under this advertiser that do not have a set value be updated to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` within a day.",
+                    "enum": [
+                        "EU_POLITICAL_ADVERTISING_STATUS_UNKNOWN",
+                        "CONTAINS_EU_POLITICAL_ADVERTISING",
+                        "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
+                    ],
+                    "enumDescriptions": [
+                        "Unknown.",
+                        "Contains EU political advertising.",
+                        "Does not contain EU political advertising."
+                    ],
                     "type": "string"
                 },
                 "creativeConfig": {
@@ -8573,7 +8802,8 @@
                         "APP_PLATFORM_ANDROID_TV",
                         "APP_PLATFORM_GENERIC_CTV",
                         "APP_PLATFORM_LG_TV",
-                        "APP_PLATFORM_VIZIO_TV"
+                        "APP_PLATFORM_VIZIO_TV",
+                        "APP_PLATFORM_VIDAA"
                     ],
                     "enumDescriptions": [
                         "Default value when app platform is not specified in this version. This enum is a placeholder for default value and does not represent a real platform option.",
@@ -8588,7 +8818,8 @@
                         "The app platform is Android TV.",
                         "The app platform is a CTV platform that is not explicitly listed elsewhere.",
                         "The app platform is LG TV.",
-                        "The app platform is VIZIO TV."
+                        "The app platform is VIZIO TV.",
+                        "The app platform is Vidaa."
                     ],
                     "type": "string"
                 },
@@ -8658,10 +8889,10 @@
             "properties": {
                 "asset": {
                     "$ref": "Asset",
-                    "description": "The associated asset."
+                    "description": "Optional. The associated asset."
                 },
                 "role": {
-                    "description": "The role of this asset for the creative.",
+                    "description": "Optional. The role of this asset for the creative.",
                     "enum": [
                         "ASSET_ROLE_UNSPECIFIED",
                         "ASSET_ROLE_MAIN",
@@ -8679,26 +8910,36 @@
                         "ASSET_ROLE_IOS_APP_ID",
                         "ASSET_ROLE_RATING",
                         "ASSET_ROLE_ICON",
-                        "ASSET_ROLE_COVER_IMAGE"
+                        "ASSET_ROLE_COVER_IMAGE",
+                        "ASSET_ROLE_BACKGROUND_COLOR",
+                        "ASSET_ROLE_ACCENT_COLOR",
+                        "ASSET_ROLE_REQUIRE_LOGO",
+                        "ASSET_ROLE_REQUIRE_IMAGE",
+                        "ASSET_ROLE_ENABLE_ASSET_ENHANCEMENTS"
                     ],
                     "enumDescriptions": [
                         "Asset role is not specified or is unknown in this version.",
                         "The asset is the main asset of the creative.",
                         "The asset is a backup asset of the creative.",
                         "The asset is a polite load asset of the creative.",
-                        "Headline of a native creative. The content must be UTF-8 encoded with a length of no more than 25 characters. This role is only supported in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
-                        "Long headline of a native creative. The content must be UTF-8 encoded with a length of no more than 50 characters. This role is only supported in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
-                        "Body text of a native creative. The content must be UTF-8 encoded with a length of no more than 90 characters. This role is only supported in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
-                        "Long body text of a native creative. The content must be UTF-8 encoded with a length of no more than 150 characters. This role is only supported in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
-                        "A short, friendly version of the landing page URL to show in the creative. This URL gives people an idea of where they'll arrive after they click on the creative. The content must be UTF-8 encoded with a length of no more than 30 characters. For example, if the landing page URL is 'http://www.example.com/page', the caption URL can be 'example.com'. The protocol (http://) is optional, but the URL can't contain spaces or special characters. This role is only supported in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
-                        "The text to use on the call-to-action button of a native creative. The content must be UTF-8 encoded with a length of no more than 15 characters. This role is only supported in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
-                        "The text that identifies the advertiser or brand name. The content must be UTF-8 encoded with a length of no more than 25 characters. This role is only supported in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                        "Headline of a native creative. The content must be UTF-8 encoded with a length of no more than 25 characters. This role is only supported in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                        "Long headline of a native creative. The content must be UTF-8 encoded with a length of no more than 50 characters. This role is only supported in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                        "Body text of a native creative. The content must be UTF-8 encoded with a length of no more than 90 characters. This role is only supported in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                        "Long body text of a native creative. The content must be UTF-8 encoded with a length of no more than 150 characters. This role is only supported in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                        "A short, friendly version of the landing page URL to show in the creative. This URL gives people an idea of where they'll arrive after they click on the creative. The content must be UTF-8 encoded with a length of no more than 30 characters. For example, if the landing page URL is 'http://www.example.com/page', the caption URL can be 'example.com'. The protocol (http://) is optional, but the URL can't contain spaces or special characters. This role is only supported in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                        "The text to use on the call-to-action button of a native creative. The content must be UTF-8 encoded with a length of no more than 15 characters. This role is only supported in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                        "The text that identifies the advertiser or brand name. The content must be UTF-8 encoded with a length of no more than 25 characters. This role is only supported in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
                         "The purchase price of your app in the Google play store or iOS app store (for example, $5.99). Note that this value is not automatically synced with the actual value listed in the store. It will always be the one provided when save the creative. The content must be UTF-8 encoded with a length of no more than 15 characters. Assets of this role are read-only.",
-                        "The ID of an Android app in the Google play store. You can find this ID in the App\u2019s Google Play Store URL after \u2018id\u2019. For example, in https://play.google.com/store/apps/details?id=com.company.appname the identifier is com.company.appname. Assets of this role are read-only.",
-                        "The ID of an iOS app in the Apple app store. This ID number can be found in the Apple App Store URL as the string of numbers directly after \"id\". For example, in https://apps.apple.com/us/app/gmail-email-by-google/id422689480 the ID is 422689480. Assets of this role are read-only.",
+                        "The ID of an Android app in the Google play store. You can find this ID in the App\u2019s Google Play Store URL after \u2018id\u2019. For example, in `https://play.google.com/store/apps/details?id=com.company.appname` the identifier is com.company.appname. Assets of this role are read-only.",
+                        "The ID of an iOS app in the Apple app store. This ID number can be found in the Apple App Store URL as the string of numbers directly after \"id\". For example, in `https://apps.apple.com/us/app/gmail-email-by-google/id422689480` the ID is 422689480. Assets of this role are read-only.",
                         "The rating of an app in the Google play store or iOS app store. Note that this value is not automatically synced with the actual rating in the store. It will always be the one provided when save the creative. Assets of this role are read-only.",
-                        "The icon of a creative. This role is only supported and required in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE`",
-                        "The cover image of a native video creative. This role is only supported and required in following creative_type: * `CREATIVE_TYPE_VIDEO`"
+                        "The icon of a creative. This role is only supported and required in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE`",
+                        "The cover image of a native video creative. This role is only supported and required in the following creative_type: * `CREATIVE_TYPE_VIDEO`",
+                        "The main color to use in a creative. This role is only supported and required in the following creative_type: * `CREATIVE_TYPE_ASSET_BASED_CREATIVE`",
+                        "The accent color to use in a creative. This role is only supported and required in the following creative_type: * `CREATIVE_TYPE_ASSET_BASED_CREATIVE`",
+                        "Whether the creative must use a logo asset. This role is only supported and required in the following creative_type: * `CREATIVE_TYPE_ASSET_BASED_CREATIVE`",
+                        "Whether the creative must use an image asset. This role is only supported and required in the following creative_type: * `CREATIVE_TYPE_ASSET_BASED_CREATIVE`",
+                        "Whether asset enhancements can be applied to the creative. This role is only supported and required in the following creative_type: * `CREATIVE_TYPE_ASSET_BASED_CREATIVE`"
                     ],
                     "type": "string"
                 }
@@ -9122,32 +9363,21 @@
             "description": "Assigned audience group targeting option details. This will be populated in the details field of an AssignedTargetingOption when targeting_type is `TARGETING_TYPE_AUDIENCE_GROUP`. The relation between each group is UNION, except for excluded_first_and_third_party_audience_group and excluded_google_audience_group, of which COMPLEMENT is used as an INTERSECTION with other groups.",
             "id": "AudienceGroupAssignedTargetingOptionDetails",
             "properties": {
-                "excludedFirstAndThirdPartyAudienceGroup": {
-                    "$ref": "FirstAndThirdPartyAudienceGroup",
-                    "description": "The first and third party audience ids and recencies of the excluded first and third party audience group. Used for negative targeting. The COMPLEMENT of the UNION of this group and other excluded audience groups is used as an INTERSECTION to any positive audience targeting. All items are logically \u2018OR\u2019 of each other."
-                },
                 "excludedGoogleAudienceGroup": {
                     "$ref": "GoogleAudienceGroup",
-                    "description": "The Google audience ids of the excluded Google audience group. Used for negative targeting. The COMPLEMENT of the UNION of this group and other excluded audience groups is used as an INTERSECTION to any positive audience targeting. Only contains Affinity, In-market and Installed-apps type Google audiences. All items are logically \u2018OR\u2019 of each other."
+                    "description": "Optional. The Google audience ids of the excluded Google audience group. Used for negative targeting. The COMPLEMENT of the UNION of this group and other excluded audience groups is used as an INTERSECTION to any positive audience targeting. Only contains Affinity, In-market and Installed-apps type Google audiences. All items are logically \u2018OR\u2019 of each other."
                 },
                 "includedCombinedAudienceGroup": {
                     "$ref": "CombinedAudienceGroup",
-                    "description": "The combined audience ids of the included combined audience group. Contains combined audience ids only."
+                    "description": "Optional. The combined audience ids of the included combined audience group. Contains combined audience ids only."
                 },
                 "includedCustomListGroup": {
                     "$ref": "CustomListGroup",
-                    "description": "The custom list ids of the included custom list group. Contains custom list ids only."
-                },
-                "includedFirstAndThirdPartyAudienceGroups": {
-                    "description": "The first and third party audience ids and recencies of included first and third party audience groups. Each first and third party audience group contains first and third party audience ids only. The relation between each first and third party audience group is INTERSECTION, and the result is UNION'ed with other audience groups. Repeated groups with same settings will be ignored.",
-                    "items": {
-                        "$ref": "FirstAndThirdPartyAudienceGroup"
-                    },
-                    "type": "array"
+                    "description": "Optional. The custom list ids of the included custom list group. Contains custom list ids only."
                 },
                 "includedGoogleAudienceGroup": {
                     "$ref": "GoogleAudienceGroup",
-                    "description": "The Google audience ids of the included Google audience group. Contains Google audience ids only."
+                    "description": "Optional. The Google audience ids of the included Google audience group. Contains Google audience ids only."
                 }
             },
             "type": "object"
@@ -9212,12 +9442,12 @@
             "id": "AudioVideoOffset",
             "properties": {
                 "percentage": {
-                    "description": "The offset in percentage of the audio or video duration.",
+                    "description": "Optional. The offset in percentage of the audio or video duration.",
                     "format": "int64",
                     "type": "string"
                 },
                 "seconds": {
-                    "description": "The offset in seconds from the start of the audio or video.",
+                    "description": "Optional. The offset in seconds from the start of the audio or video.",
                     "format": "int64",
                     "type": "string"
                 }
@@ -9405,14 +9635,14 @@
             "id": "BulkEditAdvertiserAssignedTargetingOptionsRequest",
             "properties": {
                 "createRequests": {
-                    "description": "The assigned targeting options to create in batch, specified as a list of `CreateAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`",
+                    "description": "The assigned targeting options to create in batch, specified as a list of `CreateAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`",
                     "items": {
                         "$ref": "CreateAssignedTargetingOptionsRequest"
                     },
                     "type": "array"
                 },
                 "deleteRequests": {
-                    "description": "The assigned targeting options to delete in batch, specified as a list of `DeleteAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`",
+                    "description": "The assigned targeting options to delete in batch, specified as a list of `DeleteAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`",
                     "items": {
                         "$ref": "DeleteAssignedTargetingOptionsRequest"
                     },
@@ -9860,7 +10090,16 @@
                         "GEO_REGION_TYPE_ARRONDISSEMENT",
                         "GEO_REGION_TYPE_NEIGHBORHOOD",
                         "GEO_REGION_TYPE_UNIVERSITY",
-                        "GEO_REGION_TYPE_DISTRICT"
+                        "GEO_REGION_TYPE_DISTRICT",
+                        "GEO_REGION_TYPE_NATIONAL_PARK",
+                        "GEO_REGION_TYPE_BARRIO",
+                        "GEO_REGION_TYPE_SUB_WARD",
+                        "GEO_REGION_TYPE_MUNICIPALITY_DISTRICT",
+                        "GEO_REGION_TYPE_SUB_DISTRICT",
+                        "GEO_REGION_TYPE_QUARTER",
+                        "GEO_REGION_TYPE_DIVISION",
+                        "GEO_REGION_TYPE_COMMUNE",
+                        "GEO_REGION_TYPE_COLLOQUIAL_AREA"
                     ],
                     "enumDescriptions": [
                         "The geographic region type is unknown.",
@@ -9891,7 +10130,16 @@
                         "The geographic region is an arrondissement.",
                         "The geographic region is a neighborhood.",
                         "The geographic region is a university.",
-                        "The geographic region is a district."
+                        "The geographic region is a district.",
+                        "The geographic region is a national park.",
+                        "The geographic region is a barrio.",
+                        "The geographic region is a sub ward.",
+                        "The geographic region is a municipality district.",
+                        "The geographic region is a sub district.",
+                        "The geographic region is a quarter.",
+                        "The geographic region is a division.",
+                        "The geographic region is a commune.",
+                        "The geographic region is a colloquial area."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -9956,7 +10204,7 @@
                 },
                 "frequencyCap": {
                     "$ref": "FrequencyCap",
-                    "description": "Required. The frequency cap setting of the campaign."
+                    "description": "Required. The frequency cap setting of the campaign. *Warning*: On **February 28, 2025**, frequency cap time periods greater than 30 days will no longer be accepted. [Read more about this announced change](/display-video/api/deprecations#features.lifetime_frequency_cap)"
                 },
                 "name": {
                     "description": "Output only. The resource name of the campaign.",
@@ -10272,17 +10520,17 @@
             "id": "CmTrackingAd",
             "properties": {
                 "cmAdId": {
-                    "description": "The ad ID of the campaign manager 360 tracking Ad.",
+                    "description": "Optional. The ad ID of the campaign manager 360 tracking Ad.",
                     "format": "int64",
                     "type": "string"
                 },
                 "cmCreativeId": {
-                    "description": "The creative ID of the campaign manager 360 tracking Ad.",
+                    "description": "Optional. The creative ID of the campaign manager 360 tracking Ad.",
                     "format": "int64",
                     "type": "string"
                 },
                 "cmPlacementId": {
-                    "description": "The placement ID of the campaign manager 360 tracking Ad.",
+                    "description": "Optional. The placement ID of the campaign manager 360 tracking Ad.",
                     "format": "int64",
                     "type": "string"
                 }
@@ -10317,7 +10565,7 @@
             "id": "CombinedAudienceGroup",
             "properties": {
                 "settings": {
-                    "description": "Required. All combined audience targeting settings in combined audience group. Repeated settings with same id will be ignored. The number of combined audience settings should be no more than five, error will be thrown otherwise.",
+                    "description": "Required. All combined audience targeting settings in combined audience group. Repeated settings with the same id will be ignored. The number of combined audience settings should be no more than five, error will be thrown otherwise.",
                     "items": {
                         "$ref": "CombinedAudienceTargetingSetting"
                     },
@@ -10334,99 +10582,6 @@
                     "description": "Required. Combined audience id of combined audience targeting setting. This id is combined_audience_id.",
                     "format": "int64",
                     "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "Consent": {
-            "description": "User consent status.",
-            "id": "Consent",
-            "properties": {
-                "adPersonalization": {
-                    "description": "Represents consent for ad personalization.",
-                    "enum": [
-                        "CONSENT_STATUS_UNSPECIFIED",
-                        "CONSENT_STATUS_GRANTED",
-                        "CONSENT_STATUS_DENIED"
-                    ],
-                    "enumDescriptions": [
-                        "Type value is not specified or is unknown in this version.",
-                        "Consent is granted.",
-                        "Consent is denied."
-                    ],
-                    "type": "string"
-                },
-                "adUserData": {
-                    "description": "Represents consent for ad user data.",
-                    "enum": [
-                        "CONSENT_STATUS_UNSPECIFIED",
-                        "CONSENT_STATUS_GRANTED",
-                        "CONSENT_STATUS_DENIED"
-                    ],
-                    "enumDescriptions": [
-                        "Type value is not specified or is unknown in this version.",
-                        "Consent is granted.",
-                        "Consent is denied."
-                    ],
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "ContactInfo": {
-            "description": "Contact information defining a Customer Match audience member.",
-            "id": "ContactInfo",
-            "properties": {
-                "countryCode": {
-                    "description": "Country code of the member. Must also be set with the following fields: * hashed_first_name * hashed_last_name * zip_codes",
-                    "type": "string"
-                },
-                "hashedEmails": {
-                    "description": "A list of SHA256 hashed email of the member. Before hashing, remove all whitespace and make sure the string is all lowercase.",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "hashedFirstName": {
-                    "description": "SHA256 hashed first name of the member. Before hashing, remove all whitespace and make sure the string is all lowercase. Must also be set with the following fields: * country_code * hashed_last_name * zip_codes",
-                    "type": "string"
-                },
-                "hashedLastName": {
-                    "description": "SHA256 hashed last name of the member. Before hashing, remove all whitespace and make sure the string is all lowercase. Must also be set with the following fields: * country_code * hashed_first_name * zip_codes",
-                    "type": "string"
-                },
-                "hashedPhoneNumbers": {
-                    "description": "A list of SHA256 hashed phone numbers of the member. Before hashing, all phone numbers must be formatted using the [E.164 format](//en.wikipedia.org/wiki/E.164) and include the country calling code.",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                },
-                "zipCodes": {
-                    "description": "A list of zip codes of the member. Must also be set with the following fields: * country_code * hashed_first_name * hashed_last_name",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "ContactInfoList": {
-            "description": "Wrapper message for a list of contact information defining Customer Match audience members.",
-            "id": "ContactInfoList",
-            "properties": {
-                "consent": {
-                    "$ref": "Consent",
-                    "description": "Input only. The consent setting for the users in contact_infos. Leaving this field unset indicates that consent is not specified. If ad_user_data or ad_personalization fields are set to `CONSENT_STATUS_DENIED`, the request will return an error."
-                },
-                "contactInfos": {
-                    "description": "A list of ContactInfo objects defining Customer Match audience members. The size of members after splitting the contact_infos mustn't be greater than 500,000.",
-                    "items": {
-                        "$ref": "ContactInfo"
-                    },
-                    "type": "array"
                 }
             },
             "type": "object"
@@ -10732,7 +10887,7 @@
             "id": "ConversionCountingConfig",
             "properties": {
                 "floodlightActivityConfigs": {
-                    "description": "The Floodlight activity configs used to track conversions. The number of conversions counted is the sum of all of the conversions counted by all of the Floodlight activity IDs specified in this field.",
+                    "description": "The Floodlight activity configs used to track conversions. The number of conversions counted is the sum of all of the conversions counted by all of the Floodlight activity IDs specified in this field. This field can't be updated if a custom bidding algorithm is assigned to the line item. If you set this field and assign a custom bidding algorithm in the same request, the floodlight activities must match the ones used by the custom bidding algorithm.",
                     "items": {
                         "$ref": "TrackingFloodlightActivityConfig"
                     },
@@ -10939,7 +11094,12 @@
                         "SDF_VERSION_5_5",
                         "SDF_VERSION_6",
                         "SDF_VERSION_7",
-                        "SDF_VERSION_7_1"
+                        "SDF_VERSION_7_1",
+                        "SDF_VERSION_8",
+                        "SDF_VERSION_8_1",
+                        "SDF_VERSION_9",
+                        "SDF_VERSION_9_1",
+                        "SDF_VERSION_9_2"
                     ],
                     "enumDeprecated": [
                         false,
@@ -10952,6 +11112,11 @@
                         true,
                         true,
                         true,
+                        true,
+                        true,
+                        false,
+                        false,
+                        false,
                         false,
                         false,
                         false,
@@ -10971,7 +11136,12 @@
                         "SDF version 5.5",
                         "SDF version 6",
                         "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version.",
-                        "SDF version 7.1. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
+                        "SDF version 7.1. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version.",
+                        "SDF version 8. Read the [v8 migration guide](/display-video/api/structured-data-file/v8-migration-guide) before migrating to this version.",
+                        "SDF version 8.1.",
+                        "SDF version 9. Read the [v9 migration guide](/display-video/api/structured-data-file/v9-migration-guide) before migrating to this version.",
+                        "SDF version 9.1.",
+                        "SDF version 9.2."
                     ],
                     "type": "string"
                 }
@@ -10983,7 +11153,7 @@
             "id": "Creative",
             "properties": {
                 "additionalDimensions": {
-                    "description": "Additional dimensions. Applicable when creative_type is one of: * `CREATIVE_TYPE_STANDARD` * `CREATIVE_TYPE_EXPANDABLE` * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_LIGHTBOX` * `CREATIVE_TYPE_PUBLISHER_HOSTED` If this field is specified, width_pixels and height_pixels are both required and must be greater than or equal to 0.",
+                    "description": "Optional. Additional dimensions. Applicable when creative_type is one of: * `CREATIVE_TYPE_STANDARD` * `CREATIVE_TYPE_EXPANDABLE` * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_LIGHTBOX` * `CREATIVE_TYPE_PUBLISHER_HOSTED` If this field is specified, width_pixels and height_pixels are both required and must be greater than or equal to 0.",
                     "items": {
                         "$ref": "Dimensions"
                     },
@@ -10996,7 +11166,7 @@
                     "type": "string"
                 },
                 "appendedTag": {
-                    "description": "Third-party HTML tracking tag to be appended to the creative tag.",
+                    "description": "Optional. Third-party HTML tracking tag to be appended to the creative tag.",
                     "type": "string"
                 },
                 "assets": {
@@ -11014,10 +11184,10 @@
                 },
                 "cmTrackingAd": {
                     "$ref": "CmTrackingAd",
-                    "description": "The Campaign Manager 360 tracking ad associated with the creative. Optional for the following creative_type when created by an advertiser that uses both Campaign Manager 360 and third-party ad serving: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` Output only for other cases."
+                    "description": "Optional. The Campaign Manager 360 tracking ad associated with the creative. Optional for the following creative_type when created by an advertiser that uses both Campaign Manager 360 and third-party ad serving: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` Output only for other cases."
                 },
                 "companionCreativeIds": {
-                    "description": "The IDs of companion creatives for a video creative. You can assign existing display creatives (with image or HTML5 assets) to serve surrounding the publisher's video player. Companions display around the video player while the video is playing and remain after the video has completed. Creatives contain additional dimensions can not be companion creatives. This field is only supported for following creative_type: * `CREATIVE_TYPE_AUDIO` * `CREATIVE_TYPE_VIDEO`",
+                    "description": "Optional. The IDs of companion creatives for a video creative. You can assign existing display creatives (with image or HTML5 assets) to serve surrounding the publisher's video player. Companions display around the video player while the video is playing and remain after the video has completed. Creatives contain additional dimensions can not be companion creatives. This field is only supported for the following creative_type: * `CREATIVE_TYPE_AUDIO` * `CREATIVE_TYPE_VIDEO`",
                     "items": {
                         "format": "int64",
                         "type": "string"
@@ -11025,7 +11195,7 @@
                     "type": "array"
                 },
                 "counterEvents": {
-                    "description": "Counter events for a rich media creative. Counters track the number of times that a user interacts with any part of a rich media creative in a specified way (mouse-overs, mouse-outs, clicks, taps, data loading, keyboard entries, etc.). Any event that can be captured in the creative can be recorded as a counter. Leave it empty or unset for creatives containing image assets only.",
+                    "description": "Optional. Counter events for a rich media creative. Counters track the number of times that a user interacts with any part of a rich media creative in a specified way (mouse-overs, mouse-outs, clicks, taps, data loading, keyboard entries, etc.). Any event that can be captured in the creative can be recorded as a counter. Leave it empty or unset for creatives containing image assets only.",
                     "items": {
                         "$ref": "CounterEvent"
                     },
@@ -11080,7 +11250,8 @@
                         "CREATIVE_TYPE_AUDIO",
                         "CREATIVE_TYPE_PUBLISHER_HOSTED",
                         "CREATIVE_TYPE_NATIVE_VIDEO",
-                        "CREATIVE_TYPE_TEMPLATED_APP_INSTALL_VIDEO"
+                        "CREATIVE_TYPE_TEMPLATED_APP_INSTALL_VIDEO",
+                        "CREATIVE_TYPE_ASSET_BASED_CREATIVE"
                     ],
                     "enumDescriptions": [
                         "Type value is not specified or is unknown in this version.",
@@ -11097,7 +11268,8 @@
                         "Audio creative. Create and update methods are supported for this creative type if the hosting_source is `HOSTING_SOURCE_HOSTED`",
                         "Publisher hosted creative. Create and update methods are **not** supported for this creative type.",
                         "Native video creative. Create and update methods are supported for this creative type if the hosting_source is `HOSTING_SOURCE_HOSTED`",
-                        "Templated app install mobile video creative. Create and update methods are **not** supported for this creative type."
+                        "Templated app install mobile video creative. Create and update methods are **not** supported for this creative type.",
+                        "Asset-based creative. Create and update methods are supported for this creative type if the hosting_source is `HOSTING_SOURCE_HOSTED`."
                     ],
                     "type": "string"
                 },
@@ -11203,15 +11375,15 @@
                     "type": "boolean"
                 },
                 "iasCampaignMonitoring": {
-                    "description": "Indicates whether Integral Ad Science (IAS) campaign monitoring is enabled. To enable this for the creative, make sure the Advertiser.creative_config.ias_client_id has been set to your IAS client ID.",
+                    "description": "Optional. Indicates whether Integral Ad Science (IAS) campaign monitoring is enabled. To enable this for the creative, make sure the Advertiser.creative_config.ias_client_id has been set to your IAS client ID.",
                     "type": "boolean"
                 },
                 "integrationCode": {
-                    "description": "ID information used to link this creative to an external system. Must be UTF-8 encoded with a length of no more than 10,000 characters.",
+                    "description": "Optional. ID information used to link this creative to an external system. Must be UTF-8 encoded with a length of no more than 10,000 characters.",
                     "type": "string"
                 },
                 "jsTrackerUrl": {
-                    "description": "JavaScript measurement URL from supported third-party verification providers (ComScore, DoubleVerify, IAS, Moat). HTML script tags are not supported. This field is only writeable in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                    "description": "Optional. JavaScript measurement URL from supported third-party verification providers (ComScore, DoubleVerify, IAS, Moat). HTML script tags are not supported. This field is only writeable in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
                     "type": "string"
                 },
                 "lineItemIds": {
@@ -11240,12 +11412,12 @@
                     "type": "string"
                 },
                 "notes": {
-                    "description": "User notes for this creative. Must be UTF-8 encoded with a length of no more than 20,000 characters.",
+                    "description": "Optional. User notes for this creative. Must be UTF-8 encoded with a length of no more than 20,000 characters.",
                     "type": "string"
                 },
                 "obaIcon": {
                     "$ref": "ObaIcon",
-                    "description": "Specifies the OBA icon for a video creative. This field is only supported in following creative_type: * `CREATIVE_TYPE_VIDEO`"
+                    "description": "Optional. Specifies the OBA icon for a video creative. This field is only supported in the following creative_type: * `CREATIVE_TYPE_VIDEO`"
                 },
                 "oggAudio": {
                     "description": "Output only. Indicates the third-party audio creative supports OGG. Output only and only valid for third-party audio creatives. Third-party audio creatives are creatives with following hosting_source: * `HOSTING_SOURCE_THIRD_PARTY` combined with following creative_type: * `CREATIVE_TYPE_AUDIO`",
@@ -11254,7 +11426,7 @@
                 },
                 "progressOffset": {
                     "$ref": "AudioVideoOffset",
-                    "description": "Amount of time to play the video before counting a view. This field is required when skippable is true. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`"
+                    "description": "Optional. Amount of time to play the video before counting a view. This field is required when skippable is true. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`"
                 },
                 "requireHtml5": {
                     "description": "Optional. Indicates that the creative relies on HTML5 to render properly. Optional and only valid for third-party tag creatives. Third-party tag creatives are creatives with following hosting_source: * `HOSTING_SOURCE_THIRD_PARTY` combined with following creative_type: * `CREATIVE_TYPE_STANDARD` * `CREATIVE_TYPE_EXPANDABLE`",
@@ -11275,10 +11447,10 @@
                 },
                 "skipOffset": {
                     "$ref": "AudioVideoOffset",
-                    "description": "Amount of time to play the video before the skip button appears. This field is required when skippable is true. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`"
+                    "description": "Optional. Amount of time to play the video before the skip button appears. This field is required when skippable is true. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`"
                 },
                 "skippable": {
-                    "description": "Whether the user can choose to skip a video creative. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`",
+                    "description": "Optional. Whether the user can choose to skip a video creative. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`",
                     "type": "boolean"
                 },
                 "thirdPartyTag": {
@@ -11286,28 +11458,28 @@
                     "type": "string"
                 },
                 "thirdPartyUrls": {
-                    "description": "Tracking URLs from third parties to track interactions with a video creative. This field is only supported for the following creative_type: * `CREATIVE_TYPE_AUDIO` * `CREATIVE_TYPE_VIDEO` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                    "description": "Optional. Tracking URLs from third parties to track interactions with a video creative. This field is only supported for the following creative_type: * `CREATIVE_TYPE_AUDIO` * `CREATIVE_TYPE_VIDEO` * `CREATIVE_TYPE_NATIVE_VIDEO`",
                     "items": {
                         "$ref": "ThirdPartyUrl"
                     },
                     "type": "array"
                 },
                 "timerEvents": {
-                    "description": "Timer custom events for a rich media creative. Timers track the time during which a user views and interacts with a specified part of a rich media creative. A creative can have multiple timer events, each timed independently. Leave it empty or unset for creatives containing image assets only.",
+                    "description": "Optional. Timer custom events for a rich media creative. Timers track the time during which a user views and interacts with a specified part of a rich media creative. A creative can have multiple timer events, each timed independently. Leave it empty or unset for creatives containing image assets only.",
                     "items": {
                         "$ref": "TimerEvent"
                     },
                     "type": "array"
                 },
                 "trackerUrls": {
-                    "description": "Tracking URLs for analytics providers or third-party ad technology vendors. The URLs must start with https (except on inventory that doesn't require SSL compliance). If using macros in your URL, use only macros supported by Display & Video 360. Standard URLs only, no IMG or SCRIPT tags. This field is only writeable in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
+                    "description": "Optional. Tracking URLs for analytics providers or third-party ad technology vendors. The URLs must start with `https:` (except on inventory that doesn't require SSL compliance). If using macros in your URL, use only macros supported by Display & Video 360. Standard URLs only, no IMG or SCRIPT tags. This field is only writeable in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "transcodes": {
-                    "description": "Output only. Audio/Video transcodes. Display & Video 360 transcodes the main asset into a number of alternative versions that use different file formats or have different properties (resolution, audio bit rate, and video bit rate), each designed for specific video players or bandwidths. These transcodes give a publisher's system more options to choose from for each impression on your video and ensures that the appropriate file serves based on the viewer\u2019s connection and screen size. This field is only supported in following creative_type: * `CREATIVE_TYPE_VIDEO` * `CREATIVE_TYPE_NATIVE_VIDEO` * `CREATIVE_TYPE_AUDIO`",
+                    "description": "Output only. Audio/Video transcodes. Display & Video 360 transcodes the main asset into a number of alternative versions that use different file formats or have different properties (resolution, audio bit rate, and video bit rate), each designed for specific video players or bandwidths. These transcodes give a publisher's system more options to choose from for each impression on your video and ensures that the appropriate file serves based on the viewer\u2019s connection and screen size. This field is only supported in the following creative_type: * `CREATIVE_TYPE_VIDEO` * `CREATIVE_TYPE_NATIVE_VIDEO` * `CREATIVE_TYPE_AUDIO`",
                     "items": {
                         "$ref": "Transcode"
                     },
@@ -11357,7 +11529,8 @@
                         "CREATIVE_TYPE_AUDIO",
                         "CREATIVE_TYPE_PUBLISHER_HOSTED",
                         "CREATIVE_TYPE_NATIVE_VIDEO",
-                        "CREATIVE_TYPE_TEMPLATED_APP_INSTALL_VIDEO"
+                        "CREATIVE_TYPE_TEMPLATED_APP_INSTALL_VIDEO",
+                        "CREATIVE_TYPE_ASSET_BASED_CREATIVE"
                     ],
                     "enumDescriptions": [
                         "Type value is not specified or is unknown in this version.",
@@ -11374,7 +11547,8 @@
                         "Audio creative. Create and update methods are supported for this creative type if the hosting_source is `HOSTING_SOURCE_HOSTED`",
                         "Publisher hosted creative. Create and update methods are **not** supported for this creative type.",
                         "Native video creative. Create and update methods are supported for this creative type if the hosting_source is `HOSTING_SOURCE_HOSTED`",
-                        "Templated app install mobile video creative. Create and update methods are **not** supported for this creative type."
+                        "Templated app install mobile video creative. Create and update methods are **not** supported for this creative type.",
+                        "Asset-based creative. Create and update methods are supported for this creative type if the hosting_source is `HOSTING_SOURCE_HOSTED`."
                     ],
                     "type": "string"
                 },
@@ -11426,15 +11600,11 @@
                     "description": "Required. Immutable. The type of custom bidding algorithm.",
                     "enum": [
                         "CUSTOM_BIDDING_ALGORITHM_TYPE_UNSPECIFIED",
-                        "SCRIPT_BASED",
-                        "ADS_DATA_HUB_BASED",
-                        "GOAL_BUILDER_BASED"
+                        "SCRIPT_BASED"
                     ],
                     "enumDescriptions": [
                         "Algorithm type is not specified or is unknown in this version.",
-                        "Algorithm generated through customer-uploaded custom bidding script files.",
-                        "Algorithm created through Ads Data Hub product.",
-                        "Algorithm created through goal builder in DV3 UI."
+                        "Algorithm generated through customer-uploaded custom bidding script files."
                     ],
                     "type": "string"
                 },
@@ -11624,7 +11794,7 @@
             "id": "CustomListGroup",
             "properties": {
                 "settings": {
-                    "description": "Required. All custom list targeting settings in custom list group. Repeated settings with same id will be ignored.",
+                    "description": "Required. All custom list targeting settings in custom list group. Repeated settings with the same id will be ignored.",
                     "items": {
                         "$ref": "CustomListTargetingSetting"
                     },
@@ -11900,14 +12070,16 @@
                         "DEVICE_TYPE_COMPUTER",
                         "DEVICE_TYPE_CONNECTED_TV",
                         "DEVICE_TYPE_SMART_PHONE",
-                        "DEVICE_TYPE_TABLET"
+                        "DEVICE_TYPE_TABLET",
+                        "DEVICE_TYPE_CONNECTED_DEVICE"
                     ],
                     "enumDescriptions": [
                         "Default value when device type is not specified in this version. This enum is a placeholder for default value and does not represent a real device type option.",
                         "Computer.",
                         "Connected TV.",
                         "Smart phone.",
-                        "Tablet."
+                        "Tablet.",
+                        "Connected device."
                     ],
                     "type": "string"
                 },
@@ -11929,14 +12101,16 @@
                         "DEVICE_TYPE_COMPUTER",
                         "DEVICE_TYPE_CONNECTED_TV",
                         "DEVICE_TYPE_SMART_PHONE",
-                        "DEVICE_TYPE_TABLET"
+                        "DEVICE_TYPE_TABLET",
+                        "DEVICE_TYPE_CONNECTED_DEVICE"
                     ],
                     "enumDescriptions": [
                         "Default value when device type is not specified in this version. This enum is a placeholder for default value and does not represent a real device type option.",
                         "Computer.",
                         "Connected TV.",
                         "Smart phone.",
-                        "Tablet."
+                        "Tablet.",
+                        "Connected device."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -12367,46 +12541,6 @@
             },
             "type": "object"
         },
-        "EditCustomerMatchMembersRequest": {
-            "description": "Request message for FirstAndThirdPartyAudienceService.EditCustomerMatchMembers.",
-            "id": "EditCustomerMatchMembersRequest",
-            "properties": {
-                "addedContactInfoList": {
-                    "$ref": "ContactInfoList",
-                    "description": "Input only. A list of contact information to define the members to be added."
-                },
-                "addedMobileDeviceIdList": {
-                    "$ref": "MobileDeviceIdList",
-                    "description": "Input only. A list of mobile device IDs to define the members to be added."
-                },
-                "advertiserId": {
-                    "description": "Required. The ID of the owner advertiser of the updated Customer Match FirstAndThirdPartyAudience.",
-                    "format": "int64",
-                    "type": "string"
-                },
-                "removedContactInfoList": {
-                    "$ref": "ContactInfoList",
-                    "description": "Input only. A list of contact information to define the members to be removed."
-                },
-                "removedMobileDeviceIdList": {
-                    "$ref": "MobileDeviceIdList",
-                    "description": "Input only. A list of mobile device IDs to define the members to be removed."
-                }
-            },
-            "type": "object"
-        },
-        "EditCustomerMatchMembersResponse": {
-            "description": "The response of FirstAndThirdPartyAudienceService.EditCustomerMatchMembers.",
-            "id": "EditCustomerMatchMembersResponse",
-            "properties": {
-                "firstAndThirdPartyAudienceId": {
-                    "description": "Required. The ID of the updated Customer Match FirstAndThirdPartyAudience.",
-                    "format": "int64",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "EditGuaranteedOrderReadAccessorsRequest": {
             "description": "Request message for GuaranteedOrderService.EditGuaranteedOrderReadAccessors.",
             "id": "EditGuaranteedOrderReadAccessorsRequest",
@@ -12670,7 +12804,13 @@
                         "EXCHANGE_UNITY_GBID",
                         "EXCHANGE_CHARTBOOST_GBID",
                         "EXCHANGE_ADMOST_GBID",
-                        "EXCHANGE_TOPON_GBID"
+                        "EXCHANGE_TOPON_GBID",
+                        "EXCHANGE_NETFLIX",
+                        "EXCHANGE_CORE",
+                        "EXCHANGE_COMMERCE_GRID",
+                        "EXCHANGE_SPOTIFY",
+                        "EXCHANGE_TUBI",
+                        "EXCHANGE_SNAP"
                     ],
                     "enumDescriptions": [
                         "Exchange is not specified or is unknown in this version.",
@@ -12754,7 +12894,13 @@
                         "Unity LevelPlay.",
                         "Chartboost Mediation.",
                         "AdMost.",
-                        "TopOn."
+                        "TopOn.",
+                        "Netflix.",
+                        "Core.",
+                        "Commerce Grid.",
+                        "Spotify.",
+                        "Tubi.",
+                        "Snap."
                     ],
                     "type": "string"
                 },
@@ -12864,7 +13010,13 @@
                         "EXCHANGE_UNITY_GBID",
                         "EXCHANGE_CHARTBOOST_GBID",
                         "EXCHANGE_ADMOST_GBID",
-                        "EXCHANGE_TOPON_GBID"
+                        "EXCHANGE_TOPON_GBID",
+                        "EXCHANGE_NETFLIX",
+                        "EXCHANGE_CORE",
+                        "EXCHANGE_COMMERCE_GRID",
+                        "EXCHANGE_SPOTIFY",
+                        "EXCHANGE_TUBI",
+                        "EXCHANGE_SNAP"
                     ],
                     "enumDescriptions": [
                         "Exchange is not specified or is unknown in this version.",
@@ -12948,7 +13100,13 @@
                         "Unity LevelPlay.",
                         "Chartboost Mediation.",
                         "AdMost.",
-                        "TopOn."
+                        "TopOn.",
+                        "Netflix.",
+                        "Core.",
+                        "Commerce Grid.",
+                        "Spotify.",
+                        "Tubi.",
+                        "Snap."
                     ],
                     "type": "string"
                 },
@@ -13059,7 +13217,13 @@
                         "EXCHANGE_UNITY_GBID",
                         "EXCHANGE_CHARTBOOST_GBID",
                         "EXCHANGE_ADMOST_GBID",
-                        "EXCHANGE_TOPON_GBID"
+                        "EXCHANGE_TOPON_GBID",
+                        "EXCHANGE_NETFLIX",
+                        "EXCHANGE_CORE",
+                        "EXCHANGE_COMMERCE_GRID",
+                        "EXCHANGE_SPOTIFY",
+                        "EXCHANGE_TUBI",
+                        "EXCHANGE_SNAP"
                     ],
                     "enumDescriptions": [
                         "Exchange is not specified or is unknown in this version.",
@@ -13143,7 +13307,13 @@
                         "Unity LevelPlay.",
                         "Chartboost Mediation.",
                         "AdMost.",
-                        "TopOn."
+                        "TopOn.",
+                        "Netflix.",
+                        "Core.",
+                        "Commerce Grid.",
+                        "Spotify.",
+                        "Tubi.",
+                        "Snap."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -13156,11 +13326,11 @@
             "id": "ExitEvent",
             "properties": {
                 "name": {
-                    "description": "The name of the click tag of the exit event. The name must be unique within one creative. Leave it empty or unset for creatives containing image assets only.",
+                    "description": "Optional. The name of the click tag of the exit event. The name must be unique within one creative. Leave it empty or unset for creatives containing image assets only.",
                     "type": "string"
                 },
                 "reportingName": {
-                    "description": "The name used to identify this event in reports. Leave it empty or unset for creatives containing image assets only.",
+                    "description": "Optional. The name used to identify this event in reports. Leave it empty or unset for creatives containing image assets only.",
                     "type": "string"
                 },
                 "type": {
@@ -13179,259 +13349,6 @@
                 },
                 "url": {
                     "description": "Required. The click through URL of the exit event. This is required when type is: * `EXIT_EVENT_TYPE_DEFAULT` * `EXIT_EVENT_TYPE_BACKUP`",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "FirstAndThirdPartyAudience": {
-            "description": "Describes a first or third party audience list used for targeting. First party audiences are created via usage of client data. Third party audiences are provided by Third Party data providers and can only be licensed to customers.",
-            "id": "FirstAndThirdPartyAudience",
-            "properties": {
-                "activeDisplayAudienceSize": {
-                    "description": "Output only. The estimated audience size for the Display network in the past month. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only returned in GET request.",
-                    "format": "int64",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "appId": {
-                    "description": "The app_id matches with the type of the mobile_device_ids being uploaded. Only applicable to audience_type `CUSTOMER_MATCH_DEVICE_ID`",
-                    "type": "string"
-                },
-                "audienceSource": {
-                    "description": "Output only. The source of the audience.",
-                    "enum": [
-                        "AUDIENCE_SOURCE_UNSPECIFIED",
-                        "DISPLAY_VIDEO_360",
-                        "CAMPAIGN_MANAGER",
-                        "AD_MANAGER",
-                        "SEARCH_ADS_360",
-                        "YOUTUBE",
-                        "ADS_DATA_HUB"
-                    ],
-                    "enumDescriptions": [
-                        "Default value when audience source is not specified or is unknown.",
-                        "Originated from Display & Video 360.",
-                        "Originated from Campaign Manager 360.",
-                        "Originated from Google Ad Manager.",
-                        "Originated from Search Ads 360.",
-                        "Originated from Youtube.",
-                        "Originated from Ads Data Hub."
-                    ],
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "audienceType": {
-                    "description": "The type of the audience.",
-                    "enum": [
-                        "AUDIENCE_TYPE_UNSPECIFIED",
-                        "CUSTOMER_MATCH_CONTACT_INFO",
-                        "CUSTOMER_MATCH_DEVICE_ID",
-                        "CUSTOMER_MATCH_USER_ID",
-                        "ACTIVITY_BASED",
-                        "FREQUENCY_CAP",
-                        "TAG_BASED",
-                        "YOUTUBE_USERS",
-                        "LICENSED"
-                    ],
-                    "enumDeprecated": [
-                        false,
-                        false,
-                        false,
-                        false,
-                        true,
-                        true,
-                        false,
-                        false,
-                        false
-                    ],
-                    "enumDescriptions": [
-                        "Default value when type is not specified or is unknown.",
-                        "Audience was generated through matching customers to known contact information.",
-                        "Audience was generated through matching customers to known Mobile device IDs.",
-                        "Audience was generated through matching customers to known User IDs.",
-                        "Audience was created based on campaign activity.",
-                        "Audience was created based on excluding the number of impressions they were served.",
-                        "Audience was created based on custom variables attached to pixel.",
-                        "Audience was created based on past interactions with videos, YouTube ads, or YouTube channel.",
-                        "Subtype of third party audience type."
-                    ],
-                    "type": "string"
-                },
-                "contactInfoList": {
-                    "$ref": "ContactInfoList",
-                    "description": "Input only. A list of contact information to define the initial audience members. Only applicable to audience_type `CUSTOMER_MATCH_CONTACT_INFO`"
-                },
-                "description": {
-                    "description": "The user-provided description of the audience. Only applicable to first party audiences.",
-                    "type": "string"
-                },
-                "displayAudienceSize": {
-                    "description": "Output only. The estimated audience size for the Display network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only returned in GET request.",
-                    "format": "int64",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "displayDesktopAudienceSize": {
-                    "description": "Output only. The estimated desktop audience size in Display network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.",
-                    "format": "int64",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "displayMobileAppAudienceSize": {
-                    "description": "Output only. The estimated mobile app audience size in Display network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.",
-                    "format": "int64",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "displayMobileWebAudienceSize": {
-                    "description": "Output only. The estimated mobile web audience size in Display network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.",
-                    "format": "int64",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "displayName": {
-                    "description": "The display name of the first and third party audience.",
-                    "type": "string"
-                },
-                "firstAndThirdPartyAudienceId": {
-                    "description": "Output only. The unique ID of the first and third party audience. Assigned by the system.",
-                    "format": "int64",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "firstAndThirdPartyAudienceType": {
-                    "description": "Whether the audience is a first or third party audience.",
-                    "enum": [
-                        "FIRST_AND_THIRD_PARTY_AUDIENCE_TYPE_UNSPECIFIED",
-                        "FIRST_AND_THIRD_PARTY_AUDIENCE_TYPE_FIRST_PARTY",
-                        "FIRST_AND_THIRD_PARTY_AUDIENCE_TYPE_THIRD_PARTY"
-                    ],
-                    "enumDescriptions": [
-                        "Default value when type is not specified or is unknown.",
-                        "Audience that is created via usage of client data.",
-                        "Audience that is provided by Third Party data providers."
-                    ],
-                    "type": "string"
-                },
-                "gmailAudienceSize": {
-                    "description": "Output only. The estimated audience size for Gmail network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.",
-                    "format": "int64",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "membershipDurationDays": {
-                    "description": "The duration in days that an entry remains in the audience after the qualifying event. If the audience has no expiration, set the value of this field to 10000. Otherwise, the set value must be greater than 0 and less than or equal to 540. Only applicable to first party audiences. This field is required if one of the following audience_type is used: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`",
-                    "format": "int64",
-                    "type": "string"
-                },
-                "mobileDeviceIdList": {
-                    "$ref": "MobileDeviceIdList",
-                    "description": "Input only. A list of mobile device IDs to define the initial audience members. Only applicable to audience_type `CUSTOMER_MATCH_DEVICE_ID`"
-                },
-                "name": {
-                    "description": "Output only. The resource name of the first and third party audience.",
-                    "readOnly": true,
-                    "type": "string"
-                },
-                "youtubeAudienceSize": {
-                    "description": "Output only. The estimated audience size for YouTube network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.",
-                    "format": "int64",
-                    "readOnly": true,
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "FirstAndThirdPartyAudienceGroup": {
-            "description": "Details of first and third party audience group. All first and third party audience targeting settings are logically \u2018OR\u2019 of each other.",
-            "id": "FirstAndThirdPartyAudienceGroup",
-            "properties": {
-                "settings": {
-                    "description": "Required. All first and third party audience targeting settings in first and third party audience group. Repeated settings with same id are not allowed.",
-                    "items": {
-                        "$ref": "FirstAndThirdPartyAudienceTargetingSetting"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "FirstAndThirdPartyAudienceTargetingSetting": {
-            "description": "Details of first and third party audience targeting setting.",
-            "id": "FirstAndThirdPartyAudienceTargetingSetting",
-            "properties": {
-                "firstAndThirdPartyAudienceId": {
-                    "description": "Required. First and third party audience id of the first and third party audience targeting setting. This id is first_and_third_party_audience_id.",
-                    "format": "int64",
-                    "type": "string"
-                },
-                "recency": {
-                    "description": "The recency of the first and third party audience targeting setting. Only applicable to first party audiences, otherwise will be ignored. For more info, refer to https://support.google.com/displayvideo/answer/2949947#recency When unspecified, no recency limit will be used.",
-                    "enum": [
-                        "RECENCY_NO_LIMIT",
-                        "RECENCY_1_MINUTE",
-                        "RECENCY_5_MINUTES",
-                        "RECENCY_10_MINUTES",
-                        "RECENCY_15_MINUTES",
-                        "RECENCY_30_MINUTES",
-                        "RECENCY_1_HOUR",
-                        "RECENCY_2_HOURS",
-                        "RECENCY_3_HOURS",
-                        "RECENCY_6_HOURS",
-                        "RECENCY_12_HOURS",
-                        "RECENCY_1_DAY",
-                        "RECENCY_2_DAYS",
-                        "RECENCY_3_DAYS",
-                        "RECENCY_5_DAYS",
-                        "RECENCY_7_DAYS",
-                        "RECENCY_10_DAYS",
-                        "RECENCY_14_DAYS",
-                        "RECENCY_15_DAYS",
-                        "RECENCY_21_DAYS",
-                        "RECENCY_28_DAYS",
-                        "RECENCY_30_DAYS",
-                        "RECENCY_40_DAYS",
-                        "RECENCY_45_DAYS",
-                        "RECENCY_60_DAYS",
-                        "RECENCY_90_DAYS",
-                        "RECENCY_120_DAYS",
-                        "RECENCY_180_DAYS",
-                        "RECENCY_270_DAYS",
-                        "RECENCY_365_DAYS"
-                    ],
-                    "enumDescriptions": [
-                        "No limit of recency.",
-                        "Recency is 1 minute.",
-                        "Recency is 5 minutes.",
-                        "Recency is 10 minutes.",
-                        "Recency is 15 minutes.",
-                        "Recency is 30 minutes.",
-                        "Recency is 1 hour.",
-                        "Recency is 2 hours.",
-                        "Recency is 3 hours.",
-                        "Recency is 6 hours.",
-                        "Recency is 12 hours.",
-                        "Recency is 1 day.",
-                        "Recency is 2 days.",
-                        "Recency is 3 days.",
-                        "Recency is 5 days.",
-                        "Recency is 7 days.",
-                        "Recency is 10 days.",
-                        "Recency is 14 days.",
-                        "Recency is 15 days.",
-                        "Recency is 21 days.",
-                        "Recency is 28 days.",
-                        "Recency is 30 days.",
-                        "Recency is 40 days.",
-                        "Recency is 45 days.",
-                        "Recency is 60 days.",
-                        "Recency is 90 days.",
-                        "Recency is 120 days.",
-                        "Recency is 180 days.",
-                        "Recency is 270 days.",
-                        "Recency is 365 days."
-                    ],
                     "type": "string"
                 }
             },
@@ -13523,6 +13440,15 @@
                         "TIME_UNIT_HOURS",
                         "TIME_UNIT_MINUTES"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        true,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false
+                    ],
                     "enumDescriptions": [
                         "Time unit value is not specified or is unknown in this version.",
                         "The frequency cap will be applied to the whole life time of the line item.",
@@ -13535,7 +13461,7 @@
                     "type": "string"
                 },
                 "timeUnitCount": {
-                    "description": "The number of time_unit the frequency cap will last. Required when unlimited is `false`. The following restrictions apply based on the value of time_unit: * `TIME_UNIT_LIFETIME` - this field is output only and will default to 1 * `TIME_UNIT_MONTHS` - must be between 1 and 2 * `TIME_UNIT_WEEKS` - must be between 1 and 4 * `TIME_UNIT_DAYS` - must be between 1 and 6 * `TIME_UNIT_HOURS` - must be between 1 and 23 * `TIME_UNIT_MINUTES` - must be between 1 and 59",
+                    "description": "The number of time_unit the frequency cap will last. Required when unlimited is `false`. The following restrictions apply based on the value of time_unit: * `TIME_UNIT_MONTHS` - must be 1 * `TIME_UNIT_WEEKS` - must be between 1 and 4 * `TIME_UNIT_DAYS` - must be between 1 and 6 * `TIME_UNIT_HOURS` - must be between 1 and 23 * `TIME_UNIT_MINUTES` - must be between 1 and 59",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -13601,6 +13527,20 @@
             "description": "Request message for LineItemService.GenerateDefaultLineItem.",
             "id": "GenerateDefaultLineItemRequest",
             "properties": {
+                "containsEuPoliticalAds": {
+                    "description": "Whether this line item will serve European Union political ads. If contains_eu_political_ads has been set to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` in the parent advertiser, then this field will be assigned `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` if not otherwise specified. This field can then be updated using the UI, API, or Structured Data Files. This field must be assigned when creating a new line item. Otherwise, **the `advertisers.lineItems.create` request will fail**.",
+                    "enum": [
+                        "EU_POLITICAL_ADVERTISING_STATUS_UNKNOWN",
+                        "CONTAINS_EU_POLITICAL_ADVERTISING",
+                        "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
+                    ],
+                    "enumDescriptions": [
+                        "Unknown.",
+                        "Contains EU political advertising.",
+                        "Does not contain EU political advertising."
+                    ],
+                    "type": "string"
+                },
                 "displayName": {
                     "description": "Required. The display name of the line item. Must be UTF-8 encoded with a maximum size of 240 bytes.",
                     "type": "string"
@@ -13687,7 +13627,16 @@
                         "GEO_REGION_TYPE_ARRONDISSEMENT",
                         "GEO_REGION_TYPE_NEIGHBORHOOD",
                         "GEO_REGION_TYPE_UNIVERSITY",
-                        "GEO_REGION_TYPE_DISTRICT"
+                        "GEO_REGION_TYPE_DISTRICT",
+                        "GEO_REGION_TYPE_NATIONAL_PARK",
+                        "GEO_REGION_TYPE_BARRIO",
+                        "GEO_REGION_TYPE_SUB_WARD",
+                        "GEO_REGION_TYPE_MUNICIPALITY_DISTRICT",
+                        "GEO_REGION_TYPE_SUB_DISTRICT",
+                        "GEO_REGION_TYPE_QUARTER",
+                        "GEO_REGION_TYPE_DIVISION",
+                        "GEO_REGION_TYPE_COMMUNE",
+                        "GEO_REGION_TYPE_COLLOQUIAL_AREA"
                     ],
                     "enumDescriptions": [
                         "The geographic region type is unknown.",
@@ -13718,7 +13667,16 @@
                         "The geographic region is an arrondissement.",
                         "The geographic region is a neighborhood.",
                         "The geographic region is a university.",
-                        "The geographic region is a district."
+                        "The geographic region is a district.",
+                        "The geographic region is a national park.",
+                        "The geographic region is a barrio.",
+                        "The geographic region is a sub ward.",
+                        "The geographic region is a municipality district.",
+                        "The geographic region is a sub district.",
+                        "The geographic region is a quarter.",
+                        "The geographic region is a division.",
+                        "The geographic region is a commune.",
+                        "The geographic region is a colloquial area."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -13785,7 +13743,16 @@
                         "GEO_REGION_TYPE_ARRONDISSEMENT",
                         "GEO_REGION_TYPE_NEIGHBORHOOD",
                         "GEO_REGION_TYPE_UNIVERSITY",
-                        "GEO_REGION_TYPE_DISTRICT"
+                        "GEO_REGION_TYPE_DISTRICT",
+                        "GEO_REGION_TYPE_NATIONAL_PARK",
+                        "GEO_REGION_TYPE_BARRIO",
+                        "GEO_REGION_TYPE_SUB_WARD",
+                        "GEO_REGION_TYPE_MUNICIPALITY_DISTRICT",
+                        "GEO_REGION_TYPE_SUB_DISTRICT",
+                        "GEO_REGION_TYPE_QUARTER",
+                        "GEO_REGION_TYPE_DIVISION",
+                        "GEO_REGION_TYPE_COMMUNE",
+                        "GEO_REGION_TYPE_COLLOQUIAL_AREA"
                     ],
                     "enumDescriptions": [
                         "The geographic region type is unknown.",
@@ -13816,7 +13783,16 @@
                         "The geographic region is an arrondissement.",
                         "The geographic region is a neighborhood.",
                         "The geographic region is a university.",
-                        "The geographic region is a district."
+                        "The geographic region is a district.",
+                        "The geographic region is a national park.",
+                        "The geographic region is a barrio.",
+                        "The geographic region is a sub ward.",
+                        "The geographic region is a municipality district.",
+                        "The geographic region is a sub district.",
+                        "The geographic region is a quarter.",
+                        "The geographic region is a division.",
+                        "The geographic region is a commune.",
+                        "The geographic region is a colloquial area."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -13884,7 +13860,7 @@
             "id": "GoogleAudienceGroup",
             "properties": {
                 "settings": {
-                    "description": "Required. All Google audience targeting settings in Google audience group. Repeated settings with same id will be ignored.",
+                    "description": "Required. All Google audience targeting settings in Google audience group. Repeated settings with the same id will be ignored.",
                     "items": {
                         "$ref": "GoogleAudienceTargetingSetting"
                     },
@@ -14019,7 +13995,13 @@
                         "EXCHANGE_UNITY_GBID",
                         "EXCHANGE_CHARTBOOST_GBID",
                         "EXCHANGE_ADMOST_GBID",
-                        "EXCHANGE_TOPON_GBID"
+                        "EXCHANGE_TOPON_GBID",
+                        "EXCHANGE_NETFLIX",
+                        "EXCHANGE_CORE",
+                        "EXCHANGE_COMMERCE_GRID",
+                        "EXCHANGE_SPOTIFY",
+                        "EXCHANGE_TUBI",
+                        "EXCHANGE_SNAP"
                     ],
                     "enumDescriptions": [
                         "Exchange is not specified or is unknown in this version.",
@@ -14103,7 +14085,13 @@
                         "Unity LevelPlay.",
                         "Chartboost Mediation.",
                         "AdMost.",
-                        "TopOn."
+                        "TopOn.",
+                        "Netflix.",
+                        "Core.",
+                        "Commerce Grid.",
+                        "Spotify.",
+                        "Tubi.",
+                        "Snap."
                     ],
                     "type": "string"
                 },
@@ -14341,7 +14329,7 @@
                 },
                 "bidStrategy": {
                     "$ref": "BiddingStrategy",
-                    "description": "The bidding strategy of the insertion order. By default, fixed_bid is set."
+                    "description": "Optional. The bidding strategy of the insertion order. By default, fixed_bid is set."
                 },
                 "billableOutcome": {
                     "description": "Immutable. The billable outcome of the insertion order. Outcome based buying is deprecated. `BILLABLE_OUTCOME_PAY_PER_IMPRESSION` is the only valid value.",
@@ -14409,7 +14397,7 @@
                     "type": "string"
                 },
                 "insertionOrderType": {
-                    "description": "The type of insertion order. If this field is unspecified in creation, the value defaults to `RTB`.",
+                    "description": "Optional. The type of insertion order. If this field is unspecified in creation, the value defaults to `RTB`.",
                     "enum": [
                         "INSERTION_ORDER_TYPE_UNSPECIFIED",
                         "RTB",
@@ -14424,7 +14412,7 @@
                 },
                 "integrationDetails": {
                     "$ref": "IntegrationDetails",
-                    "description": "Additional integration details of the insertion order."
+                    "description": "Optional. Additional integration details of the insertion order."
                 },
                 "name": {
                     "description": "Output only. The resource name of the insertion order.",
@@ -14433,10 +14421,10 @@
                 },
                 "pacing": {
                     "$ref": "Pacing",
-                    "description": "Required. The budget spending speed setting of the insertion order."
+                    "description": "Required. The budget spending speed setting of the insertion order. pacing_type `PACING_TYPE_ASAP` is not compatible with pacing_period `PACING_PERIOD_FLIGHT`."
                 },
                 "partnerCosts": {
-                    "description": "The partner costs associated with the insertion order. If absent or empty in CreateInsertionOrder method, the newly created insertion order will inherit partner costs from the partner settings.",
+                    "description": "Optional. The partner costs associated with the insertion order. If absent or empty in CreateInsertionOrder method, the newly created insertion order will inherit partner costs from the partner settings.",
                     "items": {
                         "$ref": "PartnerCost"
                     },
@@ -14477,7 +14465,7 @@
             "id": "InsertionOrderBudget",
             "properties": {
                 "automationType": {
-                    "description": "The type of automation used to manage bid and budget for the insertion order. If this field is unspecified in creation, the value defaults to `INSERTION_ORDER_AUTOMATION_TYPE_NONE`.",
+                    "description": "Optional. The type of automation used to manage bid and budget for the insertion order. If this field is unspecified in creation, the value defaults to `INSERTION_ORDER_AUTOMATION_TYPE_NONE`.",
                     "enum": [
                         "INSERTION_ORDER_AUTOMATION_TYPE_UNSPECIFIED",
                         "INSERTION_ORDER_AUTOMATION_TYPE_BUDGET",
@@ -14526,7 +14514,7 @@
                     "type": "string"
                 },
                 "campaignBudgetId": {
-                    "description": "The budget_id of the campaign budget that this insertion order budget segment is a part of.",
+                    "description": "Optional. The budget_id of the campaign budget that this insertion order budget segment is a part of.",
                     "format": "int64",
                     "type": "string"
                 },
@@ -14535,7 +14523,7 @@
                     "description": "Required. The start and end date settings of the budget segment. They are resolved relative to the parent advertiser's time zone. * When creating a new budget segment, both `start_date` and `end_date` must be in the future. * An existing budget segment with a `start_date` in the past has a mutable `end_date` but an immutable `start_date`. * `end_date` must be the `start_date` or later, both before the year 2037."
                 },
                 "description": {
-                    "description": "The budget segment description. It can be used to enter Purchase Order information for each budget segment and have that information printed on the invoices. Must be UTF-8 encoded.",
+                    "description": "Optional. The budget segment description. It can be used to enter Purchase Order information for each budget segment and have that information printed on the invoices. Must be UTF-8 encoded.",
                     "type": "string"
                 }
             },
@@ -14546,7 +14534,7 @@
             "id": "IntegralAdScience",
             "properties": {
                 "customSegmentId": {
-                    "description": "The custom segment ID provided by Integral Ad Science. The ID must be between `1000001` and `1999999`, inclusive.",
+                    "description": "The custom segment ID provided by Integral Ad Science. The ID must be between `1000001` and `1999999` or `3000001` and `3999999`, inclusive.",
                     "items": {
                         "format": "int64",
                         "type": "string"
@@ -14580,12 +14568,14 @@
                     "enum": [
                         "SUSPICIOUS_ACTIVITY_UNSPECIFIED",
                         "SUSPICIOUS_ACTIVITY_HR",
-                        "SUSPICIOUS_ACTIVITY_HMR"
+                        "SUSPICIOUS_ACTIVITY_HMR",
+                        "SUSPICIOUS_ACTIVITY_FD"
                     ],
                     "enumDescriptions": [
                         "This enum is only a placeholder and it doesn't specify any ad fraud prevention options.",
                         "Ad Fraud - Exclude High Risk.",
-                        "Ad Fraud - Exclude High and Moderate Risk."
+                        "Ad Fraud - Exclude High and Moderate Risk.",
+                        "Ad Fraud - Exclude Fraudulent Device."
                     ],
                     "type": "string"
                 },
@@ -14892,7 +14882,13 @@
                         "EXCHANGE_UNITY_GBID",
                         "EXCHANGE_CHARTBOOST_GBID",
                         "EXCHANGE_ADMOST_GBID",
-                        "EXCHANGE_TOPON_GBID"
+                        "EXCHANGE_TOPON_GBID",
+                        "EXCHANGE_NETFLIX",
+                        "EXCHANGE_CORE",
+                        "EXCHANGE_COMMERCE_GRID",
+                        "EXCHANGE_SPOTIFY",
+                        "EXCHANGE_TUBI",
+                        "EXCHANGE_SNAP"
                     ],
                     "enumDescriptions": [
                         "Exchange is not specified or is unknown in this version.",
@@ -14976,7 +14972,13 @@
                         "Unity LevelPlay.",
                         "Chartboost Mediation.",
                         "AdMost.",
-                        "TopOn."
+                        "TopOn.",
+                        "Netflix.",
+                        "Core.",
+                        "Commerce Grid.",
+                        "Spotify.",
+                        "Tubi.",
+                        "Snap."
                     ],
                     "type": "string"
                 },
@@ -15459,6 +15461,20 @@
                     "description": "Output only. The unique ID of the campaign that the line item belongs to.",
                     "format": "int64",
                     "readOnly": true,
+                    "type": "string"
+                },
+                "containsEuPoliticalAds": {
+                    "description": "Whether this line item will serve European Union political ads. If contains_eu_political_ads has been set to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` in the parent advertiser, then this field will be assigned `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` if not otherwise specified. This field can then be updated using the UI, API, or Structured Data Files. This field must be assigned when creating a new line item. Otherwise, **the `advertisers.lineItems.create` request will fail**.",
+                    "enum": [
+                        "EU_POLITICAL_ADVERTISING_STATUS_UNKNOWN",
+                        "CONTAINS_EU_POLITICAL_ADVERTISING",
+                        "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
+                    ],
+                    "enumDescriptions": [
+                        "Unknown.",
+                        "Contains EU political advertising.",
+                        "Does not contain EU political advertising."
+                    ],
                     "type": "string"
                 },
                 "conversionCounting": {
@@ -15949,23 +15965,6 @@
             },
             "type": "object"
         },
-        "ListFirstAndThirdPartyAudiencesResponse": {
-            "id": "ListFirstAndThirdPartyAudiencesResponse",
-            "properties": {
-                "firstAndThirdPartyAudiences": {
-                    "description": "The list of first and third party audiences. Audience size properties will not be included. This list will be absent if empty.",
-                    "items": {
-                        "$ref": "FirstAndThirdPartyAudience"
-                    },
-                    "type": "array"
-                },
-                "nextPageToken": {
-                    "description": "A token to retrieve the next page of results. Pass this value in the page_token field in the subsequent call to `ListFirstAndThirdPartyAudiences` method to retrieve the next page of results.",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "ListGoogleAudiencesResponse": {
             "id": "ListGoogleAudiencesResponse",
             "properties": {
@@ -16404,7 +16403,7 @@
             "id": "MaximizeSpendBidStrategy",
             "properties": {
                 "customBiddingAlgorithmId": {
-                    "description": "The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO`.",
+                    "description": "The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO`. Assigning a custom bidding algorithm that uses floodlight activities not identified in floodlightActivityConfigs will return an error.",
                     "format": "int64",
                     "type": "string"
                 },
@@ -16491,24 +16490,6 @@
                     "description": "Output only. The app publisher.",
                     "readOnly": true,
                     "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "MobileDeviceIdList": {
-            "description": "Wrapper message for a list of mobile device IDs defining Customer Match audience members.",
-            "id": "MobileDeviceIdList",
-            "properties": {
-                "consent": {
-                    "$ref": "Consent",
-                    "description": "Input only. The consent setting for the users in mobile_device_ids. Leaving this field unset indicates that consent is not specified. If ad_user_data or ad_personalization fields are set to `CONSENT_STATUS_DENIED`, the request will return an error."
-                },
-                "mobileDeviceIds": {
-                    "description": "A list of mobile device IDs defining Customer Match audience members. The size of mobile_device_ids mustn't be greater than 500,000.",
-                    "items": {
-                        "type": "string"
-                    },
-                    "type": "array"
                 }
             },
             "type": "object"
@@ -16660,19 +16641,19 @@
             "id": "ObaIcon",
             "properties": {
                 "clickTrackingUrl": {
-                    "description": "Required. The click tracking URL of the OBA icon. Only URLs of the following domains are allowed: * https://info.evidon.com * https://l.betrad.com",
+                    "description": "Required. The click tracking URL of the OBA icon. Only URLs of the following domains are allowed: * `https://info.evidon.com` * `https://l.betrad.com`",
                     "type": "string"
                 },
                 "dimensions": {
                     "$ref": "Dimensions",
-                    "description": "The dimensions of the OBA icon."
+                    "description": "Optional. The dimensions of the OBA icon."
                 },
                 "landingPageUrl": {
-                    "description": "Required. The landing page URL of the OBA icon. Only URLs of the following domains are allowed: * https://info.evidon.com * https://l.betrad.com",
+                    "description": "Required. The landing page URL of the OBA icon. Only URLs of the following domains are allowed: * `https://info.evidon.com` * `https://l.betrad.com`",
                     "type": "string"
                 },
                 "position": {
-                    "description": "The position of the OBA icon on the creative.",
+                    "description": "Optional. The position of the OBA icon on the creative.",
                     "enum": [
                         "OBA_ICON_POSITION_UNSPECIFIED",
                         "OBA_ICON_POSITION_UPPER_RIGHT",
@@ -16690,19 +16671,19 @@
                     "type": "string"
                 },
                 "program": {
-                    "description": "The program of the OBA icon. For example: \u201cAdChoices\u201d.",
+                    "description": "Optional. The program of the OBA icon. For example: \u201cAdChoices\u201d.",
                     "type": "string"
                 },
                 "resourceMimeType": {
-                    "description": "The MIME type of the OBA icon resource.",
+                    "description": "Optional. The MIME type of the OBA icon resource.",
                     "type": "string"
                 },
                 "resourceUrl": {
-                    "description": "The URL of the OBA icon resource.",
+                    "description": "Optional. The URL of the OBA icon resource.",
                     "type": "string"
                 },
                 "viewTrackingUrl": {
-                    "description": "Required. The view tracking URL of the OBA icon. Only URLs of the following domains are allowed: * https://info.evidon.com * https://l.betrad.com",
+                    "description": "Required. The view tracking URL of the OBA icon. Only URLs of the following domains are allowed: * `https://info.evidon.com` * `https://l.betrad.com`",
                     "type": "string"
                 }
             },
@@ -16916,7 +16897,7 @@
                     "type": "string"
                 },
                 "pacingType": {
-                    "description": "Required. The type of pacing that defines how the budget amount will be spent across the pacing_period.",
+                    "description": "Required. The type of pacing that defines how the budget amount will be spent across the pacing_period. `PACING_TYPE_ASAP` is not compatible with pacing_period `PACING_PERIOD_FLIGHT` for insertion orders.",
                     "enum": [
                         "PACING_TYPE_UNSPECIFIED",
                         "PACING_TYPE_AHEAD",
@@ -16988,8 +16969,8 @@
                         "Advertiser ID. If selected, all filter IDs must be Advertiser IDs that belong to the Partner specified in CreateSdfDownloadTaskRequest.",
                         "Campaign ID. If selected, all filter IDs must be Campaign IDs that belong to the Advertiser or Partner specified in CreateSdfDownloadTaskRequest.",
                         "Media Product ID. If selected, all filter IDs must be Media Product IDs that belong to the Advertiser or Partner specified in CreateSdfDownloadTaskRequest. Can only be used for downloading `FILE_TYPE_MEDIA_PRODUCT`.",
-                        "Insertion Order ID. If selected, all filter IDs must be Insertion Order IDs that belong to the Advertiser or Partner specified in CreateSdfDownloadTaskRequest. Can only be used for downloading `FILE_TYPE_INSERTION_ORDER`, `FILE_TYPE_LINE_ITEM`, `FILE_TYPE_AD_GROUP`, and `FILE_TYPE_AD`.",
-                        "Line Item ID. If selected, all filter IDs must be Line Item IDs that belong to the Advertiser or Partner specified in CreateSdfDownloadTaskRequest. Can only be used for downloading `FILE_TYPE_LINE_ITEM`, `FILE_TYPE_AD_GROUP`, and `FILE_TYPE_AD`."
+                        "Insertion Order ID. If selected, all filter IDs must be Insertion Order IDs that belong to the Advertiser or Partner specified in CreateSdfDownloadTaskRequest. Can only be used for downloading `FILE_TYPE_INSERTION_ORDER`, `FILE_TYPE_LINE_ITEM`, `FILE_TYPE_LINE_ITEM_QA`, `FILE_TYPE_AD_GROUP`, `FILE_TYPE_AD_GROUP_QA`, and `FILE_TYPE_AD`.",
+                        "Line Item ID. If selected, all filter IDs must be Line Item IDs that belong to the Advertiser or Partner specified in CreateSdfDownloadTaskRequest. Can only be used for downloading `FILE_TYPE_LINE_ITEM`, `FILE_TYPE_LINE_ITEM_QA`,`FILE_TYPE_AD_GROUP`, `FILE_TYPE_AD_GROUP_QA`, and `FILE_TYPE_AD`."
                     ],
                     "type": "string"
                 }
@@ -17154,7 +17135,6 @@
                         "PARTNER_COST_TYPE_THIRD_PARTY_AD_SERVER",
                         "PARTNER_COST_TYPE_TRUST_METRICS",
                         "PARTNER_COST_TYPE_VIZU",
-                        "PARTNER_COST_TYPE_ADLINGO_FEE",
                         "PARTNER_COST_TYPE_CUSTOM_FEE_1",
                         "PARTNER_COST_TYPE_CUSTOM_FEE_2",
                         "PARTNER_COST_TYPE_CUSTOM_FEE_3",
@@ -17164,8 +17144,8 @@
                     ],
                     "enumDescriptions": [
                         "Type value is not specified or is unknown in this version.",
-                        "The cost is charged for using Adloox. Billed by the partner.",
-                        "The cost is charged for using Adloox Pre-Bid. Billed through DV360.",
+                        "The cost is charged for using Scope3 (previously known as Adloox). Billed by the partner.",
+                        "The cost is charged for using Scope3 (previously known as Adloox) Pre-Bid. Billed through DV360.",
                         "The cost is charged for using AdSafe. Billed by the partner.",
                         "The cost is charged for using AdExpose. Billed by the partner.",
                         "The cost is charged for using Aggregate Knowledge. Billed by the partner.",
@@ -17187,7 +17167,6 @@
                         "The cost is charged for using a third-party ad server. Billed by the partner.",
                         "The cost is charged for using TrustMetrics. Billed by the partner.",
                         "The cost is charged for using Vizu. Billed by the partner.",
-                        "The cost is charged for using AdLingo. Billed through DV360.",
                         "The cost is charged as custom fee 1. Billed by the partner.",
                         "The cost is charged as custom fee 2. Billed by the partner.",
                         "The cost is charged as custom fee 3. Billed by the partner.",
@@ -17327,6 +17306,7 @@
                         "PERFORMANCE_GOAL_TYPE_VIEWABILITY",
                         "PERFORMANCE_GOAL_TYPE_CPIAVC",
                         "PERFORMANCE_GOAL_TYPE_CPE",
+                        "PERFORMANCE_GOAL_TYPE_CPV",
                         "PERFORMANCE_GOAL_TYPE_CLICK_CVR",
                         "PERFORMANCE_GOAL_TYPE_IMPRESSION_CVR",
                         "PERFORMANCE_GOAL_TYPE_VCPM",
@@ -17344,6 +17324,7 @@
                         "The performance goal is set in Viewability percentage.",
                         "The performance goal is set as CPIAVC (cost per impression audible and visible at completion).",
                         "The performance goal is set in CPE (cost per engagement).",
+                        "The performance goal is set in CPV (cost per view).",
                         "The performance goal is set in click conversion rate (conversions per click) percentage.",
                         "The performance goal is set in impression conversion rate (conversions per impression) percentage.",
                         "The performance goal is set in VCPM (cost per thousand viewable impressions).",
@@ -17362,7 +17343,7 @@
             "id": "PerformanceGoalBidStrategy",
             "properties": {
                 "customBiddingAlgorithmId": {
-                    "description": "The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO`.",
+                    "description": "The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO`. Assigning a custom bidding algorithm that uses floodlight activities not identified in floodlightActivityConfigs will return an error.",
                     "format": "int64",
                     "type": "string"
                 },
@@ -17815,7 +17796,12 @@
                         "SDF_VERSION_5_5",
                         "SDF_VERSION_6",
                         "SDF_VERSION_7",
-                        "SDF_VERSION_7_1"
+                        "SDF_VERSION_7_1",
+                        "SDF_VERSION_8",
+                        "SDF_VERSION_8_1",
+                        "SDF_VERSION_9",
+                        "SDF_VERSION_9_1",
+                        "SDF_VERSION_9_2"
                     ],
                     "enumDeprecated": [
                         false,
@@ -17828,6 +17814,11 @@
                         true,
                         true,
                         true,
+                        true,
+                        true,
+                        false,
+                        false,
+                        false,
                         false,
                         false,
                         false,
@@ -17847,7 +17838,12 @@
                         "SDF version 5.5",
                         "SDF version 6",
                         "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version.",
-                        "SDF version 7.1. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
+                        "SDF version 7.1. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version.",
+                        "SDF version 8. Read the [v8 migration guide](/display-video/api/structured-data-file/v8-migration-guide) before migrating to this version.",
+                        "SDF version 8.1.",
+                        "SDF version 9. Read the [v9 migration guide](/display-video/api/structured-data-file/v9-migration-guide) before migrating to this version.",
+                        "SDF version 9.1.",
+                        "SDF version 9.2."
                     ],
                     "type": "string"
                 }
@@ -17855,7 +17851,7 @@
             "type": "object"
         },
         "SdfDownloadTask": {
-            "description": "Type for the response returned by [SdfDownloadTaskService.CreateSdfDownloadTask].",
+            "description": "Type for the response returned by SdfDownloadTaskService.CreateSdfDownloadTask.",
             "id": "SdfDownloadTask",
             "properties": {
                 "resourceName": {
@@ -17866,7 +17862,7 @@
             "type": "object"
         },
         "SdfDownloadTaskMetadata": {
-            "description": "Type for the metadata returned by [SdfDownloadTaskService.CreateSdfDownloadTask].",
+            "description": "Type for the metadata returned by SdfDownloadTaskService.CreateSdfDownloadTask.",
             "id": "SdfDownloadTaskMetadata",
             "properties": {
                 "createTime": {
@@ -17895,7 +17891,12 @@
                         "SDF_VERSION_5_5",
                         "SDF_VERSION_6",
                         "SDF_VERSION_7",
-                        "SDF_VERSION_7_1"
+                        "SDF_VERSION_7_1",
+                        "SDF_VERSION_8",
+                        "SDF_VERSION_8_1",
+                        "SDF_VERSION_9",
+                        "SDF_VERSION_9_1",
+                        "SDF_VERSION_9_2"
                     ],
                     "enumDeprecated": [
                         false,
@@ -17908,6 +17909,11 @@
                         true,
                         true,
                         true,
+                        true,
+                        true,
+                        false,
+                        false,
+                        false,
                         false,
                         false,
                         false,
@@ -17927,7 +17933,12 @@
                         "SDF version 5.5",
                         "SDF version 6",
                         "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version.",
-                        "SDF version 7.1. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
+                        "SDF version 7.1. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version.",
+                        "SDF version 8. Read the [v8 migration guide](/display-video/api/structured-data-file/v8-migration-guide) before migrating to this version.",
+                        "SDF version 8.1.",
+                        "SDF version 9. Read the [v9 migration guide](/display-video/api/structured-data-file/v9-migration-guide) before migrating to this version.",
+                        "SDF version 9.1.",
+                        "SDF version 9.2."
                     ],
                     "type": "string"
                 }
@@ -18468,7 +18479,7 @@
             "id": "ThirdPartyUrl",
             "properties": {
                 "type": {
-                    "description": "The type of interaction needs to be tracked by the tracking URL",
+                    "description": "Optional. The type of interaction needs to be tracked by the tracking URL",
                     "enum": [
                         "THIRD_PARTY_URL_TYPE_UNSPECIFIED",
                         "THIRD_PARTY_URL_TYPE_IMPRESSION",
@@ -18508,7 +18519,7 @@
                     "type": "string"
                 },
                 "url": {
-                    "description": "Tracking URL used to track the interaction. Provide a URL with optional path or query string, beginning with `https:`. For example, https://www.example.com/path",
+                    "description": "Optional. Tracking URL used to track the interaction. Provide a URL with optional path or query string, beginning with `https:`. For example, `https://www.example.com/path`",
                     "type": "string"
                 }
             },
@@ -18520,7 +18531,7 @@
             "properties": {
                 "adloox": {
                     "$ref": "Adloox",
-                    "description": "Third party brand verifier -- Adloox."
+                    "description": "Third party brand verifier -- Scope3 (previously known as Adloox)."
                 },
                 "doubleVerify": {
                     "$ref": "DoubleVerify",
@@ -18592,44 +18603,44 @@
             "id": "Transcode",
             "properties": {
                 "audioBitRateKbps": {
-                    "description": "The bit rate for the audio stream of the transcoded video, or the bit rate for the transcoded audio, in kilobits per second.",
+                    "description": "Optional. The bit rate for the audio stream of the transcoded video, or the bit rate for the transcoded audio, in kilobits per second.",
                     "format": "int64",
                     "type": "string"
                 },
                 "audioSampleRateHz": {
-                    "description": "The sample rate for the audio stream of the transcoded video, or the sample rate for the transcoded audio, in hertz.",
+                    "description": "Optional. The sample rate for the audio stream of the transcoded video, or the sample rate for the transcoded audio, in hertz.",
                     "format": "int64",
                     "type": "string"
                 },
                 "bitRateKbps": {
-                    "description": "The transcoding bit rate of the transcoded video, in kilobits per second.",
+                    "description": "Optional. The transcoding bit rate of the transcoded video, in kilobits per second.",
                     "format": "int64",
                     "type": "string"
                 },
                 "dimensions": {
                     "$ref": "Dimensions",
-                    "description": "The dimensions of the transcoded video."
+                    "description": "Optional. The dimensions of the transcoded video."
                 },
                 "fileSizeBytes": {
-                    "description": "The size of the transcoded file, in bytes.",
+                    "description": "Optional. The size of the transcoded file, in bytes.",
                     "format": "int64",
                     "type": "string"
                 },
                 "frameRate": {
-                    "description": "The frame rate of the transcoded video, in frames per second.",
+                    "description": "Optional. The frame rate of the transcoded video, in frames per second.",
                     "format": "float",
                     "type": "number"
                 },
                 "mimeType": {
-                    "description": "The MIME type of the transcoded file.",
+                    "description": "Optional. The MIME type of the transcoded file.",
                     "type": "string"
                 },
                 "name": {
-                    "description": "The name of the transcoded file.",
+                    "description": "Optional. The name of the transcoded file.",
                     "type": "string"
                 },
                 "transcoded": {
-                    "description": "Indicates if the transcoding was successful.",
+                    "description": "Optional. Indicates if the transcoding was successful.",
                     "type": "boolean"
                 }
             },
@@ -18640,11 +18651,11 @@
             "id": "UniversalAdId",
             "properties": {
                 "id": {
-                    "description": "The unique creative identifier.",
+                    "description": "Optional. The unique creative identifier.",
                     "type": "string"
                 },
                 "registry": {
-                    "description": "The registry provides unique creative identifiers.",
+                    "description": "Optional. The registry provides unique creative identifiers.",
                     "enum": [
                         "UNIVERSAL_AD_REGISTRY_UNSPECIFIED",
                         "UNIVERSAL_AD_REGISTRY_OTHER",

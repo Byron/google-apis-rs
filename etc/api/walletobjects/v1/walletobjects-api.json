@@ -2679,9 +2679,39 @@
                     ]
                 }
             }
+        },
+        "walletobjects": {
+            "resources": {
+                "v1": {
+                    "resources": {
+                        "privateContent": {
+                            "methods": {
+                                "setPassUpdateNotice": {
+                                    "description": "Provide Google with information about awaiting private pass update. This will allow Google to provide the update notification to the device that currently holds this pass.",
+                                    "flatPath": "walletobjects/v1/privateContent/setPassUpdateNotice",
+                                    "httpMethod": "POST",
+                                    "id": "walletobjects.walletobjects.v1.privateContent.setPassUpdateNotice",
+                                    "parameterOrder": [],
+                                    "parameters": {},
+                                    "path": "walletobjects/v1/privateContent/setPassUpdateNotice",
+                                    "request": {
+                                        "$ref": "SetPassUpdateNoticeRequest"
+                                    },
+                                    "response": {
+                                        "$ref": "SetPassUpdateNoticeResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/wallet_object.issuer"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
-    "revision": "20240626",
+    "revision": "20251029",
     "rootUrl": "https://walletobjects.googleapis.com/",
     "schemas": {
         "ActivationOptions": {
@@ -2773,6 +2803,10 @@
                 "androidAppLinkInfo": {
                     "$ref": "AppLinkDataAppLinkInfo",
                     "description": "Optional information about the partner app link."
+                },
+                "displayText": {
+                    "$ref": "LocalizedString",
+                    "description": "Optional display text for the app link button. Character limit is 30."
                 },
                 "iosAppLinkInfo": {
                     "$ref": "AppLinkDataAppLinkInfo",
@@ -3515,7 +3549,7 @@
             "type": "object"
         },
         "DiscoverableProgram": {
-            "description": "Information about how a class may be discovered and instantiated from within the Android Pay app. This is done by searching for a loyalty or gift card program and scanning or manually entering.",
+            "description": "Information about how a class may be discovered and instantiated from within the Google Wallet app. This is done by searching for a loyalty or gift card program and scanning or manually entering.",
             "id": "DiscoverableProgram",
             "properties": {
                 "merchantSigninInfo": {
@@ -3576,7 +3610,7 @@
             "id": "DiscoverableProgramMerchantSignupInfo",
             "properties": {
                 "signupSharedDatas": {
-                    "description": " User data that is sent in a POST request to the signup website URL. This information is encoded and then shared so that the merchant's website can prefill fields used to enroll the user for the discoverable program.",
+                    "description": "User data that is sent in a POST request to the signup website URL. This information is encoded and then shared so that the merchant's website can prefill fields used to enroll the user for the discoverable program.",
                     "items": {
                         "enum": [
                             "SHARED_DATA_TYPE_UNSPECIFIED",
@@ -3906,6 +3940,7 @@
                     "description": "Translated strings for the issuer_name. Recommended maximum length is 20 characters to ensure full string is displayed on smaller screens."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
@@ -3915,6 +3950,13 @@
                 "logo": {
                     "$ref": "Image",
                     "description": "The logo image of the ticket. This image is displayed in the card detail view of the app."
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the class. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
+                    },
+                    "type": "array"
                 },
                 "messages": {
                     "description": "An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.",
@@ -3951,6 +3993,18 @@
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
+                    ],
+                    "type": "string"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this class should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If not specified, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
                     ],
                     "type": "string"
                 },
@@ -4074,6 +4128,13 @@
                     "description": "Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.",
                     "items": {
                         "$ref": "TextModuleData"
+                    },
+                    "type": "array"
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the class. For a pass only ten will be displayed, prioritizing those from the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
                     },
                     "type": "array"
                 },
@@ -4207,6 +4268,13 @@
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#eventTicketObject\"`.",
                     "type": "string"
                 },
+                "linkedObjectIds": {
+                    "description": "linked_object_ids are a list of other objects such as event ticket, loyalty, offer, generic, giftcard, transit and boarding pass that should be automatically attached to this event ticket object. If a user had saved this event ticket, then these linked_object_ids would be automatically pushed to the user's wallet (unless they turned off the setting to receive such linked passes). Make sure that objects present in linked_object_ids are already inserted - if not, calls would fail. Once linked, the linked objects cannot be unlinked. You cannot link objects belonging to another issuer. There is a limit to the number of objects that can be linked to a single object. After the limit is reached, new linked objects in the call will be ignored silently. Object IDs should follow the format issuer ID. identifier where the former is issued by Google and the latter is chosen by you.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "linkedOfferIds": {
                     "description": "A list of offer objects linked to this event ticket. The offer objects must already exist. Offer object IDs should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you.",
                     "items": {
@@ -4219,9 +4287,17 @@
                     "description": "Links module data. If links module data is also defined on the class, both will be displayed."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
+                    },
+                    "type": "array"
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the object. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
                     },
                     "type": "array"
                 },
@@ -4231,6 +4307,18 @@
                         "$ref": "Message"
                     },
                     "type": "array"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this object should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If set to DO_NOT_NOTIFY or NOTIFICATION_SETTINGS_UNSPECIFIED, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
+                    ],
+                    "type": "string"
                 },
                 "passConstraints": {
                     "$ref": "PassConstraints",
@@ -4243,6 +4331,10 @@
                 "rotatingBarcode": {
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode type and value."
+                },
+                "saveRestrictions": {
+                    "$ref": "SaveRestrictions",
+                    "description": "Restrictions on the object that needs to be verified before the user tries to save the pass. Note that this restrictions will only be applied during save time. If the restrictions changed after a user saves the pass, the new restrictions will not be applied to an already saved pass."
                 },
                 "seatInfo": {
                     "$ref": "EventSeat",
@@ -4277,14 +4369,14 @@
                         true
                     ],
                     "enumDescriptions": [
-                        "",
+                        "Default value.",
                         "Object is active and displayed to with other active objects.",
                         "Legacy alias for `ACTIVE`. Deprecated.",
-                        "",
+                        "Object has completed it's lifecycle.",
                         "Legacy alias for `COMPLETED`. Deprecated.",
                         "Object is no longer valid (`validTimeInterval` passed).",
                         "Legacy alias for `EXPIRED`. Deprecated.",
-                        "",
+                        "Object is no longer valid",
                         "Legacy alias for `INACTIVE`. Deprecated."
                     ],
                     "type": "string"
@@ -4311,6 +4403,13 @@
                 "validTimeInterval": {
                     "$ref": "TimeInterval",
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
+                    },
+                    "type": "array"
                 },
                 "version": {
                     "deprecated": true,
@@ -4662,15 +4761,15 @@
                     "description": "Links module data. If links module data is also defined on the object, both will be displayed."
                 },
                 "localBoardingDateTime": {
-                    "description": "The boarding time as it would be printed on the boarding pass. This is an ISO 8601 extended format date/time without an offset. Time may be specified up to millisecond precision. eg: `2027-03-05T06:30:00` This should be the local date/time at the airport (not a UTC time). Google will reject the request if UTC offset is provided. Time zones will be calculated by Google based on departure airport. If this is not set, Google will set it based on data from other sources.",
+                    "description": "The boarding time as it would be printed on the boarding pass. This is an ISO 8601 extended format date/time without an offset. Time may be specified up to millisecond precision. eg: `2027-03-05T06:30:00` This should be the local date/time at the airport (not a UTC time). Google will reject the request if UTC offset is provided. Time zones will be calculated by Google based on departure airport.",
                     "type": "string"
                 },
                 "localEstimatedOrActualArrivalDateTime": {
-                    "description": "The estimated time the aircraft plans to reach the destination gate (not the runway) or the actual time it reached the gate. This field should be set if at least one of the below is true: - It differs from the scheduled time. Google will use it to calculate the delay. - The aircraft already arrived at the gate. Google will use it to inform the user that the flight has arrived at the gate. This is an ISO 8601 extended format date/time without an offset. Time may be specified up to millisecond precision. eg: `2027-03-05T06:30:00` This should be the local date/time at the airport (not a UTC time). Google will reject the request if UTC offset is provided. Time zones will be calculated by Google based on arrival airport. If this is not set, Google will set it based on data from other sources.",
+                    "description": "The estimated time the aircraft plans to reach the destination gate (not the runway) or the actual time it reached the gate. This field should be set if at least one of the below is true: - It differs from the scheduled time. Google will use it to calculate the delay. - The aircraft already arrived at the gate. Google will use it to inform the user that the flight has arrived at the gate. This is an ISO 8601 extended format date/time without an offset. Time may be specified up to millisecond precision. eg: `2027-03-05T06:30:00` This should be the local date/time at the airport (not a UTC time). Google will reject the request if UTC offset is provided. Time zones will be calculated by Google based on arrival airport.",
                     "type": "string"
                 },
                 "localEstimatedOrActualDepartureDateTime": {
-                    "description": "The estimated time the aircraft plans to pull from the gate or the actual time the aircraft already pulled from the gate. Note: This is not the runway time. This field should be set if at least one of the below is true: - It differs from the scheduled time. Google will use it to calculate the delay. - The aircraft already pulled from the gate. Google will use it to inform the user when the flight actually departed. This is an ISO 8601 extended format date/time without an offset. Time may be specified up to millisecond precision. eg: `2027-03-05T06:30:00` This should be the local date/time at the airport (not a UTC time). Google will reject the request if UTC offset is provided. Time zones will be calculated by Google based on departure airport. If this is not set, Google will set it based on data from other sources.",
+                    "description": "The estimated time the aircraft plans to pull from the gate or the actual time the aircraft already pulled from the gate. Note: This is not the runway time. This field should be set if at least one of the below is true: - It differs from the scheduled time. Google will use it to calculate the delay. - The aircraft already pulled from the gate. Google will use it to inform the user when the flight actually departed. This is an ISO 8601 extended format date/time without an offset. Time may be specified up to millisecond precision. eg: `2027-03-05T06:30:00` This should be the local date/time at the airport (not a UTC time). Google will reject the request if UTC offset is provided. Time zones will be calculated by Google based on departure airport.",
                     "type": "string"
                 },
                 "localGateClosingDateTime": {
@@ -4678,7 +4777,7 @@
                     "type": "string"
                 },
                 "localScheduledArrivalDateTime": {
-                    "description": "The scheduled time the aircraft plans to reach the destination gate (not the runway). Note: This field should not change too close to the flight time. For updates to departure times (delays, etc), please set `localEstimatedOrActualArrivalDateTime`. This is an ISO 8601 extended format date/time without an offset. Time may be specified up to millisecond precision. eg: `2027-03-05T06:30:00` This should be the local date/time at the airport (not a UTC time). Google will reject the request if UTC offset is provided. Time zones will be calculated by Google based on arrival airport. If this is not set, Google will set it based on data from other sources.",
+                    "description": "The scheduled time the aircraft plans to reach the destination gate (not the runway). Note: This field should not change too close to the flight time. For updates to departure times (delays, etc), please set `localEstimatedOrActualArrivalDateTime`. This is an ISO 8601 extended format date/time without an offset. Time may be specified up to millisecond precision. eg: `2027-03-05T06:30:00` This should be the local date/time at the airport (not a UTC time). Google will reject the request if UTC offset is provided. Time zones will be calculated by Google based on arrival airport.",
                     "type": "string"
                 },
                 "localScheduledDepartureDateTime": {
@@ -4690,9 +4789,17 @@
                     "description": "Translated strings for the issuer_name. Recommended maximum length is 20 characters to ensure full string is displayed on smaller screens."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
+                    },
+                    "type": "array"
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the class. Any additional MerchantLocations added beyond the 10 will be rejected by the validator. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
                     },
                     "type": "array"
                 },
@@ -4731,6 +4838,18 @@
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
+                    ],
+                    "type": "string"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this class should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If not specified, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
                     ],
                     "type": "string"
                 },
@@ -4795,6 +4914,13 @@
                     "description": "Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.",
                     "items": {
                         "$ref": "TextModuleData"
+                    },
+                    "type": "array"
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the class. For a pass only ten will be displayed, prioritizing those from the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
                     },
                     "type": "array"
                 },
@@ -4951,14 +5077,29 @@
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#flightObject\"`.",
                     "type": "string"
                 },
+                "linkedObjectIds": {
+                    "description": "linked_object_ids are a list of other objects such as event ticket, loyalty, offer, generic, giftcard, transit and boarding pass that should be automatically attached to this flight object. If a user had saved this boarding pass, then these linked_object_ids would be automatically pushed to the user's wallet (unless they turned off the setting to receive such linked passes). Make sure that objects present in linked_object_ids are already inserted - if not, calls would fail. Once linked, the linked objects cannot be unlinked. You cannot link objects belonging to another issuer. There is a limit to the number of objects that can be linked to a single object. After the limit is reached, new linked objects in the call will be ignored silently. Object IDs should follow the format issuer ID. identifier where the former is issued by Google and the latter is chosen by you.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "linksModuleData": {
                     "$ref": "LinksModuleData",
                     "description": "Links module data. If links module data is also defined on the class, both will be displayed."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
+                    },
+                    "type": "array"
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the object. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
                     },
                     "type": "array"
                 },
@@ -4968,6 +5109,18 @@
                         "$ref": "Message"
                     },
                     "type": "array"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this object should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If set to DO_NOT_NOTIFY or NOTIFICATION_SETTINGS_UNSPECIFIED, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
+                    ],
+                    "type": "string"
                 },
                 "passConstraints": {
                     "$ref": "PassConstraints",
@@ -4984,6 +5137,10 @@
                 "rotatingBarcode": {
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode type and value."
+                },
+                "saveRestrictions": {
+                    "$ref": "SaveRestrictions",
+                    "description": "Restrictions on the object that needs to be verified before the user tries to save the pass. Note that this restrictions will only be applied during save time. If the restrictions changed after a user saves the pass, the new restrictions will not be applied to an already saved pass."
                 },
                 "securityProgramLogo": {
                     "$ref": "Image",
@@ -5018,14 +5175,14 @@
                         true
                     ],
                     "enumDescriptions": [
-                        "",
+                        "Default value.",
                         "Object is active and displayed to with other active objects.",
                         "Legacy alias for `ACTIVE`. Deprecated.",
-                        "",
+                        "Object has completed it's lifecycle.",
                         "Legacy alias for `COMPLETED`. Deprecated.",
                         "Object is no longer valid (`validTimeInterval` passed).",
                         "Legacy alias for `EXPIRED`. Deprecated.",
-                        "",
+                        "Object is no longer valid",
                         "Legacy alias for `INACTIVE`. Deprecated."
                     ],
                     "type": "string"
@@ -5040,6 +5197,13 @@
                 "validTimeInterval": {
                     "$ref": "TimeInterval",
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
+                    },
+                    "type": "array"
                 },
                 "version": {
                     "deprecated": true,
@@ -5131,6 +5295,13 @@
                     "$ref": "LinksModuleData",
                     "description": "Links module data. If `linksModuleData` is also defined on the object, both will be displayed. The maximum number of these fields displayed is 10 from class and 10 from object."
                 },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the class. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
+                    },
+                    "type": "array"
+                },
                 "messages": {
                     "description": "An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.",
                     "items": {
@@ -5185,6 +5356,13 @@
                     "description": "Text module data. If `textModulesData` is also defined on the object, both will be displayed. The maximum number of these fields displayed is 10 from class and 10 from object.",
                     "items": {
                         "$ref": "TextModuleData"
+                    },
+                    "type": "array"
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the class. For a pass only ten will be displayed, prioritizing those from the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
                     },
                     "type": "array"
                 },
@@ -5269,6 +5447,7 @@
                         "GENERIC_HOME_INSURANCE",
                         "GENERIC_ENTRY_TICKET",
                         "GENERIC_RECEIPT",
+                        "GENERIC_LOYALTY_CARD",
                         "GENERIC_OTHER"
                     ],
                     "enumDescriptions": [
@@ -5284,6 +5463,7 @@
                         "Home-insurance cards",
                         "Entry tickets",
                         "Receipts",
+                        "Loyalty cards. Please note that it is advisable to use a dedicated Loyalty card pass type instead of this generic type. A dedicated loyalty card pass type offers more features and functionality than a generic pass type.",
                         "Other type"
                     ],
                     "type": "string"
@@ -5319,6 +5499,13 @@
                     },
                     "type": "array"
                 },
+                "linkedObjectIds": {
+                    "description": "linked_object_ids are a list of other objects such as event ticket, loyalty, offer, generic, giftcard, transit and boarding pass that should be automatically attached to this generic object. If a user had saved this generic card, then these linked_object_ids would be automatically pushed to the user's wallet (unless they turned off the setting to receive such linked passes). Make sure that objects present in linked_object_ids are already inserted - if not, calls would fail. Once linked, the linked objects cannot be unlinked. You cannot link objects belonging to another issuer. There is a limit to the number of objects that can be linked to a single object. After the limit is reached, new linked objects in the call will be ignored silently. Object IDs should follow the format issuer ID. identifier where the former is issued by Google and the latter is chosen by you.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "linksModuleData": {
                     "$ref": "LinksModuleData",
                     "description": "Links module data. If `linksModuleData` is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from class and 10 from object."
@@ -5326,6 +5513,20 @@
                 "logo": {
                     "$ref": "Image",
                     "description": "The logo image of the pass. This image is displayed in the card detail view in upper left, and also on the list/thumbnail view. If the logo is not present, the first letter of `cardTitle` would be shown as logo."
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the object. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
+                    },
+                    "type": "array"
+                },
+                "messages": {
+                    "description": "An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.",
+                    "items": {
+                        "$ref": "Message"
+                    },
+                    "type": "array"
                 },
                 "notifications": {
                     "$ref": "Notifications",
@@ -5338,6 +5539,10 @@
                 "rotatingBarcode": {
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode settings/details."
+                },
+                "saveRestrictions": {
+                    "$ref": "SaveRestrictions",
+                    "description": "Restrictions on the object that needs to be verified before the user tries to save the pass. Note that this restrictions will only be applied during save time. If the restrictions changed after a user saves the pass, the new restrictions will not be applied to an already saved pass."
                 },
                 "smartTapRedemptionValue": {
                     "description": "The value that will be transmitted to a Smart Tap certified terminal over NFC for this object. The class level fields `enableSmartTap` and `redemptionIssuers` must also be set up correctly in order for the pass to support Smart Tap. Only ASCII characters are supported.",
@@ -5368,14 +5573,14 @@
                         true
                     ],
                     "enumDescriptions": [
-                        "",
+                        "Default value.",
                         "Object is active and displayed to with other active objects.",
                         "Legacy alias for `ACTIVE`. Deprecated.",
-                        "",
+                        "Object has completed it's lifecycle.",
                         "Legacy alias for `COMPLETED`. Deprecated.",
                         "Object is no longer valid (`validTimeInterval` passed).",
                         "Legacy alias for `EXPIRED`. Deprecated.",
-                        "",
+                        "Object is no longer valid",
                         "Legacy alias for `INACTIVE`. Deprecated."
                     ],
                     "type": "string"
@@ -5394,6 +5599,13 @@
                 "validTimeInterval": {
                     "$ref": "TimeInterval",
                     "description": "The time period this object will be considered valid or usable. When the time period is passed, the object will be considered expired, which will affect the rendering on user's devices."
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
+                    },
+                    "type": "array"
                 },
                 "wideLogo": {
                     "$ref": "Image",
@@ -5533,9 +5745,17 @@
                     "description": "Translated strings for the pin_label."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
+                    },
+                    "type": "array"
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the class. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
                     },
                     "type": "array"
                 },
@@ -5578,6 +5798,18 @@
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
+                    ],
+                    "type": "string"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this class should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If not specified, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
                     ],
                     "type": "string"
                 },
@@ -5646,6 +5878,13 @@
                     "description": "Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.",
                     "items": {
                         "$ref": "TextModuleData"
+                    },
+                    "type": "array"
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the class. For a pass only ten will be displayed, prioritizing those from the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
                     },
                     "type": "array"
                 },
@@ -5783,14 +6022,29 @@
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#giftCardObject\"`.",
                     "type": "string"
                 },
+                "linkedObjectIds": {
+                    "description": "linked_object_ids are a list of other objects such as event ticket, loyalty, offer, generic, giftcard, transit and boarding pass that should be automatically attached to this giftcard object. If a user had saved this gift card, then these linked_object_ids would be automatically pushed to the user's wallet (unless they turned off the setting to receive such linked passes). Make sure that objects present in linked_object_ids are already inserted - if not, calls would fail. Once linked, the linked objects cannot be unlinked. You cannot link objects belonging to another issuer. There is a limit to the number of objects that can be linked to a single object. After the limit is reached, new linked objects in the call will be ignored silently. Object IDs should follow the format issuer ID. identifier where the former is issued by Google and the latter is chosen by you.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "linksModuleData": {
                     "$ref": "LinksModuleData",
                     "description": "Links module data. If links module data is also defined on the class, both will be displayed."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
+                    },
+                    "type": "array"
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the object. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
                     },
                     "type": "array"
                 },
@@ -5800,6 +6054,18 @@
                         "$ref": "Message"
                     },
                     "type": "array"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this object should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If set to DO_NOT_NOTIFY or NOTIFICATION_SETTINGS_UNSPECIFIED, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
+                    ],
+                    "type": "string"
                 },
                 "passConstraints": {
                     "$ref": "PassConstraints",
@@ -5812,6 +6078,10 @@
                 "rotatingBarcode": {
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode type and value."
+                },
+                "saveRestrictions": {
+                    "$ref": "SaveRestrictions",
+                    "description": "Restrictions on the object that needs to be verified before the user tries to save the pass. Note that this restrictions will only be applied during save time. If the restrictions changed after a user saves the pass, the new restrictions will not be applied to an already saved pass."
                 },
                 "smartTapRedemptionValue": {
                     "description": "The value that will be transmitted to a Smart Tap certified terminal over NFC for this object. The class level fields `enableSmartTap` and `redemptionIssuers` must also be set up correctly in order for the pass to support Smart Tap. Only ASCII characters are supported.",
@@ -5842,14 +6112,14 @@
                         true
                     ],
                     "enumDescriptions": [
-                        "",
+                        "Default value.",
                         "Object is active and displayed to with other active objects.",
                         "Legacy alias for `ACTIVE`. Deprecated.",
-                        "",
+                        "Object has completed it's lifecycle.",
                         "Legacy alias for `COMPLETED`. Deprecated.",
                         "Object is no longer valid (`validTimeInterval` passed).",
                         "Legacy alias for `EXPIRED`. Deprecated.",
-                        "",
+                        "Object is no longer valid",
                         "Legacy alias for `INACTIVE`. Deprecated."
                     ],
                     "type": "string"
@@ -5864,6 +6134,13 @@
                 "validTimeInterval": {
                     "$ref": "TimeInterval",
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
+                    },
+                    "type": "array"
                 },
                 "version": {
                     "deprecated": true,
@@ -5917,7 +6194,7 @@
             "type": "object"
         },
         "Image": {
-            "description": "Wrapping type for Google hosted images. Next ID: 7",
+            "description": "Wrapping type for Google hosted images.",
             "id": "Image",
             "properties": {
                 "contentDescription": {
@@ -5929,9 +6206,13 @@
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#image\"`.",
                     "type": "string"
                 },
+                "privateImageId": {
+                    "description": "An ID for an already uploaded private image. Either this or source_uri should be set. Requests setting both or neither will be rejected. Please contact support to use private images.",
+                    "type": "string"
+                },
                 "sourceUri": {
                     "$ref": "ImageUri",
-                    "description": "The URI for the image."
+                    "description": "A URI for the image. Either this or private_image_id should be set. Requests setting both or neither will be rejected."
                 }
             },
             "type": "object"
@@ -6346,9 +6627,17 @@
                     "description": "Translated strings for the secondary_rewards_tier_label."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
+                    },
+                    "type": "array"
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the class. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
                     },
                     "type": "array"
                 },
@@ -6387,6 +6676,18 @@
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
+                    ],
+                    "type": "string"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this class should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If not specified, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
                     ],
                     "type": "string"
                 },
@@ -6471,6 +6772,13 @@
                     "description": "Text module data. If text module data is also defined on the class, both will be displayed. The maximum number of these fields displayed is 10 from the object and 10 from the class.",
                     "items": {
                         "$ref": "TextModuleData"
+                    },
+                    "type": "array"
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the class. For a pass only ten will be displayed, prioritizing those from the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
                     },
                     "type": "array"
                 },
@@ -6600,6 +6908,13 @@
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#loyaltyObject\"`.",
                     "type": "string"
                 },
+                "linkedObjectIds": {
+                    "description": "linked_object_ids are a list of other objects such as event ticket, loyalty, offer, generic, giftcard, transit and boarding pass that should be automatically attached to this loyalty object. If a user had saved this loyalty card, then these linked_object_ids would be automatically pushed to the user's wallet (unless they turned off the setting to receive such linked passes). Make sure that objects present in linked_object_ids are already inserted - if not, calls would fail. Once linked, the linked objects cannot be unlinked. You cannot link objects belonging to another issuer. There is a limit to the number of objects that can be linked to a single object. After the limit is reached, new linked objects in the call will be ignored silently. Object IDs should follow the format issuer ID. identifier where the former is issued by Google and the latter is chosen by you.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "linkedOfferIds": {
                     "description": "A list of offer objects linked to this loyalty card. The offer objects must already exist. Offer object IDs should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you.",
                     "items": {
@@ -6612,6 +6927,7 @@
                     "description": "Links module data. If links module data is also defined on the class, both will be displayed."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
@@ -6622,12 +6938,31 @@
                     "$ref": "LoyaltyPoints",
                     "description": "The loyalty reward points label, balance, and type."
                 },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the object. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
+                    },
+                    "type": "array"
+                },
                 "messages": {
                     "description": "An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.",
                     "items": {
                         "$ref": "Message"
                     },
                     "type": "array"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this object should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If set to DO_NOT_NOTIFY or NOTIFICATION_SETTINGS_UNSPECIFIED, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
+                    ],
+                    "type": "string"
                 },
                 "passConstraints": {
                     "$ref": "PassConstraints",
@@ -6636,6 +6971,10 @@
                 "rotatingBarcode": {
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode type and value."
+                },
+                "saveRestrictions": {
+                    "$ref": "SaveRestrictions",
+                    "description": "Restrictions on the object that needs to be verified before the user tries to save the pass. Note that this restrictions will only be applied during save time. If the restrictions changed after a user saves the pass, the new restrictions will not be applied to an already saved pass."
                 },
                 "secondaryLoyaltyPoints": {
                     "$ref": "LoyaltyPoints",
@@ -6670,14 +7009,14 @@
                         true
                     ],
                     "enumDescriptions": [
-                        "",
+                        "Default value.",
                         "Object is active and displayed to with other active objects.",
                         "Legacy alias for `ACTIVE`. Deprecated.",
-                        "",
+                        "Object has completed it's lifecycle.",
                         "Legacy alias for `COMPLETED`. Deprecated.",
                         "Object is no longer valid (`validTimeInterval` passed).",
                         "Legacy alias for `EXPIRED`. Deprecated.",
-                        "",
+                        "Object is no longer valid",
                         "Legacy alias for `INACTIVE`. Deprecated."
                     ],
                     "type": "string"
@@ -6692,6 +7031,13 @@
                 "validTimeInterval": {
                     "$ref": "TimeInterval",
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
+                    },
+                    "type": "array"
                 },
                 "version": {
                     "deprecated": true,
@@ -6986,6 +7332,11 @@
                     ],
                     "type": "string"
                 },
+                "physicalHeaders": {
+                    "description": "The physical headers provided by RequestReceivedParameters in Scotty request. type is uploader_service.KeyValuePairs.",
+                    "format": "byte",
+                    "type": "string"
+                },
                 "requestId": {
                     "description": "The Scotty request ID.",
                     "type": "string"
@@ -7003,6 +7354,23 @@
                 "totalBytesIsEstimated": {
                     "description": "Whether the total bytes field contains an estimated data.",
                     "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "MerchantLocation": {
+            "description": "Locations of interest for this class or object. Currently, this location is used for geofenced notifications. When a user is within a set radius of this lat/long, and dwells there, Google will trigger a notification. When a user exits this radius, the notification will be hidden.",
+            "id": "MerchantLocation",
+            "properties": {
+                "latitude": {
+                    "description": "The latitude specified as any value in the range of -90.0 through +90.0, both inclusive. Values outside these bounds will be rejected.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "longitude": {
+                    "description": "The longitude specified in the range -180.0 through +180.0, both inclusive. Values outside these bounds will be rejected.",
+                    "format": "double",
+                    "type": "number"
                 }
             },
             "type": "object"
@@ -7097,6 +7465,17 @@
                 "linkedOfferObjectIds": {
                     "$ref": "ModifyLinkedOfferObjects",
                     "description": "The linked offer object ids to add or remove from the object."
+                }
+            },
+            "type": "object"
+        },
+        "ModuleViewConstraints": {
+            "description": "Constraints that all must be met for the module to be shown.",
+            "id": "ModuleViewConstraints",
+            "properties": {
+                "displayInterval": {
+                    "$ref": "TimeInterval",
+                    "description": "The period of time that the module will be displayed to users. Can define both a `startTime` and `endTime`. The module is displayed immediately after insertion unless a `startTime` is set. The module is displayed indefinitely if `endTime` is not set."
                 }
             },
             "type": "object"
@@ -7262,9 +7641,17 @@
                     "description": "Translated strings for the title. Recommended maximum length is 60 characters to ensure full string is displayed on smaller screens."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
+                    },
+                    "type": "array"
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the class. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
                     },
                     "type": "array"
                 },
@@ -7303,6 +7690,18 @@
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
+                    ],
+                    "type": "string"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this class should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If not specified, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
                     ],
                     "type": "string"
                 },
@@ -7418,6 +7817,13 @@
                 "titleImage": {
                     "$ref": "Image",
                     "description": "The title image of the offer. This image is displayed in both the details and list views of the app."
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the class. For a pass only ten will be displayed, prioritizing those from the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
+                    },
+                    "type": "array"
                 },
                 "version": {
                     "deprecated": true,
@@ -7537,6 +7943,13 @@
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#offerObject\"`.",
                     "type": "string"
                 },
+                "linkedObjectIds": {
+                    "description": "linked_object_ids are a list of other objects such as event ticket, loyalty, offer, generic, giftcard, transit and boarding pass that should be automatically attached to this offer object. If a user had saved this offer, then these linked_object_ids would be automatically pushed to the user's wallet (unless they turned off the setting to receive such linked passes). Make sure that objects present in linked_object_ids are already inserted - if not, calls would fail. Once linked, the linked objects cannot be unlinked. You cannot link objects belonging to another issuer. There is a limit to the number of objects that can be linked to a single object. After the limit is reached, new linked objects in the call will be ignored silently. Object IDs should follow the format issuer ID.identifier where the former is issued by Google and the latter is chosen by you.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "linksModuleData": {
                     "$ref": "LinksModuleData",
                     "description": "Links module data. If links module data is also defined on the class, both will be displayed."
@@ -7548,12 +7961,31 @@
                     },
                     "type": "array"
                 },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the object. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
+                    },
+                    "type": "array"
+                },
                 "messages": {
                     "description": "An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.",
                     "items": {
                         "$ref": "Message"
                     },
                     "type": "array"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this object should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If set to DO_NOT_NOTIFY or NOTIFICATION_SETTINGS_UNSPECIFIED, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
+                    ],
+                    "type": "string"
                 },
                 "passConstraints": {
                     "$ref": "PassConstraints",
@@ -7562,6 +7994,10 @@
                 "rotatingBarcode": {
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode type and value."
+                },
+                "saveRestrictions": {
+                    "$ref": "SaveRestrictions",
+                    "description": "Restrictions on the object that needs to be verified before the user tries to save the pass. Note that this restrictions will only be applied during save time. If the restrictions changed after a user saves the pass, the new restrictions will not be applied to an already saved pass."
                 },
                 "smartTapRedemptionValue": {
                     "description": "The value that will be transmitted to a Smart Tap certified terminal over NFC for this object. The class level fields `enableSmartTap` and `redemptionIssuers` must also be set up correctly in order for the pass to support Smart Tap. Only ASCII characters are supported.",
@@ -7592,14 +8028,14 @@
                         true
                     ],
                     "enumDescriptions": [
-                        "",
+                        "Default value.",
                         "Object is active and displayed to with other active objects.",
                         "Legacy alias for `ACTIVE`. Deprecated.",
-                        "",
+                        "Object has completed it's lifecycle.",
                         "Legacy alias for `COMPLETED`. Deprecated.",
                         "Object is no longer valid (`validTimeInterval` passed).",
                         "Legacy alias for `EXPIRED`. Deprecated.",
-                        "",
+                        "Object is no longer valid",
                         "Legacy alias for `INACTIVE`. Deprecated."
                     ],
                     "type": "string"
@@ -7614,6 +8050,13 @@
                 "validTimeInterval": {
                     "$ref": "TimeInterval",
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
+                    },
+                    "type": "array"
                 },
                 "version": {
                     "deprecated": true,
@@ -8132,6 +8575,17 @@
             },
             "type": "object"
         },
+        "SaveRestrictions": {
+            "description": "Defines restrictions on the object that will be verified during save. Note: this is an advanced feature, please contact Google for implementation support.",
+            "id": "SaveRestrictions",
+            "properties": {
+                "restrictToEmailSha256": {
+                    "description": "Restrict the save of the referencing object to the given email address only. This is the hex output of SHA256 sum of the email address, all lowercase and without any notations like \".\" or \"+\", except \"@\". For example, for example@example.com, this value will be 31c5543c1734d25c7206f5fd591525d0295bec6fe84ff82f946a34fe970a1e66 and for Example@example.com, this value will be bc34f262c93ad7122763684ccea6f07fb7f5d8a2d11e60ce15a6f43fe70ce632 If email address of the logged-in user who tries to save this pass does not match with the defined value here, users won't be allowed to save this pass. They will instead be prompted with an error to contact the issuer. This information should be gathered from the user with an explicit consent via Sign in with Google integration https://developers.google.com/identity/authentication. Please contact with support before using Save Restrictions.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "SecurityAnimation": {
             "id": "SecurityAnimation",
             "properties": {
@@ -8155,6 +8609,31 @@
                     "type": "string"
                 }
             },
+            "type": "object"
+        },
+        "SetPassUpdateNoticeRequest": {
+            "description": "Request to send a private pass update notice information to Google, so that devices can then fetch the notice prompting the user to update a pass.",
+            "id": "SetPassUpdateNoticeRequest",
+            "properties": {
+                "externalPassId": {
+                    "description": "Required. A fully qualified identifier of the pass that the issuer wants to notify the pass holder(s) about. Formatted as .",
+                    "type": "string"
+                },
+                "updateUri": {
+                    "description": "Required. The issuer endpoint URI the pass holder needs to follow in order to receive an updated pass JWT. It can not contain any sensitive information. The endpoint needs to authenticate the user before giving the user the updated JWT. Example update URI https://someissuer.com/update/passId=someExternalPassId",
+                    "type": "string"
+                },
+                "updatedPassJwtSignature": {
+                    "description": "Required. The JWT signature of the updated pass that the issuer wants to notify Google about. Only devices that report a different JWT signature than this JWT signature will receive the update notification.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SetPassUpdateNoticeResponse": {
+            "description": "A response to a request to notify Google of an awaiting update to a private pass.",
+            "id": "SetPassUpdateNoticeResponse",
+            "properties": {},
             "type": "object"
         },
         "SignUpInfo": {
@@ -8264,7 +8743,7 @@
                     "type": "string"
                 },
                 "id": {
-                    "description": "The ID associated with a text module. This field is here to enable ease of management of text modules.",
+                    "description": "The ID associated with a text module. This field is here to enable ease of management of text modules and referencing them in template overrides. The ID should only include alphanumeric characters, '_', or '-'. It can not include dots, as dots are used to separate fields within FieldReference.fieldPaths in template overrides.",
                     "type": "string"
                 },
                 "localizedBody": {
@@ -8612,6 +9091,7 @@
                     "description": "Translated strings for the issuer_name. Recommended maximum length is 20 characters to ensure full string is displayed on smaller screens."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
@@ -8621,6 +9101,13 @@
                 "logo": {
                     "$ref": "Image",
                     "description": "Required. The logo image of the ticket. This image is displayed in the card detail view of the app."
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the class. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
+                    },
+                    "type": "array"
                 },
                 "messages": {
                     "description": "An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.",
@@ -8657,6 +9144,18 @@
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
+                    ],
+                    "type": "string"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this class should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If set to DO_NOT_NOTIFY or NOTIFICATION_SETTINGS_UNSPECIFIED, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
                     ],
                     "type": "string"
                 },
@@ -8766,6 +9265,13 @@
                         "Legacy alias for `OTHER`. Deprecated."
                     ],
                     "type": "string"
+                },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the class. For a pass only ten will be displayed, prioritizing those from the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
+                    },
+                    "type": "array"
                 },
                 "version": {
                     "deprecated": true,
@@ -8935,14 +9441,29 @@
                     "$ref": "InfoModuleData",
                     "description": "Deprecated. Use textModulesData instead."
                 },
+                "linkedObjectIds": {
+                    "description": "linked_object_ids are a list of other objects such as event ticket, loyalty, offer, generic, giftcard, transit and boarding pass that should be automatically attached to this transit object. If a user had saved this transit card, then these linked_object_ids would be automatically pushed to the user's wallet (unless they turned off the setting to receive such linked passes). Make sure that objects present in linked_object_ids are already inserted - if not, calls would fail. Once linked, the linked objects cannot be unlinked. You cannot link objects belonging to another issuer. There is a limit to the number of objects that can be linked to a single object. After the limit is reached, new linked objects in the call will be ignored silently. Object IDs should follow the format issuer ID. identifier where the former is issued by Google and the latter is chosen by you.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "linksModuleData": {
                     "$ref": "LinksModuleData",
                     "description": "Links module data. If links module data is also defined on the class, both will be displayed."
                 },
                 "locations": {
+                    "deprecated": true,
                     "description": "Note: This field is currently not supported to trigger geo notifications.",
                     "items": {
                         "$ref": "LatLongPoint"
+                    },
+                    "type": "array"
+                },
+                "merchantLocations": {
+                    "description": "Merchant locations. There is a maximum of ten on the object. Any additional MerchantLocations added beyond the 10 will be rejected. These locations will trigger a notification when a user enters within a Google-set radius of the point. This field replaces the deprecated LatLongPoints.",
+                    "items": {
+                        "$ref": "MerchantLocation"
                     },
                     "type": "array"
                 },
@@ -8952,6 +9473,18 @@
                         "$ref": "Message"
                     },
                     "type": "array"
+                },
+                "notifyPreference": {
+                    "description": "Whether or not field updates to this object should trigger notifications. When set to NOTIFY, we will attempt to trigger a field update notification to users. These notifications will only be sent to users if the field is part of an allowlist. If set to DO_NOT_NOTIFY or NOTIFICATION_SETTINGS_UNSPECIFIED, no notification will be triggered. This setting is ephemeral and needs to be set with each PATCH or UPDATE request, otherwise a notification will not be triggered.",
+                    "enum": [
+                        "NOTIFICATION_SETTINGS_FOR_UPDATES_UNSPECIFIED",
+                        "NOTIFY_ON_UPDATE"
+                    ],
+                    "enumDescriptions": [
+                        "Default behavior is no notifications sent.",
+                        "This value will result in a notification being sent, if the updated fields are part of an allowlist."
+                    ],
+                    "type": "string"
                 },
                 "passConstraints": {
                     "$ref": "PassConstraints",
@@ -8994,6 +9527,10 @@
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode type and value."
                 },
+                "saveRestrictions": {
+                    "$ref": "SaveRestrictions",
+                    "description": "Restrictions on the object that needs to be verified before the user tries to save the pass. Note that this restrictions will only be applied during save time. If the restrictions changed after a user saves the pass, the new restrictions will not be applied to an already saved pass."
+                },
                 "smartTapRedemptionValue": {
                     "description": "The value that will be transmitted to a Smart Tap certified terminal over NFC for this object. The class level fields `enableSmartTap` and `redemptionIssuers` must also be set up correctly in order for the pass to support Smart Tap. Only ASCII characters are supported.",
                     "type": "string"
@@ -9023,14 +9560,14 @@
                         true
                     ],
                     "enumDescriptions": [
-                        "",
+                        "Default value.",
                         "Object is active and displayed to with other active objects.",
                         "Legacy alias for `ACTIVE`. Deprecated.",
-                        "",
+                        "Object has completed it's lifecycle.",
                         "Legacy alias for `COMPLETED`. Deprecated.",
                         "Object is no longer valid (`validTimeInterval` passed).",
                         "Legacy alias for `EXPIRED`. Deprecated.",
-                        "",
+                        "Object is no longer valid",
                         "Legacy alias for `INACTIVE`. Deprecated."
                     ],
                     "type": "string"
@@ -9125,6 +9662,13 @@
                     "$ref": "TimeInterval",
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
                 },
+                "valueAddedModuleData": {
+                    "description": "Optional value added module data. Maximum of ten on the object.",
+                    "items": {
+                        "$ref": "ValueAddedModuleData"
+                    },
+                    "type": "array"
+                },
                 "version": {
                     "deprecated": true,
                     "description": "Deprecated",
@@ -9212,6 +9756,23 @@
             },
             "type": "object"
         },
+        "UploadPrivateImageRequest": {
+            "description": "Request to upload a private image to use in a pass.",
+            "id": "UploadPrivateImageRequest",
+            "properties": {},
+            "type": "object"
+        },
+        "UploadPrivateImageResponse": {
+            "description": "Response for uploading the private image.",
+            "id": "UploadPrivateImageResponse",
+            "properties": {
+                "privateImageId": {
+                    "description": "Unique ID of the uploaded image to be referenced later in Image.private_image_id.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Uri": {
             "id": "Uri",
             "properties": {
@@ -9235,6 +9796,38 @@
                 "uri": {
                     "description": "The location of a web page, image, or other resource. URIs in the `LinksModuleData` module can have different prefixes indicating the type of URI (a link to a web page, a link to a map, a telephone number, or an email address). URIs must have a scheme.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ValueAddedModuleData": {
+            "description": "Data for Value Added module. Required fields are header and uri.",
+            "id": "ValueAddedModuleData",
+            "properties": {
+                "body": {
+                    "$ref": "LocalizedString",
+                    "description": "Body to be displayed on the module. Character limit is 50 and longer strings will be truncated."
+                },
+                "header": {
+                    "$ref": "LocalizedString",
+                    "description": "Header to be displayed on the module. Character limit is 60 and longer strings will be truncated."
+                },
+                "image": {
+                    "$ref": "Image",
+                    "description": "Image to be displayed on the module. Recommended image ratio is 1:1. Images will be resized to fit this ratio."
+                },
+                "sortIndex": {
+                    "description": "The index for sorting the modules. Modules with a lower sort index are shown before modules with a higher sort index. If unspecified, the sort index is assumed to be INT_MAX. For two modules with the same index, the sorting behavior is undefined.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "uri": {
+                    "description": "URI that the module leads to on click. This can be a web link or a deep link as mentioned in https://developer.android.com/training/app-links/deep-linking.",
+                    "type": "string"
+                },
+                "viewConstraints": {
+                    "$ref": "ModuleViewConstraints",
+                    "description": "Constraints that all must be met for the module to be shown."
                 }
             },
             "type": "object"

@@ -143,6 +143,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Unless explicitly documented otherwise, don't use this unsupported field which is primarily intended for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -249,6 +255,11 @@
                                         "name"
                                     ],
                                     "parameters": {
+                                        "force": {
+                                            "description": "Optional. If set to true, any nested resources from this instance will also be deleted.",
+                                            "location": "query",
+                                            "type": "boolean"
+                                        },
                                         "name": {
                                             "description": "Required. The instance resource name in the format projects/{project}/locations/{location}/instances/{instance}",
                                             "location": "path",
@@ -760,7 +771,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "datafusion.projects.locations.operations.cancel",
@@ -930,7 +941,7 @@
             }
         }
     },
-    "revision": "20240618",
+    "revision": "20251006",
     "rootUrl": "https://datafusion.googleapis.com/",
     "schemas": {
         "Accelerator": {
@@ -1056,7 +1067,7 @@
             "id": "CryptoKeyConfig",
             "properties": {
                 "keyReference": {
-                    "description": "The name of the key which is used to encrypt/decrypt customer data. For key in Cloud KMS, the key should be in the format of `projects/*/locations/*/keyRings/*/cryptoKeys/*`.",
+                    "description": "Optional. The name of the key which is used to encrypt/decrypt customer data. For key in Cloud KMS, the key should be in the format of `projects/*/locations/*/keyRings/*/cryptoKeys/*`.",
                     "type": "string"
                 }
             },
@@ -1075,7 +1086,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "Required. The resource name of the dns peering zone. Format: projects/{project}/locations/{location}/instances/{instance}/dnsPeerings/{dns_peering}",
+                    "description": "Identifier. The resource name of the dns peering zone. Format: projects/{project}/locations/{location}/instances/{instance}/dnsPeerings/{dns_peering}",
                     "type": "string"
                 },
                 "targetNetwork": {
@@ -1181,18 +1192,18 @@
                 },
                 "cryptoKeyConfig": {
                     "$ref": "CryptoKeyConfig",
-                    "description": "The crypto key configuration. This field is used by the Customer-Managed Encryption Keys (CMEK) feature."
+                    "description": "Optional. The crypto key configuration. This field is used by the Customer-Managed Encryption Keys (CMEK) feature."
                 },
                 "dataplexDataLineageIntegrationEnabled": {
                     "description": "Optional. Option to enable the Dataplex Lineage Integration feature.",
                     "type": "boolean"
                 },
                 "dataprocServiceAccount": {
-                    "description": "User-managed service account to set on Dataproc when Cloud Data Fusion creates Dataproc to run data processing pipelines. This allows users to have fine-grained access control on Dataproc's accesses to cloud resources.",
+                    "description": "Optional. User-managed service account to set on Dataproc when Cloud Data Fusion creates Dataproc to run data processing pipelines. This allows users to have fine-grained access control on Dataproc's accesses to cloud resources.",
                     "type": "string"
                 },
                 "description": {
-                    "description": "A description of this instance.",
+                    "description": "Optional. A description of this instance.",
                     "type": "string"
                 },
                 "disabledReason": {
@@ -1200,11 +1211,13 @@
                     "items": {
                         "enum": [
                             "DISABLED_REASON_UNSPECIFIED",
-                            "KMS_KEY_ISSUE"
+                            "KMS_KEY_ISSUE",
+                            "PROJECT_STATE_OFF"
                         ],
                         "enumDescriptions": [
                             "This is an unknown reason for disabling.",
-                            "The KMS key used by the instance is either revoked or denied access to"
+                            "The KMS key used by the instance is either revoked or denied access to",
+                            "The consumer project is in a non-ACTIVE state."
                         ],
                         "type": "string"
                     },
@@ -1212,28 +1225,29 @@
                     "type": "array"
                 },
                 "displayName": {
-                    "description": "Display name for an instance.",
+                    "description": "Optional. Display name for an instance.",
                     "type": "string"
                 },
                 "enableRbac": {
-                    "description": "Option to enable granular role-based access control.",
+                    "description": "Optional. Option to enable granular role-based access control.",
                     "type": "boolean"
                 },
                 "enableStackdriverLogging": {
-                    "description": "Option to enable Stackdriver Logging.",
+                    "description": "Optional. Option to enable Dataproc Stackdriver Logging.",
                     "type": "boolean"
                 },
                 "enableStackdriverMonitoring": {
-                    "description": "Option to enable Stackdriver Monitoring.",
+                    "description": "Optional. Option to enable Stackdriver Monitoring.",
                     "type": "boolean"
                 },
                 "enableZoneSeparation": {
-                    "description": "Option to enable zone separation.",
+                    "description": "Output only. Option to enable zone separation.",
+                    "readOnly": true,
                     "type": "boolean"
                 },
                 "eventPublishConfig": {
                     "$ref": "EventPublishConfig",
-                    "description": "Option to enable and pass metadata for event publishing."
+                    "description": "Optional. Option to enable and pass metadata for event publishing."
                 },
                 "gcsBucket": {
                     "description": "Output only. Cloud Storage bucket generated by Data Fusion in the customer project.",
@@ -1247,6 +1261,18 @@
                     "description": "The resource labels for instance to use to annotate any related underlying resources such as Compute Engine VMs. The character '=' is not allowed to be used within the labels.",
                     "type": "object"
                 },
+                "loggingConfig": {
+                    "$ref": "LoggingConfig",
+                    "description": "Optional. The logging configuration for this instance. This field is supported only in CDF versions 6.11.0 and above."
+                },
+                "maintenanceEvents": {
+                    "description": "Output only. The maintenance events for this instance.",
+                    "items": {
+                        "$ref": "MaintenanceEvent"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
                 "maintenancePolicy": {
                     "$ref": "MaintenancePolicy",
                     "description": "Optional. Configure the maintenance policy for this instance."
@@ -1258,13 +1284,13 @@
                 },
                 "networkConfig": {
                     "$ref": "NetworkConfig",
-                    "description": "Network configuration options. These are required when a private Data Fusion instance is to be created."
+                    "description": "Optional. Network configuration options. These are required when a private Data Fusion instance is to be created."
                 },
                 "options": {
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Map of additional options used to configure the behavior of Data Fusion instance.",
+                    "description": "Optional. Map of additional options used to configure the behavior of Data Fusion instance.",
                     "type": "object"
                 },
                 "p4ServiceAccount": {
@@ -1277,7 +1303,12 @@
                     "type": "string"
                 },
                 "privateInstance": {
-                    "description": "Specifies whether the Data Fusion instance should be private. If set to true, all Data Fusion nodes will have private IP addresses and will not be able to access the public internet.",
+                    "description": "Optional. Specifies whether the Data Fusion instance should be private. If set to true, all Data Fusion nodes will have private IP addresses and will not be able to access the public internet.",
+                    "type": "boolean"
+                },
+                "satisfiesPzi": {
+                    "description": "Output only. Reserved for future use.",
+                    "readOnly": true,
                     "type": "boolean"
                 },
                 "satisfiesPzs": {
@@ -1309,7 +1340,8 @@
                         "UPDATING",
                         "AUTO_UPDATING",
                         "AUTO_UPGRADING",
-                        "DISABLED"
+                        "DISABLED",
+                        "ENABLING"
                     ],
                     "enumDescriptions": [
                         "Instance does not have a state yet",
@@ -1322,7 +1354,8 @@
                         "Instance is being updated on customer request",
                         "Instance is being auto-updated",
                         "Instance is being auto-upgraded",
-                        "Instance is disabled"
+                        "Instance is disabled",
+                        "Instance is being enabled."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -1331,6 +1364,13 @@
                     "description": "Output only. Additional information about the current state of this Data Fusion instance if available.",
                     "readOnly": true,
                     "type": "string"
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Input only. Immutable. Tag keys/values directly bound to this resource. For example: \"123/environment\": \"production\", \"123/costCenter\": \"marketing\"",
+                    "type": "object"
                 },
                 "tenantProjectId": {
                     "description": "Output only. The name of the tenant project.",
@@ -1360,7 +1400,7 @@
                     "type": "string"
                 },
                 "version": {
-                    "description": "Current version of Data Fusion.",
+                    "description": "Optional. Current version of Data Fusion.",
                     "type": "string"
                 },
                 "workforceIdentityServiceEndpoint": {
@@ -1369,7 +1409,7 @@
                     "type": "string"
                 },
                 "zone": {
-                    "description": "Name of the zone in which the Data Fusion instance will be created. Only DEVELOPER instances use this field.",
+                    "description": "Optional. Name of the zone in which the Data Fusion instance will be created. Only DEVELOPER instances use this field.",
                     "type": "string"
                 }
             },
@@ -1380,7 +1420,8 @@
             "id": "ListAvailableVersionsResponse",
             "properties": {
                 "availableVersions": {
-                    "description": "Represents a list of versions that are supported.",
+                    "deprecated": true,
+                    "description": "Represents a list of versions that are supported. Deprecated: Use versions field instead.",
                     "items": {
                         "$ref": "Version"
                     },
@@ -1389,6 +1430,13 @@
                 "nextPageToken": {
                     "description": "Token to retrieve the next page of results or empty if there are no more results in the list.",
                     "type": "string"
+                },
+                "versions": {
+                    "description": "Represents a list of all versions.",
+                    "items": {
+                        "$ref": "Version"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1519,6 +1567,53 @@
                 },
                 "name": {
                     "description": "Resource name for the location, which may vary between implementations. For example: `\"projects/example-project/locations/us-east1\"`",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "LoggingConfig": {
+            "description": "Logging configuration for a Data Fusion instance.",
+            "id": "LoggingConfig",
+            "properties": {
+                "instanceCloudLoggingDisabled": {
+                    "description": "Optional. Option to determine whether instance logs should be written to Cloud Logging. By default, instance logs are written to Cloud Logging.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "MaintenanceEvent": {
+            "description": "Represents a maintenance event.",
+            "id": "MaintenanceEvent",
+            "properties": {
+                "endTime": {
+                    "description": "Output only. The end time of the maintenance event provided in [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. Example: \"2024-01-02T12:04:06-06:00\" This field will be empty if the maintenance event is not yet complete.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "startTime": {
+                    "description": "Output only. The start time of the maintenance event provided in [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. Example: \"2024-01-01T12:04:06-04:00\"",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Output only. The state of the maintenance event.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "SCHEDULED",
+                        "STARTED",
+                        "COMPLETED"
+                    ],
+                    "enumDescriptions": [
+                        "The state of the maintenance event is unspecified.",
+                        "The maintenance is scheduled but has not started.",
+                        "The maintenance has been started.",
+                        "The maintenance has been completed."
+                    ],
+                    "readOnly": true,
                     "type": "string"
                 }
             },
@@ -1875,12 +1970,14 @@
                     "enum": [
                         "TYPE_UNSPECIFIED",
                         "TYPE_PREVIEW",
-                        "TYPE_GENERAL_AVAILABILITY"
+                        "TYPE_GENERAL_AVAILABILITY",
+                        "TYPE_DEPRECATED"
                     ],
                     "enumDescriptions": [
                         "Version does not have availability yet",
                         "Version is under development and not considered stable",
-                        "Version is available for public use Version is under development and not considered stable"
+                        "Version is available for public use",
+                        "Version is no longer supported."
                     ],
                     "type": "string"
                 },

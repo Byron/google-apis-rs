@@ -112,7 +112,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "ondemandscanning.projects.locations.operations.cancel",
@@ -217,6 +217,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the [ListOperationsResponse.unreachable] field. This can only be `true` when reading across collections e.g. when `parent` is set to `\"projects/example/locations/-\"`. This field is not by default supported and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1beta1/{+name}/operations",
@@ -339,7 +344,7 @@
             }
         }
     },
-    "revision": "20240624",
+    "revision": "20251027",
     "rootUrl": "https://ondemandscanning.googleapis.com/",
     "schemas": {
         "AliasContext": {
@@ -502,12 +507,32 @@
             },
             "type": "object"
         },
+        "BaseImage": {
+            "description": "BaseImage describes a base image of a container image.",
+            "id": "BaseImage",
+            "properties": {
+                "layerCount": {
+                    "description": "The number of layers that the base image is composed of.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "The name of the base image.",
+                    "type": "string"
+                },
+                "repository": {
+                    "description": "The repository name in which the base image is from.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "BinarySourceInfo": {
             "id": "BinarySourceInfo",
             "properties": {
                 "binaryVersion": {
                     "$ref": "PackageVersion",
-                    "description": "The binary package. This is significant when the source is different than the binary itself. Historically if they've differed, we've stored the name of the source and its version in the package/version fields, but we should also store the binary package info, as that's what's actually installed. See b/175908657#comment15."
+                    "description": "The binary package. This is significant when the source is different than the binary itself. Historically if they've differed, we've stored the name of the source and its version in the package/version fields, but we should also store the binary package info, as that's what's actually installed."
                 },
                 "sourceVersion": {
                     "$ref": "PackageVersion",
@@ -664,6 +689,16 @@
             "id": "BuilderConfig",
             "properties": {
                 "id": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "CISAKnownExploitedVulnerabilities": {
+            "id": "CISAKnownExploitedVulnerabilities",
+            "properties": {
+                "knownRansomwareCampaignUse": {
+                    "description": "Whether the vulnerability is known to have been leveraged as part of a ransomware campaign.",
                     "type": "string"
                 }
             },
@@ -1097,6 +1132,13 @@
                     "description": "The CPE of the resource being scanned.",
                     "type": "string"
                 },
+                "files": {
+                    "description": "Files that make up the resource described by the occurrence.",
+                    "items": {
+                        "$ref": "File"
+                    },
+                    "type": "array"
+                },
                 "lastScanTime": {
                     "description": "The last time this resource was scanned.",
                     "format": "google-datetime",
@@ -1105,10 +1147,6 @@
                 "sbomStatus": {
                     "$ref": "SBOMStatus",
                     "description": "The status of an SBOM generation."
-                },
-                "vulnerabilityAttestation": {
-                    "$ref": "VulnerabilityAttestation",
-                    "description": "The status of an vulnerability attestation generation."
                 }
             },
             "type": "object"
@@ -1152,6 +1190,37 @@
             },
             "type": "object"
         },
+        "ExploitPredictionScoringSystem": {
+            "id": "ExploitPredictionScoringSystem",
+            "properties": {
+                "percentile": {
+                    "description": "The percentile of the current score, the proportion of all scored vulnerabilities with the same or a lower EPSS score",
+                    "format": "double",
+                    "type": "number"
+                },
+                "score": {
+                    "description": "The EPSS score representing the probability [0-1] of exploitation in the wild in the next 30 days",
+                    "format": "double",
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "File": {
+            "id": "File",
+            "properties": {
+                "digest": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "FileHashes": {
             "description": "Container message for hashes of byte content of files, used in source messages to verify integrity of source input to the build.",
             "id": "FileHashes",
@@ -1173,6 +1242,9 @@
                 "filePath": {
                     "description": "For jars that are contained inside .war files, this filepath can indicate the path to war file combined with the path to jar file.",
                     "type": "string"
+                },
+                "layerDetails": {
+                    "$ref": "LayerDetails"
                 }
             },
             "type": "object"
@@ -1237,6 +1309,26 @@
             },
             "type": "object"
         },
+        "GrafeasV1BaseImage": {
+            "description": "BaseImage describes a base image of a container image.",
+            "id": "GrafeasV1BaseImage",
+            "properties": {
+                "layerCount": {
+                    "description": "The number of layers that the base image is composed of.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "The name of the base image.",
+                    "type": "string"
+                },
+                "repository": {
+                    "description": "The repository name in which the base image is from.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GrafeasV1FileLocation": {
             "description": "Indicates the location at which a package was found.",
             "id": "GrafeasV1FileLocation",
@@ -1244,6 +1336,41 @@
                 "filePath": {
                     "description": "For jars that are contained inside .war files, this filepath can indicate the path to war file combined with the path to jar file.",
                     "type": "string"
+                },
+                "layerDetails": {
+                    "$ref": "GrafeasV1LayerDetails",
+                    "description": "Each package found in a file should have its own layer metadata (that is, information from the origin layer of the package)."
+                }
+            },
+            "type": "object"
+        },
+        "GrafeasV1LayerDetails": {
+            "description": "Details about the layer a package was found in.",
+            "id": "GrafeasV1LayerDetails",
+            "properties": {
+                "baseImages": {
+                    "description": "The base images the layer is found within.",
+                    "items": {
+                        "$ref": "GrafeasV1BaseImage"
+                    },
+                    "type": "array"
+                },
+                "chainId": {
+                    "description": "The layer chain ID (sha256 hash) of the layer in the container image. https://github.com/opencontainers/image-spec/blob/main/config.md#layer-chainid",
+                    "type": "string"
+                },
+                "command": {
+                    "description": "The layer build command that was used to build the layer. This may not be found in all layers depending on how the container image is built.",
+                    "type": "string"
+                },
+                "diffId": {
+                    "description": "The diff ID (typically a sha256 hash) of the layer in the container image.",
+                    "type": "string"
+                },
+                "index": {
+                    "description": "The index of the layer in the container image.",
+                    "format": "int32",
+                    "type": "integer"
                 }
             },
             "type": "object"
@@ -1561,6 +1688,37 @@
             },
             "type": "object"
         },
+        "LayerDetails": {
+            "description": "Details about the layer a package was found in.",
+            "id": "LayerDetails",
+            "properties": {
+                "baseImages": {
+                    "description": "The base images the layer is found within.",
+                    "items": {
+                        "$ref": "BaseImage"
+                    },
+                    "type": "array"
+                },
+                "chainId": {
+                    "description": "The layer chain ID (sha256 hash) of the layer in the container image. https://github.com/opencontainers/image-spec/blob/main/config.md#layer-chainid",
+                    "type": "string"
+                },
+                "command": {
+                    "description": "The layer build command that was used to build the layer. This may not be found in all layers depending on how the container image is built.",
+                    "type": "string"
+                },
+                "diffId": {
+                    "description": "The diff ID (sha256 hash) of the layer in the container image.",
+                    "type": "string"
+                },
+                "index": {
+                    "description": "The index of the layer in the container image.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
         "License": {
             "description": "License information.",
             "id": "License",
@@ -1588,6 +1746,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections e.g. when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -1768,7 +1933,8 @@
                         "COMPLIANCE",
                         "DSSE_ATTESTATION",
                         "VULNERABILITY_ASSESSMENT",
-                        "SBOM_REFERENCE"
+                        "SBOM_REFERENCE",
+                        "SECRET"
                     ],
                     "enumDescriptions": [
                         "Default value. This value is unused.",
@@ -1783,7 +1949,8 @@
                         "This represents a Compliance Note",
                         "This represents a DSSE attestation Note",
                         "This represents a Vulnerability Assessment.",
-                        "This represents an SBOM Reference."
+                        "This represents an SBOM Reference.",
+                        "This represents a secret."
                     ],
                     "type": "string"
                 },
@@ -1810,6 +1977,10 @@
                 "sbomReference": {
                     "$ref": "SBOMReferenceOccurrence",
                     "description": "Describes a specific SBOM reference occurrences."
+                },
+                "secret": {
+                    "$ref": "SecretOccurrence",
+                    "description": "Describes a secret."
                 },
                 "updateTime": {
                     "description": "Output only. The time this occurrence was last updated.",
@@ -1902,6 +2073,9 @@
                     "description": "HashDigest stores the SHA512 hash digest of the jar file if the package is of type Maven. This field will be unset for non Maven packages.",
                     "type": "string"
                 },
+                "layerDetails": {
+                    "$ref": "LayerDetails"
+                },
                 "licenses": {
                     "description": "The list of licenses found that are related to a given package. Note that licenses may also be stored on the BinarySourceInfo. If there is no BinarySourceInfo (because there's no concept of source vs binary), then it will be stored here, while if there are BinarySourceInfos, it will be stored there, as one source can have multiple binaries with different licenses.",
                     "items": {
@@ -1938,7 +2112,8 @@
                         "NUGET",
                         "RUBYGEMS",
                         "RUST",
-                        "COMPOSER"
+                        "COMPOSER",
+                        "SWIFT"
                     ],
                     "enumDescriptions": [
                         "",
@@ -1950,13 +2125,14 @@
                         "NPM packages.",
                         "Nuget (C#/.NET) packages.",
                         "Ruby packges (from RubyGems package manager).",
-                        "Rust packages from Cargo (Github ecosystem is `RUST`).",
-                        "PHP packages from Composer package manager."
+                        "Rust packages from Cargo (GitHub ecosystem is `RUST`).",
+                        "PHP packages from Composer package manager.",
+                        "Swift packages from Swift Package Manager (SwiftPM)."
                     ],
                     "type": "string"
                 },
                 "patchedCve": {
-                    "description": "CVEs that this package is no longer vulnerable to go/drydock-dd-custom-binary-scanning",
+                    "description": "CVEs that this package is no longer vulnerable to",
                     "items": {
                         "type": "string"
                     },
@@ -2292,6 +2468,20 @@
             },
             "type": "object"
         },
+        "Risk": {
+            "id": "Risk",
+            "properties": {
+                "cisaKev": {
+                    "$ref": "CISAKnownExploitedVulnerabilities",
+                    "description": "CISA maintains the authoritative source of vulnerabilities that have been exploited in the wild."
+                },
+                "epss": {
+                    "$ref": "ExploitPredictionScoringSystem",
+                    "description": "The Exploit Prediction Scoring System (EPSS) estimates the likelihood (probability) that a software vulnerability will be exploited in the wild."
+                }
+            },
+            "type": "object"
+        },
         "RunDetails": {
             "id": "RunDetails",
             "properties": {
@@ -2404,6 +2594,124 @@
                 },
                 "referrerId": {
                     "description": "The person or system referring this predicate to the consumer.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SecretLocation": {
+            "description": "The location of the secret.",
+            "id": "SecretLocation",
+            "properties": {
+                "fileLocation": {
+                    "$ref": "GrafeasV1FileLocation",
+                    "description": "The secret is found from a file."
+                }
+            },
+            "type": "object"
+        },
+        "SecretOccurrence": {
+            "description": "The occurrence provides details of a secret.",
+            "id": "SecretOccurrence",
+            "properties": {
+                "kind": {
+                    "description": "Required. Type of secret.",
+                    "enum": [
+                        "SECRET_KIND_UNSPECIFIED",
+                        "SECRET_KIND_UNKNOWN",
+                        "SECRET_KIND_GCP_SERVICE_ACCOUNT_KEY",
+                        "SECRET_KIND_GCP_API_KEY",
+                        "SECRET_KIND_GCP_OAUTH2_CLIENT_CREDENTIALS",
+                        "SECRET_KIND_GCP_OAUTH2_ACCESS_TOKEN",
+                        "SECRET_KIND_ANTHROPIC_ADMIN_API_KEY",
+                        "SECRET_KIND_ANTHROPIC_API_KEY",
+                        "SECRET_KIND_AZURE_ACCESS_TOKEN",
+                        "SECRET_KIND_AZURE_IDENTITY_TOKEN",
+                        "SECRET_KIND_DOCKER_HUB_PERSONAL_ACCESS_TOKEN",
+                        "SECRET_KIND_GITHUB_APP_REFRESH_TOKEN",
+                        "SECRET_KIND_GITHUB_APP_SERVER_TO_SERVER_TOKEN",
+                        "SECRET_KIND_GITHUB_APP_USER_TO_SERVER_TOKEN",
+                        "SECRET_KIND_GITHUB_CLASSIC_PERSONAL_ACCESS_TOKEN",
+                        "SECRET_KIND_GITHUB_FINE_GRAINED_PERSONAL_ACCESS_TOKEN",
+                        "SECRET_KIND_GITHUB_OAUTH_TOKEN",
+                        "SECRET_KIND_HUGGINGFACE_API_KEY",
+                        "SECRET_KIND_OPENAI_API_KEY",
+                        "SECRET_KIND_PERPLEXITY_API_KEY",
+                        "SECRET_KIND_STRIPE_SECRET_KEY",
+                        "SECRET_KIND_STRIPE_RESTRICTED_KEY",
+                        "SECRET_KIND_STRIPE_WEBHOOK_SECRET"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified",
+                        "The secret kind is unknown.",
+                        "A Google Cloud service account key per: https://cloud.google.com/iam/docs/creating-managing-service-account-keys",
+                        "A Google Cloud API key per: https://cloud.google.com/docs/authentication/api-keys",
+                        "A Google Cloud OAuth2 client credentials per: https://developers.google.com/identity/protocols/oauth2",
+                        "A Google Cloud OAuth2 access token per: https://cloud.google.com/docs/authentication/token-types#access",
+                        "An Anthropic Admin API key.",
+                        "An Anthropic API key.",
+                        "An Azure access token.",
+                        "An Azure Identity Platform ID token.",
+                        "A Docker Hub personal access token.",
+                        "A GitHub App refresh token.",
+                        "A GitHub App server-to-server token.",
+                        "A GitHub App user-to-server token.",
+                        "A GitHub personal access token (classic).",
+                        "A GitHub fine-grained personal access token.",
+                        "A GitHub OAuth token.",
+                        "A Hugging Face API key.",
+                        "An OpenAI API key.",
+                        "A Perplexity API key.",
+                        "A Stripe secret key.",
+                        "A Stripe restricted key.",
+                        "A Stripe webhook secret."
+                    ],
+                    "type": "string"
+                },
+                "locations": {
+                    "description": "Optional. Locations where the secret is detected.",
+                    "items": {
+                        "$ref": "SecretLocation"
+                    },
+                    "type": "array"
+                },
+                "statuses": {
+                    "description": "Optional. Status of the secret.",
+                    "items": {
+                        "$ref": "SecretStatus"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "SecretStatus": {
+            "description": "The status of the secret with a timestamp.",
+            "id": "SecretStatus",
+            "properties": {
+                "message": {
+                    "description": "Optional. Optional message about the status code.",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Optional. The status of the secret.",
+                    "enum": [
+                        "STATUS_UNSPECIFIED",
+                        "UNKNOWN",
+                        "VALID",
+                        "INVALID"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified",
+                        "The status of the secret is unknown.",
+                        "The secret is valid.",
+                        "The secret is invalid."
+                    ],
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Optional. The time the secret status was last updated.",
+                    "format": "google-datetime",
                     "type": "string"
                 }
             },
@@ -2841,36 +3149,6 @@
             },
             "type": "object"
         },
-        "VulnerabilityAttestation": {
-            "description": "The status of an vulnerability attestation generation.",
-            "id": "VulnerabilityAttestation",
-            "properties": {
-                "error": {
-                    "description": "If failure, the error reason for why the attestation generation failed.",
-                    "type": "string"
-                },
-                "lastAttemptTime": {
-                    "description": "The last time we attempted to generate an attestation.",
-                    "format": "google-datetime",
-                    "type": "string"
-                },
-                "state": {
-                    "description": "The success/failure state of the latest attestation attempt.",
-                    "enum": [
-                        "VULNERABILITY_ATTESTATION_STATE_UNSPECIFIED",
-                        "SUCCESS",
-                        "FAILURE"
-                    ],
-                    "enumDescriptions": [
-                        "Default unknown state.",
-                        "Attestation was successfully generated and stored.",
-                        "Attestation was unsuccessfully generated and stored."
-                    ],
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "VulnerabilityOccurrence": {
             "description": "An occurrence of a severity vulnerability on a resource.",
             "id": "VulnerabilityOccurrence",
@@ -2947,6 +3225,10 @@
                         "$ref": "RelatedUrl"
                     },
                     "type": "array"
+                },
+                "risk": {
+                    "$ref": "Risk",
+                    "description": "Risk information about the vulnerability, such as CISA, EPSS, etc."
                 },
                 "severity": {
                     "description": "Output only. The note provider assigned severity of this vulnerability.",

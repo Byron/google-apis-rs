@@ -177,7 +177,7 @@
             }
         }
     },
-    "revision": "20240621",
+    "revision": "20250822",
     "rootUrl": "https://cloudasset.googleapis.com/",
     "schemas": {
         "AnalyzeIamPolicyLongrunningMetadata": {
@@ -632,6 +632,7 @@
             "properties": {
                 "etag": {
                     "description": "Output only. An opaque identifier for the current version of the `AccessPolicy`. This will always be a strongly validated etag, meaning that two Access Policies will be identical if and only if their etags are identical. Clients should not expect this to be in any specific format.",
+                    "readOnly": true,
                     "type": "string"
                 },
                 "name": {
@@ -830,7 +831,7 @@
             "id": "GoogleIdentityAccesscontextmanagerV1EgressFrom",
             "properties": {
                 "identities": {
-                    "description": "A list of identities that are allowed access through [EgressPolicy]. Identities can be an individual user, service account, Google group, or third-party identity. The `v1` identities that have the prefix `user`, `group`, `serviceAccount`, `principal`, and `principalSet` in https://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.",
+                    "description": "A list of identities that are allowed access through [EgressPolicy]. Identities can be an individual user, service account, Google group, or third-party identity. For third-party identity, only single identities are supported and other identity types are not supported. The `v1` identities that have the prefix `user`, `group`, `serviceAccount`, and `principal` in https://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.",
                     "items": {
                         "type": "string"
                     },
@@ -887,6 +888,10 @@
                 "egressTo": {
                     "$ref": "GoogleIdentityAccesscontextmanagerV1EgressTo",
                     "description": "Defines the conditions on the ApiOperation and destination resources that cause this EgressPolicy to apply."
+                },
+                "title": {
+                    "description": "Optional. Human-readable title for the egress rule. The title must be unique within the perimeter and can not exceed 100 characters. Within the access policy, the combined length of all rule titles must not exceed 240,000 characters.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -897,6 +902,10 @@
             "properties": {
                 "accessLevel": {
                     "description": "An AccessLevel resource name that allows protected resources inside the ServicePerimeters to access outside the ServicePerimeter boundaries. AccessLevels listed must be in the same policy as this ServicePerimeter. Referencing a nonexistent AccessLevel will cause an error. If an AccessLevel name is not specified, only resources within the perimeter can be accessed through Google Cloud calls with request origins within the perimeter. Example: `accessPolicies/MY_POLICY/accessLevels/MY_LEVEL`. If a single `*` is specified for `access_level`, then all EgressSources will be allowed.",
+                    "type": "string"
+                },
+                "resource": {
+                    "description": "A Google Cloud resource from the service perimeter that you want to allow to access data outside the perimeter. This field supports only projects. The project format is `projects/{project_number}`. You can't use `*` in this field to allow all Google Cloud resources.",
                     "type": "string"
                 }
             },
@@ -926,6 +935,13 @@
                         "type": "string"
                     },
                     "type": "array"
+                },
+                "roles": {
+                    "description": "IAM roles that represent the set of operations that the sources specified in the corresponding EgressFrom. are allowed to perform in this ServicePerimeter.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -935,7 +951,7 @@
             "id": "GoogleIdentityAccesscontextmanagerV1IngressFrom",
             "properties": {
                 "identities": {
-                    "description": "A list of identities that are allowed access through [IngressPolicy]. Identities can be an individual user, service account, Google group, or third-party identity. The `v1` identities that have the prefix `user`, `group`, `serviceAccount`, `principal`, and `principalSet` in https://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.",
+                    "description": "A list of identities that are allowed access through [IngressPolicy]. Identities can be an individual user, service account, Google group, or third-party identity. For third-party identity, only single identities are supported and other identity types are not supported. The `v1` identities that have the prefix `user`, `group`, `serviceAccount`, and `principal` in https://cloud.google.com/iam/docs/principal-identifiers#v1 are supported.",
                     "items": {
                         "type": "string"
                     },
@@ -978,6 +994,10 @@
                 "ingressTo": {
                     "$ref": "GoogleIdentityAccesscontextmanagerV1IngressTo",
                     "description": "Defines the conditions on the ApiOperation and request destination that cause this IngressPolicy to apply."
+                },
+                "title": {
+                    "description": "Optional. Human-readable title for the ingress rule. The title must be unique within the perimeter and can not exceed 100 characters. Within the access policy, the combined length of all rule titles must not exceed 240,000 characters.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1010,6 +1030,13 @@
                 },
                 "resources": {
                     "description": "A list of resources, currently only projects in the form `projects/`, protected by this ServicePerimeter that are allowed to be accessed by sources defined in the corresponding IngressFrom. If a single `*` is specified, then access to all resources inside the perimeter are allowed.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "roles": {
+                    "description": "IAM roles that represent the set of operations that the sources specified in the corresponding IngressFrom are allowed to perform in this ServicePerimeter.",
                     "items": {
                         "type": "string"
                     },
@@ -1076,6 +1103,10 @@
             "properties": {
                 "description": {
                     "description": "Description of the `ServicePerimeter` and its use. Does not affect behavior.",
+                    "type": "string"
+                },
+                "etag": {
+                    "description": "Optional. An opaque identifier for the current version of the `ServicePerimeter`. This identifier does not follow any specific format. If an etag is not provided, the operation will be performed as if a valid etag is provided.",
                     "type": "string"
                 },
                 "name": {

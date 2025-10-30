@@ -204,6 +204,34 @@
                             "scopes": [
                                 "https://www.googleapis.com/auth/authorized-buyers-marketplace"
                             ]
+                        },
+                        "setReadyToServe": {
+                            "description": "Sets the given finalized deal as ready to serve. By default, deals are set as ready to serve as soon as they're finalized. If you want to opt out of the default behavior, and manually indicate that deals are ready to serve, ask your Technical Account Manager to add you to the allowlist. If you choose to use this method, finalized deals belonging to the bidder and its child seats don't start serving until after you call `setReadyToServe`, and after the deals become active. For example, you can use this method to delay receiving bid requests until your creative is ready. In addition, bidders can use the URL path \"/v1/bidders/{accountId}/finalizedDeals/{dealId}\" to set ready to serve for the finalized deals belong to itself, its child seats and all their clients. This method only applies to programmatic guaranteed deals.",
+                            "flatPath": "v1/bidders/{biddersId}/finalizedDeals/{finalizedDealsId}:setReadyToServe",
+                            "httpMethod": "POST",
+                            "id": "authorizedbuyersmarketplace.bidders.finalizedDeals.setReadyToServe",
+                            "parameterOrder": [
+                                "deal"
+                            ],
+                            "parameters": {
+                                "deal": {
+                                    "description": "Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}` or `bidders/{accountId}/finalizedDeals/{dealId}`",
+                                    "location": "path",
+                                    "pattern": "^bidders/[^/]+/finalizedDeals/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+deal}:setReadyToServe",
+                            "request": {
+                                "$ref": "SetReadyToServeRequest"
+                            },
+                            "response": {
+                                "$ref": "FinalizedDeal"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/authorized-buyers-marketplace"
+                            ]
                         }
                     }
                 }
@@ -920,7 +948,7 @@
                             ]
                         },
                         "setReadyToServe": {
-                            "description": "Sets the given finalized deal as ready to serve. By default, deals are set as ready to serve as soon as they're finalized. If you want to opt out of the default behavior, and manually indicate that deals are ready to serve, ask your Technical Account Manager to add you to the allowlist. If you choose to use this method, finalized deals belonging to the bidder and its child seats don't start serving until after you call `setReadyToServe`, and after the deals become active. For example, you can use this method to delay receiving bid requests until your creative is ready. This method only applies to programmatic guaranteed deals.",
+                            "description": "Sets the given finalized deal as ready to serve. By default, deals are set as ready to serve as soon as they're finalized. If you want to opt out of the default behavior, and manually indicate that deals are ready to serve, ask your Technical Account Manager to add you to the allowlist. If you choose to use this method, finalized deals belonging to the bidder and its child seats don't start serving until after you call `setReadyToServe`, and after the deals become active. For example, you can use this method to delay receiving bid requests until your creative is ready. In addition, bidders can use the URL path \"/v1/bidders/{accountId}/finalizedDeals/{dealId}\" to set ready to serve for the finalized deals belong to itself, its child seats and all their clients. This method only applies to programmatic guaranteed deals.",
                             "flatPath": "v1/buyers/{buyersId}/finalizedDeals/{finalizedDealsId}:setReadyToServe",
                             "httpMethod": "POST",
                             "id": "authorizedbuyersmarketplace.buyers.finalizedDeals.setReadyToServe",
@@ -929,7 +957,7 @@
                             ],
                             "parameters": {
                                 "deal": {
-                                    "description": "Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}`",
+                                    "description": "Required. Format: `buyers/{accountId}/finalizedDeals/{dealId}` or `bidders/{accountId}/finalizedDeals/{dealId}`",
                                     "location": "path",
                                     "pattern": "^buyers/[^/]+/finalizedDeals/[^/]+$",
                                     "required": true,
@@ -1102,7 +1130,7 @@
                             ]
                         },
                         "patch": {
-                            "description": "Updates the proposal at the given revision number. If the revision number in the request is behind the latest one kept in the server, an error message will be returned. See FieldMask for how to use FieldMask. Only fields specified in the UpdateProposalRequest.update_mask will be updated; Fields noted as 'Immutable' or 'Output only' yet specified in the UpdateProposalRequest.update_mask will be ignored and left unchanged. Updating a private auction proposal is not allowed and will result in an error.",
+                            "description": "Updates the proposal at the given revision number. If the revision number in the request is behind the latest one kept in the server, an error message will be returned. See FieldMask for how to use FieldMask. Only fields specified in the UpdateProposalRequest.update_mask will be updated; Fields noted as 'Immutable' or 'Output only' yet specified in the UpdateProposalRequest.update_mask will be ignored and left unchanged. Updating a private auction proposal is only allowed for buyer private data, all other fields are immutable.",
                             "flatPath": "v1/buyers/{buyersId}/proposals/{proposalsId}",
                             "httpMethod": "PATCH",
                             "id": "authorizedbuyersmarketplace.buyers.proposals.patch",
@@ -1367,7 +1395,7 @@
             }
         }
     },
-    "revision": "20240625",
+    "revision": "20251028",
     "rootUrl": "https://authorizedbuyersmarketplace.googleapis.com/",
     "schemas": {
         "AcceptProposalRequest": {
@@ -1466,6 +1494,11 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "dealOwnerSeatId": {
+                    "description": "Output only. If set, this field contains the DSP specific seat id set by the media planner account that is considered the owner of this deal. The seat ID is in the calling DSP's namespace.",
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "description": {
                     "description": "Output only. A description of the auction package.",
                     "readOnly": true,
@@ -1476,7 +1509,7 @@
                     "type": "string"
                 },
                 "eligibleSeatIds": {
-                    "description": "Output only. If set, this field contains the list of DSP specific seat ids set by media planners that are eligible to transact on this deal. The seat ID is in the calling DSP's namespace.",
+                    "description": "Output only. If set, this field identifies a seat that the media planner selected as the owner of this auction package. This is a seat ID in the DSP's namespace that was provided to the media planner.",
                     "items": {
                         "type": "string"
                     },
@@ -1864,6 +1897,21 @@
                 },
                 "buyer": {
                     "description": "Output only. Refers to a buyer in Real-time Bidding API's Buyer resource. Format: `buyers/{buyerAccountId}`",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "buyerPermissionType": {
+                    "description": "Output only. The buyer permission type of the deal.",
+                    "enum": [
+                        "BUYER_PERMISSION_TYPE_UNSPECIFIED",
+                        "NEGOTIATOR_ONLY",
+                        "BIDDER"
+                    ],
+                    "enumDescriptions": [
+                        "A placeholder for an undefined buyer permission type.",
+                        "Only the [Deal.negotiating_buyer] can transact on the deal.",
+                        "All buyers under the [Deal.negotiating_buyer]'s bidder can transact on the deal."
+                    ],
                     "readOnly": true,
                     "type": "string"
                 },
@@ -2621,7 +2669,7 @@
             "type": "object"
         },
         "PrivateData": {
-            "description": "Buyers are allowed to store certain types of private data in a proposal or deal.",
+            "description": "Buyers are allowed to store certain types of private data in a proposal.",
             "id": "PrivateData",
             "properties": {
                 "referenceId": {
@@ -3040,7 +3088,7 @@
                 },
                 "inventorySizeTargeting": {
                     "$ref": "InventorySizeTargeting",
-                    "description": "Inventory sizes to be targeted."
+                    "description": "Inventory sizes to be targeted. Only PIXEL inventory size type is supported."
                 },
                 "note": {
                     "description": "A message that is sent to the publisher. Maximum length is 1024 characters.",
@@ -3111,22 +3159,22 @@
             "id": "TimeOfDay",
             "properties": {
                 "hours": {
-                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+                    "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "minutes": {
-                    "description": "Minutes of hour of day. Must be from 0 to 59.",
+                    "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "nanos": {
-                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+                    "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "seconds": {
-                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.",
+                    "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
                     "format": "int32",
                     "type": "integer"
                 }
@@ -3138,11 +3186,11 @@
             "id": "TimeZone",
             "properties": {
                 "id": {
-                    "description": "IANA Time Zone Database time zone, e.g. \"America/New_York\".",
+                    "description": "IANA Time Zone Database time zone. For example \"America/New_York\".",
                     "type": "string"
                 },
                 "version": {
-                    "description": "Optional. IANA Time Zone Database version number, e.g. \"2019a\".",
+                    "description": "Optional. IANA Time Zone Database version number. For example \"2019a\".",
                     "type": "string"
                 }
             },

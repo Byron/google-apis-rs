@@ -18,6 +18,468 @@
     "description": "Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development. ",
     "discoveryVersion": "v1",
     "documentationLink": "https://cloud.google.com/firestore",
+    "endpoints": [
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.africa-south1.rep.googleapis.com/",
+            "location": "africa-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.asia-east1.rep.googleapis.com/",
+            "location": "asia-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.asia-east2.rep.googleapis.com/",
+            "location": "asia-east2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.asia-northeast1.rep.googleapis.com/",
+            "location": "asia-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.asia-northeast2.rep.googleapis.com/",
+            "location": "asia-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.asia-northeast3.rep.googleapis.com/",
+            "location": "asia-northeast3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.asia-south1.rep.googleapis.com/",
+            "location": "asia-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.asia-south2.rep.googleapis.com/",
+            "location": "asia-south2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.asia-southeast1.rep.googleapis.com/",
+            "location": "asia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.asia-southeast2.rep.googleapis.com/",
+            "location": "asia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.australia-southeast1.rep.googleapis.com/",
+            "location": "australia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.australia-southeast2.rep.googleapis.com/",
+            "location": "australia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-central2.rep.googleapis.com/",
+            "location": "europe-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-north1.rep.googleapis.com/",
+            "location": "europe-north1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-north2.rep.googleapis.com/",
+            "location": "europe-north2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-southwest1.rep.googleapis.com/",
+            "location": "europe-southwest1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-west1.rep.googleapis.com/",
+            "location": "europe-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-west10.rep.googleapis.com/",
+            "location": "europe-west10"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-west12.rep.googleapis.com/",
+            "location": "europe-west12"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-west2.rep.googleapis.com/",
+            "location": "europe-west2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-west3.rep.googleapis.com/",
+            "location": "europe-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-west4.rep.googleapis.com/",
+            "location": "europe-west4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-west6.rep.googleapis.com/",
+            "location": "europe-west6"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-west8.rep.googleapis.com/",
+            "location": "europe-west8"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.europe-west9.rep.googleapis.com/",
+            "location": "europe-west9"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.me-central1.rep.googleapis.com/",
+            "location": "me-central1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.me-central2.rep.googleapis.com/",
+            "location": "me-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.me-west1.rep.googleapis.com/",
+            "location": "me-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.northamerica-northeast1.rep.googleapis.com/",
+            "location": "northamerica-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.northamerica-northeast2.rep.googleapis.com/",
+            "location": "northamerica-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.northamerica-south1.rep.googleapis.com/",
+            "location": "northamerica-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.southamerica-east1.rep.googleapis.com/",
+            "location": "southamerica-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.southamerica-west1.rep.googleapis.com/",
+            "location": "southamerica-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-central1.rep.googleapis.com/",
+            "location": "us-central1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-east1.rep.googleapis.com/",
+            "location": "us-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-east4.rep.googleapis.com/",
+            "location": "us-east4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-east5.rep.googleapis.com/",
+            "location": "us-east5"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-south1.rep.googleapis.com/",
+            "location": "us-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-west1.rep.googleapis.com/",
+            "location": "us-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-west2.rep.googleapis.com/",
+            "location": "us-west2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-west3.rep.googleapis.com/",
+            "location": "us-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-west4.rep.googleapis.com/",
+            "location": "us-west4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-east7.rep.googleapis.com/",
+            "location": "us-east7"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us-west8.rep.googleapis.com/",
+            "location": "us-west8"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.africa-south1.rep.googleapis.com/",
+            "location": "africa-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.asia-east1.rep.googleapis.com/",
+            "location": "asia-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.asia-east2.rep.googleapis.com/",
+            "location": "asia-east2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.asia-northeast1.rep.googleapis.com/",
+            "location": "asia-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.asia-northeast2.rep.googleapis.com/",
+            "location": "asia-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.asia-northeast3.rep.googleapis.com/",
+            "location": "asia-northeast3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.asia-south1.rep.googleapis.com/",
+            "location": "asia-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.asia-south2.rep.googleapis.com/",
+            "location": "asia-south2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.asia-southeast1.rep.googleapis.com/",
+            "location": "asia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.asia-southeast2.rep.googleapis.com/",
+            "location": "asia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.australia-southeast1.rep.googleapis.com/",
+            "location": "australia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.australia-southeast2.rep.googleapis.com/",
+            "location": "australia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-central2.rep.googleapis.com/",
+            "location": "europe-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-north1.rep.googleapis.com/",
+            "location": "europe-north1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-north2.rep.googleapis.com/",
+            "location": "europe-north2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-southwest1.rep.googleapis.com/",
+            "location": "europe-southwest1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-west1.rep.googleapis.com/",
+            "location": "europe-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-west10.rep.googleapis.com/",
+            "location": "europe-west10"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-west12.rep.googleapis.com/",
+            "location": "europe-west12"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-west2.rep.googleapis.com/",
+            "location": "europe-west2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-west3.rep.googleapis.com/",
+            "location": "europe-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-west4.rep.googleapis.com/",
+            "location": "europe-west4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-west6.rep.googleapis.com/",
+            "location": "europe-west6"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-west8.rep.googleapis.com/",
+            "location": "europe-west8"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.europe-west9.rep.googleapis.com/",
+            "location": "europe-west9"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.me-central1.rep.googleapis.com/",
+            "location": "me-central1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.me-central2.rep.googleapis.com/",
+            "location": "me-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.me-west1.rep.googleapis.com/",
+            "location": "me-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.northamerica-northeast1.rep.googleapis.com/",
+            "location": "northamerica-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.northamerica-northeast2.rep.googleapis.com/",
+            "location": "northamerica-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.northamerica-south1.rep.googleapis.com/",
+            "location": "northamerica-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.southamerica-east1.rep.googleapis.com/",
+            "location": "southamerica-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.southamerica-west1.rep.googleapis.com/",
+            "location": "southamerica-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-central1.rep.googleapis.com/",
+            "location": "us-central1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-east1.rep.googleapis.com/",
+            "location": "us-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-east4.rep.googleapis.com/",
+            "location": "us-east4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-east5.rep.googleapis.com/",
+            "location": "us-east5"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-south1.rep.googleapis.com/",
+            "location": "us-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-west1.rep.googleapis.com/",
+            "location": "us-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-west2.rep.googleapis.com/",
+            "location": "us-west2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-west3.rep.googleapis.com/",
+            "location": "us-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-west4.rep.googleapis.com/",
+            "location": "us-west4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-east7.rep.googleapis.com/",
+            "location": "us-east7"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us-west8.rep.googleapis.com/",
+            "location": "us-west8"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.eu.rep.googleapis.com/",
+            "location": "eu"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://firestore.us.rep.googleapis.com/",
+            "location": "us"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.eu.rep.googleapis.com/",
+            "location": "eu"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://batch-firestore.us.rep.googleapis.com/",
+            "location": "us"
+        }
+    ],
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -141,6 +603,35 @@
                                 "https://www.googleapis.com/auth/datastore"
                             ]
                         },
+                        "clone": {
+                            "description": "Creates a new database by cloning an existing one. The new database must be in the same cloud region or multi-region location as the existing database. This behaves similar to FirestoreAdmin.CreateDatabase except instead of creating a new empty database, a new database is created with the database type, index configuration, and documents from an existing database. The long-running operation can be used to track the progress of the clone, with the Operation's metadata field type being the CloneDatabaseMetadata. The response type is the Database if the clone was successful. The new database is not readable or writeable until the LRO has completed.",
+                            "flatPath": "v1/projects/{projectsId}/databases:clone",
+                            "httpMethod": "POST",
+                            "id": "firestore.projects.databases.clone",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. The project to clone the database in. Format is `projects/{project_id}`.",
+                                    "location": "path",
+                                    "pattern": "^projects/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+parent}/databases:clone",
+                            "request": {
+                                "$ref": "GoogleFirestoreAdminV1CloneDatabaseRequest"
+                            },
+                            "response": {
+                                "$ref": "GoogleLongrunningOperation"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform",
+                                "https://www.googleapis.com/auth/datastore"
+                            ]
+                        },
                         "create": {
                             "description": "Create a database.",
                             "flatPath": "v1/projects/{projectsId}/databases",
@@ -151,7 +642,7 @@
                             ],
                             "parameters": {
                                 "databaseId": {
-                                    "description": "Required. The ID to use for the database, which will become the final component of the database's resource name. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. \"(default)\" database id is also valid.",
+                                    "description": "Required. The ID to use for the database, which will become the final component of the database's resource name. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. \"(default)\" database ID is also valid if the database is Standard edition.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -1421,7 +1912,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "firestore.projects.databases.operations.cancel",
@@ -1532,11 +2023,219 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the [ListOperationsResponse.unreachable] field. This can only be `true` when reading across collections e.g. when `parent` is set to `\"projects/example/locations/-\"`. This field is not by default supported and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1/{+name}/operations",
                                     "response": {
                                         "$ref": "GoogleLongrunningListOperationsResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/datastore"
+                                    ]
+                                }
+                            }
+                        },
+                        "userCreds": {
+                            "methods": {
+                                "create": {
+                                    "description": "Create a user creds.",
+                                    "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/userCreds",
+                                    "httpMethod": "POST",
+                                    "id": "firestore.projects.databases.userCreds.create",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "parent": {
+                                            "description": "Required. A parent name of the form `projects/{project_id}/databases/{database_id}`",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/databases/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "userCredsId": {
+                                            "description": "Required. The ID to use for the user creds, which will become the final component of the user creds's resource name. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/.",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+parent}/userCreds",
+                                    "request": {
+                                        "$ref": "GoogleFirestoreAdminV1UserCreds"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleFirestoreAdminV1UserCreds"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/datastore"
+                                    ]
+                                },
+                                "delete": {
+                                    "description": "Deletes a user creds.",
+                                    "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/userCreds/{userCredsId}",
+                                    "httpMethod": "DELETE",
+                                    "id": "firestore.projects.databases.userCreds.delete",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/userCreds/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}",
+                                    "response": {
+                                        "$ref": "Empty"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/datastore"
+                                    ]
+                                },
+                                "disable": {
+                                    "description": "Disables a user creds. No-op if the user creds are already disabled.",
+                                    "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/userCreds/{userCredsId}:disable",
+                                    "httpMethod": "POST",
+                                    "id": "firestore.projects.databases.userCreds.disable",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/userCreds/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}:disable",
+                                    "request": {
+                                        "$ref": "GoogleFirestoreAdminV1DisableUserCredsRequest"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleFirestoreAdminV1UserCreds"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/datastore"
+                                    ]
+                                },
+                                "enable": {
+                                    "description": "Enables a user creds. No-op if the user creds are already enabled.",
+                                    "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/userCreds/{userCredsId}:enable",
+                                    "httpMethod": "POST",
+                                    "id": "firestore.projects.databases.userCreds.enable",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/userCreds/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}:enable",
+                                    "request": {
+                                        "$ref": "GoogleFirestoreAdminV1EnableUserCredsRequest"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleFirestoreAdminV1UserCreds"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/datastore"
+                                    ]
+                                },
+                                "get": {
+                                    "description": "Gets a user creds resource. Note that the returned resource does not contain the secret value itself.",
+                                    "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/userCreds/{userCredsId}",
+                                    "httpMethod": "GET",
+                                    "id": "firestore.projects.databases.userCreds.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/userCreds/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}",
+                                    "response": {
+                                        "$ref": "GoogleFirestoreAdminV1UserCreds"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/datastore"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "List all user creds in the database. Note that the returned resource does not contain the secret value itself.",
+                                    "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/userCreds",
+                                    "httpMethod": "GET",
+                                    "id": "firestore.projects.databases.userCreds.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "parent": {
+                                            "description": "Required. A parent database name of the form `projects/{project_id}/databases/{database_id}`",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/databases/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+parent}/userCreds",
+                                    "response": {
+                                        "$ref": "GoogleFirestoreAdminV1ListUserCredsResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/datastore"
+                                    ]
+                                },
+                                "resetPassword": {
+                                    "description": "Resets the password of a user creds.",
+                                    "flatPath": "v1/projects/{projectsId}/databases/{databasesId}/userCreds/{userCredsId}:resetPassword",
+                                    "httpMethod": "POST",
+                                    "id": "firestore.projects.databases.userCreds.resetPassword",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/databases/[^/]+/userCreds/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}:resetPassword",
+                                    "request": {
+                                        "$ref": "GoogleFirestoreAdminV1ResetUserPasswordRequest"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleFirestoreAdminV1UserCreds"
                                     },
                                     "scopes": [
                                         "https://www.googleapis.com/auth/cloud-platform",
@@ -1584,6 +2283,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Unless explicitly documented otherwise, don't use this unsupported field which is primarily intended for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -1682,6 +2387,11 @@
                                         "parent"
                                     ],
                                     "parameters": {
+                                        "filter": {
+                                            "description": "An expression that filters the list of returned backups. A filter expression consists of a field name, a comparison operator, and a value for filtering. The value must be a string, a number, or a boolean. The comparison operator must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`. Colon `:` is the contains operator. Filter rules are not case sensitive. The following fields in the Backup are eligible for filtering: * `database_uid` (supports `=` only)",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
                                         "parent": {
                                             "description": "Required. The location to list backups from. Format is `projects/{project}/locations/{location}`. Use `{location} = '-'` to list backups from all locations for the given project. This allows listing backups from a single location or from all locations.",
                                             "location": "path",
@@ -1706,7 +2416,7 @@
             }
         }
     },
-    "revision": "20240617",
+    "revision": "20251014",
     "rootUrl": "https://firestore.googleapis.com/",
     "schemas": {
         "Aggregation": {
@@ -2066,7 +2776,7 @@
             "type": "object"
         },
         "DocumentChange": {
-            "description": "A Document has changed. May be the result of multiple writes, including deletes, that ultimately resulted in a new value for the Document. Multiple DocumentChange messages may be returned for the same logical change, if multiple targets are affected. For PipelineQueryTargets, `document` will be in the new pipeline format, For a Listen stream with both QueryTargets and PipelineQueryTargets present, if a document matches both types of queries, then a separate DocumentChange messages will be sent out one for each set.",
+            "description": "A Document has changed. May be the result of multiple writes, including deletes, that ultimately resulted in a new value for the Document. Multiple DocumentChange messages may be returned for the same logical change, if multiple targets are affected.",
             "id": "DocumentChange",
             "properties": {
                 "document": {
@@ -2388,7 +3098,7 @@
             "type": "object"
         },
         "FindNearest": {
-            "description": "Nearest Neighbors search config.",
+            "description": "Nearest Neighbors search config. The ordering provided by FindNearest supersedes the order_by stage. If multiple documents have the same vector distance, the returned document order is not guaranteed to be stable between queries.",
             "id": "FindNearest",
             "properties": {
                 "distanceMeasure": {
@@ -2401,11 +3111,20 @@
                     ],
                     "enumDescriptions": [
                         "Should not be set.",
-                        "Measures the EUCLIDEAN distance between the vectors. See [Euclidean](https://en.wikipedia.org/wiki/Euclidean_distance) to learn more",
-                        "Compares vectors based on the angle between them, which allows you to measure similarity that isn't based on the vectors magnitude. We recommend using DOT_PRODUCT with unit normalized vectors instead of COSINE distance, which is mathematically equivalent with better performance. See [Cosine Similarity](https://en.wikipedia.org/wiki/Cosine_similarity) to learn more.",
-                        "Similar to cosine but is affected by the magnitude of the vectors. See [Dot Product](https://en.wikipedia.org/wiki/Dot_product) to learn more."
+                        "Measures the EUCLIDEAN distance between the vectors. See [Euclidean](https://en.wikipedia.org/wiki/Euclidean_distance) to learn more. The resulting distance decreases the more similar two vectors are.",
+                        "COSINE distance compares vectors based on the angle between them, which allows you to measure similarity that isn't based on the vectors magnitude. We recommend using DOT_PRODUCT with unit normalized vectors instead of COSINE distance, which is mathematically equivalent with better performance. See [Cosine Similarity](https://en.wikipedia.org/wiki/Cosine_similarity) to learn more about COSINE similarity and COSINE distance. The resulting COSINE distance decreases the more similar two vectors are.",
+                        "Similar to cosine but is affected by the magnitude of the vectors. See [Dot Product](https://en.wikipedia.org/wiki/Dot_product) to learn more. The resulting distance increases the more similar two vectors are."
                     ],
                     "type": "string"
+                },
+                "distanceResultField": {
+                    "description": "Optional. Optional name of the field to output the result of the vector distance calculation. Must conform to document field name limitations.",
+                    "type": "string"
+                },
+                "distanceThreshold": {
+                    "description": "Optional. Option to specify a threshold for which no less similar documents will be returned. The behavior of the specified `distance_measure` will affect the meaning of the distance threshold. Since DOT_PRODUCT distances increase when the vectors are more similar, the comparison is inverted. * For EUCLIDEAN, COSINE: `WHERE distance <= distance_threshold` * For DOT_PRODUCT: `WHERE distance >= distance_threshold`",
+                    "format": "double",
+                    "type": "number"
                 },
                 "limit": {
                     "description": "Required. The number of nearest neighbors to return. Must be a positive integer of no more than 1000.",
@@ -2499,7 +3218,7 @@
                     "type": "string"
                 },
                 "retention": {
-                    "description": "At what relative time in the future, compared to its creation time, the backup should be deleted, e.g. keep backups for 7 days.",
+                    "description": "At what relative time in the future, compared to its creation time, the backup should be deleted, e.g. keep backups for 7 days. The maximum supported retention period is 14 weeks.",
                     "format": "google-duration",
                     "type": "string"
                 },
@@ -2516,12 +3235,23 @@
             },
             "type": "object"
         },
+        "GoogleFirestoreAdminV1BackupSource": {
+            "description": "Information about a backup that was used to restore a database.",
+            "id": "GoogleFirestoreAdminV1BackupSource",
+            "properties": {
+                "backup": {
+                    "description": "The resource name of the backup that was used to restore this database. Format: `projects/{project}/locations/{location}/backups/{backup}`.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1BulkDeleteDocumentsMetadata": {
             "description": "Metadata for google.longrunning.Operation results from FirestoreAdmin.BulkDeleteDocuments.",
             "id": "GoogleFirestoreAdminV1BulkDeleteDocumentsMetadata",
             "properties": {
                 "collectionIds": {
-                    "description": "The ids of the collection groups that are being deleted.",
+                    "description": "The IDs of the collection groups that are being deleted.",
                     "items": {
                         "type": "string"
                     },
@@ -2533,7 +3263,7 @@
                     "type": "string"
                 },
                 "namespaceIds": {
-                    "description": "Which namespace ids are being deleted.",
+                    "description": "Which namespace IDs are being deleted.",
                     "items": {
                         "type": "string"
                     },
@@ -2605,6 +3335,85 @@
             },
             "type": "object"
         },
+        "GoogleFirestoreAdminV1CloneDatabaseMetadata": {
+            "description": "Metadata for the long-running operation from the CloneDatabase request.",
+            "id": "GoogleFirestoreAdminV1CloneDatabaseMetadata",
+            "properties": {
+                "database": {
+                    "description": "The name of the database being cloned to.",
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "The time the clone finished, unset for ongoing clones.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "operationState": {
+                    "description": "The operation state of the clone.",
+                    "enum": [
+                        "OPERATION_STATE_UNSPECIFIED",
+                        "INITIALIZING",
+                        "PROCESSING",
+                        "CANCELLING",
+                        "FINALIZING",
+                        "SUCCESSFUL",
+                        "FAILED",
+                        "CANCELLED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Request is being prepared for processing.",
+                        "Request is actively being processed.",
+                        "Request is in the process of being cancelled after user called google.longrunning.Operations.CancelOperation on the operation.",
+                        "Request has been processed and is in its finalization stage.",
+                        "Request has completed successfully.",
+                        "Request has finished being processed, but encountered an error.",
+                        "Request has finished being cancelled after user called google.longrunning.Operations.CancelOperation."
+                    ],
+                    "type": "string"
+                },
+                "pitrSnapshot": {
+                    "$ref": "GoogleFirestoreAdminV1PitrSnapshot",
+                    "description": "The snapshot from which this database was cloned."
+                },
+                "progressPercentage": {
+                    "$ref": "GoogleFirestoreAdminV1Progress",
+                    "description": "How far along the clone is as an estimated percentage of remaining time."
+                },
+                "startTime": {
+                    "description": "The time the clone was started.",
+                    "format": "google-datetime",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleFirestoreAdminV1CloneDatabaseRequest": {
+            "description": "The request message for FirestoreAdmin.CloneDatabase.",
+            "id": "GoogleFirestoreAdminV1CloneDatabaseRequest",
+            "properties": {
+                "databaseId": {
+                    "description": "Required. The ID to use for the database, which will become the final component of the database's resource name. This database ID must not be associated with an existing database. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. \"(default)\" database ID is also valid if the database is Standard edition.",
+                    "type": "string"
+                },
+                "encryptionConfig": {
+                    "$ref": "GoogleFirestoreAdminV1EncryptionConfig",
+                    "description": "Optional. Encryption configuration for the cloned database. If this field is not specified, the cloned database will use the same encryption configuration as the source database, namely use_source_encryption."
+                },
+                "pitrSnapshot": {
+                    "$ref": "GoogleFirestoreAdminV1PitrSnapshot",
+                    "description": "Required. Specification of the PITR data to clone from. The source database must exist. The cloned database will be created in the same location as the source database."
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Immutable. Tags to be bound to the cloned database. The tags should be provided in the format of `tagKeys/{tag_key_id} -> tagValues/{tag_value_id}`.",
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1CmekConfig": {
             "description": "The CMEK (Customer Managed Encryption Key) configuration for a Firestore database. If not present, the database is secured by the default Google encryption key.",
             "id": "GoogleFirestoreAdminV1CmekConfig",
@@ -2630,15 +3439,21 @@
             "properties": {},
             "type": "object"
         },
+        "GoogleFirestoreAdminV1CustomerManagedEncryptionOptions": {
+            "description": "The configuration options for using CMEK (Customer Managed Encryption Key) encryption.",
+            "id": "GoogleFirestoreAdminV1CustomerManagedEncryptionOptions",
+            "properties": {
+                "kmsKeyName": {
+                    "description": "Required. Only keys in the same location as the database are allowed to be used for encryption. For Firestore's nam5 multi-region, this corresponds to Cloud KMS multi-region us. For Firestore's eur3 multi-region, this corresponds to Cloud KMS multi-region europe. See https://cloud.google.com/kms/docs/locations. The expected format is `projects/{project_id}/locations/{kms_location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1DailyRecurrence": {
             "description": "Represents a recurring schedule that runs every day. The time zone is UTC.",
             "id": "GoogleFirestoreAdminV1DailyRecurrence",
-            "properties": {
-                "time": {
-                    "$ref": "TimeOfDay",
-                    "description": "Time of the day. The first run scheduled will be either on the same day if schedule creation time precedes time_of_day or the next day otherwise."
-                }
-            },
+            "properties": {},
             "type": "object"
         },
         "GoogleFirestoreAdminV1Database": {
@@ -2685,6 +3500,20 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "databaseEdition": {
+                    "description": "Immutable. The edition of the database.",
+                    "enum": [
+                        "DATABASE_EDITION_UNSPECIFIED",
+                        "STANDARD",
+                        "ENTERPRISE"
+                    ],
+                    "enumDescriptions": [
+                        "Not used.",
+                        "Standard edition. This is the default setting if not specified.",
+                        "Enterprise edition."
+                    ],
+                    "type": "string"
+                },
                 "deleteProtectionState": {
                     "description": "State of delete protection for the database.",
                     "enum": [
@@ -2715,13 +3544,46 @@
                     "description": "This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.",
                     "type": "string"
                 },
+                "firestoreDataAccessMode": {
+                    "description": "Optional. The Firestore API data access mode to use for this database. If not set on write: - the default value is DATA_ACCESS_MODE_DISABLED for Enterprise Edition. - the default value is DATA_ACCESS_MODE_ENABLED for Standard Edition.",
+                    "enum": [
+                        "DATA_ACCESS_MODE_UNSPECIFIED",
+                        "DATA_ACCESS_MODE_ENABLED",
+                        "DATA_ACCESS_MODE_DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Not Used.",
+                        "Accessing the database through the API is allowed.",
+                        "Accessing the database through the API is disallowed."
+                    ],
+                    "type": "string"
+                },
+                "freeTier": {
+                    "description": "Output only. Background: Free tier is the ability of a Firestore database to use a small amount of resources every day without being charged. Once usage exceeds the free tier limit further usage is charged. Whether this database can make use of the free tier. Only one database per project can be eligible for the free tier. The first (or next) database that is created in a project without a free tier database will be marked as eligible for the free tier. Databases that are created while there is a free tier database will not be eligible for the free tier.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
                 "keyPrefix": {
-                    "description": "Output only. The key_prefix for this database. This key_prefix is used, in combination with the project id (\"~\") to construct the application id that is returned from the Cloud Datastore APIs in Google App Engine first generation runtimes. This value may be empty in which case the appid to use for URL-encoded keys is the project_id (eg: foo instead of v~foo).",
+                    "description": "Output only. The key_prefix for this database. This key_prefix is used, in combination with the project ID (\"~\") to construct the application ID that is returned from the Cloud Datastore APIs in Google App Engine first generation runtimes. This value may be empty in which case the appid to use for URL-encoded keys is the project_id (eg: foo instead of v~foo).",
                     "readOnly": true,
                     "type": "string"
                 },
                 "locationId": {
                     "description": "The location of the database. Available locations are listed at https://cloud.google.com/firestore/docs/locations.",
+                    "type": "string"
+                },
+                "mongodbCompatibleDataAccessMode": {
+                    "description": "Optional. The MongoDB compatible API data access mode to use for this database. If not set on write, the default value is DATA_ACCESS_MODE_ENABLED for Enterprise Edition. The value is always DATA_ACCESS_MODE_DISABLED for Standard Edition.",
+                    "enum": [
+                        "DATA_ACCESS_MODE_UNSPECIFIED",
+                        "DATA_ACCESS_MODE_ENABLED",
+                        "DATA_ACCESS_MODE_DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Not Used.",
+                        "Accessing the database through the API is allowed.",
+                        "Accessing the database through the API is disallowed."
+                    ],
                     "type": "string"
                 },
                 "name": {
@@ -2746,6 +3608,32 @@
                     "description": "Output only. The database resource's prior database ID. This field is only populated for deleted databases.",
                     "readOnly": true,
                     "type": "string"
+                },
+                "realtimeUpdatesMode": {
+                    "description": "Immutable. The default Realtime Updates mode to use for this database.",
+                    "enum": [
+                        "REALTIME_UPDATES_MODE_UNSPECIFIED",
+                        "REALTIME_UPDATES_MODE_ENABLED",
+                        "REALTIME_UPDATES_MODE_DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "The Realtime Updates feature is not specified.",
+                        "The Realtime Updates feature is enabled by default. This could potentially degrade write performance for the database.",
+                        "The Realtime Updates feature is disabled by default."
+                    ],
+                    "type": "string"
+                },
+                "sourceInfo": {
+                    "$ref": "GoogleFirestoreAdminV1SourceInfo",
+                    "description": "Output only. Information about the provenance of this database.",
+                    "readOnly": true
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Input only. Immutable. Tag keys/values directly bound to this resource. For example: \"123/environment\": \"production\", \"123/costCenter\": \"marketing\"",
+                    "type": "object"
                 },
                 "type": {
                     "description": "The type of the database. See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.",
@@ -2787,12 +3675,43 @@
             "properties": {},
             "type": "object"
         },
+        "GoogleFirestoreAdminV1DisableUserCredsRequest": {
+            "description": "The request for FirestoreAdmin.DisableUserCreds.",
+            "id": "GoogleFirestoreAdminV1DisableUserCredsRequest",
+            "properties": {},
+            "type": "object"
+        },
+        "GoogleFirestoreAdminV1EnableUserCredsRequest": {
+            "description": "The request for FirestoreAdmin.EnableUserCreds.",
+            "id": "GoogleFirestoreAdminV1EnableUserCredsRequest",
+            "properties": {},
+            "type": "object"
+        },
+        "GoogleFirestoreAdminV1EncryptionConfig": {
+            "description": "Encryption configuration for a new database being created from another source. The source could be a Backup .",
+            "id": "GoogleFirestoreAdminV1EncryptionConfig",
+            "properties": {
+                "customerManagedEncryption": {
+                    "$ref": "GoogleFirestoreAdminV1CustomerManagedEncryptionOptions",
+                    "description": "Use Customer Managed Encryption Keys (CMEK) for encryption."
+                },
+                "googleDefaultEncryption": {
+                    "$ref": "GoogleFirestoreAdminV1GoogleDefaultEncryptionOptions",
+                    "description": "Use Google default encryption."
+                },
+                "useSourceEncryption": {
+                    "$ref": "GoogleFirestoreAdminV1SourceEncryptionOptions",
+                    "description": "The database will use the same encryption configuration as the source."
+                }
+            },
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1ExportDocumentsMetadata": {
             "description": "Metadata for google.longrunning.Operation results from FirestoreAdmin.ExportDocuments.",
             "id": "GoogleFirestoreAdminV1ExportDocumentsMetadata",
             "properties": {
                 "collectionIds": {
-                    "description": "Which collection ids are being exported.",
+                    "description": "Which collection IDs are being exported.",
                     "items": {
                         "type": "string"
                     },
@@ -2804,7 +3723,7 @@
                     "type": "string"
                 },
                 "namespaceIds": {
-                    "description": "Which namespace ids are being exported.",
+                    "description": "Which namespace IDs are being exported.",
                     "items": {
                         "type": "string"
                     },
@@ -2864,7 +3783,7 @@
             "id": "GoogleFirestoreAdminV1ExportDocumentsRequest",
             "properties": {
                 "collectionIds": {
-                    "description": "Which collection ids to export. Unspecified means all collections. Each collection id in this list must be unique.",
+                    "description": "Which collection IDs to export. Unspecified means all collections. Each collection ID in this list must be unique.",
                     "items": {
                         "type": "string"
                     },
@@ -2901,7 +3820,7 @@
             "type": "object"
         },
         "GoogleFirestoreAdminV1Field": {
-            "description": "Represents a single field in the database. Fields are grouped by their \"Collection Group\", which represent all collections in the database with the same id.",
+            "description": "Represents a single field in the database. Fields are grouped by their \"Collection Group\", which represent all collections in the database with the same ID.",
             "id": "GoogleFirestoreAdminV1Field",
             "properties": {
                 "indexConfig": {
@@ -2989,12 +3908,18 @@
             "properties": {},
             "type": "object"
         },
+        "GoogleFirestoreAdminV1GoogleDefaultEncryptionOptions": {
+            "description": "The configuration options for using Google default encryption.",
+            "id": "GoogleFirestoreAdminV1GoogleDefaultEncryptionOptions",
+            "properties": {},
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1ImportDocumentsMetadata": {
             "description": "Metadata for google.longrunning.Operation results from FirestoreAdmin.ImportDocuments.",
             "id": "GoogleFirestoreAdminV1ImportDocumentsMetadata",
             "properties": {
                 "collectionIds": {
-                    "description": "Which collection ids are being imported.",
+                    "description": "Which collection IDs are being imported.",
                     "items": {
                         "type": "string"
                     },
@@ -3010,7 +3935,7 @@
                     "type": "string"
                 },
                 "namespaceIds": {
-                    "description": "Which namespace ids are being imported.",
+                    "description": "Which namespace IDs are being imported.",
                     "items": {
                         "type": "string"
                     },
@@ -3061,7 +3986,7 @@
             "id": "GoogleFirestoreAdminV1ImportDocumentsRequest",
             "properties": {
                 "collectionIds": {
-                    "description": "Which collection ids to import. Unspecified means all collections included in the import. Each collection id in this list must be unique.",
+                    "description": "Which collection IDs to import. Unspecified means all collections included in the import. Each collection ID in this list must be unique.",
                     "items": {
                         "type": "string"
                     },
@@ -3089,11 +4014,29 @@
                     "description": "The API scope supported by this index.",
                     "enum": [
                         "ANY_API",
-                        "DATASTORE_MODE_API"
+                        "DATASTORE_MODE_API",
+                        "MONGODB_COMPATIBLE_API"
                     ],
                     "enumDescriptions": [
                         "The index can only be used by the Firestore Native query API. This is the default.",
-                        "The index can only be used by the Firestore in Datastore Mode query API."
+                        "The index can only be used by the Firestore in Datastore Mode query API.",
+                        "The index can only be used by the MONGODB_COMPATIBLE_API."
+                    ],
+                    "type": "string"
+                },
+                "density": {
+                    "description": "Immutable. The density configuration of the index.",
+                    "enum": [
+                        "DENSITY_UNSPECIFIED",
+                        "SPARSE_ALL",
+                        "SPARSE_ANY",
+                        "DENSE"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified. It will use database default setting. This value is input only.",
+                        "An index entry will only exist if ALL fields are present in the document. This is both the default and only allowed value for Standard Edition databases (for both Cloud Firestore `ANY_API` and Cloud Datastore `DATASTORE_MODE_API`). Take for example the following document: ``` { \"__name__\": \"...\", \"a\": 1, \"b\": 2, \"c\": 3 } ``` an index on `(a ASC, b ASC, c ASC, __name__ ASC)` will generate an index entry for this document since `a`, 'b', `c`, and `__name__` are all present but an index of `(a ASC, d ASC, __name__ ASC)` will not generate an index entry for this document since `d` is missing. This means that such indexes can only be used to serve a query when the query has either implicit or explicit requirements that all fields from the index are present.",
+                        "An index entry will exist if ANY field are present in the document. This is used as the definition of a sparse index for Enterprise Edition databases. Take for example the following document: ``` { \"__name__\": \"...\", \"a\": 1, \"b\": 2, \"c\": 3 } ``` an index on `(a ASC, d ASC)` will generate an index entry for this document since `a` is present, and will fill in an `unset` value for `d`. An index on `(d ASC, e ASC)` will not generate any index entry as neither `d` nor `e` are present. An index that contains `__name__` will generate an index entry for all documents since Firestore guarantees that all documents have a `__name__` field.",
+                        "An index entry will exist regardless of if the fields are present or not. This is the default density for an Enterprise Edition database. The index will store `unset` values for fields that are not present in the document."
                     ],
                     "type": "string"
                 },
@@ -3104,12 +4047,16 @@
                     },
                     "type": "array"
                 },
+                "multikey": {
+                    "description": "Optional. Whether the index is multikey. By default, the index is not multikey. For non-multikey indexes, none of the paths in the index definition reach or traverse an array, except via an explicit array index. For multikey indexes, at most one of the paths in the index definition reach or traverse an array, except via an explicit array index. Violations will result in errors. Note this field only applies to index with MONGODB_COMPATIBLE_API ApiScope.",
+                    "type": "boolean"
+                },
                 "name": {
                     "description": "Output only. A server defined name for this index. The form of this name for composite indexes will be: `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{composite_index_id}` For single field indexes, this field will be empty.",
                     "type": "string"
                 },
                 "queryScope": {
-                    "description": "Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id. Indexes with a collection group query scope specified allow queries against all collections descended from a specific document, specified at query time, and that have the same collection id as this index.",
+                    "description": "Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection ID. Indexes with a collection group query scope specified allow queries against all collections descended from a specific document, specified at query time, and that have the same collection ID as this index.",
                     "enum": [
                         "QUERY_SCOPE_UNSPECIFIED",
                         "COLLECTION",
@@ -3118,11 +4065,16 @@
                     ],
                     "enumDescriptions": [
                         "The query scope is unspecified. Not a valid option.",
-                        "Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the collection id specified by the index.",
-                        "Indexes with a collection group query scope specified allow queries against all collections that has the collection id specified by the index.",
+                        "Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the collection ID specified by the index.",
+                        "Indexes with a collection group query scope specified allow queries against all collections that has the collection ID specified by the index.",
                         "Include all the collections's ancestor in the index. Only available for Datastore Mode databases."
                     ],
                     "type": "string"
+                },
+                "shardCount": {
+                    "description": "Optional. The number of shards for the index.",
+                    "format": "int32",
+                    "type": "integer"
                 },
                 "state": {
                     "description": "Output only. The serving state of the index.",
@@ -3139,6 +4091,10 @@
                         "The index was being created, but something went wrong. There is no active long-running operation for the index, and the most recently finished long-running operation failed. The index is not updated when writing a document. Some index data may exist. Use the google.longrunning.Operations API to determine why the operation that last attempted to create this index failed, then re-create the index."
                     ],
                     "type": "string"
+                },
+                "unique": {
+                    "description": "Optional. Whether it is an unique index. Unique index ensures all values for the indexed field(s) are unique across documents.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -3380,10 +4336,46 @@
             },
             "type": "object"
         },
+        "GoogleFirestoreAdminV1ListUserCredsResponse": {
+            "description": "The response for FirestoreAdmin.ListUserCreds.",
+            "id": "GoogleFirestoreAdminV1ListUserCredsResponse",
+            "properties": {
+                "userCreds": {
+                    "description": "The user creds for the database.",
+                    "items": {
+                        "$ref": "GoogleFirestoreAdminV1UserCreds"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1LocationMetadata": {
             "description": "The metadata message for google.cloud.location.Location.metadata.",
             "id": "GoogleFirestoreAdminV1LocationMetadata",
             "properties": {},
+            "type": "object"
+        },
+        "GoogleFirestoreAdminV1PitrSnapshot": {
+            "description": "A consistent snapshot of a database at a specific point in time. A PITR (Point-in-time recovery) snapshot with previous versions of a database's data is available for every minute up to the associated database's data retention period. If the PITR feature is enabled, the retention period is 7 days; otherwise, it is one hour.",
+            "id": "GoogleFirestoreAdminV1PitrSnapshot",
+            "properties": {
+                "database": {
+                    "description": "Required. The name of the database that this was a snapshot of. Format: `projects/{project}/databases/{database}`.",
+                    "type": "string"
+                },
+                "databaseUid": {
+                    "description": "Output only. Public UUID of the database the snapshot was associated with.",
+                    "format": "byte",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "snapshotTime": {
+                    "description": "Required. Snapshot time of the database.",
+                    "format": "google-datetime",
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "GoogleFirestoreAdminV1Progress": {
@@ -3398,6 +4390,24 @@
                 "estimatedWork": {
                     "description": "The amount of work estimated.",
                     "format": "int64",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleFirestoreAdminV1ResetUserPasswordRequest": {
+            "description": "The request for FirestoreAdmin.ResetUserPassword.",
+            "id": "GoogleFirestoreAdminV1ResetUserPasswordRequest",
+            "properties": {},
+            "type": "object"
+        },
+        "GoogleFirestoreAdminV1ResourceIdentity": {
+            "description": "Describes a Resource Identity principal.",
+            "id": "GoogleFirestoreAdminV1ResourceIdentity",
+            "properties": {
+                "principal": {
+                    "description": "Output only. Principal identifier string. See: https://cloud.google.com/iam/docs/principal-identifiers",
+                    "readOnly": true,
                     "type": "string"
                 }
             },
@@ -3461,24 +4471,44 @@
             "id": "GoogleFirestoreAdminV1RestoreDatabaseRequest",
             "properties": {
                 "backup": {
-                    "description": "Backup to restore from. Must be from the same project as the parent. Format is: `projects/{project_id}/locations/{location}/backups/{backup}`",
+                    "description": "Required. Backup to restore from. Must be from the same project as the parent. The restored database will be created in the same location as the source backup. Format is: `projects/{project_id}/locations/{location}/backups/{backup}`",
                     "type": "string"
                 },
                 "databaseId": {
-                    "description": "Required. The ID to use for the database, which will become the final component of the database's resource name. This database id must not be associated with an existing database. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. \"(default)\" database id is also valid.",
+                    "description": "Required. The ID to use for the database, which will become the final component of the database's resource name. This database ID must not be associated with an existing database. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. \"(default)\" database ID is also valid if the database is Standard edition.",
                     "type": "string"
                 },
-                "kmsKeyName": {
-                    "description": "Use Customer Managed Encryption Keys (CMEK) for encryption. Only keys in the same location as this database are allowed to be used for encryption. For Firestore's nam5 multi-region, this corresponds to Cloud KMS multi-region us. For Firestore's eur3 multi-region, this corresponds to Cloud KMS multi-region europe. See https://cloud.google.com/kms/docs/locations. The expected format is `projects/{project_id}/locations/{kms_location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`.",
+                "encryptionConfig": {
+                    "$ref": "GoogleFirestoreAdminV1EncryptionConfig",
+                    "description": "Optional. Encryption configuration for the restored database. If this field is not specified, the restored database will use the same encryption configuration as the backup, namely use_source_encryption."
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Immutable. Tags to be bound to the restored database. The tags should be provided in the format of `tagKeys/{tag_key_id} -> tagValues/{tag_value_id}`.",
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleFirestoreAdminV1SourceEncryptionOptions": {
+            "description": "The configuration options for using the same encryption method as the source.",
+            "id": "GoogleFirestoreAdminV1SourceEncryptionOptions",
+            "properties": {},
+            "type": "object"
+        },
+        "GoogleFirestoreAdminV1SourceInfo": {
+            "description": "Information about the provenance of this database.",
+            "id": "GoogleFirestoreAdminV1SourceInfo",
+            "properties": {
+                "backup": {
+                    "$ref": "GoogleFirestoreAdminV1BackupSource",
+                    "description": "If set, this database was restored from the specified backup (or a snapshot thereof)."
+                },
+                "operation": {
+                    "description": "The associated long-running operation. This field may not be set after the operation has completed. Format: `projects/{project}/databases/{database}/operations/{operation}`.",
                     "type": "string"
-                },
-                "useBackupEncryption": {
-                    "$ref": "Empty",
-                    "description": "The restored database will use the same encryption configuration as the backup. This is the default option when no `encryption_config` is specified."
-                },
-                "useGoogleDefaultEncryption": {
-                    "$ref": "Empty",
-                    "description": "Use Google default encryption."
                 }
             },
             "type": "object"
@@ -3559,6 +4589,53 @@
             "properties": {},
             "type": "object"
         },
+        "GoogleFirestoreAdminV1UserCreds": {
+            "description": "A Cloud Firestore User Creds.",
+            "id": "GoogleFirestoreAdminV1UserCreds",
+            "properties": {
+                "createTime": {
+                    "description": "Output only. The time the user creds were created.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Identifier. The resource name of the UserCreds. Format: `projects/{project}/databases/{database}/userCreds/{user_creds}`",
+                    "type": "string"
+                },
+                "resourceIdentity": {
+                    "$ref": "GoogleFirestoreAdminV1ResourceIdentity",
+                    "description": "Resource Identity descriptor."
+                },
+                "securePassword": {
+                    "description": "Output only. The plaintext server-generated password for the user creds. Only populated in responses for CreateUserCreds and ResetUserPassword.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Output only. Whether the user creds are enabled or disabled. Defaults to ENABLED on creation.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "ENABLED",
+                        "DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "The default value. Should not be used.",
+                        "The user creds are enabled.",
+                        "The user creds are disabled."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. The time the user creds were last updated.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleFirestoreAdminV1VectorConfig": {
             "description": "The index configuration to support vector search operations",
             "id": "GoogleFirestoreAdminV1VectorConfig",
@@ -3602,10 +4679,6 @@
                         "Sunday"
                     ],
                     "type": "string"
-                },
-                "time": {
-                    "$ref": "TimeOfDay",
-                    "description": "Time of the day. If day is today, the first run will happen today if schedule creation time precedes time_of_day, and the next week otherwise."
                 }
             },
             "type": "object"
@@ -3628,6 +4701,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "GoogleLongrunningOperation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections e.g. when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -4194,7 +5274,7 @@
             "type": "object"
         },
         "StructuredQuery": {
-            "description": "A Firestore query. The query stages are executed in the following order: 1. from 2. where 3. select 4. order_by + start_at + end_at 5. offset 6. limit",
+            "description": "A Firestore query. The query stages are executed in the following order: 1. from 2. where 3. select 4. order_by + start_at + end_at 5. offset 6. limit 7. find_nearest",
             "id": "StructuredQuery",
             "properties": {
                 "endAt": {
@@ -4287,7 +5367,7 @@
                     "type": "string"
                 },
                 "targetId": {
-                    "description": "The target ID that identifies the target on the stream. Must be a positive number and non-zero. If `target_id` is 0 (or unspecified), the server will assign an ID for this target and return that in a `TargetChange::ADD` event. Once a target with `target_id=0` is added, all subsequent targets must also have `target_id=0`. If an `AddTarget` request with `target_id != 0` is sent to the server after a target with `target_id=0` is added, the server will immediately send a response with a `TargetChange::Remove` event. Note that if the client sends multiple `AddTarget` requests without an ID, the order of IDs returned in `TargetChage.target_ids` are undefined. Therefore, clients should provide a target ID instead of relying on the server to assign one. If `target_id` is non-zero, there must not be an existing active target on this stream with the same ID.",
+                    "description": "The target ID that identifies the target on the stream. Must be a positive number and non-zero. If `target_id` is 0 (or unspecified), the server will assign an ID for this target and return that in a `TargetChange::ADD` event. Once a target with `target_id=0` is added, all subsequent targets must also have `target_id=0`. If an `AddTarget` request with `target_id != 0` is sent to the server after a target with `target_id=0` is added, the server will immediately send a response with a `TargetChange::Remove` event. Note that if the client sends multiple `AddTarget` requests without an ID, the order of IDs returned in `TargetChange.target_ids` are undefined. Therefore, clients should provide a target ID instead of relying on the server to assign one. If `target_id` is non-zero, there must not be an existing active target on this stream with the same ID.",
                     "format": "int32",
                     "type": "integer"
                 }
@@ -4337,33 +5417,6 @@
                         "type": "integer"
                     },
                     "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "TimeOfDay": {
-            "description": "Represents a time of day. The date and time zone are either not significant or are specified elsewhere. An API may choose to allow leap seconds. Related types are google.type.Date and `google.protobuf.Timestamp`.",
-            "id": "TimeOfDay",
-            "properties": {
-                "hours": {
-                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
-                    "format": "int32",
-                    "type": "integer"
-                },
-                "minutes": {
-                    "description": "Minutes of hour of day. Must be from 0 to 59.",
-                    "format": "int32",
-                    "type": "integer"
-                },
-                "nanos": {
-                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
-                    "format": "int32",
-                    "type": "integer"
-                },
-                "seconds": {
-                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.",
-                    "format": "int32",
-                    "type": "integer"
                 }
             },
             "type": "object"

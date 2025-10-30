@@ -17,7 +17,7 @@
     "canonicalName": "Vault",
     "description": "Retention and eDiscovery for Google Workspace. To work with Vault resources, the account must have the [required Vault privileges](https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege. For example, to download an export, an account needs the **Manage Exports** privilege and the matter shared with them. ",
     "discoveryVersion": "v1",
-    "documentationLink": "https://developers.google.com/vault",
+    "documentationLink": "https://developers.google.com/workspace/vault",
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -258,7 +258,7 @@
                             "enumDescriptions": [
                                 "The amount of detail is unspecified. Same as **BASIC**.",
                                 "Returns the matter ID, name, description, and state. Default choice.",
-                                "Returns the basic details and a list of matter owners and collaborators (see [MatterPermissions](https://developers.google.com/vault/reference/rest/v1/matters#matterpermission))."
+                                "Returns the basic details and a list of matter owners and collaborators (see [MatterPermissions](https://developers.google.com/workspace/vault/reference/rest/v1/matters#matterpermission))."
                             ],
                             "location": "query",
                             "type": "string"
@@ -318,7 +318,7 @@
                             "enumDescriptions": [
                                 "The amount of detail is unspecified. Same as **BASIC**.",
                                 "Returns the matter ID, name, description, and state. Default choice.",
-                                "Returns the basic details and a list of matter owners and collaborators (see [MatterPermissions](https://developers.google.com/vault/reference/rest/v1/matters#matterpermission))."
+                                "Returns the basic details and a list of matter owners and collaborators (see [MatterPermissions](https://developers.google.com/workspace/vault/reference/rest/v1/matters#matterpermission))."
                             ],
                             "location": "query",
                             "type": "string"
@@ -1080,7 +1080,7 @@
         "operations": {
             "methods": {
                 "cancel": {
-                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                     "flatPath": "v1/operations/{operationsId}:cancel",
                     "httpMethod": "POST",
                     "id": "vault.operations.cancel",
@@ -1189,6 +1189,11 @@
                             "description": "The standard list page token.",
                             "location": "query",
                             "type": "string"
+                        },
+                        "returnPartialSuccess": {
+                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the [ListOperationsResponse.unreachable] field. This can only be `true` when reading across collections e.g. when `parent` is set to `\"projects/example/locations/-\"`. This field is not by default supported and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                            "location": "query",
+                            "type": "boolean"
                         }
                     },
                     "path": "v1/{+name}",
@@ -1203,7 +1208,7 @@
             }
         }
     },
-    "revision": "20240617",
+    "revision": "20251027",
     "rootUrl": "https://vault.googleapis.com/",
     "schemas": {
         "AccountCount": {
@@ -1346,13 +1351,15 @@
                         "EXPORT_FORMAT_UNSPECIFIED",
                         "MBOX",
                         "PST",
-                        "ICS"
+                        "ICS",
+                        "XML"
                     ],
                     "enumDescriptions": [
                         "No export format specified.",
                         "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
                         "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
-                        "Export as ICS. Only available for Calendar."
+                        "Export as ICS. Only available for Calendar.",
+                        "Export as XML. Only available for Gemini."
                     ],
                     "type": "string"
                 }
@@ -1575,6 +1582,31 @@
             },
             "type": "object"
         },
+        "DriveDocumentIds": {
+            "description": "Specify Drive documents by document ID.",
+            "id": "DriveDocumentIds",
+            "properties": {
+                "ids": {
+                    "description": "Required. A list of Drive document IDs.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "DriveDocumentInfo": {
+            "description": "The Drive documents to search.",
+            "id": "DriveDocumentInfo",
+            "properties": {
+                "documentIds": {
+                    "$ref": "DriveDocumentIds",
+                    "description": "Specify Drive documents by document ID."
+                }
+            },
+            "type": "object"
+        },
         "DriveExportOptions": {
             "description": "Options for Drive exports.",
             "id": "DriveExportOptions",
@@ -1587,7 +1619,7 @@
             "type": "object"
         },
         "DriveOptions": {
-            "description": "Additional options for Drive search",
+            "description": "Additional options for Drive search.",
             "id": "DriveOptions",
             "properties": {
                 "clientSideEncryptedOption": {
@@ -1607,6 +1639,7 @@
                     "type": "string"
                 },
                 "includeSharedDrives": {
+                    "deprecated": true,
                     "description": "Set to **true** to include shared drives.",
                     "type": "boolean"
                 },
@@ -1614,6 +1647,22 @@
                     "deprecated": true,
                     "description": "Set to true to include Team Drive.",
                     "type": "boolean"
+                },
+                "sharedDrivesOption": {
+                    "description": "Optional. Options to include or exclude documents in shared drives. We recommend using this field over include_shared_drives. This field overrides include_shared_drives and include_team_drives when set.",
+                    "enum": [
+                        "SHARED_DRIVES_OPTION_UNSPECIFIED",
+                        "NOT_INCLUDED",
+                        "INCLUDED_IF_ACCOUNT_IS_NOT_A_MEMBER",
+                        "INCLUDED"
+                    ],
+                    "enumDescriptions": [
+                        "No shared drive option specified.",
+                        "If a resource is in a shared drive, it isn't included in the search.",
+                        "Shared drive resources are only included in instances where the account is a collaborator on a resource but they are not a member of the shared drive. This maps to the *\"Included only if documents shared directly (not due to shared drive membership)\"* option in the Vault UI. (Previously \"include_shared_drives\" off)",
+                        "Resources in shared drives are included in the search. (Previously \"include_shared_drives\" on)"
+                    ],
+                    "type": "string"
                 },
                 "versionDate": {
                     "description": "Search the current version of the Drive file, but export the contents of the last version saved before 12:00 AM UTC on the specified date. Enter the date in UTC.",
@@ -1706,6 +1755,10 @@
                     "$ref": "DriveExportOptions",
                     "description": "Options for Drive exports."
                 },
+                "geminiOptions": {
+                    "$ref": "GeminiExportOptions",
+                    "description": "Option available for Gemini export."
+                },
                 "groupsOptions": {
                     "$ref": "GroupsExportOptions",
                     "description": "Options for Groups exports."
@@ -1763,6 +1816,37 @@
             },
             "type": "object"
         },
+        "GeminiExportOptions": {
+            "description": "The options for Gemini exports.",
+            "id": "GeminiExportOptions",
+            "properties": {
+                "exportFormat": {
+                    "description": "The file format for exported messages.",
+                    "enum": [
+                        "EXPORT_FORMAT_UNSPECIFIED",
+                        "MBOX",
+                        "PST",
+                        "ICS",
+                        "XML"
+                    ],
+                    "enumDescriptions": [
+                        "No export format specified.",
+                        "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
+                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
+                        "Export as ICS. Only available for Calendar.",
+                        "Export as XML. Only available for Gemini."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GeminiOptions": {
+            "description": "Additional options for Gemini search",
+            "id": "GeminiOptions",
+            "properties": {},
+            "type": "object"
+        },
         "GroupsCountResult": {
             "description": "Groups specific count metrics.",
             "id": "GroupsCountResult",
@@ -1811,13 +1895,15 @@
                         "EXPORT_FORMAT_UNSPECIFIED",
                         "MBOX",
                         "PST",
-                        "ICS"
+                        "ICS",
+                        "XML"
                     ],
                     "enumDescriptions": [
                         "No export format specified.",
                         "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
                         "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
-                        "Export as ICS. Only available for Calendar."
+                        "Export as ICS. Only available for Calendar.",
+                        "Export as XML. Only available for Gemini."
                     ],
                     "type": "string"
                 }
@@ -1834,13 +1920,15 @@
                         "EXPORT_FORMAT_UNSPECIFIED",
                         "MBOX",
                         "PST",
-                        "ICS"
+                        "ICS",
+                        "XML"
                     ],
                     "enumDescriptions": [
                         "No export format specified.",
                         "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
                         "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
-                        "Export as ICS. Only available for Calendar."
+                        "Export as ICS. Only available for Calendar.",
+                        "Export as XML. Only available for Gemini."
                     ],
                     "type": "string"
                 }
@@ -1852,7 +1940,7 @@
             "id": "HangoutsChatInfo",
             "properties": {
                 "roomId": {
-                    "description": "A list of Chat spaces IDs, as provided by the [Chat API](https://developers.google.com/chat). There is a limit of exporting from 500 Chat spaces per request.",
+                    "description": "A list of Chat spaces IDs, as provided by the [Chat API](https://developers.google.com/workspace/chat). There is a limit of exporting from 500 Chat spaces per request.",
                     "items": {
                         "type": "string"
                     },
@@ -2037,7 +2125,8 @@
                         "GROUPS",
                         "HANGOUTS_CHAT",
                         "VOICE",
-                        "CALENDAR"
+                        "CALENDAR",
+                        "GEMINI"
                     ],
                     "enumDescriptions": [
                         "No service specified.",
@@ -2046,7 +2135,8 @@
                         "Groups.",
                         "For export, Google Chat only. For holds, Google Chat and classic Hangouts.",
                         "Google Voice.",
-                        "Calendar."
+                        "Calendar.",
+                        "Gemini."
                     ],
                     "type": "string"
                 },
@@ -2156,6 +2246,13 @@
                         "$ref": "Operation"
                     },
                     "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections e.g. when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -2226,13 +2323,15 @@
                         "EXPORT_FORMAT_UNSPECIFIED",
                         "MBOX",
                         "PST",
-                        "ICS"
+                        "ICS",
+                        "XML"
                     ],
                     "enumDescriptions": [
                         "No export format specified.",
                         "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
                         "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
-                        "Export as ICS. Only available for Calendar."
+                        "Export as ICS. Only available for Calendar.",
+                        "Export as XML. Only available for Gemini."
                     ],
                     "type": "string"
                 },
@@ -2296,6 +2395,22 @@
                         "$ref": "MatterPermission"
                     },
                     "type": "array"
+                },
+                "matterRegion": {
+                    "description": "Optional. The requested data region for the matter.",
+                    "enum": [
+                        "MATTER_REGION_UNSPECIFIED",
+                        "ANY",
+                        "US",
+                        "EUROPE"
+                    ],
+                    "enumDescriptions": [
+                        "The region is unspecified. Defaults to ANY.",
+                        "Any region.",
+                        "United States region.",
+                        "Europe region."
+                    ],
+                    "type": "string"
                 },
                 "name": {
                     "description": "The name of the matter.",
@@ -2412,7 +2527,8 @@
                         "GROUPS",
                         "HANGOUTS_CHAT",
                         "VOICE",
-                        "CALENDAR"
+                        "CALENDAR",
+                        "GEMINI"
                     ],
                     "enumDescriptions": [
                         "No service specified.",
@@ -2421,7 +2537,8 @@
                         "Groups.",
                         "For export, Google Chat only. For holds, Google Chat and classic Hangouts.",
                         "Google Voice.",
-                        "Calendar."
+                        "Calendar.",
+                        "Gemini."
                     ],
                     "type": "string"
                 },
@@ -2441,6 +2558,10 @@
                     ],
                     "type": "string"
                 },
+                "driveDocumentInfo": {
+                    "$ref": "DriveDocumentInfo",
+                    "description": "Required when **SearchMethod** is **DRIVE_DOCUMENT**."
+                },
                 "driveOptions": {
                     "$ref": "DriveOptions",
                     "description": "Set Drive search-specific options."
@@ -2449,6 +2570,10 @@
                     "description": "The end time for the search query. Specify in GMT. The value is rounded to 12 AM on the specified date.",
                     "format": "google-datetime",
                     "type": "string"
+                },
+                "geminiOptions": {
+                    "$ref": "GeminiOptions",
+                    "description": "Set Gemini search-specific options."
                 },
                 "hangoutsChatInfo": {
                     "$ref": "HangoutsChatInfo",
@@ -2472,7 +2597,8 @@
                         "ENTIRE_ORG",
                         "ROOM",
                         "SITES_URL",
-                        "SHARED_DRIVE"
+                        "SHARED_DRIVE",
+                        "DRIVE_DOCUMENT"
                     ],
                     "enumDeprecated": [
                         false,
@@ -2482,17 +2608,19 @@
                         false,
                         false,
                         false,
+                        false,
                         false
                     ],
                     "enumDescriptions": [
                         "A search method must be specified or else it is rejected.",
-                        "Search the data of the accounts specified in [AccountInfo](https://developers.google.com/vault/reference/rest/v1/Query#accountinfo).",
-                        "Search the data of all accounts in the organizational unit specified in [OrgUnitInfo](https://developers.google.com/vault/reference/rest/v1/Query#orgunitinfo).",
+                        "Search the data of the accounts specified in [AccountInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#accountinfo).",
+                        "Search the data of all accounts in the organizational unit specified in [OrgUnitInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#orgunitinfo).",
                         "Search the data in the Team Drive specified in **team_drive_info**.",
                         "Search the data of all accounts in the organization. Supported only for Gmail. When specified, you don't need to specify **AccountInfo** or **OrgUnitInfo**.",
-                        "Search messages in the Chat spaces specified in [HangoutsChatInfo](https://developers.google.com/vault/reference/rest/v1/Query#hangoutschatinfo).",
-                        "Search for sites by the published site URLs specified in [SitesUrlInfo](https://developers.google.com/vault/reference/rest/v1/Query#sitesurlinfo).",
-                        "Search the files in the shared drives specified in [SharedDriveInfo](https://developers.google.com/vault/reference/rest/v1/Query#shareddriveinfo)."
+                        "Search messages in the Chat spaces specified in [HangoutsChatInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#hangoutschatinfo).",
+                        "Search for sites by the published site URLs specified in [SitesUrlInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#sitesurlinfo).",
+                        "Search the files in the shared drives specified in [SharedDriveInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#shareddriveinfo).",
+                        "Retrieve the documents specified in DriveDocumentInfo."
                     ],
                     "type": "string"
                 },
@@ -2511,7 +2639,8 @@
                         "ENTIRE_ORG",
                         "ROOM",
                         "SITES_URL",
-                        "SHARED_DRIVE"
+                        "SHARED_DRIVE",
+                        "DRIVE_DOCUMENT"
                     ],
                     "enumDeprecated": [
                         false,
@@ -2521,17 +2650,19 @@
                         false,
                         false,
                         false,
+                        false,
                         false
                     ],
                     "enumDescriptions": [
                         "A search method must be specified or else it is rejected.",
-                        "Search the data of the accounts specified in [AccountInfo](https://developers.google.com/vault/reference/rest/v1/Query#accountinfo).",
-                        "Search the data of all accounts in the organizational unit specified in [OrgUnitInfo](https://developers.google.com/vault/reference/rest/v1/Query#orgunitinfo).",
+                        "Search the data of the accounts specified in [AccountInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#accountinfo).",
+                        "Search the data of all accounts in the organizational unit specified in [OrgUnitInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#orgunitinfo).",
                         "Search the data in the Team Drive specified in **team_drive_info**.",
                         "Search the data of all accounts in the organization. Supported only for Gmail. When specified, you don't need to specify **AccountInfo** or **OrgUnitInfo**.",
-                        "Search messages in the Chat spaces specified in [HangoutsChatInfo](https://developers.google.com/vault/reference/rest/v1/Query#hangoutschatinfo).",
-                        "Search for sites by the published site URLs specified in [SitesUrlInfo](https://developers.google.com/vault/reference/rest/v1/Query#sitesurlinfo).",
-                        "Search the files in the shared drives specified in [SharedDriveInfo](https://developers.google.com/vault/reference/rest/v1/Query#shareddriveinfo)."
+                        "Search messages in the Chat spaces specified in [HangoutsChatInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#hangoutschatinfo).",
+                        "Search for sites by the published site URLs specified in [SitesUrlInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#sitesurlinfo).",
+                        "Search the files in the shared drives specified in [SharedDriveInfo](https://developers.google.com/workspace/vault/reference/rest/v1/Query#shareddriveinfo).",
+                        "Retrieve the documents specified in DriveDocumentInfo."
                     ],
                     "type": "string"
                 },
@@ -2754,13 +2885,15 @@
                         "EXPORT_FORMAT_UNSPECIFIED",
                         "MBOX",
                         "PST",
-                        "ICS"
+                        "ICS",
+                        "XML"
                     ],
                     "enumDescriptions": [
                         "No export format specified.",
                         "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
                         "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
-                        "Export as ICS. Only available for Calendar."
+                        "Export as ICS. Only available for Calendar.",
+                        "Export as XML. Only available for Gemini."
                     ],
                     "type": "string"
                 }

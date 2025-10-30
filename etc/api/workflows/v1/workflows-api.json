@@ -143,6 +143,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Unless explicitly documented otherwise, don't use this unsupported field which is primarily intended for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -260,6 +266,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the [ListOperationsResponse.unreachable] field. This can only be `true` when reading across collections e.g. when `parent` is set to `\"projects/example/locations/-\"`. This field is not by default supported and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1/{+name}/operations",
@@ -485,7 +496,7 @@
             }
         }
     },
-    "revision": "20240612",
+    "revision": "20251019",
     "rootUrl": "https://workflows.googleapis.com/",
     "schemas": {
         "Empty": {
@@ -524,6 +535,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections e.g. when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -776,6 +794,20 @@
                     "description": "Description of the workflow provided by the user. Must be at most 1000 Unicode characters long. This is a workflow-wide field and is not tied to a specific revision.",
                     "type": "string"
                 },
+                "executionHistoryLevel": {
+                    "description": "Optional. Describes the execution history level to apply to this workflow.",
+                    "enum": [
+                        "EXECUTION_HISTORY_LEVEL_UNSPECIFIED",
+                        "EXECUTION_HISTORY_BASIC",
+                        "EXECUTION_HISTORY_DETAILED"
+                    ],
+                    "enumDescriptions": [
+                        "The default/unset value.",
+                        "Enable execution history basic feature.",
+                        "Enable execution history detailed feature."
+                    ],
+                    "type": "string"
+                },
                 "labels": {
                     "additionalProperties": {
                         "type": "string"
@@ -825,6 +857,13 @@
                     "$ref": "StateError",
                     "description": "Output only. Error regarding the state of the workflow. For example, this field will have error details if the execution data is unavailable due to revoked KMS key permissions.",
                     "readOnly": true
+                },
+                "tags": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Input only. Immutable. Tags associated with this workflow.",
+                    "type": "object"
                 },
                 "updateTime": {
                     "description": "Output only. The timestamp for when the workflow was last updated. This is a workflow-wide field and is not tied to a specific revision.",

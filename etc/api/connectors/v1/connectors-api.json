@@ -193,6 +193,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Unless explicitly documented otherwise, don't use this unsupported field which is primarily intended for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -305,6 +311,11 @@
                                         "name"
                                     ],
                                     "parameters": {
+                                        "force": {
+                                            "description": "Optional. If set to true, any child EndUserAuthentication/EventSubscription resources will also be deleted. Otherwise, the request will fail if the connection has any children. Followed the best practice from https://aip.dev/135#cascading-delete",
+                                            "location": "query",
+                                            "type": "boolean"
+                                        },
                                         "name": {
                                             "description": "Required. Resource name of the form: `projects/*/locations/*/connections/*`",
                                             "location": "path",
@@ -523,7 +534,7 @@
                                             "type": "string"
                                         },
                                         "updateMask": {
-                                            "description": "Required. You can modify only the fields listed below. To lock/unlock a connection: * `lock_config` To suspend/resume a connection: * `suspended` To update the connection details: * `description` * `labels` * `connector_version` * `config_variables` * `auth_config` * `destination_configs` * `node_config` * `log_config` * `ssl_config` * `eventing_enablement_type` * `eventing_config` * `auth_override_enabled`",
+                                            "description": "Required. The list of fields to update. Fields are specified relative to the connection. A field will be overwritten if it is in the mask. The field mask must not be empty, and it must not contain fields that are immutable or only set by the server. You can modify only the fields listed below. To lock/unlock a connection: * `lock_config` To suspend/resume a connection: * `suspended` To update the connection details: * `description` * `labels` * `connector_version` * `config_variables` * `auth_config` * `destination_configs` * `node_config` * `log_config` * `ssl_config` * `eventing_enablement_type` * `eventing_config` * `auth_override_enabled` * `async_operations_enabled`",
                                             "format": "google-fieldmask",
                                             "location": "query",
                                             "type": "string"
@@ -867,6 +878,188 @@
                                         }
                                     }
                                 },
+                                "endUserAuthentications": {
+                                    "methods": {
+                                        "create": {
+                                            "description": "Creates a new EndUserAuthentication in a given project,location and connection.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/connections/{connectionsId}/endUserAuthentications",
+                                            "httpMethod": "POST",
+                                            "id": "connectors.projects.locations.connections.endUserAuthentications.create",
+                                            "parameterOrder": [
+                                                "parent"
+                                            ],
+                                            "parameters": {
+                                                "endUserAuthenticationId": {
+                                                    "description": "Required. Identifier to assign to the EndUserAuthentication. Must be unique within scope of the parent resource.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "parent": {
+                                                    "description": "Required. Parent resource of the EndUserAuthentication, of the form: `projects/*/locations/*/connections/*`",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/connections/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+parent}/endUserAuthentications",
+                                            "request": {
+                                                "$ref": "EndUserAuthentication"
+                                            },
+                                            "response": {
+                                                "$ref": "Operation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "delete": {
+                                            "description": "Deletes a single EndUserAuthentication.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/connections/{connectionsId}/endUserAuthentications/{endUserAuthenticationsId}",
+                                            "httpMethod": "DELETE",
+                                            "id": "connectors.projects.locations.connections.endUserAuthentications.delete",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Required. Resource name of the form: `projects/*/locations/*/connections/*/endUserAuthentication/*`",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/connections/[^/]+/endUserAuthentications/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "Operation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "get": {
+                                            "description": "Gets details of a single EndUserAuthentication.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/connections/{connectionsId}/endUserAuthentications/{endUserAuthenticationsId}",
+                                            "httpMethod": "GET",
+                                            "id": "connectors.projects.locations.connections.endUserAuthentications.get",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Required. Resource name of the form: `projects/*/locations/*/connections/*/EndUserAuthentications/*`",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/connections/[^/]+/endUserAuthentications/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "view": {
+                                                    "description": "Optional. View of the EndUserAuthentication to return.",
+                                                    "enum": [
+                                                        "END_USER_AUTHENTICATION_VIEW_UNSPECIFIED",
+                                                        "BASIC_VIEW",
+                                                        "FULL_VIEW"
+                                                    ],
+                                                    "enumDescriptions": [
+                                                        "END_USER_AUTHENTICATION_UNSPECIFIED.",
+                                                        "Do not include secret fields.",
+                                                        "Include secret fields."
+                                                    ],
+                                                    "location": "query",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "EndUserAuthentication"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "list": {
+                                            "description": "List EndUserAuthentications in a given project,location and connection.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/connections/{connectionsId}/endUserAuthentications",
+                                            "httpMethod": "GET",
+                                            "id": "connectors.projects.locations.connections.endUserAuthentications.list",
+                                            "parameterOrder": [
+                                                "parent"
+                                            ],
+                                            "parameters": {
+                                                "filter": {
+                                                    "description": "Filter.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "orderBy": {
+                                                    "description": "Order by parameters.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "pageSize": {
+                                                    "description": "Page size.",
+                                                    "format": "int32",
+                                                    "location": "query",
+                                                    "type": "integer"
+                                                },
+                                                "pageToken": {
+                                                    "description": "Page token.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "parent": {
+                                                    "description": "Required. Parent resource of the EndUserAuthentication, of the form: `projects/*/locations/*/connections/*`",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/connections/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+parent}/endUserAuthentications",
+                                            "response": {
+                                                "$ref": "ListEndUserAuthenticationsResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "patch": {
+                                            "description": "Updates the parameters of a single EndUserAuthentication.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/connections/{connectionsId}/endUserAuthentications/{endUserAuthenticationsId}",
+                                            "httpMethod": "PATCH",
+                                            "id": "connectors.projects.locations.connections.endUserAuthentications.patch",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Required. Identifier. Resource name of the EndUserAuthentication. Format: projects/{project}/locations/{location}/connections/{connection}/endUserAuthentications/{end_user_authentication}",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/connections/[^/]+/endUserAuthentications/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "updateMask": {
+                                                    "description": "Required. The list of fields to update. A field will be overwritten if it is in the mask. You can modify only the fields listed below. To update the EndUserAuthentication details: * `notify_endpoint_destination`",
+                                                    "format": "google-fieldmask",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "request": {
+                                                "$ref": "EndUserAuthentication"
+                                            },
+                                            "response": {
+                                                "$ref": "Operation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        }
+                                    }
+                                },
                                 "eventSubscriptions": {
                                     "methods": {
                                         "create": {
@@ -1008,7 +1201,7 @@
                                             ],
                                             "parameters": {
                                                 "name": {
-                                                    "description": "Required. Resource name of the EventSubscription. Format: projects/{project}/locations/{location}/connections/{connection}/eventSubscriptions/{event_subscription}",
+                                                    "description": "Required. Identifier. Resource name of the EventSubscription. Format: projects/{project}/locations/{location}/connections/{connection}/eventSubscriptions/{event_subscription}",
                                                     "location": "path",
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/connections/[^/]+/eventSubscriptions/[^/]+$",
                                                     "required": true,
@@ -1095,6 +1288,11 @@
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/connections/[^/]+$",
                                                     "required": true,
                                                     "type": "string"
+                                                },
+                                                "schemaAsString": {
+                                                    "description": "Optional. Flag to indicate if schema should be returned as string or not",
+                                                    "location": "query",
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "path": "v1/{+parent}/runtimeActionSchemas",
@@ -1240,6 +1438,62 @@
                                             "scopes": [
                                                 "https://www.googleapis.com/auth/cloud-platform"
                                             ]
+                                        },
+                                        "publish": {
+                                            "description": "Publish request for the CustomConnectorVersion. Once approved, the CustomConnectorVersion will be published as PartnerConnector.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/customConnectors/{customConnectorsId}/customConnectorVersions/{customConnectorVersionsId}:publish",
+                                            "httpMethod": "POST",
+                                            "id": "connectors.projects.locations.customConnectors.customConnectorVersions.publish",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Required. Resource name of the form: `projects/{project}/locations/{location}/customConnectors/{custom_connector}/customConnectorVersions/{custom_connector_version}`",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/customConnectors/[^/]+/customConnectorVersions/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}:publish",
+                                            "request": {
+                                                "$ref": "PublishCustomConnectorVersionRequest"
+                                            },
+                                            "response": {
+                                                "$ref": "Operation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
+                                        },
+                                        "withdraw": {
+                                            "description": "Withdraw the publish request for the CustomConnectorVersion. This can only be used before the CustomConnectorVersion is published.",
+                                            "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/customConnectors/{customConnectorsId}/customConnectorVersions/{customConnectorVersionsId}:withdraw",
+                                            "httpMethod": "POST",
+                                            "id": "connectors.projects.locations.customConnectors.customConnectorVersions.withdraw",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "Required. Resource name of the form: `projects/{project}/locations/{location}/customConnectors/{custom_connector}/customConnectorVersions/{custom_connector_version}`",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/locations/[^/]+/customConnectors/[^/]+/customConnectorVersions/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}:withdraw",
+                                            "request": {
+                                                "$ref": "WithdrawCustomConnectorVersionRequest"
+                                            },
+                                            "response": {
+                                                "$ref": "Operation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform"
+                                            ]
                                         }
                                     }
                                 }
@@ -1257,7 +1511,7 @@
                                     ],
                                     "parameters": {
                                         "endpointAttachmentId": {
-                                            "description": "Required. Identifier to assign to the EndpointAttachment. Must be unique within scope of the parent resource.",
+                                            "description": "Required. Identifier to assign to the EndpointAttachment. Must be unique within scope of the parent resource. The regex is: `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`.",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -1320,6 +1574,21 @@
                                             "pattern": "^projects/[^/]+/locations/[^/]+/endpointAttachments/[^/]+$",
                                             "required": true,
                                             "type": "string"
+                                        },
+                                        "view": {
+                                            "description": "Optional. Specifies which fields of the EndpointAttachment are returned in the response. Defaults to `ENDPOINT_ATTACHMENT_VIEW_BASIC` view.",
+                                            "enum": [
+                                                "ENDPOINT_ATTACHMENT_VIEW_UNSPECIFIED",
+                                                "ENDPOINT_ATTACHMENT_VIEW_BASIC",
+                                                "ENDPOINT_ATTACHMENT_VIEW_FULL"
+                                            ],
+                                            "enumDescriptions": [
+                                                "ENDPOINT_ATTACHMENT_VIEW_UNSPECIFIED.",
+                                                "Do not include status.",
+                                                "Includes Status."
+                                            ],
+                                            "location": "query",
+                                            "type": "string"
                                         }
                                     },
                                     "path": "v1/{+name}",
@@ -1365,6 +1634,21 @@
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+$",
                                             "required": true,
+                                            "type": "string"
+                                        },
+                                        "view": {
+                                            "description": "Optional. Specifies which fields of the EndpointAttachment are returned in the response. Defaults to `ENDPOINT_ATTACHMENT_VIEW_BASIC` view.",
+                                            "enum": [
+                                                "ENDPOINT_ATTACHMENT_VIEW_UNSPECIFIED",
+                                                "ENDPOINT_ATTACHMENT_VIEW_BASIC",
+                                                "ENDPOINT_ATTACHMENT_VIEW_FULL"
+                                            ],
+                                            "enumDescriptions": [
+                                                "ENDPOINT_ATTACHMENT_VIEW_UNSPECIFIED.",
+                                                "Do not include status.",
+                                                "Includes Status."
+                                            ],
+                                            "location": "query",
                                             "type": "string"
                                         }
                                     },
@@ -1863,6 +2147,11 @@
                                                     "pattern": "^projects/[^/]+/locations/global$",
                                                     "required": true,
                                                     "type": "string"
+                                                },
+                                                "returnPartialSuccess": {
+                                                    "description": "Optional. If true, allow partial responses for multi-regional Aggregated List requests.",
+                                                    "location": "query",
+                                                    "type": "boolean"
                                                 }
                                             },
                                             "path": "v1/{+parent}/managedZones",
@@ -1914,7 +2203,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "connectors.projects.locations.operations.cancel",
@@ -2022,6 +2311,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the [ListOperationsResponse.unreachable] field. This can only be `true` when reading across collections e.g. when `parent` is set to `\"projects/example/locations/-\"`. This field is not by default supported and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1/{+name}/operations",
@@ -2258,6 +2552,48 @@
                                     "resources": {
                                         "versions": {
                                             "methods": {
+                                                "fetchAuthSchema": {
+                                                    "description": "fetch and return the list of auth config variables required to override the connection backend auth.",
+                                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/providers/{providersId}/connectors/{connectorsId}/versions/{versionsId}:fetchAuthSchema",
+                                                    "httpMethod": "GET",
+                                                    "id": "connectors.projects.locations.providers.connectors.versions.fetchAuthSchema",
+                                                    "parameterOrder": [
+                                                        "name"
+                                                    ],
+                                                    "parameters": {
+                                                        "name": {
+                                                            "description": "Required. Parent resource of the Connector Version, of the form: `projects/*/locations/*/providers/*/connectors/*/versions/*`",
+                                                            "location": "path",
+                                                            "pattern": "^projects/[^/]+/locations/[^/]+/providers/[^/]+/connectors/[^/]+/versions/[^/]+$",
+                                                            "required": true,
+                                                            "type": "string"
+                                                        },
+                                                        "view": {
+                                                            "description": "Optional. View of the AuthSchema. The default value is BASIC.",
+                                                            "enum": [
+                                                                "AUTH_SCHEMA_VIEW_UNSPECIFIED",
+                                                                "BASIC",
+                                                                "JSON_SCHEMA",
+                                                                "EUA_SCHEMA"
+                                                            ],
+                                                            "enumDescriptions": [
+                                                                "Default value.",
+                                                                "Basic view of the AuthSchema.",
+                                                                "JSON schema view of the AuthSchema.",
+                                                                "EUA Schema view of the AuthSchema."
+                                                            ],
+                                                            "location": "query",
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "path": "v1/{+name}:fetchAuthSchema",
+                                                    "response": {
+                                                        "$ref": "FetchAuthSchemaResponse"
+                                                    },
+                                                    "scopes": [
+                                                        "https://www.googleapis.com/auth/cloud-platform"
+                                                    ]
+                                                },
                                                 "get": {
                                                     "description": "Gets details of a single connector version.",
                                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/providers/{providersId}/connectors/{connectorsId}/versions/{versionsId}",
@@ -2319,7 +2655,6 @@
                                                             "type": "string"
                                                         },
                                                         "parent": {
-                                                            "description": "Required. Parent resource of the connectors, of the form: `projects/*/locations/*/providers/*/connectors/*` Only global location is supported for ConnectorVersion resource.",
                                                             "location": "path",
                                                             "pattern": "^projects/[^/]+/locations/[^/]+/providers/[^/]+/connectors/[^/]+$",
                                                             "required": true,
@@ -2427,7 +2762,7 @@
             }
         }
     },
-    "revision": "20240619",
+    "revision": "20250930",
     "rootUrl": "https://connectors.googleapis.com/",
     "schemas": {
         "AuditConfig": {
@@ -2483,18 +2818,18 @@
             "id": "AuthConfig",
             "properties": {
                 "additionalVariables": {
-                    "description": "List containing additional auth configs.",
+                    "description": "Optional. List containing additional auth configs.",
                     "items": {
                         "$ref": "ConfigVariable"
                     },
                     "type": "array"
                 },
                 "authKey": {
-                    "description": "Identifier key for auth config",
+                    "description": "Optional. Identifier key for auth config",
                     "type": "string"
                 },
                 "authType": {
-                    "description": "The type of authentication configured.",
+                    "description": "Optional. The type of authentication configured.",
                     "enum": [
                         "AUTH_TYPE_UNSPECIFIED",
                         "USER_PASSWORD",
@@ -2502,7 +2837,8 @@
                         "OAUTH2_CLIENT_CREDENTIALS",
                         "SSH_PUBLIC_KEY",
                         "OAUTH2_AUTH_CODE_FLOW",
-                        "GOOGLE_AUTHENTICATION"
+                        "GOOGLE_AUTHENTICATION",
+                        "OAUTH2_AUTH_CODE_FLOW_GOOGLE_MANAGED"
                     ],
                     "enumDescriptions": [
                         "Authentication type not specified.",
@@ -2511,13 +2847,18 @@
                         "Oauth 2.0 Client Credentials Grant Authentication",
                         "SSH Public Key Authentication",
                         "Oauth 2.0 Authorization Code Flow",
-                        "Google authentication"
+                        "Google authentication",
+                        "Oauth 2.0 Authorization Code Flow with Google Provided OAuth Client"
                     ],
                     "type": "string"
                 },
                 "oauth2AuthCodeFlow": {
                     "$ref": "Oauth2AuthCodeFlow",
                     "description": "Oauth2AuthCodeFlow."
+                },
+                "oauth2AuthCodeFlowGoogleManaged": {
+                    "$ref": "Oauth2AuthCodeFlowGoogleManaged",
+                    "description": "Oauth2AuthCodeFlowGoogleManaged."
                 },
                 "oauth2ClientCredentials": {
                     "$ref": "Oauth2ClientCredentials",
@@ -2555,7 +2896,8 @@
                         "OAUTH2_CLIENT_CREDENTIALS",
                         "SSH_PUBLIC_KEY",
                         "OAUTH2_AUTH_CODE_FLOW",
-                        "GOOGLE_AUTHENTICATION"
+                        "GOOGLE_AUTHENTICATION",
+                        "OAUTH2_AUTH_CODE_FLOW_GOOGLE_MANAGED"
                     ],
                     "enumDescriptions": [
                         "Authentication type not specified.",
@@ -2564,7 +2906,8 @@
                         "Oauth 2.0 Client Credentials Grant Authentication",
                         "SSH Public Key Authentication",
                         "Oauth 2.0 Authorization Code Flow",
-                        "Google authentication"
+                        "Google authentication",
+                        "Oauth 2.0 Authorization Code Flow with Google Provided OAuth Client"
                     ],
                     "type": "string"
                 },
@@ -2582,6 +2925,136 @@
                 "displayName": {
                     "description": "Display name for authentication template.",
                     "type": "string"
+                },
+                "isDefault": {
+                    "description": "Whether the auth config is the default one.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "AuthField": {
+            "description": "AuthField defines a field in an authentication type.",
+            "id": "AuthField",
+            "properties": {
+                "dataType": {
+                    "description": "Data type of the field.",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Description of the field.",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "Key of the field.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AuthObject": {
+            "description": "AuthObject defines a JSON schema of an authentication type.",
+            "id": "AuthObject",
+            "properties": {
+                "additionalProperties": {
+                    "description": "Whether the object has additional properties.",
+                    "type": "boolean"
+                },
+                "authKey": {
+                    "description": "Auth key of the object.",
+                    "type": "string"
+                },
+                "authType": {
+                    "description": "Auth type of the object.",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Description of the object.",
+                    "type": "string"
+                },
+                "isDefault": {
+                    "description": "Whether the object is the default one.",
+                    "type": "boolean"
+                },
+                "properties": {
+                    "additionalProperties": {
+                        "$ref": "AuthProperty"
+                    },
+                    "description": "Properties of the object.",
+                    "type": "object"
+                },
+                "type": {
+                    "description": "Type of the object.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AuthProperty": {
+            "description": "AuthProperty defines a property of an authentication type.",
+            "id": "AuthProperty",
+            "properties": {
+                "description": {
+                    "description": "Description of the property.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Type of the property.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AuthSchema": {
+            "description": "AuthSchema defines the schema of an authentication type.",
+            "id": "AuthSchema",
+            "properties": {
+                "authFields": {
+                    "description": "List of AuthFields.",
+                    "items": {
+                        "$ref": "AuthField"
+                    },
+                    "type": "array"
+                },
+                "authKey": {
+                    "description": "Auth key of the schema.",
+                    "type": "string"
+                },
+                "authType": {
+                    "description": "Auth type of the schema.",
+                    "enum": [
+                        "AUTH_TYPE_UNSPECIFIED",
+                        "USER_PASSWORD",
+                        "OAUTH2_JWT_BEARER",
+                        "OAUTH2_CLIENT_CREDENTIALS",
+                        "SSH_PUBLIC_KEY",
+                        "OAUTH2_AUTH_CODE_FLOW",
+                        "GOOGLE_AUTHENTICATION",
+                        "OAUTH2_AUTH_CODE_FLOW_GOOGLE_MANAGED"
+                    ],
+                    "enumDescriptions": [
+                        "Authentication type not specified.",
+                        "Username and Password Authentication.",
+                        "JSON Web Token (JWT) Profile for Oauth 2.0 Authorization Grant based authentication",
+                        "Oauth 2.0 Client Credentials Grant Authentication",
+                        "SSH Public Key Authentication",
+                        "Oauth 2.0 Authorization Code Flow",
+                        "Google authentication",
+                        "Oauth 2.0 Authorization Code Flow with Google Provided OAuth Client"
+                    ],
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Description of the schema.",
+                    "type": "string"
+                },
+                "displayName": {
+                    "description": "Display name of the schema.",
+                    "type": "string"
+                },
+                "isDefault": {
+                    "description": "Whether the auth schema is the default one.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -2591,22 +3064,30 @@
             "id": "AuthorizationCodeLink",
             "properties": {
                 "clientId": {
-                    "description": "The client ID assigned to the Google Cloud Connectors OAuth app for the connector data source.",
+                    "description": "Optional. The client ID assigned to the Google Cloud Connectors OAuth app for the connector data source.",
                     "type": "string"
                 },
+                "clientSecret": {
+                    "$ref": "Secret",
+                    "description": "Optional. The client secret assigned to the Google Cloud Connectors OAuth app for the connector data source."
+                },
                 "enablePkce": {
-                    "description": "Whether to enable PKCE for the auth code flow.",
+                    "description": "Optional. Whether to enable PKCE for the auth code flow.",
+                    "type": "boolean"
+                },
+                "omitQueryParams": {
+                    "description": "Optional. Omit query params from the redirect URI.",
                     "type": "boolean"
                 },
                 "scopes": {
-                    "description": "The scopes for which the user will authorize Google Cloud Connectors on the connector data source.",
+                    "description": "Optional. The scopes for which the user will authorize Google Cloud Connectors on the connector data source.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "uri": {
-                    "description": "The base URI the user must click to trigger the authorization code login flow.",
+                    "description": "Optional. The base URI the user must click to trigger the authorization code login flow.",
                     "type": "string"
                 }
             },
@@ -2680,7 +3161,7 @@
                     "type": "string"
                 },
                 "key": {
-                    "description": "Key of the config variable.",
+                    "description": "Optional. Key of the config variable.",
                     "type": "string"
                 },
                 "secretValue": {
@@ -2700,18 +3181,18 @@
             "properties": {
                 "authorizationCodeLink": {
                     "$ref": "AuthorizationCodeLink",
-                    "description": "Authorization code link options. To be populated if `ValueType` is `AUTHORIZATION_CODE`"
+                    "description": "Optional. Authorization code link options. To be populated if `ValueType` is `AUTHORIZATION_CODE`"
                 },
                 "description": {
-                    "description": "Description.",
+                    "description": "Optional. Description.",
                     "type": "string"
                 },
                 "displayName": {
-                    "description": "Display name of the parameter.",
+                    "description": "Optional. Display name of the parameter.",
                     "type": "string"
                 },
                 "enumOptions": {
-                    "description": "Enum options. To be populated if `ValueType` is `ENUM`",
+                    "description": "Optional. Enum options. To be populated if `ValueType` is `ENUM`",
                     "items": {
                         "$ref": "EnumOption"
                     },
@@ -2730,15 +3211,15 @@
                     "type": "string"
                 },
                 "isAdvanced": {
-                    "description": "Indicates if current template is part of advanced settings",
+                    "description": "Optional. Indicates if current template is part of advanced settings",
                     "type": "boolean"
                 },
                 "key": {
-                    "description": "Key of the config variable.",
+                    "description": "Optional. Key of the config variable.",
                     "type": "string"
                 },
                 "locationType": {
-                    "description": "Optional. Location Tyep denotes where this value should be sent in BYOC connections.",
+                    "description": "Optional. Location Type denotes where this value should be sent in BYOC connections.",
                     "enum": [
                         "LOCATION_TYPE_UNSPECIFIED",
                         "HEADER",
@@ -2760,19 +3241,19 @@
                     "description": "Optional. MultipleSelectConfig represents the multiple options for a config variable."
                 },
                 "required": {
-                    "description": "Flag represents that this `ConfigVariable` must be provided for a connection.",
+                    "description": "Optional. Flag represents that this `ConfigVariable` must be provided for a connection.",
                     "type": "boolean"
                 },
                 "requiredCondition": {
                     "$ref": "LogicalExpression",
-                    "description": "Condition under which a field would be required. The condition can be represented in the form of a logical expression."
+                    "description": "Optional. Condition under which a field would be required. The condition can be represented in the form of a logical expression."
                 },
                 "roleGrant": {
                     "$ref": "RoleGrant",
-                    "description": "Role grant configuration for the config variable."
+                    "description": "Optional. Role grant configuration for the config variable."
                 },
                 "state": {
-                    "description": "State of the config variable.",
+                    "description": "Output only. State of the config variable.",
                     "enum": [
                         "STATE_UNSPECIFIED",
                         "ACTIVE",
@@ -2783,14 +3264,15 @@
                         "Config variable is active",
                         "Config variable is deprecated."
                     ],
+                    "readOnly": true,
                     "type": "string"
                 },
                 "validationRegex": {
-                    "description": "Regular expression in RE2 syntax used for validating the `value` of a `ConfigVariable`.",
+                    "description": "Optional. Regular expression in RE2 syntax used for validating the `value` of a `ConfigVariable`.",
                     "type": "string"
                 },
                 "valueType": {
-                    "description": "Type of the parameter: string, int, bool etc. consider custom type for the benefit for the validation.",
+                    "description": "Optional. Type of the parameter: string, int, bool etc. consider custom type for the benefit for the validation.",
                     "enum": [
                         "VALUE_TYPE_UNSPECIFIED",
                         "STRING",
@@ -2822,9 +3304,17 @@
             "description": "Connection represents an instance of connector.",
             "id": "Connection",
             "properties": {
+                "asyncOperationsEnabled": {
+                    "description": "Optional. Async operations enabled for the connection. If Async Operations is enabled, Connection allows the customers to initiate async long running operations using the actions API.",
+                    "type": "boolean"
+                },
                 "authConfig": {
                     "$ref": "AuthConfig",
                     "description": "Optional. Configuration for establishing the connection's authentication with an external system."
+                },
+                "authOverrideEnabled": {
+                    "description": "Optional. Auth override enabled for the connection. If Auth Override is enabled, Connection allows the backend service auth to be overridden in the entities/actions API.",
+                    "type": "boolean"
                 },
                 "billingConfig": {
                     "$ref": "BillingConfig",
@@ -2860,6 +3350,7 @@
                         "PREVIEW",
                         "GA",
                         "DEPRECATED",
+                        "TEST",
                         "PRIVATE_PREVIEW"
                     ],
                     "enumDescriptions": [
@@ -2867,6 +3358,7 @@
                         "PREVIEW.",
                         "GA.",
                         "DEPRECATED.",
+                        "TEST.",
                         "PRIVATE_PREVIEW."
                     ],
                     "readOnly": true,
@@ -2894,6 +3386,10 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "euaOauthAuthConfig": {
+                    "$ref": "AuthConfig",
+                    "description": "Optional. Additional Oauth2.0 Auth config for EUA. If the connection is configured using non-OAuth authentication but OAuth needs to be used for EUA, this field can be populated with the OAuth config. This should be a OAuth2AuthCodeFlow Auth type only."
+                },
                 "eventingConfig": {
                     "$ref": "EventingConfig",
                     "description": "Optional. Eventing config of a connection"
@@ -2916,6 +3412,15 @@
                     "$ref": "EventingRuntimeData",
                     "description": "Output only. Eventing Runtime Data.",
                     "readOnly": true
+                },
+                "fallbackOnAdminCredentials": {
+                    "description": "Optional. Fallback on admin credentials for the connection. If this both auth_override_enabled and fallback_on_admin_credentials are set to true, the connection will use the admin credentials if the dynamic auth header is not present during auth override.",
+                    "type": "boolean"
+                },
+                "host": {
+                    "description": "Output only. The name of the Hostname of the Service Directory service with TLS.",
+                    "readOnly": true,
+                    "type": "string"
                 },
                 "imageLocation": {
                     "description": "Output only. GCR location where the runtime image is stored. formatted like: gcr.io/{bucketName}/{imageName}",
@@ -2987,6 +3492,18 @@
                 "suspended": {
                     "description": "Optional. Suspended indicates if a user has suspended a connection or not.",
                     "type": "boolean"
+                },
+                "tlsServiceDirectory": {
+                    "description": "Output only. The name of the Service Directory service with TLS.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "trafficShapingConfigs": {
+                    "description": "Optional. Traffic shaping configuration for the connection.",
+                    "items": {
+                        "$ref": "TrafficShapingConfig"
+                    },
+                    "type": "array"
                 },
                 "updateTime": {
                     "description": "Output only. Updated time.",
@@ -3177,6 +3694,7 @@
                         "PREVIEW",
                         "GA",
                         "DEPRECATED",
+                        "TEST",
                         "PRIVATE_PREVIEW"
                     ],
                     "enumDescriptions": [
@@ -3184,10 +3702,16 @@
                         "PREVIEW.",
                         "GA.",
                         "DEPRECATED.",
+                        "TEST.",
                         "PRIVATE_PREVIEW."
                     ],
                     "readOnly": true,
                     "type": "string"
+                },
+                "marketplaceConnectorDetails": {
+                    "$ref": "MarketplaceConnectorDetails",
+                    "description": "Output only. Marketplace connector details. Will be null if the connector is not marketplace connector.",
+                    "readOnly": true
                 },
                 "name": {
                     "description": "Output only. Resource name of the Connector. Format: projects/{project}/locations/{location}/providers/{provider}/connectors/{connector} Only global location is supported for Connector resource.",
@@ -3220,10 +3744,18 @@
             "description": "This cofiguration provides infra configs like rate limit threshold which need to be configurable for every connector version",
             "id": "ConnectorInfraConfig",
             "properties": {
+                "alwaysAllocateCpu": {
+                    "description": "Indicates that the Cloud Run CPU should always be allocated.",
+                    "type": "boolean"
+                },
                 "connectionRatelimitWindowSeconds": {
                     "description": "The window used for ratelimiting runtime requests to connections.",
                     "format": "int64",
                     "type": "string"
+                },
+                "connectorVersioningEnabled": {
+                    "description": "Indicate whether connector versioning is enabled.",
+                    "type": "boolean"
                 },
                 "deploymentModel": {
                     "description": "Indicate whether connector is deployed on GKE/CloudRun",
@@ -3247,6 +3779,31 @@
                     "description": "Max QPS supported for internal requests originating from Connd.",
                     "format": "int64",
                     "type": "string"
+                },
+                "maxInstanceRequestConcurrency": {
+                    "description": "Max Instance Request Conncurrency for Cloud Run service.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "migrateDeploymentModel": {
+                    "description": "Indicate whether connector is being migrated to cloud run deployment model.",
+                    "type": "boolean"
+                },
+                "migrateTls": {
+                    "description": "Indicate whether connector is being migrated to TLS.",
+                    "type": "boolean"
+                },
+                "networkEgressModeOverride": {
+                    "$ref": "NetworkEgressModeOverride",
+                    "description": "Network egress mode override to migrate to direct VPC egress."
+                },
+                "provisionCloudSpanner": {
+                    "description": "Indicate whether cloud spanner is required for connector job.",
+                    "type": "boolean"
+                },
+                "provisionMemstore": {
+                    "description": "Indicate whether memstore is required for connector job.",
+                    "type": "boolean"
                 },
                 "ratelimitThreshold": {
                     "description": "Max QPS supported by the connector version before throttling of requests.",
@@ -3327,6 +3884,16 @@
                     "description": "Output only. Eventing configuration supported by the Connector.",
                     "readOnly": true
                 },
+                "isCustomActionsSupported": {
+                    "description": "Output only. Is custom actions supported.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "isCustomEntitiesSupported": {
+                    "description": "Output only. Is custom entities supported.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
                 "labels": {
                     "additionalProperties": {
                         "type": "string"
@@ -3342,6 +3909,7 @@
                         "PREVIEW",
                         "GA",
                         "DEPRECATED",
+                        "TEST",
                         "PRIVATE_PREVIEW"
                     ],
                     "enumDescriptions": [
@@ -3349,6 +3917,7 @@
                         "PREVIEW.",
                         "GA.",
                         "DEPRECATED.",
+                        "TEST.",
                         "PRIVATE_PREVIEW."
                     ],
                     "readOnly": true,
@@ -3391,6 +3960,22 @@
                     "description": "Output only. Information about the runtime features supported by the Connector.",
                     "readOnly": true
                 },
+                "supportedStandardActions": {
+                    "description": "Output only. Supported standard actions.",
+                    "items": {
+                        "$ref": "StandardAction"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "supportedStandardEntities": {
+                    "description": "Output only. Supported standard entities.",
+                    "items": {
+                        "$ref": "StandardEntity"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
                 "unsupportedConnectionTypes": {
                     "description": "Output only. Unsupported connection types.",
                     "items": {
@@ -3416,12 +4001,17 @@
                     "format": "google-datetime",
                     "readOnly": true,
                     "type": "string"
+                },
+                "vpcscConfig": {
+                    "$ref": "VpcscConfig",
+                    "description": "Output only. VPCSC config for the connector.",
+                    "readOnly": true
                 }
             },
             "type": "object"
         },
         "ConnectorVersionInfraConfig": {
-            "description": "This cofiguration provides infra configs like rate limit threshold which need to be configurable for every connector version",
+            "description": "This configuration provides infra configs like rate limit threshold which need to be configurable for every connector version",
             "id": "ConnectorVersionInfraConfig",
             "properties": {
                 "connectionRatelimitWindowSeconds": {
@@ -3431,7 +4021,7 @@
                     "type": "string"
                 },
                 "deploymentModel": {
-                    "description": "Optional. Indicates whether connector is deployed on GKE/CloudRun",
+                    "description": "Output only. Indicates whether connector is deployed on GKE/CloudRun",
                     "enum": [
                         "DEPLOYMENT_MODEL_UNSPECIFIED",
                         "GKE_MST",
@@ -3442,6 +4032,26 @@
                         "Default model gke mst.",
                         "Cloud run mst."
                     ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "deploymentModelMigrationState": {
+                    "description": "Output only. Status of the deployment model migration.",
+                    "enum": [
+                        "DEPLOYMENT_MODEL_MIGRATION_STATE_UNSPECIFIED",
+                        "IN_PROGRESS",
+                        "COMPLETED",
+                        "ROLLEDBACK",
+                        "ROLLBACK_IN_PROGRESS"
+                    ],
+                    "enumDescriptions": [
+                        "Deployment model migration state is not specified.",
+                        "Deployment model migration is in progress.",
+                        "Deployment model migration is completed.",
+                        "Deployment model migration rolledback.",
+                        "Deployment model migration rollback in progress."
+                    ],
+                    "readOnly": true,
                     "type": "string"
                 },
                 "hpaConfig": {
@@ -3454,6 +4064,12 @@
                     "format": "int64",
                     "readOnly": true,
                     "type": "string"
+                },
+                "maxInstanceRequestConcurrency": {
+                    "description": "Output only. Max instance request concurrency.",
+                    "format": "int32",
+                    "readOnly": true,
+                    "type": "integer"
                 },
                 "ratelimitThreshold": {
                     "description": "Output only. Max QPS supported by the connector version before throttling of requests.",
@@ -3475,6 +4091,21 @@
                     "description": "Output only. The name of shared connector deployment.",
                     "readOnly": true,
                     "type": "string"
+                },
+                "tlsMigrationState": {
+                    "description": "Output only. Status of the TLS migration.",
+                    "enum": [
+                        "TLS_MIGRATION_STATE_UNSPECIFIED",
+                        "TLS_MIGRATION_NOT_STARTED",
+                        "TLS_MIGRATION_COMPLETED"
+                    ],
+                    "enumDescriptions": [
+                        "TLS migration state is not specified.",
+                        "TLS migration is in progress.",
+                        "TLS migration is completed."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -3484,7 +4115,7 @@
             "id": "ConnectorsLogConfig",
             "properties": {
                 "enabled": {
-                    "description": "Enabled represents whether logging is enabled or not for a connection.",
+                    "description": "Optional. Enabled represents whether logging is enabled or not for a connection.",
                     "type": "boolean"
                 },
                 "level": {
@@ -3526,6 +4157,14 @@
                     "readOnly": true,
                     "type": "array"
                 },
+                "allMarketplaceVersions": {
+                    "description": "Output only. All marketplace versions.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
                 "createTime": {
                     "description": "Output only. Created time.",
                     "format": "google-datetime",
@@ -3537,12 +4176,14 @@
                     "enum": [
                         "CUSTOM_CONNECTOR_TYPE_UNSPECIFIED",
                         "OPEN_API",
-                        "PROTO"
+                        "PROTO",
+                        "SDK"
                     ],
                     "enumDescriptions": [
                         "Connector type is not specified.",
                         "OpenAPI connector.",
-                        "Proto connector."
+                        "Proto connector.",
+                        "SDK connector."
                     ],
                     "type": "string"
                 },
@@ -3569,6 +4210,14 @@
                     "description": "Identifier. Resource name of the CustomConnector. Format: projects/{project}/locations/{location}/customConnectors/{connector}",
                     "type": "string"
                 },
+                "publishedMarketplaceVersions": {
+                    "description": "Output only. Published marketplace versions.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
                 "updateTime": {
                     "description": "Output only. Updated time.",
                     "format": "google-datetime",
@@ -3582,12 +4231,27 @@
             "description": "CustomConnectorVersion indicates a specific version of a connector.",
             "id": "CustomConnectorVersion",
             "properties": {
+                "asyncOperationsSupport": {
+                    "description": "Optional. Indicates if Async Operations/Connector Job is supported. This is only available for SDK based custom connectors.",
+                    "type": "boolean"
+                },
                 "authConfig": {
                     "$ref": "AuthConfig",
-                    "description": "Optional. Authentication config for accessing connector facade/ proxy. This is used only when enable_backend_destination_config is true."
+                    "description": "Optional. Authentication config for accessing connector service (facade). This is used only when enable_backend_destination_config is true."
+                },
+                "authConfigTemplates": {
+                    "description": "Optional. Auth Config Templates is only used when connector backend is enabled. This is used to specify the auth configs supported by the connector backend service to talk to the actual application backend.",
+                    "items": {
+                        "$ref": "AuthConfigTemplate"
+                    },
+                    "type": "array"
+                },
+                "authOverrideSupport": {
+                    "description": "Optional. Auth override support.",
+                    "type": "boolean"
                 },
                 "backendVariableTemplates": {
-                    "description": "Optional. Backend variables config templates. This translates to additional variable templates in connection.",
+                    "description": "Optional. Backend variable templates is only used when connector backend is enabled. This is used to specify the variables required by the connector backend service to talk to the actual application backend. This translates to additional variable templates in the connection config.",
                     "items": {
                         "$ref": "ConfigVariableTemplate"
                     },
@@ -3600,14 +4264,14 @@
                     "type": "string"
                 },
                 "destinationConfigs": {
-                    "description": "Optional. Destination config(s) for accessing connector facade/ proxy. This is used only when enable_backend_destination_config is true.",
+                    "description": "Optional. Destination config(s) for accessing connector service (facade). This is used only when enable_backend_destination_config is true.",
                     "items": {
                         "$ref": "DestinationConfig"
                     },
                     "type": "array"
                 },
                 "enableBackendDestinationConfig": {
-                    "description": "Optional. When enabled, the connector will be a facade/ proxy, and connects to the destination provided during connection creation.",
+                    "description": "Optional. Indicates if an intermediatory connectorservice is used as backend. When this is enabled, the connector destination and connector auth config are required. For SDK based connectors, this is always enabled.",
                     "type": "boolean"
                 },
                 "labels": {
@@ -3622,16 +4286,25 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "partnerMetadata": {
+                    "$ref": "PartnerMetadata",
+                    "description": "Optional. Partner metadata details. This should be populated only when publishing the custom connector to partner connector."
+                },
+                "publishStatus": {
+                    "$ref": "PublishStatus",
+                    "description": "Output only. Publish status of a custom connector.",
+                    "readOnly": true
+                },
                 "serviceAccount": {
                     "description": "Optional. Service account used by runtime plane to access auth config secrets.",
                     "type": "string"
                 },
                 "specLocation": {
-                    "description": "Optional. Location of the custom connector spec. The location can be either a public url like `https://public-url.com/spec` Or a Google Cloud Storage location like `gs:///`",
+                    "description": "Optional. Location of the custom connector spec. This is only used for Open API based custom connectors. The location can be either a public url like `https://public-url.com/spec` Or a Google Cloud Storage location like `gs:///`.",
                     "type": "string"
                 },
                 "specServerUrls": {
-                    "description": "Output only. Server URLs parsed from the spec.",
+                    "description": "Output only. Server URLs parsed from the Open API spec. This is only used for Open API based custom connectors.",
                     "items": {
                         "type": "string"
                     },
@@ -3843,6 +4516,21 @@
             },
             "type": "object"
         },
+        "EUASecret": {
+            "description": "EUASecret provides a reference to entries in Secret Manager.",
+            "id": "EUASecret",
+            "properties": {
+                "secretValue": {
+                    "description": "Optional. The plain string value of the secret.",
+                    "type": "string"
+                },
+                "secretVersion": {
+                    "description": "Optional. The resource name of the secret version in the format, format as: `projects/*/secrets/*/versions/*`.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "EgressControlConfig": {
             "description": "Egress control config for connector runtime. These configurations define the rules to identify which outbound domains/hosts needs to be whitelisted. It may be a static information for a particular connector version or it is derived from the configurations provided by the customer in Connection resource.",
             "id": "EgressControlConfig",
@@ -3894,7 +4582,7 @@
             "id": "EncryptionKey",
             "properties": {
                 "kmsKeyName": {
-                    "description": "The [KMS key name] with which the content of the Operation is encrypted. The expected format: `projects/*/locations/*/keyRings/*/cryptoKeys/*`. Will be empty string if google managed.",
+                    "description": "Optional. The [KMS key name] with which the content of the Operation is encrypted. The expected format: `projects/*/locations/*/keyRings/*/cryptoKeys/*`. Will be empty string if google managed.",
                     "type": "string"
                 },
                 "type": {
@@ -3919,15 +4607,432 @@
             "id": "EndPoint",
             "properties": {
                 "endpointUri": {
-                    "description": "The URI of the Endpoint.",
+                    "description": "Optional. The URI of the Endpoint.",
                     "type": "string"
                 },
                 "headers": {
-                    "description": "List of Header to be added to the Endpoint.",
+                    "description": "Optional. List of Header to be added to the Endpoint.",
                     "items": {
                         "$ref": "Header"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthentication": {
+            "description": "AuthConfig defines details of a authentication type.",
+            "id": "EndUserAuthentication",
+            "properties": {
+                "configVariables": {
+                    "description": "Optional. Config variables for the EndUserAuthentication.",
+                    "items": {
+                        "$ref": "EndUserAuthenticationConfigVariable"
+                    },
+                    "type": "array"
+                },
+                "createTime": {
+                    "description": "Output only. Created time.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "destinationConfigs": {
+                    "description": "Optional. Destination configs for the EndUserAuthentication.",
+                    "items": {
+                        "$ref": "DestinationConfig"
+                    },
+                    "type": "array"
+                },
+                "endUserAuthenticationConfig": {
+                    "$ref": "EndUserAuthenticationConfig",
+                    "description": "Optional. The EndUserAuthenticationConfig for the EndUserAuthentication."
+                },
+                "labels": {
+                    "description": "Optional. Labels for the EndUserAuthentication.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "Required. Identifier. Resource name of the EndUserAuthentication. Format: projects/{project}/locations/{location}/connections/{connection}/endUserAuthentications/{end_user_authentication}",
+                    "type": "string"
+                },
+                "notifyEndpointDestination": {
+                    "$ref": "EndUserAuthenticationNotifyEndpointDestination",
+                    "description": "Optional. The destination to hit when we receive an event"
+                },
+                "roles": {
+                    "description": "Optional. Roles for the EndUserAuthentication.",
+                    "items": {
+                        "enum": [
+                            "ROLE_UNSPECIFIED",
+                            "READER",
+                            "READER_DOMAIN_WIDE_ACCESSIBLE"
+                        ],
+                        "enumDescriptions": [
+                            "Default state.",
+                            "READER.",
+                            "READER_DOMAIN_WIDE_ACCESSIBLE which has access to only public data."
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "status": {
+                    "$ref": "EndUserAuthenticationEndUserAuthenticationStatus",
+                    "description": "Optional. Status of the EndUserAuthentication."
+                },
+                "updateTime": {
+                    "description": "Output only. Updated time.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "userId": {
+                    "description": "Optional. The user id of the user.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationConfig": {
+            "description": "EndUserAuthenticationConfig defines details of a authentication configuration for EUC",
+            "id": "EndUserAuthenticationConfig",
+            "properties": {
+                "additionalVariables": {
+                    "description": "Optional. List containing additional auth configs.",
+                    "items": {
+                        "$ref": "EndUserAuthenticationConfigVariable"
+                    },
+                    "type": "array"
+                },
+                "authKey": {
+                    "description": "Identifier key for auth config",
+                    "type": "string"
+                },
+                "authType": {
+                    "description": "The type of authentication configured.",
+                    "enum": [
+                        "AUTH_TYPE_UNSPECIFIED",
+                        "USER_PASSWORD",
+                        "OAUTH2_JWT_BEARER",
+                        "OAUTH2_CLIENT_CREDENTIALS",
+                        "SSH_PUBLIC_KEY",
+                        "OAUTH2_AUTH_CODE_FLOW",
+                        "GOOGLE_AUTHENTICATION",
+                        "OAUTH2_AUTH_CODE_FLOW_GOOGLE_MANAGED"
+                    ],
+                    "enumDescriptions": [
+                        "Authentication type not specified.",
+                        "Username and Password Authentication.",
+                        "JSON Web Token (JWT) Profile for Oauth 2.0 Authorization Grant based authentication",
+                        "Oauth 2.0 Client Credentials Grant Authentication",
+                        "SSH Public Key Authentication",
+                        "Oauth 2.0 Authorization Code Flow",
+                        "Google authentication",
+                        "Oauth 2.0 Authorization Code Flow with Google Provided OAuth Client"
+                    ],
+                    "type": "string"
+                },
+                "oauth2AuthCodeFlow": {
+                    "$ref": "EndUserAuthenticationConfigOauth2AuthCodeFlow",
+                    "description": "Oauth2AuthCodeFlow."
+                },
+                "oauth2AuthCodeFlowGoogleManaged": {
+                    "$ref": "EndUserAuthenticationConfigOauth2AuthCodeFlowGoogleManaged",
+                    "description": "Oauth2AuthCodeFlowGoogleManaged."
+                },
+                "oauth2ClientCredentials": {
+                    "$ref": "EndUserAuthenticationConfigOauth2ClientCredentials",
+                    "description": "Oauth2ClientCredentials."
+                },
+                "oauth2JwtBearer": {
+                    "$ref": "EndUserAuthenticationConfigOauth2JwtBearer",
+                    "description": "Oauth2JwtBearer."
+                },
+                "sshPublicKey": {
+                    "$ref": "EndUserAuthenticationConfigSshPublicKey",
+                    "description": "SSH Public Key."
+                },
+                "userPassword": {
+                    "$ref": "EndUserAuthenticationConfigUserPassword",
+                    "description": "UserPassword."
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationConfigOauth2AuthCodeFlow": {
+            "description": "Parameters to support Oauth 2.0 Auth Code Grant Authentication. See https://www.rfc-editor.org/rfc/rfc6749#section-1.3.1 for more details.",
+            "id": "EndUserAuthenticationConfigOauth2AuthCodeFlow",
+            "properties": {
+                "authCode": {
+                    "description": "Optional. Authorization code to be exchanged for access and refresh tokens.",
+                    "type": "string"
+                },
+                "authUri": {
+                    "description": "Optional. Auth URL for Authorization Code Flow",
+                    "type": "string"
+                },
+                "clientId": {
+                    "description": "Optional. Client ID for user-provided OAuth app.",
+                    "type": "string"
+                },
+                "clientSecret": {
+                    "$ref": "EUASecret",
+                    "description": "Optional. Client secret for user-provided OAuth app."
+                },
+                "enablePkce": {
+                    "description": "Optional. Whether to enable PKCE when the user performs the auth code flow.",
+                    "type": "boolean"
+                },
+                "oauthTokenData": {
+                    "$ref": "OAuthTokenData",
+                    "description": "Optional. Auth Code Data"
+                },
+                "pkceVerifier": {
+                    "description": "Optional. PKCE verifier to be used during the auth code exchange.",
+                    "type": "string"
+                },
+                "redirectUri": {
+                    "description": "Optional. Redirect URI to be provided during the auth code exchange.",
+                    "type": "string"
+                },
+                "scopes": {
+                    "description": "Optional. Scopes the connection will request when the user performs the auth code flow.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationConfigOauth2AuthCodeFlowGoogleManaged": {
+            "description": "Parameters to support Oauth 2.0 Auth Code Grant Authentication using Google Provided OAuth Client. See https://tools.ietf.org/html/rfc6749#section-1.3.1 for more details.",
+            "id": "EndUserAuthenticationConfigOauth2AuthCodeFlowGoogleManaged",
+            "properties": {
+                "authCode": {
+                    "description": "Optional. Authorization code to be exchanged for access and refresh tokens.",
+                    "type": "string"
+                },
+                "oauthTokenData": {
+                    "$ref": "OAuthTokenData",
+                    "description": "Auth Code Data"
+                },
+                "redirectUri": {
+                    "description": "Optional. Redirect URI to be provided during the auth code exchange.",
+                    "type": "string"
+                },
+                "scopes": {
+                    "description": "Required. Scopes the connection will request when the user performs the auth code flow.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationConfigOauth2ClientCredentials": {
+            "description": "Parameters to support Oauth 2.0 Client Credentials Grant Authentication. See https://tools.ietf.org/html/rfc6749#section-1.3.4 for more details.",
+            "id": "EndUserAuthenticationConfigOauth2ClientCredentials",
+            "properties": {
+                "clientId": {
+                    "description": "The client identifier.",
+                    "type": "string"
+                },
+                "clientSecret": {
+                    "$ref": "EUASecret",
+                    "description": "Required. string value or secret version containing the client secret."
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationConfigOauth2JwtBearer": {
+            "description": "Parameters to support JSON Web Token (JWT) Profile for Oauth 2.0 Authorization Grant based authentication. See https://tools.ietf.org/html/rfc7523 for more details.",
+            "id": "EndUserAuthenticationConfigOauth2JwtBearer",
+            "properties": {
+                "clientKey": {
+                    "$ref": "EUASecret",
+                    "description": "Required. secret version/value reference containing a PKCS#8 PEM-encoded private key associated with the Client Certificate. This private key will be used to sign JWTs used for the jwt-bearer authorization grant. Specified in the form as: `projects/*/strings/*/versions/*`."
+                },
+                "jwtClaims": {
+                    "$ref": "EndUserAuthenticationConfigOauth2JwtBearerJwtClaims",
+                    "description": "JwtClaims providers fields to generate the token."
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationConfigOauth2JwtBearerJwtClaims": {
+            "description": "JWT claims used for the jwt-bearer authorization grant.",
+            "id": "EndUserAuthenticationConfigOauth2JwtBearerJwtClaims",
+            "properties": {
+                "audience": {
+                    "description": "Value for the \"aud\" claim.",
+                    "type": "string"
+                },
+                "issuer": {
+                    "description": "Value for the \"iss\" claim.",
+                    "type": "string"
+                },
+                "subject": {
+                    "description": "Value for the \"sub\" claim.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationConfigSshPublicKey": {
+            "description": "Parameters to support Ssh public key Authentication.",
+            "id": "EndUserAuthenticationConfigSshPublicKey",
+            "properties": {
+                "certType": {
+                    "description": "Format of SSH Client cert.",
+                    "type": "string"
+                },
+                "sshClientCert": {
+                    "$ref": "EUASecret",
+                    "description": "Required. SSH Client Cert. It should contain both public and private key."
+                },
+                "sshClientCertPass": {
+                    "$ref": "EUASecret",
+                    "description": "Required. Password (passphrase) for ssh client certificate if it has one."
+                },
+                "username": {
+                    "description": "The user account used to authenticate.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationConfigUserPassword": {
+            "description": "Parameters to support Username and Password Authentication.",
+            "id": "EndUserAuthenticationConfigUserPassword",
+            "properties": {
+                "password": {
+                    "$ref": "EUASecret",
+                    "description": "Required. string value or secret version reference containing the password."
+                },
+                "username": {
+                    "description": "Username.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationConfigVariable": {
+            "description": "EndUserAuthenticationConfigVariable represents a configuration variable present in a EndUserAuthentication.",
+            "id": "EndUserAuthenticationConfigVariable",
+            "properties": {
+                "boolValue": {
+                    "description": "Value is a bool.",
+                    "type": "boolean"
+                },
+                "intValue": {
+                    "description": "Value is an integer",
+                    "format": "int64",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "Required. Key of the config variable.",
+                    "type": "string"
+                },
+                "secretValue": {
+                    "$ref": "EUASecret",
+                    "description": "Value is a secret"
+                },
+                "stringValue": {
+                    "description": "Value is a string.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationEndUserAuthenticationStatus": {
+            "description": "EndUserAuthentication Status denotes the status of the EndUserAuthentication resource.",
+            "id": "EndUserAuthenticationEndUserAuthenticationStatus",
+            "properties": {
+                "description": {
+                    "description": "Output only. Description of the state.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Output only. State of Event Subscription resource.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "ACTIVE",
+                        "ERROR"
+                    ],
+                    "enumDescriptions": [
+                        "Default state.",
+                        "EndUserAuthentication is in Active state.",
+                        "EndUserAuthentication is in Error state."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationNotifyEndpointDestination": {
+            "description": "Message for NotifyEndpointDestination Destination to hit when the refresh token is expired.",
+            "id": "EndUserAuthenticationNotifyEndpointDestination",
+            "properties": {
+                "endpoint": {
+                    "$ref": "EndUserAuthenticationNotifyEndpointDestinationEndPoint",
+                    "description": "Optional. OPTION 1: Hit an endpoint when the refresh token is expired."
+                },
+                "serviceAccount": {
+                    "description": "Required. Service account needed for runtime plane to notify the backend.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Required. type of the destination",
+                    "enum": [
+                        "TYPE_UNSPECIFIED",
+                        "ENDPOINT"
+                    ],
+                    "enumDescriptions": [
+                        "Default state.",
+                        "Endpoint - Hit the value of endpoint when event is received"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationNotifyEndpointDestinationEndPoint": {
+            "description": "Endpoint message includes details of the Destination endpoint.",
+            "id": "EndUserAuthenticationNotifyEndpointDestinationEndPoint",
+            "properties": {
+                "endpointUri": {
+                    "description": "Required. The URI of the Endpoint.",
+                    "type": "string"
+                },
+                "headers": {
+                    "description": "Optional. List of Header to be added to the Endpoint.",
+                    "items": {
+                        "$ref": "EndUserAuthenticationNotifyEndpointDestinationEndPointHeader"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "EndUserAuthenticationNotifyEndpointDestinationEndPointHeader": {
+            "description": "Header details for a given header to be added to Endpoint.",
+            "id": "EndUserAuthenticationNotifyEndpointDestinationEndPointHeader",
+            "properties": {
+                "key": {
+                    "description": "Required. Key of Header.",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "Required. Value of Header.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -3971,6 +5076,31 @@
                     "description": "Required. The path of the service attachment",
                     "type": "string"
                 },
+                "state": {
+                    "description": "Output only. The Private Service Connect Connection Endpoint State. This value is only available in the Full view.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "PENDING",
+                        "ACCEPTED",
+                        "REJECTED",
+                        "CLOSED",
+                        "FROZEN",
+                        "NEEDS_ATTENTION",
+                        "ACCEPTED_NOT_PROGRAMMED"
+                    ],
+                    "enumDescriptions": [
+                        "STATE_UNSPECIFIED.",
+                        "The endpoint is pending acceptance by the producer.",
+                        "The endpoint has been accepted by the producer.",
+                        "The endpoint has been rejected by the producer.",
+                        "The endpoint has been closed by the producer and will not serve traffic going forward.",
+                        "The endpoint has been frozen by the producer and will not serve traffic.",
+                        "The endpoint has been accepted by the producer, but it is not ready to serve the traffic due to producer side issues.",
+                        "The endpoint has been accepted by the producer, but it cannot be programmed to the data plane due to invariant violation."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "updateTime": {
                     "description": "Output only. Updated time.",
                     "format": "google-datetime",
@@ -3980,16 +5110,27 @@
             },
             "type": "object"
         },
+        "EnrichmentConfig": {
+            "description": "Data enrichment configuration.",
+            "id": "EnrichmentConfig",
+            "properties": {
+                "appendAcl": {
+                    "description": "Optional. Append ACL to the event.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
         "EnumOption": {
             "description": "EnumOption definition",
             "id": "EnumOption",
             "properties": {
                 "displayName": {
-                    "description": "Display name of the option.",
+                    "description": "Optional. Display name of the option.",
                     "type": "string"
                 },
                 "id": {
-                    "description": "Id of the option.",
+                    "description": "Optional. Id of the option.",
                     "type": "string"
                 }
             },
@@ -4018,7 +5159,7 @@
                     "description": "Optional. JMS is the source for the event listener."
                 },
                 "name": {
-                    "description": "Required. Resource name of the EventSubscription. Format: projects/{project}/locations/{location}/connections/{connection}/eventSubscriptions/{event_subscription}",
+                    "description": "Required. Identifier. Resource name of the EventSubscription. Format: projects/{project}/locations/{location}/connections/{connection}/eventSubscriptions/{event_subscription}",
                     "type": "string"
                 },
                 "status": {
@@ -4057,19 +5198,27 @@
                     "$ref": "EndPoint",
                     "description": "OPTION 1: Hit an endpoint when we receive an event."
                 },
+                "pubsub": {
+                    "$ref": "PubSub",
+                    "description": "OPTION 3: Write the event to Pub/Sub topic."
+                },
                 "serviceAccount": {
-                    "description": "Service account needed for runtime plane to trigger IP workflow.",
+                    "description": "Optional. Service account needed for runtime plane to trigger IP workflow.",
                     "type": "string"
                 },
                 "type": {
-                    "description": "type of the destination",
+                    "description": "Optional. type of the destination",
                     "enum": [
                         "TYPE_UNSPECIFIED",
-                        "ENDPOINT"
+                        "ENDPOINT",
+                        "GCS",
+                        "PUBSUB"
                     ],
                     "enumDescriptions": [
                         "Default state.",
-                        "Endpoint - Hit the value of endpoint when event is received"
+                        "Endpoint - Hit the value of endpoint when event is received",
+                        "Cloud Storage - Write the event to Cloud Storage bucket",
+                        "Pub/Sub - Write the event to Pub/Sub topic"
                     ],
                     "type": "string"
                 }
@@ -4159,11 +5308,11 @@
             "type": "object"
         },
         "EventingConfig": {
-            "description": "Eventing Configuration of a connection",
+            "description": "Eventing Configuration of a connection next: 19",
             "id": "EventingConfig",
             "properties": {
                 "additionalVariables": {
-                    "description": "Additional eventing related field values",
+                    "description": "Optional. Additional eventing related field values",
                     "items": {
                         "$ref": "ConfigVariable"
                     },
@@ -4171,14 +5320,18 @@
                 },
                 "authConfig": {
                     "$ref": "AuthConfig",
-                    "description": "Auth details for the webhook adapter."
+                    "description": "Optional. Auth details for the webhook adapter."
                 },
                 "deadLetterConfig": {
                     "$ref": "DeadLetterConfig",
                     "description": "Optional. Dead letter configuration for eventing of a connection."
                 },
+                "enrichmentConfig": {
+                    "$ref": "EnrichmentConfig",
+                    "description": "Optional. Data enrichment configuration."
+                },
                 "enrichmentEnabled": {
-                    "description": "Enrichment Enabled.",
+                    "description": "Optional. Enrichment Enabled.",
                     "type": "boolean"
                 },
                 "eventsListenerIngressEndpoint": {
@@ -4188,6 +5341,13 @@
                 "listenerAuthConfig": {
                     "$ref": "AuthConfig",
                     "description": "Optional. Auth details for the event listener."
+                },
+                "privateConnectivityAllowlistedProjects": {
+                    "description": "Optional. List of projects to be allowlisted for the service attachment created in the tenant project for eventing ingress.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "privateConnectivityEnabled": {
                     "description": "Optional. Private Connectivity Enabled.",
@@ -4199,13 +5359,17 @@
                 },
                 "registrationDestinationConfig": {
                     "$ref": "DestinationConfig",
-                    "description": "Registration endpoint for auto registration."
+                    "description": "Optional. Registration endpoint for auto registration."
+                },
+                "sslConfig": {
+                    "$ref": "SslConfig",
+                    "description": "Optional. Ssl config of a connection"
                 }
             },
             "type": "object"
         },
         "EventingConfigTemplate": {
-            "description": "Eventing Config details of a connector version.",
+            "description": "Eventing Config details of a connector version. next: 14",
             "id": "EventingConfigTemplate",
             "properties": {
                 "additionalVariables": {
@@ -4271,6 +5435,10 @@
                     "$ref": "DestinationConfigTemplate",
                     "description": "Registration host destination config template."
                 },
+                "sslConfigTemplate": {
+                    "$ref": "SslConfigTemplate",
+                    "description": "SSL Config template for the connector version."
+                },
                 "triggerConfigVariables": {
                     "description": "Trigger Config fields that needs to be rendered",
                     "items": {
@@ -4312,6 +5480,7 @@
                         "PREVIEW",
                         "GA",
                         "DEPRECATED",
+                        "TEST",
                         "PRIVATE_PREVIEW"
                     ],
                     "enumDescriptions": [
@@ -4319,6 +5488,7 @@
                         "PREVIEW.",
                         "GA.",
                         "DEPRECATED.",
+                        "TEST.",
                         "PRIVATE_PREVIEW."
                     ],
                     "readOnly": true,
@@ -4377,6 +5547,11 @@
                 "webhookData": {
                     "$ref": "WebhookData",
                     "description": "Output only. Webhook data.",
+                    "readOnly": true
+                },
+                "webhookSubscriptions": {
+                    "$ref": "WebhookSubscriptions",
+                    "description": "Output only. Webhook subscriptions.",
                     "readOnly": true
                 }
             },
@@ -4459,6 +5634,24 @@
                         "$ref": "ExtractionRule"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "FetchAuthSchemaResponse": {
+            "description": "Response message for Connectors.GetAuthSchema.",
+            "id": "FetchAuthSchemaResponse",
+            "properties": {
+                "authSchemas": {
+                    "description": "List of AuthSchemas.",
+                    "items": {
+                        "$ref": "AuthSchema"
+                    },
+                    "type": "array"
+                },
+                "jsonSchema": {
+                    "$ref": "JsonAuthSchema",
+                    "description": "JSON schema of the AuthSchemas. This is only populated if the view is JSON_SCHEMA. The schema is in draft-07 format."
                 }
             },
             "type": "object"
@@ -4660,7 +5853,7 @@
                     "type": "boolean"
                 },
                 "comparator": {
-                    "description": "Comparator to use for comparing the field value.",
+                    "description": "Optional. Comparator to use for comparing the field value.",
                     "enum": [
                         "COMPARATOR_UNSPECIFIED",
                         "EQUALS",
@@ -4679,7 +5872,7 @@
                     "type": "string"
                 },
                 "key": {
-                    "description": "Key of the field.",
+                    "description": "Optional. Key of the field.",
                     "type": "string"
                 },
                 "stringValue": {
@@ -4713,11 +5906,11 @@
             "id": "Header",
             "properties": {
                 "key": {
-                    "description": "Key of Header.",
+                    "description": "Optional. Key of Header.",
                     "type": "string"
                 },
                 "value": {
-                    "description": "Value of Header.",
+                    "description": "Optional. Value of Header.",
                     "type": "string"
                 }
             },
@@ -4903,6 +6096,10 @@
                     "description": "consumer_defined_name is the name of the instance set by the service consumers. Generally this is different from the `name` field which reperesents the system-assigned id of the instance which the service consumers do not recognize. This is a required field for tenants onboarding to Maintenance Window notifications (go/slm-rollout-maintenance-policies#prerequisites).",
                     "type": "string"
                 },
+                "consumerProjectNumber": {
+                    "description": "Optional. The consumer_project_number associated with this Apigee instance. This field is added specifically to support Apigee integration with SLM Rollout and UMM. It represents the numerical project ID of the GCP project that consumes this Apigee instance. It is used for SLM rollout notifications and UMM integration, enabling proper mapping to customer projects and log delivery for Apigee instances. This field complements consumer_project_id and may be used for specific Apigee scenarios where the numerical ID is required.",
+                    "type": "string"
+                },
                 "createTime": {
                     "description": "Output only. Timestamp when the resource was created.",
                     "format": "google-datetime",
@@ -5043,10 +6240,36 @@
             },
             "type": "object"
         },
+        "JsonAuthSchema": {
+            "description": "JsonAuthSchema defines the JSON schema of all authentication types.",
+            "id": "JsonAuthSchema",
+            "properties": {
+                "$schema": {
+                    "description": "JSON schema of the AuthSchemas.",
+                    "type": "string"
+                },
+                "oneOf": {
+                    "description": "List of AuthObjects.",
+                    "items": {
+                        "$ref": "AuthObject"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "JsonSchema": {
             "description": "JsonSchema representation of schema metadata",
             "id": "JsonSchema",
             "properties": {
+                "additionalDetails": {
+                    "additionalProperties": {
+                        "description": "Properties of the object.",
+                        "type": "any"
+                    },
+                    "description": "Additional details apart from standard json schema fields, this gives flexibility to store metadata about the schema",
+                    "type": "object"
+                },
                 "default": {
                     "description": "The default value of the field or object described by this schema.",
                     "type": "any"
@@ -5244,15 +6467,15 @@
             "id": "JwtClaims",
             "properties": {
                 "audience": {
-                    "description": "Value for the \"aud\" claim.",
+                    "description": "Optional. Value for the \"aud\" claim.",
                     "type": "string"
                 },
                 "issuer": {
-                    "description": "Value for the \"iss\" claim.",
+                    "description": "Optional. Value for the \"iss\" claim.",
                     "type": "string"
                 },
                 "subject": {
-                    "description": "Value for the \"sub\" claim.",
+                    "description": "Optional. Value for the \"sub\" claim.",
                     "type": "string"
                 }
             },
@@ -5401,6 +6624,31 @@
             },
             "type": "object"
         },
+        "ListEndUserAuthenticationsResponse": {
+            "description": "Response message for ConnectorsService.ListEndUserAuthentications",
+            "id": "ListEndUserAuthenticationsResponse",
+            "properties": {
+                "endUserAuthentications": {
+                    "description": "Subscriptions.",
+                    "items": {
+                        "$ref": "EndUserAuthentication"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "Next page token.",
+                    "type": "string"
+                },
+                "unreachable": {
+                    "description": "Locations that could not be reached.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "ListEndpointAttachmentsResponse": {
             "description": "Response message for ConnectorsService.ListEndpointAttachments",
             "id": "ListEndpointAttachmentsResponse",
@@ -5519,6 +6767,13 @@
                 "nextPageToken": {
                     "description": "Next page token.",
                     "type": "string"
+                },
+                "unreachable": {
+                    "description": "Locations that could not be reached.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -5535,6 +6790,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections e.g. when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -5662,11 +6924,11 @@
             "id": "LockConfig",
             "properties": {
                 "locked": {
-                    "description": "Indicates whether or not the connection is locked.",
+                    "description": "Optional. Indicates whether or not the connection is locked.",
                     "type": "boolean"
                 },
                 "reason": {
-                    "description": "Describes why a connection is locked.",
+                    "description": "Optional. Describes why a connection is locked.",
                     "type": "string"
                 }
             },
@@ -5677,21 +6939,21 @@
             "id": "LogicalExpression",
             "properties": {
                 "fieldComparisons": {
-                    "description": "A list of fields to be compared.",
+                    "description": "Optional. A list of fields to be compared.",
                     "items": {
                         "$ref": "FieldComparison"
                     },
                     "type": "array"
                 },
                 "logicalExpressions": {
-                    "description": "A list of nested conditions to be compared.",
+                    "description": "Optional. A list of nested conditions to be compared.",
                     "items": {
                         "$ref": "LogicalExpression"
                     },
                     "type": "array"
                 },
                 "logicalOperator": {
-                    "description": "The logical operator to use between the fields and conditions.",
+                    "description": "Optional. The logical operator to use between the fields and conditions.",
                     "enum": [
                         "OPERATOR_UNSPECIFIED",
                         "AND",
@@ -5872,6 +7134,29 @@
             },
             "type": "object"
         },
+        "MarketplaceConnectorDetails": {
+            "description": "Marketplace connector details.",
+            "id": "MarketplaceConnectorDetails",
+            "properties": {
+                "marketplaceProduct": {
+                    "description": "Marketplace product name.",
+                    "type": "string"
+                },
+                "marketplaceProductId": {
+                    "description": "Marketplace product ID.",
+                    "type": "string"
+                },
+                "marketplaceProductUri": {
+                    "description": "Marketplace product URL.",
+                    "type": "string"
+                },
+                "partner": {
+                    "description": "The name of the partner.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "MultipleSelectConfig": {
             "description": "MultipleSelectConfig represents the multiple options for a config variable.",
             "id": "MultipleSelectConfig",
@@ -5888,7 +7173,7 @@
                     "type": "array"
                 },
                 "valueSeparator": {
-                    "description": "Required. Value separator.",
+                    "description": "Required. Value separator. Only \",\" can be used for OAuth auth code flow scope field.",
                     "type": "string"
                 }
             },
@@ -5946,17 +7231,46 @@
             },
             "type": "object"
         },
+        "NetworkEgressModeOverride": {
+            "description": "NetworkEgressModeOverride provides the network egress mode override for a connector.",
+            "id": "NetworkEgressModeOverride",
+            "properties": {
+                "isEventingOverrideEnabled": {
+                    "description": "boolean should be set to true to make sure only eventing enabled connections are migrated to direct vpc egress.",
+                    "type": "boolean"
+                },
+                "isJobsOverrideEnabled": {
+                    "description": "boolean should be set to true to make sure only async operations enabled connections are migrated to direct vpc egress.",
+                    "type": "boolean"
+                },
+                "networkEgressMode": {
+                    "description": "Determines the VPC Egress mode for the connector.",
+                    "enum": [
+                        "NETWORK_EGRESS_MODE_UNSPECIFIED",
+                        "SERVERLESS_VPC_ACCESS_CONNECTOR",
+                        "DIRECT_VPC_EGRESS"
+                    ],
+                    "enumDescriptions": [
+                        "Network Egress mode is not specified.",
+                        "Default model VPC Access Connector.",
+                        "Direct VPC Egress."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "NodeConfig": {
             "description": "Node configuration for the connection.",
             "id": "NodeConfig",
             "properties": {
                 "maxNodeCount": {
-                    "description": "Maximum number of nodes in the runtime nodes.",
+                    "description": "Optional. Maximum number of nodes in the runtime nodes.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "minNodeCount": {
-                    "description": "Minimum number of nodes in the runtime nodes.",
+                    "description": "Optional. Minimum number of nodes in the runtime nodes.",
                     "format": "int32",
                     "type": "integer"
                 }
@@ -5996,40 +7310,87 @@
             },
             "type": "object"
         },
+        "OAuthTokenData": {
+            "description": "pass only at create and not update using updateMask Auth Code Data",
+            "id": "OAuthTokenData",
+            "properties": {
+                "accessToken": {
+                    "$ref": "EUASecret",
+                    "description": "Optional. Access token for the connection."
+                },
+                "createTime": {
+                    "description": "Optional. Timestamp when the access token was created.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "expiry": {
+                    "description": "Optional. Time in seconds when the access token expires.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "refreshToken": {
+                    "$ref": "EUASecret",
+                    "description": "Optional. Refresh token for the connection."
+                }
+            },
+            "type": "object"
+        },
         "Oauth2AuthCodeFlow": {
             "description": "Parameters to support Oauth 2.0 Auth Code Grant Authentication. See https://www.rfc-editor.org/rfc/rfc6749#section-1.3.1 for more details.",
             "id": "Oauth2AuthCodeFlow",
             "properties": {
                 "authCode": {
-                    "description": "Authorization code to be exchanged for access and refresh tokens.",
+                    "description": "Optional. Authorization code to be exchanged for access and refresh tokens.",
                     "type": "string"
                 },
                 "authUri": {
-                    "description": "Auth URL for Authorization Code Flow",
+                    "description": "Optional. Auth URL for Authorization Code Flow",
                     "type": "string"
                 },
                 "clientId": {
-                    "description": "Client ID for user-provided OAuth app.",
+                    "description": "Optional. Client ID for user-provided OAuth app.",
                     "type": "string"
                 },
                 "clientSecret": {
                     "$ref": "Secret",
-                    "description": "Client secret for user-provided OAuth app."
+                    "description": "Optional. Client secret for user-provided OAuth app."
                 },
                 "enablePkce": {
-                    "description": "Whether to enable PKCE when the user performs the auth code flow.",
+                    "description": "Optional. Whether to enable PKCE when the user performs the auth code flow.",
                     "type": "boolean"
                 },
                 "pkceVerifier": {
-                    "description": "PKCE verifier to be used during the auth code exchange.",
+                    "description": "Optional. PKCE verifier to be used during the auth code exchange.",
                     "type": "string"
                 },
                 "redirectUri": {
-                    "description": "Redirect URI to be provided during the auth code exchange.",
+                    "description": "Optional. Redirect URI to be provided during the auth code exchange.",
                     "type": "string"
                 },
                 "scopes": {
-                    "description": "Scopes the connection will request when the user performs the auth code flow.",
+                    "description": "Optional. Scopes the connection will request when the user performs the auth code flow.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "Oauth2AuthCodeFlowGoogleManaged": {
+            "description": "Parameters to support Oauth 2.0 Auth Code Grant Authentication using Google Provided OAuth Client. See https://tools.ietf.org/html/rfc6749#section-1.3.1 for more details.",
+            "id": "Oauth2AuthCodeFlowGoogleManaged",
+            "properties": {
+                "authCode": {
+                    "description": "Optional. Authorization code to be exchanged for access and refresh tokens.",
+                    "type": "string"
+                },
+                "redirectUri": {
+                    "description": "Optional. Redirect URI to be provided during the auth code exchange.",
+                    "type": "string"
+                },
+                "scopes": {
+                    "description": "Required. Scopes the connection will request when the user performs the auth code flow.",
                     "items": {
                         "type": "string"
                     },
@@ -6043,12 +7404,12 @@
             "id": "Oauth2ClientCredentials",
             "properties": {
                 "clientId": {
-                    "description": "The client identifier.",
+                    "description": "Optional. The client identifier.",
                     "type": "string"
                 },
                 "clientSecret": {
                     "$ref": "Secret",
-                    "description": "Secret version reference containing the client secret."
+                    "description": "Optional. Secret version reference containing the client secret."
                 }
             },
             "type": "object"
@@ -6059,11 +7420,11 @@
             "properties": {
                 "clientKey": {
                     "$ref": "Secret",
-                    "description": "Secret version reference containing a PKCS#8 PEM-encoded private key associated with the Client Certificate. This private key will be used to sign JWTs used for the jwt-bearer authorization grant. Specified in the form as: `projects/*/secrets/*/versions/*`."
+                    "description": "Optional. Secret version reference containing a PKCS#8 PEM-encoded private key associated with the Client Certificate. This private key will be used to sign JWTs used for the jwt-bearer authorization grant. Specified in the form as: `projects/*/secrets/*/versions/*`."
                 },
                 "jwtClaims": {
                     "$ref": "JwtClaims",
-                    "description": "JwtClaims providers fields to generate the token."
+                    "description": "Optional. JwtClaims providers fields to generate the token."
                 }
             },
             "type": "object"
@@ -6142,6 +7503,85 @@
                 "verb": {
                     "description": "Output only. Name of the verb executed by the operation.",
                     "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PartnerMetadata": {
+            "description": "Partner metadata details. This will be populated when publishing the custom connector as a partner connector version. On publishing, parntner connector version will be created using the fields in PartnerMetadata.",
+            "id": "PartnerMetadata",
+            "properties": {
+                "acceptGcpTos": {
+                    "description": "Required. Whether the user has accepted the Google Cloud Platform Terms of Service (https://cloud.google.com/terms/) and the Google Cloud Marketplace Terms of Service (https://cloud.google.com/terms/marketplace/launcher?hl=en).",
+                    "type": "boolean"
+                },
+                "additionalComments": {
+                    "description": "Optional. Additional comments for the submission.",
+                    "type": "string"
+                },
+                "confirmPartnerRequirements": {
+                    "description": "Required. Confirmation that connector meets all applicable requirements mentioned in the Partner Connector Publishing requirements list and Partner onboardiong requirements list (https://cloud.google.com/marketplace/docs/partners/get-started#requirements).",
+                    "type": "boolean"
+                },
+                "demoUri": {
+                    "description": "Required. Public URL for the demo video.",
+                    "type": "string"
+                },
+                "hasDynamicSpecUri": {
+                    "description": "Output only. Has dynamic open api spec uri.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "integrationTemplates": {
+                    "description": "Required. Integration example templates for the custom connector.",
+                    "type": "string"
+                },
+                "localSpecPath": {
+                    "description": "Output only. Local spec path. Required if has_dynamic_spec_uri is true.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "marketplaceProduct": {
+                    "description": "Optional. Marketplace product name.",
+                    "type": "string"
+                },
+                "marketplaceProductId": {
+                    "description": "Required. Marketplace product ID.",
+                    "type": "string"
+                },
+                "marketplaceProductProjectId": {
+                    "description": "Optional. Marketplace product project ID.",
+                    "type": "string"
+                },
+                "marketplaceProductUri": {
+                    "description": "Optional. Marketplace product URL.",
+                    "type": "string"
+                },
+                "partner": {
+                    "description": "Required. Partner name.",
+                    "type": "string"
+                },
+                "partnerConnectorDisplayName": {
+                    "description": "Required. Partner connector display name.",
+                    "type": "string"
+                },
+                "publishRequestTime": {
+                    "description": "Output only. Publish request time.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "targetApplication": {
+                    "description": "Required. Target application for which partner connector is built.",
+                    "type": "string"
+                },
+                "targetCustomerSegment": {
+                    "description": "Required. Target customer segment for the partner connector.",
+                    "type": "string"
+                },
+                "useCases": {
+                    "description": "Required. Details about partner connector use cases.",
                     "type": "string"
                 }
             },
@@ -6237,6 +7677,7 @@
                         "PREVIEW",
                         "GA",
                         "DEPRECATED",
+                        "TEST",
                         "PRIVATE_PREVIEW"
                     ],
                     "enumDescriptions": [
@@ -6244,6 +7685,7 @@
                         "PREVIEW.",
                         "GA.",
                         "DEPRECATED.",
+                        "TEST.",
                         "PRIVATE_PREVIEW."
                     ],
                     "readOnly": true,
@@ -6278,6 +7720,86 @@
                 },
                 "resourceUrl": {
                     "description": "URL identifying the resource, e.g. \"https://www.googleapis.com/compute/v1/projects/...)\".",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PubSub": {
+            "description": "Pub/Sub message includes details of the Destination Pub/Sub topic.",
+            "id": "PubSub",
+            "properties": {
+                "attributes": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Pub/Sub message attributes to be added to the Pub/Sub message.",
+                    "type": "object"
+                },
+                "configVariables": {
+                    "description": "Optional. Configuration for configuring the trigger",
+                    "items": {
+                        "$ref": "ConfigVariable"
+                    },
+                    "type": "array"
+                },
+                "projectId": {
+                    "description": "Required. The project id which has the Pub/Sub topic.",
+                    "type": "string"
+                },
+                "topicId": {
+                    "description": "Required. The topic id of the Pub/Sub topic.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "PublishCustomConnectorVersionRequest": {
+            "description": "Request message for ConnectorsService.PublishCustomConnectorVersion",
+            "id": "PublishCustomConnectorVersionRequest",
+            "properties": {
+                "partnerMetadata": {
+                    "$ref": "PartnerMetadata",
+                    "description": "Required. Partner metadata details for validating and publishing the custom connector as a partner connector version."
+                }
+            },
+            "type": "object"
+        },
+        "PublishStatus": {
+            "description": "Publish status of a custom connector.",
+            "id": "PublishStatus",
+            "properties": {
+                "publishState": {
+                    "description": "Output only. Publish state of the custom connector.",
+                    "enum": [
+                        "PUBLISH_STATE_UNSPECIFIED",
+                        "PUBLISHED",
+                        "PUBLISH_IN_PROGRESS",
+                        "UNPUBLISHED"
+                    ],
+                    "enumDescriptions": [
+                        "State Unspecified.",
+                        "Connector version has been published as partner connector version.",
+                        "Connector version is in the process of being published as partner connector version.",
+                        "Connector version has been unpublished as partner connector version"
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "publishTime": {
+                    "description": "Output only. Publish time.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "publishedAs": {
+                    "description": "Output only. Partner connector name. Will be set on the custom connector. Format: providers/partner/connectors//versions/",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "publishedSource": {
+                    "description": "Output only. Custom connector name. Will be set on the partner connector. Format: providers/customconnectors/connectors//versions/",
+                    "readOnly": true,
                     "type": "string"
                 }
             },
@@ -6325,11 +7847,11 @@
             "id": "Resource",
             "properties": {
                 "pathTemplate": {
-                    "description": "Template to uniquely represent a Google Cloud resource in a format IAM expects This is a template that can have references to other values provided in the config variable template.",
+                    "description": "Optional. Template to uniquely represent a Google Cloud resource in a format IAM expects This is a template that can have references to other values provided in the config variable template.",
                     "type": "string"
                 },
                 "type": {
-                    "description": "Different types of resource supported.",
+                    "description": "Optional. Different types of resource supported.",
                     "enum": [
                         "TYPE_UNSPECIFIED",
                         "GCP_PROJECT",
@@ -6532,6 +8054,10 @@
                     ],
                     "type": "string"
                 },
+                "defaultValue": {
+                    "description": "The following field specifies the default value of the Parameter provided by the external system if a value is not provided.",
+                    "type": "any"
+                },
                 "description": {
                     "description": "A brief description of the field.",
                     "type": "string"
@@ -6543,6 +8069,10 @@
                 "jsonSchema": {
                     "$ref": "JsonSchema",
                     "description": "JsonSchema representation of this action's result"
+                },
+                "nullable": {
+                    "description": "Specifies whether a null value is allowed.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -6558,11 +8088,11 @@
             "id": "RoleGrant",
             "properties": {
                 "helperTextTemplate": {
-                    "description": "Template that UI can use to provide helper text to customers.",
+                    "description": "Optional. Template that UI can use to provide helper text to customers.",
                     "type": "string"
                 },
                 "principal": {
-                    "description": "Prinicipal/Identity for whom the role need to assigned.",
+                    "description": "Optional. Principal/Identity for whom the role need to assigned.",
                     "enum": [
                         "PRINCIPAL_UNSPECIFIED",
                         "CONNECTOR_SA"
@@ -6575,10 +8105,10 @@
                 },
                 "resource": {
                     "$ref": "Resource",
-                    "description": "Resource on which the roles needs to be granted for the principal."
+                    "description": "Optional. Resource on which the roles needs to be granted for the principal."
                 },
                 "roles": {
-                    "description": "List of roles that need to be granted.",
+                    "description": "Optional. List of roles that need to be granted.",
                     "items": {
                         "type": "string"
                     },
@@ -6619,6 +8149,11 @@
                     "readOnly": true,
                     "type": "array"
                 },
+                "inputSchemaAsString": {
+                    "description": "Output only. Input schema as string.",
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "resultJsonSchema": {
                     "$ref": "JsonSchema",
                     "description": "Output only. JsonSchema representation of this action's result metadata",
@@ -6631,6 +8166,11 @@
                     },
                     "readOnly": true,
                     "type": "array"
+                },
+                "resultSchemaAsString": {
+                    "description": "Output only. Result schema as string.",
+                    "readOnly": true,
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -6874,7 +8414,7 @@
             "id": "Secret",
             "properties": {
                 "secretVersion": {
-                    "description": "The resource name of the secret version in the format, format as: `projects/*/secrets/*/versions/*`.",
+                    "description": "Optional. The resource name of the secret version in the format, format as: `projects/*/secrets/*/versions/*`.",
                     "type": "string"
                 }
             },
@@ -6964,7 +8504,7 @@
             "id": "Source",
             "properties": {
                 "fieldId": {
-                    "description": "Field identifier. For example config vaiable name.",
+                    "description": "Field identifier. For example config variable name.",
                     "type": "string"
                 },
                 "sourceType": {
@@ -6987,19 +8527,19 @@
             "id": "SshPublicKey",
             "properties": {
                 "certType": {
-                    "description": "Format of SSH Client cert.",
+                    "description": "Optional. Format of SSH Client cert.",
                     "type": "string"
                 },
                 "sshClientCert": {
                     "$ref": "Secret",
-                    "description": "SSH Client Cert. It should contain both public and private key."
+                    "description": "Optional. SSH Client Cert. It should contain both public and private key."
                 },
                 "sshClientCertPass": {
                     "$ref": "Secret",
-                    "description": "Password (passphrase) for ssh client certificate if it has one."
+                    "description": "Optional. Password (passphrase) for ssh client certificate if it has one."
                 },
                 "username": {
-                    "description": "The user account used to authenticate.",
+                    "description": "Optional. The user account used to authenticate.",
                     "type": "string"
                 }
             },
@@ -7010,14 +8550,14 @@
             "id": "SslConfig",
             "properties": {
                 "additionalVariables": {
-                    "description": "Additional SSL related field values",
+                    "description": "Optional. Additional SSL related field values",
                     "items": {
                         "$ref": "ConfigVariable"
                     },
                     "type": "array"
                 },
                 "clientCertType": {
-                    "description": "Type of Client Cert (PEM/JKS/.. etc.)",
+                    "description": "Optional. Type of Client Cert (PEM/JKS/.. etc.)",
                     "enum": [
                         "CERT_TYPE_UNSPECIFIED",
                         "PEM"
@@ -7030,22 +8570,22 @@
                 },
                 "clientCertificate": {
                     "$ref": "Secret",
-                    "description": "Client Certificate"
+                    "description": "Optional. Client Certificate"
                 },
                 "clientPrivateKey": {
                     "$ref": "Secret",
-                    "description": "Client Private Key"
+                    "description": "Optional. Client Private Key"
                 },
                 "clientPrivateKeyPass": {
                     "$ref": "Secret",
-                    "description": "Secret containing the passphrase protecting the Client Private Key"
+                    "description": "Optional. Secret containing the passphrase protecting the Client Private Key"
                 },
                 "privateServerCertificate": {
                     "$ref": "Secret",
-                    "description": "Private Server Certificate. Needs to be specified if trust model is `PRIVATE`."
+                    "description": "Optional. Private Server Certificate. Needs to be specified if trust model is `PRIVATE`."
                 },
                 "serverCertType": {
-                    "description": "Type of Server Cert (PEM/JKS/.. etc.)",
+                    "description": "Optional. Type of Server Cert (PEM/JKS/.. etc.)",
                     "enum": [
                         "CERT_TYPE_UNSPECIFIED",
                         "PEM"
@@ -7057,7 +8597,7 @@
                     "type": "string"
                 },
                 "trustModel": {
-                    "description": "Trust Model of the SSL connection",
+                    "description": "Optional. Trust Model of the SSL connection",
                     "enum": [
                         "PUBLIC",
                         "PRIVATE",
@@ -7071,7 +8611,7 @@
                     "type": "string"
                 },
                 "type": {
-                    "description": "Controls the ssl type for the given connector version.",
+                    "description": "Optional. Controls the ssl type for the given connector version.",
                     "enum": [
                         "SSL_TYPE_UNSPECIFIED",
                         "TLS",
@@ -7085,7 +8625,7 @@
                     "type": "string"
                 },
                 "useSsl": {
-                    "description": "Bool for enabling SSL",
+                    "description": "Optional. Bool for enabling SSL",
                     "type": "boolean"
                 }
             },
@@ -7153,6 +8693,28 @@
             },
             "type": "object"
         },
+        "StandardAction": {
+            "description": "Standard action",
+            "id": "StandardAction",
+            "properties": {
+                "name": {
+                    "description": "Name of the standard action.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "StandardEntity": {
+            "description": "Standard entity",
+            "id": "StandardEntity",
+            "properties": {
+                "name": {
+                    "description": "Name of the standard entity.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Status": {
             "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
             "id": "Status",
@@ -7186,6 +8748,10 @@
             "properties": {
                 "actionApis": {
                     "description": "Specifies if the connector supports action apis like 'executeAction'.",
+                    "type": "boolean"
+                },
+                "asyncOperations": {
+                    "description": "Specifies if the connector supports async long running operations.",
                     "type": "boolean"
                 },
                 "entityApis": {
@@ -7232,24 +8798,41 @@
             "id": "TimeOfDay",
             "properties": {
                 "hours": {
-                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+                    "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "minutes": {
-                    "description": "Minutes of hour of day. Must be from 0 to 59.",
+                    "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "nanos": {
-                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+                    "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "seconds": {
-                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.",
+                    "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
                     "format": "int32",
                     "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "TrafficShapingConfig": {
+            "description": "* TrafficShapingConfig defines the configuration for shaping API traffic by specifying a quota limit and the duration over which this limit is enforced. This configuration helps to control and manage the rate at which API calls are made on the client side, preventing service overload on the backend. For example: - if the quota limit is 100 calls per 10 seconds, then the message would be: { quota_limit: 100 duration: { seconds: 10 } } - if the quota limit is 100 calls per 5 minutes, then the message would be: { quota_limit: 100 duration: { seconds: 300 } } - if the quota limit is 10000 calls per day, then the message would be: { quota_limit: 10000 duration: { seconds: 86400 } and so on.",
+            "id": "TrafficShapingConfig",
+            "properties": {
+                "duration": {
+                    "description": "Required. * The duration over which the API call quota limits are calculated. This duration is used to define the time window for evaluating if the number of API calls made by a user is within the allowed quota limits. For example: - To define a quota sampled over 16 seconds, set `seconds` to 16 - To define a quota sampled over 5 minutes, set `seconds` to 300 (5 * 60) - To define a quota sampled over 1 day, set `seconds` to 86400 (24 * 60 * 60) and so on. It is important to note that this duration is not the time the quota is valid for, but rather the time window over which the quota is evaluated. For example, if the quota is 100 calls per 10 seconds, then this duration field would be set to 10 seconds.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "quotaLimit": {
+                    "description": "Required. Maximum number of api calls allowed.",
+                    "format": "int64",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -7298,10 +8881,10 @@
             "properties": {
                 "password": {
                     "$ref": "Secret",
-                    "description": "Secret version reference containing the password."
+                    "description": "Optional. Secret version reference containing the password."
                 },
                 "username": {
-                    "description": "Username.",
+                    "description": "Optional. Username.",
                     "type": "string"
                 }
             },
@@ -7324,12 +8907,14 @@
                     "enum": [
                         "CUSTOM_CONNECTOR_TYPE_UNSPECIFIED",
                         "OPEN_API",
-                        "PROTO"
+                        "PROTO",
+                        "SDK"
                     ],
                     "enumDescriptions": [
                         "Connector type is not specified.",
                         "OpenAPI connector.",
-                        "Proto connector."
+                        "Proto connector.",
+                        "SDK connector."
                     ],
                     "type": "string"
                 }
@@ -7343,6 +8928,24 @@
                 "errorMessage": {
                     "description": "Error message. The spec is valid if the error message is empty.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "VpcscConfig": {
+            "description": "This configuration provides VPCSC config for a connector.",
+            "id": "VpcscConfig",
+            "properties": {
+                "defaultAllowlistedHost": {
+                    "description": "The list of allowlisted FQDNs for VPCSC.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "disableFirewallVpcscFlow": {
+                    "description": "Whether to disable firewall VPCSC flow.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -7390,6 +8993,21 @@
             },
             "type": "object"
         },
+        "WebhookSubscriptions": {
+            "description": "WebhookSubscriptions has details of webhook subscriptions.",
+            "id": "WebhookSubscriptions",
+            "properties": {
+                "webhookData": {
+                    "description": "Output only. Webhook data.",
+                    "items": {
+                        "$ref": "WebhookData"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "WeeklyCycle": {
             "description": "Time window specified for weekly operations.",
             "id": "WeeklyCycle",
@@ -7402,6 +9020,12 @@
                     "type": "array"
                 }
             },
+            "type": "object"
+        },
+        "WithdrawCustomConnectorVersionRequest": {
+            "description": "Request message for ConnectorsService.WithdrawCustomConnectorVersion",
+            "id": "WithdrawCustomConnectorVersionRequest",
+            "properties": {},
             "type": "object"
         }
     },

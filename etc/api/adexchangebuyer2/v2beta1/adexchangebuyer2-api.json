@@ -3115,7 +3115,7 @@
             }
         }
     },
-    "revision": "20240625",
+    "revision": "20251028",
     "rootUrl": "https://adexchangebuyer.googleapis.com/",
     "schemas": {
         "AbsoluteDateRange": {
@@ -5661,14 +5661,16 @@
                         "AD_NOT_RENDERED",
                         "INVALID_IMPRESSION",
                         "FATAL_VAST_ERROR",
-                        "LOST_IN_MEDIATION"
+                        "LOST_IN_MEDIATION",
+                        "OVERDELIVERED_IMPRESSION"
                     ],
                     "enumDescriptions": [
                         "A placeholder for an undefined status. This value will never be returned in responses.",
                         "The buyer was not billed because the ad was not rendered by the publisher.",
                         "The buyer was not billed because the impression won by the bid was determined to be invalid.",
                         "A video impression was served but a fatal error was reported from the client during playback.",
-                        "The buyer was not billed because the ad was outplaced in the mediation waterfall."
+                        "The buyer was not billed because the ad was outplaced in the mediation waterfall.",
+                        "The impression was not billed because it exceeded a guaranteed deal delivery goal."
                     ],
                     "type": "string"
                 }
@@ -6570,22 +6572,22 @@
             "id": "TimeOfDay",
             "properties": {
                 "hours": {
-                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+                    "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "minutes": {
-                    "description": "Minutes of hour of day. Must be from 0 to 59.",
+                    "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "nanos": {
-                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+                    "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "seconds": {
-                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.",
+                    "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
                     "format": "int32",
                     "type": "integer"
                 }

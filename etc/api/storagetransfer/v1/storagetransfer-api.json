@@ -392,7 +392,7 @@
                     ],
                     "parameters": {
                         "filter": {
-                            "description": "Required. A list of query parameters specified as JSON text in the form of: `{\"projectId\":\"my_project_id\", \"jobNames\":[\"jobid1\",\"jobid2\",...], \"jobStatuses\":[\"status1\",\"status2\",...]}` Since `jobNames` and `jobStatuses` support multiple values, their values must be specified with array notation. `projectId` is required. `jobNames` and `jobStatuses` are optional. The valid values for `jobStatuses` are case-insensitive: ENABLED, DISABLED, and DELETED.",
+                            "description": "Required. A list of query parameters specified as JSON text in the form of: ``` { \"projectId\":\"my_project_id\", \"jobNames\":[\"jobid1\",\"jobid2\",...], \"jobStatuses\":[\"status1\",\"status2\",...], \"dataBackend\":\"QUERY_REPLICATION_CONFIGS\", \"sourceBucket\":\"source-bucket-name\", \"sinkBucket\":\"sink-bucket-name\", } ``` The JSON formatting in the example is for display only; provide the query parameters without spaces or line breaks. * `projectId` is required. * Since `jobNames` and `jobStatuses` support multiple values, their values must be specified with array notation. `jobNames` and `jobStatuses` are optional. Valid values are case-insensitive: * ENABLED * DISABLED * DELETED * Specify `\"dataBackend\":\"QUERY_REPLICATION_CONFIGS\"` to return a list of cross-bucket replication jobs. * Limit the results to jobs from a particular bucket with `sourceBucket` and/or to a particular bucket with `sinkBucket`.",
                             "location": "query",
                             "required": true,
                             "type": "string"
@@ -563,6 +563,11 @@
                             "description": "The list page token.",
                             "location": "query",
                             "type": "string"
+                        },
+                        "returnPartialSuccess": {
+                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the [ListOperationsResponse.unreachable] field. This can only be `true` when reading across collections e.g. when `parent` is set to `\"projects/example/locations/-\"`. This field is not by default supported and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                            "location": "query",
+                            "type": "boolean"
                         }
                     },
                     "path": "v1/{+name}",
@@ -632,7 +637,7 @@
             }
         }
     },
-    "revision": "20240622",
+    "revision": "20251010",
     "rootUrl": "https://storagetransfer.googleapis.com/",
     "schemas": {
         "AgentPool": {
@@ -764,6 +769,10 @@
                     "description": "Optional. The Resource name of a secret in Secret Manager. The Azure SAS token must be stored in Secret Manager in JSON format: { \"sas_token\" : \"SAS_TOKEN\" } GoogleServiceAccount must be granted `roles/secretmanager.secretAccessor` for the resource. See [Configure access to a source: Microsoft Azure Blob Storage] (https://cloud.google.com/storage-transfer/docs/source-microsoft-azure#secret_manager) for more information. If `credentials_secret` is specified, do not specify azure_credentials. Format: `projects/{project_number}/secrets/{secret_name}`",
                     "type": "string"
                 },
+                "federatedIdentityConfig": {
+                    "$ref": "FederatedIdentityConfig",
+                    "description": "Optional. Federated identity config of a user registered Azure application. If `federated_identity_config` is specified, do not specify azure_credentials or credentials_secret."
+                },
                 "path": {
                     "description": "Root path to transfer objects. Must be an empty string or full path name that ends with a '/'. This field is treated as an object prefix. As such, it should generally not begin with a '/'.",
                     "type": "string"
@@ -833,18 +842,19 @@
             "type": "object"
         },
         "ErrorLogEntry": {
-            "description": "An entry describing an error that has occurred.",
+            "description": "LINT.IfChange An entry describing an error that has occurred.",
             "id": "ErrorLogEntry",
             "properties": {
                 "errorDetails": {
-                    "description": "A list of messages that carry the error details.",
+                    "description": "Optional. A list of messages that carry the error details.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "url": {
-                    "description": "Required. A URL that refers to the target (a data source, a data sink, or an object) with which the error is associated.",
+                    "description": "Output only. A URL that refers to the target (a data source, a data sink, or an object) with which the error is associated.",
+                    "readOnly": true,
                     "type": "string"
                 }
             },
@@ -932,6 +942,21 @@
             },
             "type": "object"
         },
+        "FederatedIdentityConfig": {
+            "description": "The identity of an Azure application through which Storage Transfer Service can authenticate requests using Azure workload identity federation. Storage Transfer Service can issue requests to Azure Storage through registered Azure applications, eliminating the need to pass credentials to Storage Transfer Service directly. To configure federated identity, see [Configure access to Microsoft Azure Storage](https://cloud.google.com/storage-transfer/docs/source-microsoft-azure#option_3_authenticate_using_federated_identity).",
+            "id": "FederatedIdentityConfig",
+            "properties": {
+                "clientId": {
+                    "description": "Required. The client (application) ID of the application with federated credentials.",
+                    "type": "string"
+                },
+                "tenantId": {
+                    "description": "Required. The tenant (directory) ID of the application with federated credentials.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GcsData": {
             "description": "In a GcsData resource, an object's name is the Cloud Storage object's name and its \"last modification time\" refers to the object's `updated` property of Cloud Storage objects, which changes when the content or the metadata of the object is updated.",
             "id": "GcsData",
@@ -982,7 +1007,7 @@
             "id": "HttpData",
             "properties": {
                 "listUrl": {
-                    "description": "Required. The URL that points to the file that stores the object list entries. This file must allow public access. Currently, only URLs with HTTP and HTTPS schemes are supported.",
+                    "description": "Required. The URL that points to the file that stores the object list entries. This file must allow public access. The URL is either an HTTP/HTTPS address (e.g. `https://example.com/urllist.tsv`) or a Cloud Storage path (e.g. `gs://my-bucket/urllist.tsv`).",
                     "type": "string"
                 }
             },
@@ -1018,6 +1043,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections e.g. when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -1056,12 +1088,14 @@
                         "enum": [
                             "LOGGABLE_ACTION_STATE_UNSPECIFIED",
                             "SUCCEEDED",
-                            "FAILED"
+                            "FAILED",
+                            "SKIPPED"
                         ],
                         "enumDescriptions": [
                             "Default value. This value is unused.",
                             "`LoggableAction` completed successfully. `SUCCEEDED` actions are logged as INFO.",
-                            "`LoggableAction` terminated in an error state. `FAILED` actions are logged as ERROR."
+                            "`LoggableAction` terminated in an error state. `FAILED` actions are logged as ERROR.",
+                            "The `COPY` action was skipped for this file. Only supported for agent-based transfers. `SKIPPED` actions are logged as INFO."
                         ],
                         "type": "string"
                     },
@@ -1080,7 +1114,7 @@
                             "Default value. This value is unused.",
                             "Listing objects in a bucket.",
                             "Deleting objects at the source or the destination.",
-                            "Copying objects to Google Cloud Storage."
+                            "Copying objects to the destination."
                         ],
                         "type": "string"
                     },
@@ -1275,7 +1309,7 @@
             "type": "object"
         },
         "ObjectConditions": {
-            "description": "Conditions that determine which objects are transferred. Applies only to Cloud Data Sources such as S3, Azure, and Cloud Storage. The \"last modification time\" refers to the time of the last change to the object's content or metadata \u2014 specifically, this is the `updated` property of Cloud Storage objects, the `LastModified` field of S3 objects, and the `Last-Modified` header of Azure blobs. Transfers with a PosixFilesystem source or destination don't support `ObjectConditions`.",
+            "description": "Conditions that determine which objects are transferred. Applies only to Cloud Data Sources such as S3, Azure, and Cloud Storage. The \"last modification time\" refers to the time of the last change to the object's content or metadata \u2014 specifically, this is the `updated` property of Cloud Storage objects, the `LastModified` field of S3 objects, and the `Last-Modified` header of Azure blobs. For S3 objects, the `LastModified` value is the time the object begins uploading. If the object meets your \"last modification time\" criteria, but has not finished uploading, the object is not transferred. See [Transfer from Amazon S3 to Cloud Storage](https://cloud.google.com/storage-transfer/docs/create-transfers/agentless/s3#transfer_options) for more information. Transfers with a PosixFilesystem source or destination don't support `ObjectConditions`.",
             "id": "ObjectConditions",
             "properties": {
                 "excludePrefixes": {
@@ -1368,24 +1402,24 @@
             "type": "object"
         },
         "ReplicationSpec": {
-            "description": "Specifies the configuration for running a replication job.",
+            "description": "Specifies the configuration for a cross-bucket replication job. Cross-bucket replication copies new or updated objects from a source Cloud Storage bucket to a destination Cloud Storage bucket. Existing objects in the source bucket are not copied by a new cross-bucket replication job.",
             "id": "ReplicationSpec",
             "properties": {
                 "gcsDataSink": {
                     "$ref": "GcsData",
-                    "description": "Specifies cloud Storage data sink."
+                    "description": "The Cloud Storage bucket to which to replicate objects."
                 },
                 "gcsDataSource": {
                     "$ref": "GcsData",
-                    "description": "Specifies cloud Storage data source."
+                    "description": "The Cloud Storage bucket from which to replicate objects."
                 },
                 "objectConditions": {
                     "$ref": "ObjectConditions",
-                    "description": "Specifies the object conditions to only include objects that satisfy these conditions in the set of data source objects. Object conditions based on objects' \"last modification time\" do not exclude objects in a data sink."
+                    "description": "Object conditions that determine which objects are transferred. For replication jobs, only `include_prefixes` and `exclude_prefixes` are supported."
                 },
                 "transferOptions": {
                     "$ref": "TransferOptions",
-                    "description": "Specifies the actions to be performed on the object during replication. Delete options are not supported for replication and when specified, the request fails with an INVALID_ARGUMENT error."
+                    "description": "Specifies the metadata options to be applied during replication. Delete options are not supported. If a delete option is specified, the request fails with an INVALID_ARGUMENT error."
                 }
             },
             "type": "object"
@@ -1476,7 +1510,7 @@
             "properties": {
                 "endTimeOfDay": {
                     "$ref": "TimeOfDay",
-                    "description": "The time in UTC that no further transfer operations are scheduled. Combined with schedule_end_date, `end_time_of_day` specifies the end date and time for starting new transfer operations. This field must be greater than or equal to the timestamp corresponding to the combintation of schedule_start_date and start_time_of_day, and is subject to the following: * If `end_time_of_day` is not set and `schedule_end_date` is set, then a default value of `23:59:59` is used for `end_time_of_day`. * If `end_time_of_day` is set and `schedule_end_date` is not set, then INVALID_ARGUMENT is returned."
+                    "description": "The time in UTC that no further transfer operations are scheduled. Combined with schedule_end_date, `end_time_of_day` specifies the end date and time for starting new transfer operations. This field must be greater than or equal to the timestamp corresponding to the combination of schedule_start_date and start_time_of_day, and is subject to the following: * If `end_time_of_day` is not set and `schedule_end_date` is set, then a default value of `23:59:59` is used for `end_time_of_day`. * If `end_time_of_day` is set and `schedule_end_date` is not set, then INVALID_ARGUMENT is returned."
                 },
                 "repeatInterval": {
                     "description": "Interval between the start of each scheduled TransferOperation. If unspecified, the default value is 24 hours. This value may not be less than 1 hour.",
@@ -1530,22 +1564,22 @@
             "id": "TimeOfDay",
             "properties": {
                 "hours": {
-                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+                    "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "minutes": {
-                    "description": "Minutes of hour of day. Must be from 0 to 59.",
+                    "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "nanos": {
-                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+                    "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "seconds": {
-                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.",
+                    "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
                     "format": "int32",
                     "type": "integer"
                 }
@@ -1722,6 +1756,10 @@
                     "$ref": "Schedule",
                     "description": "Specifies schedule for the transfer job. This is an optional field. When the field is not set, the job never executes a transfer, unless you invoke RunTransferJob or update the job to have a non-empty schedule."
                 },
+                "serviceAccount": {
+                    "description": "Optional. The user-managed service account to which to delegate service agent permissions. You can grant Cloud Storage bucket permissions to this service account instead of to the Transfer Service service agent. Format is `projects/-/serviceAccounts/ACCOUNT_EMAIL_OR_UNIQUEID` Either the service account email (`SERVICE_ACCOUNT_NAME@PROJECT_ID.iam.gserviceaccount.com`) or the unique ID (`123456789012345678901`) are accepted in the string. The `-` wildcard character is required; replacing it with a project ID is invalid. See https://cloud.google.com//storage-transfer/docs/delegate-service-agent-permissions for required permissions.",
+                    "type": "string"
+                },
                 "status": {
                     "description": "Status of the job. This value MUST be specified for `CreateTransferJobRequests`. **Note:** The effect of the new job status takes place during a subsequent job run. For example, if you change the job status from ENABLED to DISABLED, and an operation spawned by the transfer is running, the status change would not affect the current operation.",
                     "enum": [
@@ -1849,7 +1887,7 @@
                     "description": "Represents the selected metadata options for a transfer job."
                 },
                 "overwriteObjectsAlreadyExistingInSink": {
-                    "description": "When to overwrite objects that already exist in the sink. The default is that only objects that are different from the source are ovewritten. If true, all objects in the sink whose name matches an object in the source are overwritten with the source object.",
+                    "description": "When to overwrite objects that already exist in the sink. The default is that only objects that are different from the source are overwritten. If true, all objects in the sink whose name matches an object in the source are overwritten with the source object.",
                     "type": "boolean"
                 },
                 "overwriteWhen": {
@@ -1877,23 +1915,23 @@
             "properties": {
                 "awsS3CompatibleDataSource": {
                     "$ref": "AwsS3CompatibleData",
-                    "description": "An AWS S3 compatible data source."
+                    "description": "Optional. An AWS S3 compatible data source."
                 },
                 "awsS3DataSource": {
                     "$ref": "AwsS3Data",
-                    "description": "An AWS S3 data source."
+                    "description": "Optional. An AWS S3 data source."
                 },
                 "azureBlobStorageDataSource": {
                     "$ref": "AzureBlobStorageData",
-                    "description": "An Azure Blob Storage data source."
+                    "description": "Optional. An Azure Blob Storage data source."
                 },
                 "gcsDataSink": {
                     "$ref": "GcsData",
-                    "description": "A Cloud Storage data sink."
+                    "description": "Optional. A Cloud Storage data sink."
                 },
                 "gcsDataSource": {
                     "$ref": "GcsData",
-                    "description": "A Cloud Storage data source."
+                    "description": "Optional. A Cloud Storage data source."
                 },
                 "gcsIntermediateDataLocation": {
                     "$ref": "GcsData",
@@ -1901,11 +1939,11 @@
                 },
                 "hdfsDataSource": {
                     "$ref": "HdfsData",
-                    "description": "An HDFS cluster data source."
+                    "description": "Optional. An HDFS cluster data source."
                 },
                 "httpDataSource": {
                     "$ref": "HttpData",
-                    "description": "An HTTP URL data source."
+                    "description": "Optional. An HTTP URL data source."
                 },
                 "objectConditions": {
                     "$ref": "ObjectConditions",
@@ -1913,11 +1951,11 @@
                 },
                 "posixDataSink": {
                     "$ref": "PosixFilesystem",
-                    "description": "A POSIX Filesystem data sink."
+                    "description": "Optional. A POSIX Filesystem data sink."
                 },
                 "posixDataSource": {
                     "$ref": "PosixFilesystem",
-                    "description": "A POSIX Filesystem data source."
+                    "description": "Optional. A POSIX Filesystem data source."
                 },
                 "sinkAgentPoolName": {
                     "description": "Specifies the agent pool name associated with the posix data sink. When unspecified, the default name is used.",

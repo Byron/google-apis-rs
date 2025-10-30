@@ -15,6 +15,233 @@
     "description": "Creates and manages builds on Google Cloud Platform.",
     "discoveryVersion": "v1",
     "documentationLink": "https://cloud.google.com/cloud-build/docs/",
+    "endpoints": [
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.africa-south1.rep.googleapis.com/",
+            "location": "africa-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.asia-east1.rep.googleapis.com/",
+            "location": "asia-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.asia-east2.rep.googleapis.com/",
+            "location": "asia-east2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.asia-northeast1.rep.googleapis.com/",
+            "location": "asia-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.asia-northeast2.rep.googleapis.com/",
+            "location": "asia-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.asia-northeast3.rep.googleapis.com/",
+            "location": "asia-northeast3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.asia-south1.rep.googleapis.com/",
+            "location": "asia-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.asia-south2.rep.googleapis.com/",
+            "location": "asia-south2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.asia-southeast1.rep.googleapis.com/",
+            "location": "asia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.asia-southeast2.rep.googleapis.com/",
+            "location": "asia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.australia-southeast1.rep.googleapis.com/",
+            "location": "australia-southeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.australia-southeast2.rep.googleapis.com/",
+            "location": "australia-southeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-central2.rep.googleapis.com/",
+            "location": "europe-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-north1.rep.googleapis.com/",
+            "location": "europe-north1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-north2.rep.googleapis.com/",
+            "location": "europe-north2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-southwest1.rep.googleapis.com/",
+            "location": "europe-southwest1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-west1.rep.googleapis.com/",
+            "location": "europe-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-west10.rep.googleapis.com/",
+            "location": "europe-west10"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-west12.rep.googleapis.com/",
+            "location": "europe-west12"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-west2.rep.googleapis.com/",
+            "location": "europe-west2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-west3.rep.googleapis.com/",
+            "location": "europe-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-west4.rep.googleapis.com/",
+            "location": "europe-west4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-west6.rep.googleapis.com/",
+            "location": "europe-west6"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-west8.rep.googleapis.com/",
+            "location": "europe-west8"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.europe-west9.rep.googleapis.com/",
+            "location": "europe-west9"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.me-central1.rep.googleapis.com/",
+            "location": "me-central1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.me-central2.rep.googleapis.com/",
+            "location": "me-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.me-west1.rep.googleapis.com/",
+            "location": "me-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.northamerica-northeast1.rep.googleapis.com/",
+            "location": "northamerica-northeast1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.northamerica-northeast2.rep.googleapis.com/",
+            "location": "northamerica-northeast2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.northamerica-south1.rep.googleapis.com/",
+            "location": "northamerica-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.southamerica-east1.rep.googleapis.com/",
+            "location": "southamerica-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.southamerica-west1.rep.googleapis.com/",
+            "location": "southamerica-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-central1.rep.googleapis.com/",
+            "location": "us-central1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-central2.rep.googleapis.com/",
+            "location": "us-central2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-east1.rep.googleapis.com/",
+            "location": "us-east1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-east4.rep.googleapis.com/",
+            "location": "us-east4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-east5.rep.googleapis.com/",
+            "location": "us-east5"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-east7.rep.googleapis.com/",
+            "location": "us-east7"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-south1.rep.googleapis.com/",
+            "location": "us-south1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-west1.rep.googleapis.com/",
+            "location": "us-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-west2.rep.googleapis.com/",
+            "location": "us-west2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-west3.rep.googleapis.com/",
+            "location": "us-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-west4.rep.googleapis.com/",
+            "location": "us-west4"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://cloudbuild.us-west8.rep.googleapis.com/",
+            "location": "us-west8"
+        }
+    ],
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -167,7 +394,7 @@
         "operations": {
             "methods": {
                 "cancel": {
-                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                     "flatPath": "v1/operations/{operationsId}:cancel",
                     "httpMethod": "POST",
                     "id": "cloudbuild.operations.cancel",
@@ -226,7 +453,7 @@
                 "builds": {
                     "methods": {
                         "approve": {
-                            "description": "Approves or rejects a pending build. If approved, the returned LRO will be analogous to the LRO returned from a CreateBuild call. If rejected, the returned LRO will be immediately done.",
+                            "description": "Approves or rejects a pending build. If approved, the returned long-running operation (LRO) will be analogous to the LRO returned from a CreateBuild call. If rejected, the returned LRO will be immediately done.",
                             "flatPath": "v1/projects/{projectsId}/builds/{buildsId}:approve",
                             "httpMethod": "POST",
                             "id": "cloudbuild.projects.builds.approve",
@@ -453,7 +680,7 @@
                                     "type": "string"
                                 },
                                 "parent": {
-                                    "description": "Required. Name of the parent project. For example: projects/{$project_number} or projects/{$project_id}",
+                                    "description": "Name of the parent project. For example: projects/{$project_number} or projects/{$project_id}",
                                     "location": "path",
                                     "pattern": "^projects/[^/]+$",
                                     "required": true,
@@ -909,7 +1136,7 @@
                         "builds": {
                             "methods": {
                                 "approve": {
-                                    "description": "Approves or rejects a pending build. If approved, the returned LRO will be analogous to the LRO returned from a CreateBuild call. If rejected, the returned LRO will be immediately done.",
+                                    "description": "Approves or rejects a pending build. If approved, the returned long-running operation (LRO) will be analogous to the LRO returned from a CreateBuild call. If rejected, the returned LRO will be immediately done.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/builds/{buildsId}:approve",
                                     "httpMethod": "POST",
                                     "id": "cloudbuild.projects.locations.builds.approve",
@@ -1384,7 +1611,7 @@
                                             "type": "string"
                                         },
                                         "parent": {
-                                            "description": "Required. Name of the parent project. For example: projects/{$project_number} or projects/{$project_id}",
+                                            "description": "Name of the parent project. For example: projects/{$project_number} or projects/{$project_id}",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+$",
                                             "required": true,
@@ -1552,7 +1779,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "cloudbuild.projects.locations.operations.cancel",
@@ -2346,7 +2573,7 @@
             }
         }
     },
-    "revision": "20240618",
+    "revision": "20250930",
     "rootUrl": "https://cloudbuild.googleapis.com/",
     "schemas": {
         "ApprovalConfig": {
@@ -2456,6 +2683,13 @@
             "description": "Artifacts produced by a build that should be uploaded upon successful completion of all build steps.",
             "id": "Artifacts",
             "properties": {
+                "goModules": {
+                    "description": "Optional. A list of Go modules to be uploaded to Artifact Registry upon successful completion of all build steps. If any objects fail to be pushed, the build is marked FAILURE.",
+                    "items": {
+                        "$ref": "GoModule"
+                    },
+                    "type": "array"
+                },
                 "images": {
                     "description": "A list of images to be pushed upon the successful completion of all build steps. The images will be pushed using the builder service account's credentials. The digests of the pushed images will be stored in the Build resource's results field. If any of the images fail to be pushed, the build is marked FAILURE.",
                     "items": {
@@ -2793,6 +3027,13 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "dependencies": {
+                    "description": "Optional. Dependencies that the Cloud Build worker will fetch before executing user steps.",
+                    "items": {
+                        "$ref": "Dependency"
+                    },
+                    "type": "array"
+                },
                 "failureInfo": {
                     "$ref": "FailureInfo",
                     "description": "Output only. Contains information about the build when status=FAILURE.",
@@ -3017,11 +3258,13 @@
                     "description": "Optional. Option to specify how default logs buckets are setup.",
                     "enum": [
                         "DEFAULT_LOGS_BUCKET_BEHAVIOR_UNSPECIFIED",
-                        "REGIONAL_USER_OWNED_BUCKET"
+                        "REGIONAL_USER_OWNED_BUCKET",
+                        "LEGACY_BUCKET"
                     ],
                     "enumDescriptions": [
                         "Unspecified.",
-                        "Bucket is located in user-owned project in the same region as the build. The builder service account must have access to create and write to Cloud Storage buckets in the build project."
+                        "Bucket is located in user-owned project in the same region as the build. The builder service account must have access to create and write to Cloud Storage buckets in the build project.",
+                        "Bucket is located in a Google-owned project and is not regionalized."
                     ],
                     "type": "string"
                 },
@@ -3032,6 +3275,10 @@
                 },
                 "dynamicSubstitutions": {
                     "description": "Option to specify whether or not to apply bash style string operations to the substitutions. NOTE: this is always enabled for triggered builds and cannot be overridden in the build configuration file.",
+                    "type": "boolean"
+                },
+                "enableStructuredLogging": {
+                    "description": "Optional. Option to specify whether structured logging is enabled. If true, JSON-formatted logs are parsed as structured logs.",
                     "type": "boolean"
                 },
                 "env": {
@@ -3115,6 +3362,10 @@
                     "$ref": "PoolOption",
                     "description": "Optional. Specification for execution on a `WorkerPool`. See [running builds in a private pool](https://cloud.google.com/build/docs/private-pools/run-builds-in-private-pool) for more information."
                 },
+                "pubsubTopic": {
+                    "description": "Optional. Option to specify the Pub/Sub topic to receive build status updates.",
+                    "type": "string"
+                },
                 "requestedVerifyOption": {
                     "description": "Requested verifiability options.",
                     "enum": [
@@ -3141,12 +3392,14 @@
                             "NONE",
                             "SHA256",
                             "MD5",
+                            "GO_MODULE_H1",
                             "SHA512"
                         ],
                         "enumDescriptions": [
                             "No hash requested.",
                             "Use a sha256 hash.",
                             "Use a md5 hash.",
+                            "Dirhash of a Go module's source code which is then hex-encoded.",
                             "Use a sha512 hash."
                         ],
                         "type": "string"
@@ -3338,6 +3591,10 @@
                     "description": "Human-readable description of this trigger.",
                     "type": "string"
                 },
+                "developerConnectEventConfig": {
+                    "$ref": "DeveloperConnectEventConfig",
+                    "description": "Optional. The configuration of a trigger that creates a build whenever an event from the DeveloperConnect API is received."
+                },
                 "disabled": {
                     "description": "If true, the trigger will never automatically execute a build.",
                     "type": "boolean"
@@ -3428,7 +3685,7 @@
                     "type": "string"
                 },
                 "serviceAccount": {
-                    "description": "The service account used for all user-controlled operations including UpdateBuildTrigger, RunBuildTrigger, CreateBuild, and CancelBuild. If no service account is set, then the standard Cloud Build service account ([PROJECT_NUM]@system.gserviceaccount.com) will be used instead. Format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_ID_OR_EMAIL}`",
+                    "description": "The service account used for all user-controlled operations including UpdateBuildTrigger, RunBuildTrigger, CreateBuild, and CancelBuild. If no service account is set and the legacy Cloud Build service account ([PROJECT_NUM]@cloudbuild.gserviceaccount.com) is the default for the project then it will be used instead. Format: `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_ID_OR_EMAIL}`",
                     "type": "string"
                 },
                 "sourceToBuild": {
@@ -3738,6 +3995,21 @@
             },
             "type": "object"
         },
+        "Dependency": {
+            "description": "A dependency that the Cloud Build worker will fetch before executing user steps.",
+            "id": "Dependency",
+            "properties": {
+                "empty": {
+                    "description": "If set to true disable all dependency fetching (ignoring the default source as well).",
+                    "type": "boolean"
+                },
+                "gitSource": {
+                    "$ref": "GitSourceDependency",
+                    "description": "Represents a git repository as a build dependency."
+                }
+            },
+            "type": "object"
+        },
         "DeveloperConnectConfig": {
             "description": "This config defines the location of a source through Developer Connect.",
             "id": "DeveloperConnectConfig",
@@ -3753,6 +4025,48 @@
                 "revision": {
                     "description": "Required. The revision to fetch from the Git repository such as a branch, a tag, a commit SHA, or any Git ref.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DeveloperConnectEventConfig": {
+            "description": "The configuration of a trigger that creates a build whenever an event from the DeveloperConnect API is received.",
+            "id": "DeveloperConnectEventConfig",
+            "properties": {
+                "gitRepositoryLink": {
+                    "description": "Required. The Developer Connect Git repository link, formatted as `projects/*/locations/*/connections/*/gitRepositoryLink/*`.",
+                    "type": "string"
+                },
+                "gitRepositoryLinkType": {
+                    "description": "Output only. The type of DeveloperConnect GitRepositoryLink.",
+                    "enum": [
+                        "GIT_REPOSITORY_LINK_TYPE_UNSPECIFIED",
+                        "GITHUB",
+                        "GITHUB_ENTERPRISE",
+                        "GITLAB",
+                        "GITLAB_ENTERPRISE",
+                        "BITBUCKET_DATA_CENTER",
+                        "BITBUCKET_CLOUD"
+                    ],
+                    "enumDescriptions": [
+                        "If unspecified, GitRepositoryLinkType defaults to GITHUB.",
+                        "The SCM repo is GITHUB.",
+                        "The SCM repo is GITHUB_ENTERPRISE.",
+                        "The SCM repo is GITLAB.",
+                        "The SCM repo is GITLAB_ENTERPRISE.",
+                        "The SCM repo is BITBUCKET_DATA_CENTER.",
+                        "The SCM repo is BITBUCKET_CLOUD."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "pullRequest": {
+                    "$ref": "PullRequestFilter",
+                    "description": "Filter to match changes in pull requests."
+                },
+                "push": {
+                    "$ref": "PushFilter",
+                    "description": "Filter to match changes in refs like branches and tags."
                 }
             },
             "type": "object"
@@ -3806,26 +4120,6 @@
                         "$ref": "Hash"
                     },
                     "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "GCSLocation": {
-            "description": "Represents a storage location in Cloud Storage",
-            "id": "GCSLocation",
-            "properties": {
-                "bucket": {
-                    "description": "Cloud Storage bucket. See https://cloud.google.com/storage/docs/naming#requirements",
-                    "type": "string"
-                },
-                "generation": {
-                    "description": "Cloud Storage generation for the object. If the generation is omitted, the latest generation will be used.",
-                    "format": "int64",
-                    "type": "string"
-                },
-                "object": {
-                    "description": "Cloud Storage object. See https://cloud.google.com/storage/docs/naming#objectnames",
-                    "type": "string"
                 }
             },
             "type": "object"
@@ -4255,6 +4549,80 @@
             },
             "type": "object"
         },
+        "GitSourceDependency": {
+            "description": "Represents a git repository as a build dependency.",
+            "id": "GitSourceDependency",
+            "properties": {
+                "depth": {
+                    "description": "Optional. How much history should be fetched for the build (default 1, -1 for all history).",
+                    "format": "int64",
+                    "type": "string"
+                },
+                "destPath": {
+                    "description": "Required. Where should the files be placed on the worker.",
+                    "type": "string"
+                },
+                "recurseSubmodules": {
+                    "description": "Optional. True if submodules should be fetched too (default false).",
+                    "type": "boolean"
+                },
+                "repository": {
+                    "$ref": "GitSourceRepository",
+                    "description": "Required. The kind of repo (url or dev connect)."
+                },
+                "revision": {
+                    "description": "Required. The revision that we will fetch the repo at.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GitSourceRepository": {
+            "description": "A repository for a git source.",
+            "id": "GitSourceRepository",
+            "properties": {
+                "developerConnect": {
+                    "description": "The Developer Connect Git repository link formatted as `projects/*/locations/*/connections/*/gitRepositoryLink/*`",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "Location of the Git repository.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoModule": {
+            "description": "Go module to upload to Artifact Registry upon successful completion of all build steps. A module refers to all dependencies in a go.mod file.",
+            "id": "GoModule",
+            "properties": {
+                "modulePath": {
+                    "description": "Optional. The Go module's \"module path\". e.g. example.com/foo/v2",
+                    "type": "string"
+                },
+                "moduleVersion": {
+                    "description": "Optional. The Go module's semantic version in the form vX.Y.Z. e.g. v0.1.1 Pre-release identifiers can also be added by appending a dash and dot separated ASCII alphanumeric characters and hyphens. e.g. v0.2.3-alpha.x.12m.5",
+                    "type": "string"
+                },
+                "repositoryLocation": {
+                    "description": "Optional. Location of the Artifact Registry repository. i.e. us-east1 Defaults to the build\u2019s location.",
+                    "type": "string"
+                },
+                "repositoryName": {
+                    "description": "Optional. Artifact Registry repository name. Specified Go modules will be zipped and uploaded to Artifact Registry with this location as a prefix. e.g. my-go-repo",
+                    "type": "string"
+                },
+                "repositoryProjectId": {
+                    "description": "Optional. Project ID of the Artifact Registry repository. Defaults to the build project.",
+                    "type": "string"
+                },
+                "sourcePath": {
+                    "description": "Optional. Source path of the go.mod file in the build's workspace. If not specified, this will default to the current directory. e.g. ~/code/go/mypackage",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Hash": {
             "description": "Container message for hash values.",
             "id": "Hash",
@@ -4265,12 +4633,14 @@
                         "NONE",
                         "SHA256",
                         "MD5",
+                        "GO_MODULE_H1",
                         "SHA512"
                     ],
                     "enumDescriptions": [
                         "No hash requested.",
                         "Use a sha256 hash.",
                         "Use a md5 hash.",
+                        "Dirhash of a Go module's source code which is then hex-encoded.",
                         "Use a sha512 hash."
                     ],
                     "type": "string"
@@ -4315,12 +4685,8 @@
             "id": "HttpConfig",
             "properties": {
                 "proxySecretVersionName": {
-                    "description": "SecretVersion resource of the HTTP proxy URL. The proxy URL should be in format protocol://@]proxyhost[:port].",
+                    "description": "SecretVersion resource of the HTTP proxy URL. The Service Account used in the build (either the default Service Account or user-specified Service Account) should have `secretmanager.versions.access` permissions on this secret. The proxy URL should be in format `protocol://@]proxyhost[:port]`.",
                     "type": "string"
-                },
-                "proxySslCaInfo": {
-                    "$ref": "GCSLocation",
-                    "description": "Optional. Cloud Storage object storing the certificate to use with the HTTP proxy."
                 }
             },
             "type": "object"
@@ -4497,7 +4863,7 @@
                     "type": "string"
                 },
                 "path": {
-                    "description": "Path to an artifact in the build's workspace to be uploaded to Artifact Registry. This can be either an absolute path, e.g. /workspace/my-app/target/my-app-1.0.SNAPSHOT.jar or a relative path from /workspace, e.g. my-app/target/my-app-1.0.SNAPSHOT.jar.",
+                    "description": "Optional. Path to an artifact in the build's workspace to be uploaded to Artifact Registry. This can be either an absolute path, e.g. /workspace/my-app/target/my-app-1.0.SNAPSHOT.jar or a relative path from /workspace, e.g. my-app/target/my-app-1.0.SNAPSHOT.jar.",
                     "type": "string"
                 },
                 "repository": {
@@ -4545,7 +4911,7 @@
             "id": "NpmPackage",
             "properties": {
                 "packagePath": {
-                    "description": "Path to the package.json. e.g. workspace/path/to/package",
+                    "description": "Optional. Path to the package.json. e.g. workspace/path/to/package Only one of `archive` or `package_path` can be specified.",
                     "type": "string"
                 },
                 "repository": {
@@ -4600,7 +4966,7 @@
                     "type": "string"
                 },
                 "cancelRequested": {
-                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have google.longrunning.Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                     "readOnly": true,
                     "type": "boolean"
                 },
@@ -4653,9 +5019,32 @@
                     "$ref": "NetworkConfig",
                     "description": "Network configuration for the pool."
                 },
+                "privateServiceConnect": {
+                    "$ref": "PrivateServiceConnect",
+                    "description": "Immutable. Private Service Connect(PSC) Network configuration for the pool."
+                },
                 "workerConfig": {
                     "$ref": "WorkerConfig",
                     "description": "Machine configuration for the workers in the pool."
+                }
+            },
+            "type": "object"
+        },
+        "PrivateServiceConnect": {
+            "description": "Defines the Private Service Connect network configuration for the pool.",
+            "id": "PrivateServiceConnect",
+            "properties": {
+                "networkAttachment": {
+                    "description": "Required. Immutable. The network attachment that the worker network interface is peered to. Must be in the format `projects/{project}/regions/{region}/networkAttachments/{networkAttachment}`. The region of network attachment must be the same as the worker pool. See [Network Attachments](https://cloud.google.com/vpc/docs/about-network-attachments)",
+                    "type": "string"
+                },
+                "publicIpAddressDisabled": {
+                    "description": "Required. Immutable. Disable public IP on the primary network interface. If true, workers are created without any public address, which prevents network egress to public IPs unless a network proxy is configured. If false, workers are created with a public address which allows for public internet egress. The public address only applies to traffic through the primary network interface. If `route_all_traffic` is set to true, all traffic will go through the non-primary network interface, this boolean has no effect.",
+                    "type": "boolean"
+                },
+                "routeAllTraffic": {
+                    "description": "Immutable. Route all traffic through PSC interface. Enable this if you want full control of traffic in the private pool. Configure Cloud NAT for the subnet of network attachment if you need to access public Internet. If false, Only route RFC 1918 (10.0.0.0/8, 172.16.0.0/12, and 192.168.0.0/16) and RFC 6598 (100.64.0.0/10) through PSC interface.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -4919,6 +5308,13 @@
                     "items": {
                         "format": "byte",
                         "type": "string"
+                    },
+                    "type": "array"
+                },
+                "goModules": {
+                    "description": "Optional. Go module artifacts uploaded to Artifact Registry at the end of the build.",
+                    "items": {
+                        "$ref": "UploadedGoModule"
                     },
                     "type": "array"
                 },
@@ -5312,6 +5708,26 @@
             },
             "type": "object"
         },
+        "UploadedGoModule": {
+            "description": "A Go module artifact uploaded to Artifact Registry using the GoModule directive.",
+            "id": "UploadedGoModule",
+            "properties": {
+                "fileHashes": {
+                    "$ref": "FileHashes",
+                    "description": "Hash types and values of the Go Module Artifact."
+                },
+                "pushTiming": {
+                    "$ref": "TimeSpan",
+                    "description": "Output only. Stores timing information for pushing the specified artifact.",
+                    "readOnly": true
+                },
+                "uri": {
+                    "description": "URI of the uploaded artifact.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "UploadedMavenArtifact": {
             "description": "A Maven artifact uploaded using the MavenArtifact directive.",
             "id": "UploadedMavenArtifact",
@@ -5444,9 +5860,13 @@
             "id": "WorkerConfig",
             "properties": {
                 "diskSizeGb": {
-                    "description": "Size of the disk attached to the worker, in GB. See [Worker pool config file](https://cloud.google.com/build/docs/private-pools/worker-pool-config-file-schema). Specify a value of up to 2000. If `0` is specified, Cloud Build will use a standard disk size.",
+                    "description": "Size of the disk attached to the worker, in GB. See [Worker pool config file](https://cloud.google.com/build/docs/private-pools/worker-pool-config-file-schema). Specify a value of up to 4000. If `0` is specified, Cloud Build will use a standard disk size.",
                     "format": "int64",
                     "type": "string"
+                },
+                "enableNestedVirtualization": {
+                    "description": "Optional. Enable nested virtualization on the worker, if supported by the machine type. By default, nested virtualization is disabled.",
+                    "type": "boolean"
                 },
                 "machineType": {
                     "description": "Optional. Machine type of a worker, such as `e2-medium`. See [Worker pool config file](https://cloud.google.com/build/docs/private-pools/worker-pool-config-file-schema). If left blank, Cloud Build will use a sensible default.",
@@ -5494,7 +5914,7 @@
                 },
                 "privatePoolV1Config": {
                     "$ref": "PrivatePoolV1Config",
-                    "description": "Legacy Private Pool configuration."
+                    "description": "Private Pool configuration."
                 },
                 "state": {
                     "description": "Output only. `WorkerPool` state.",

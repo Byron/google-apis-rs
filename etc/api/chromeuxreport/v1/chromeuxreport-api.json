@@ -131,7 +131,7 @@
             }
         }
     },
-    "revision": "20240625",
+    "revision": "20251028",
     "rootUrl": "https://chromeuxreport.googleapis.com/",
     "schemas": {
         "Bin": {
@@ -140,8 +140,7 @@
             "properties": {
                 "density": {
                     "description": "The proportion of users that experienced this bin's value for the given metric.",
-                    "format": "double",
-                    "type": "number"
+                    "type": "any"
                 },
                 "end": {
                     "description": "End is the end of the data bin. If end is not populated, then the bin has no end and is valid from start to +inf.",
@@ -363,6 +362,11 @@
             "description": "Request payload sent by a physical web client. This request includes all necessary context to load a particular user experience history record.",
             "id": "QueryHistoryRequest",
             "properties": {
+                "collectionPeriodCount": {
+                    "description": "The number of collection periods to return. If not specified, the default is 25. If present, must be in the range [1, 40].",
+                    "format": "int32",
+                    "type": "integer"
+                },
                 "formFactor": {
                     "description": "The form factor is a query dimension that specifies the device class that the record's data should belong to. Note: If no form factor is specified, then a special record with aggregated data over all form factors will be returned.",
                     "enum": [

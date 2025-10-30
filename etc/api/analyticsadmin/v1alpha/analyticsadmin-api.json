@@ -209,7 +209,7 @@
                     ],
                     "parameters": {
                         "name": {
-                            "description": "Required. The name of the settings to lookup. Format: accounts/{account}/dataSharingSettings Example: \"accounts/1000/dataSharingSettings\"",
+                            "description": "Required. The name of the settings to lookup. Format: accounts/{account}/dataSharingSettings Example: `accounts/1000/dataSharingSettings`",
                             "location": "path",
                             "pattern": "^accounts/[^/]+/dataSharingSettings$",
                             "required": true,
@@ -226,7 +226,7 @@
                     ]
                 },
                 "list": {
-                    "description": "Returns all accounts accessible by the caller. Note that these accounts might not currently have GA4 properties. Soft-deleted (ie: \"trashed\") accounts are excluded by default. Returns an empty list if no relevant accounts are found.",
+                    "description": "Returns all accounts accessible by the caller. Note that these accounts might not currently have GA properties. Soft-deleted (ie: \"trashed\") accounts are excluded by default. Returns an empty list if no relevant accounts are found.",
                     "flatPath": "v1alpha/accounts",
                     "httpMethod": "GET",
                     "id": "analyticsadmin.accounts.list",
@@ -311,7 +311,7 @@
                     ]
                 },
                 "runAccessReport": {
-                    "description": "Returns a customized report of data access records. The report provides records of each time a user reads Google Analytics reporting data. Access records are retained for up to 2 years. Data Access Reports can be requested for a property. Reports may be requested for any property, but dimensions that aren't related to quota can only be requested on Google Analytics 360 properties. This method is only available to Administrators. These data access records include GA4 UI Reporting, GA4 UI Explorations, GA4 Data API, and other products like Firebase & Admob that can retrieve data from Google Analytics through a linkage. These records don't include property configuration changes like adding a stream or changing a property's time zone. For configuration change history, see [searchChangeHistoryEvents](https://developers.google.com/analytics/devguides/config/admin/v1/rest/v1alpha/accounts/searchChangeHistoryEvents).",
+                    "description": "Returns a customized report of data access records. The report provides records of each time a user reads Google Analytics reporting data. Access records are retained for up to 2 years. Data Access Reports can be requested for a property. Reports may be requested for any property, but dimensions that aren't related to quota can only be requested on Google Analytics 360 properties. This method is only available to Administrators. These data access records include GA UI Reporting, GA UI Explorations, GA Data API, and other products like Firebase & Admob that can retrieve data from Google Analytics through a linkage. These records don't include property configuration changes like adding a stream or changing a property's time zone. For configuration change history, see [searchChangeHistoryEvents](https://developers.google.com/analytics/devguides/config/admin/v1/rest/v1alpha/accounts/searchChangeHistoryEvents). To give your feedback on this API, complete the [Google Analytics Access Reports feedback](https://docs.google.com/forms/d/e/1FAIpQLSdmEBUrMzAEdiEKk5TV5dEHvDUZDRlgWYdQdAeSdtR4hVjEhw/viewform) form.",
                     "flatPath": "v1alpha/accounts/{accountsId}:runAccessReport",
                     "httpMethod": "POST",
                     "id": "analyticsadmin.accounts.runAccessReport",
@@ -320,7 +320,7 @@
                     ],
                     "parameters": {
                         "entity": {
-                            "description": "The Data Access Report supports requesting at the property level or account level. If requested at the account level, Data Access Reports include all access for all properties under that account. To request at the property level, entity should be for example 'properties/123' if \"123\" is your GA4 property ID. To request at the account level, entity should be for example 'accounts/1234' if \"1234\" is your GA4 Account ID.",
+                            "description": "The Data Access Report supports requesting at the property level or account level. If requested at the account level, Data Access Reports include all access for all properties under that account. To request at the property level, entity should be for example 'properties/123' if \"123\" is your Google Analytics property ID. To request at the account level, entity should be for example 'accounts/1234' if \"1234\" is your Google Analytics Account ID.",
                             "location": "path",
                             "pattern": "^accounts/[^/]+$",
                             "required": true,
@@ -340,7 +340,7 @@
                     ]
                 },
                 "searchChangeHistoryEvents": {
-                    "description": "Searches through all changes to an account or its children given the specified set of filters.",
+                    "description": "Searches through all changes to an account or its children given the specified set of filters. Only returns the subset of changes supported by the API. The UI may return additional changes.",
                     "flatPath": "v1alpha/accounts/{accountsId}:searchChangeHistoryEvents",
                     "httpMethod": "POST",
                     "id": "analyticsadmin.accounts.searchChangeHistoryEvents",
@@ -349,7 +349,7 @@
                     ],
                     "parameters": {
                         "account": {
-                            "description": "Required. The account resource for which to return change history resources. Format: accounts/{account} Example: \"accounts/100\"",
+                            "description": "Required. The account resource for which to return change history resources. Format: accounts/{account} Example: `accounts/100`",
                             "location": "path",
                             "pattern": "^accounts/[^/]+$",
                             "required": true,
@@ -666,7 +666,7 @@
                     ]
                 },
                 "create": {
-                    "description": "Creates an \"GA4\" property with the specified location and attributes.",
+                    "description": "Creates a Google Analytics property with the specified location and attributes.",
                     "flatPath": "v1alpha/properties",
                     "httpMethod": "POST",
                     "id": "analyticsadmin.properties.create",
@@ -678,24 +678,6 @@
                     },
                     "response": {
                         "$ref": "GoogleAnalyticsAdminV1alphaProperty"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/analytics.edit"
-                    ]
-                },
-                "createConnectedSiteTag": {
-                    "description": "Creates a connected site tag for a Universal Analytics property. You can create a maximum of 20 connected site tags per property. Note: This API cannot be used on GA4 properties.",
-                    "flatPath": "v1alpha/properties:createConnectedSiteTag",
-                    "httpMethod": "POST",
-                    "id": "analyticsadmin.properties.createConnectedSiteTag",
-                    "parameterOrder": [],
-                    "parameters": {},
-                    "path": "v1alpha/properties:createConnectedSiteTag",
-                    "request": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaCreateConnectedSiteTagRequest"
-                    },
-                    "response": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaCreateConnectedSiteTagResponse"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/analytics.edit"
@@ -719,26 +701,8 @@
                         "https://www.googleapis.com/auth/analytics.edit"
                     ]
                 },
-                "createSubproperty": {
-                    "description": "Create a subproperty and a subproperty event filter that applies to the created subproperty.",
-                    "flatPath": "v1alpha/properties:createSubproperty",
-                    "httpMethod": "POST",
-                    "id": "analyticsadmin.properties.createSubproperty",
-                    "parameterOrder": [],
-                    "parameters": {},
-                    "path": "v1alpha/properties:createSubproperty",
-                    "request": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaCreateSubpropertyRequest"
-                    },
-                    "response": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaCreateSubpropertyResponse"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/analytics.edit"
-                    ]
-                },
                 "delete": {
-                    "description": "Marks target Property as soft-deleted (ie: \"trashed\") and returns it. This API does not have a method to restore soft-deleted properties. However, they can be restored using the Trash Can UI. If the properties are not restored before the expiration time, the Property and all child resources (eg: GoogleAdsLinks, Streams, AccessBindings) will be permanently purged. https://support.google.com/analytics/answer/6154772 Returns an error if the target is not found, or is not a GA4 Property.",
+                    "description": "Marks target Property as soft-deleted (ie: \"trashed\") and returns it. This API does not have a method to restore soft-deleted properties. However, they can be restored using the Trash Can UI. If the properties are not restored before the expiration time, the Property and all child resources (eg: GoogleAdsLinks, Streams, AccessBindings) will be permanently purged. https://support.google.com/analytics/answer/6154772 Returns an error if the target is not found.",
                     "flatPath": "v1alpha/properties/{propertiesId}",
                     "httpMethod": "DELETE",
                     "id": "analyticsadmin.properties.delete",
@@ -762,67 +726,8 @@
                         "https://www.googleapis.com/auth/analytics.edit"
                     ]
                 },
-                "deleteConnectedSiteTag": {
-                    "description": "Deletes a connected site tag for a Universal Analytics property. Note: this has no effect on GA4 properties.",
-                    "flatPath": "v1alpha/properties:deleteConnectedSiteTag",
-                    "httpMethod": "POST",
-                    "id": "analyticsadmin.properties.deleteConnectedSiteTag",
-                    "parameterOrder": [],
-                    "parameters": {},
-                    "path": "v1alpha/properties:deleteConnectedSiteTag",
-                    "request": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaDeleteConnectedSiteTagRequest"
-                    },
-                    "response": {
-                        "$ref": "GoogleProtobufEmpty"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/analytics.edit"
-                    ]
-                },
-                "fetchAutomatedGa4ConfigurationOptOut": {
-                    "description": "Fetches the opt out status for the automated GA4 setup process for a UA property. Note: this has no effect on GA4 property.",
-                    "flatPath": "v1alpha/properties:fetchAutomatedGa4ConfigurationOptOut",
-                    "httpMethod": "POST",
-                    "id": "analyticsadmin.properties.fetchAutomatedGa4ConfigurationOptOut",
-                    "parameterOrder": [],
-                    "parameters": {},
-                    "path": "v1alpha/properties:fetchAutomatedGa4ConfigurationOptOut",
-                    "request": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaFetchAutomatedGa4ConfigurationOptOutRequest"
-                    },
-                    "response": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaFetchAutomatedGa4ConfigurationOptOutResponse"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/analytics.edit",
-                        "https://www.googleapis.com/auth/analytics.readonly"
-                    ]
-                },
-                "fetchConnectedGa4Property": {
-                    "description": "Given a specified UA property, looks up the GA4 property connected to it. Note: this cannot be used with GA4 properties.",
-                    "flatPath": "v1alpha/properties:fetchConnectedGa4Property",
-                    "httpMethod": "GET",
-                    "id": "analyticsadmin.properties.fetchConnectedGa4Property",
-                    "parameterOrder": [],
-                    "parameters": {
-                        "property": {
-                            "description": "Required. The UA property for which to look up the connected GA4 property. Note this request uses the internal property ID, not the tracking ID of the form UA-XXXXXX-YY. Format: properties/{internal_web_property_id} Example: properties/1234",
-                            "location": "query",
-                            "type": "string"
-                        }
-                    },
-                    "path": "v1alpha/properties:fetchConnectedGa4Property",
-                    "response": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaFetchConnectedGa4PropertyResponse"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/analytics.edit",
-                        "https://www.googleapis.com/auth/analytics.readonly"
-                    ]
-                },
                 "get": {
-                    "description": "Lookup for a single \"GA4\" Property.",
+                    "description": "Lookup for a single GA Property.",
                     "flatPath": "v1alpha/properties/{propertiesId}",
                     "httpMethod": "GET",
                     "id": "analyticsadmin.properties.get",
@@ -925,8 +830,34 @@
                         "https://www.googleapis.com/auth/analytics.readonly"
                     ]
                 },
+                "getReportingIdentitySettings": {
+                    "description": "Returns the reporting identity settings for this property.",
+                    "flatPath": "v1alpha/properties/{propertiesId}/reportingIdentitySettings",
+                    "httpMethod": "GET",
+                    "id": "analyticsadmin.properties.getReportingIdentitySettings",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Required. The name of the settings to lookup. Format: properties/{property}/reportingIdentitySettings Example: \"properties/1000/reportingIdentitySettings\"",
+                            "location": "path",
+                            "pattern": "^properties/[^/]+/reportingIdentitySettings$",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1alpha/{+name}",
+                    "response": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaReportingIdentitySettings"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/analytics.edit",
+                        "https://www.googleapis.com/auth/analytics.readonly"
+                    ]
+                },
                 "list": {
-                    "description": "Returns child Properties under the specified parent Account. Only \"GA4\" properties will be returned. Properties will be excluded if the caller does not have access. Soft-deleted (ie: \"trashed\") properties are excluded by default. Returns an empty list if no relevant properties are found.",
+                    "description": "Returns child Properties under the specified parent Account. Properties will be excluded if the caller does not have access. Soft-deleted (ie: \"trashed\") properties are excluded by default. Returns an empty list if no relevant properties are found.",
                     "flatPath": "v1alpha/properties",
                     "httpMethod": "GET",
                     "id": "analyticsadmin.properties.list",
@@ -957,25 +888,6 @@
                     "path": "v1alpha/properties",
                     "response": {
                         "$ref": "GoogleAnalyticsAdminV1alphaListPropertiesResponse"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/analytics.edit",
-                        "https://www.googleapis.com/auth/analytics.readonly"
-                    ]
-                },
-                "listConnectedSiteTags": {
-                    "description": "Lists the connected site tags for a Universal Analytics property. A maximum of 20 connected site tags will be returned. Note: this has no effect on GA4 property.",
-                    "flatPath": "v1alpha/properties:listConnectedSiteTags",
-                    "httpMethod": "POST",
-                    "id": "analyticsadmin.properties.listConnectedSiteTags",
-                    "parameterOrder": [],
-                    "parameters": {},
-                    "path": "v1alpha/properties:listConnectedSiteTags",
-                    "request": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaListConnectedSiteTagsRequest"
-                    },
-                    "response": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaListConnectedSiteTagsResponse"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/analytics.edit",
@@ -1016,8 +928,26 @@
                         "https://www.googleapis.com/auth/analytics.edit"
                     ]
                 },
+                "provisionSubproperty": {
+                    "description": "Create a subproperty and a subproperty event filter that applies to the created subproperty.",
+                    "flatPath": "v1alpha/properties:provisionSubproperty",
+                    "httpMethod": "POST",
+                    "id": "analyticsadmin.properties.provisionSubproperty",
+                    "parameterOrder": [],
+                    "parameters": {},
+                    "path": "v1alpha/properties:provisionSubproperty",
+                    "request": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaProvisionSubpropertyRequest"
+                    },
+                    "response": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaProvisionSubpropertyResponse"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/analytics.edit"
+                    ]
+                },
                 "runAccessReport": {
-                    "description": "Returns a customized report of data access records. The report provides records of each time a user reads Google Analytics reporting data. Access records are retained for up to 2 years. Data Access Reports can be requested for a property. Reports may be requested for any property, but dimensions that aren't related to quota can only be requested on Google Analytics 360 properties. This method is only available to Administrators. These data access records include GA4 UI Reporting, GA4 UI Explorations, GA4 Data API, and other products like Firebase & Admob that can retrieve data from Google Analytics through a linkage. These records don't include property configuration changes like adding a stream or changing a property's time zone. For configuration change history, see [searchChangeHistoryEvents](https://developers.google.com/analytics/devguides/config/admin/v1/rest/v1alpha/accounts/searchChangeHistoryEvents).",
+                    "description": "Returns a customized report of data access records. The report provides records of each time a user reads Google Analytics reporting data. Access records are retained for up to 2 years. Data Access Reports can be requested for a property. Reports may be requested for any property, but dimensions that aren't related to quota can only be requested on Google Analytics 360 properties. This method is only available to Administrators. These data access records include GA UI Reporting, GA UI Explorations, GA Data API, and other products like Firebase & Admob that can retrieve data from Google Analytics through a linkage. These records don't include property configuration changes like adding a stream or changing a property's time zone. For configuration change history, see [searchChangeHistoryEvents](https://developers.google.com/analytics/devguides/config/admin/v1/rest/v1alpha/accounts/searchChangeHistoryEvents). To give your feedback on this API, complete the [Google Analytics Access Reports feedback](https://docs.google.com/forms/d/e/1FAIpQLSdmEBUrMzAEdiEKk5TV5dEHvDUZDRlgWYdQdAeSdtR4hVjEhw/viewform) form.",
                     "flatPath": "v1alpha/properties/{propertiesId}:runAccessReport",
                     "httpMethod": "POST",
                     "id": "analyticsadmin.properties.runAccessReport",
@@ -1026,7 +956,7 @@
                     ],
                     "parameters": {
                         "entity": {
-                            "description": "The Data Access Report supports requesting at the property level or account level. If requested at the account level, Data Access Reports include all access for all properties under that account. To request at the property level, entity should be for example 'properties/123' if \"123\" is your GA4 property ID. To request at the account level, entity should be for example 'accounts/1234' if \"1234\" is your GA4 Account ID.",
+                            "description": "The Data Access Report supports requesting at the property level or account level. If requested at the account level, Data Access Reports include all access for all properties under that account. To request at the property level, entity should be for example 'properties/123' if \"123\" is your Google Analytics property ID. To request at the account level, entity should be for example 'accounts/1234' if \"1234\" is your Google Analytics Account ID.",
                             "location": "path",
                             "pattern": "^properties/[^/]+$",
                             "required": true,
@@ -1045,19 +975,29 @@
                         "https://www.googleapis.com/auth/analytics.readonly"
                     ]
                 },
-                "setAutomatedGa4ConfigurationOptOut": {
-                    "description": "Sets the opt out status for the automated GA4 setup process for a UA property. Note: this has no effect on GA4 property.",
-                    "flatPath": "v1alpha/properties:setAutomatedGa4ConfigurationOptOut",
+                "submitUserDeletion": {
+                    "description": "Submits a request for user deletion for a property.",
+                    "flatPath": "v1alpha/properties/{propertiesId}:submitUserDeletion",
                     "httpMethod": "POST",
-                    "id": "analyticsadmin.properties.setAutomatedGa4ConfigurationOptOut",
-                    "parameterOrder": [],
-                    "parameters": {},
-                    "path": "v1alpha/properties:setAutomatedGa4ConfigurationOptOut",
+                    "id": "analyticsadmin.properties.submitUserDeletion",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Required. The name of the property to submit user deletion for.",
+                            "location": "path",
+                            "pattern": "^properties/[^/]+$",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v1alpha/{+name}:submitUserDeletion",
                     "request": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaSetAutomatedGa4ConfigurationOptOutRequest"
+                        "$ref": "GoogleAnalyticsAdminV1alphaSubmitUserDeletionRequest"
                     },
                     "response": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaSetAutomatedGa4ConfigurationOptOutResponse"
+                        "$ref": "GoogleAnalyticsAdminV1alphaSubmitUserDeletionResponse"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/analytics.edit"
@@ -1710,6 +1650,59 @@
                 },
                 "bigQueryLinks": {
                     "methods": {
+                        "create": {
+                            "description": "Creates a BigQueryLink.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/bigQueryLinks",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.bigQueryLinks.create",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. Example format: properties/1234",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/bigQueryLinks",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaBigQueryLink"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaBigQueryLink"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "delete": {
+                            "description": "Deletes a BigQueryLink on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/bigQueryLinks/{bigQueryLinksId}",
+                            "httpMethod": "DELETE",
+                            "id": "analyticsadmin.properties.bigQueryLinks.delete",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The BigQueryLink to delete. Example format: properties/1234/bigQueryLinks/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/bigQueryLinks/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleProtobufEmpty"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
                         "get": {
                             "description": "Lookup for a single BigQuery Link.",
                             "flatPath": "v1alpha/properties/{propertiesId}/bigQueryLinks/{bigQueryLinksId}",
@@ -1771,6 +1764,40 @@
                             "scopes": [
                                 "https://www.googleapis.com/auth/analytics.edit",
                                 "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "patch": {
+                            "description": "Updates a BigQueryLink.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/bigQueryLinks/{bigQueryLinksId}",
+                            "httpMethod": "PATCH",
+                            "id": "analyticsadmin.properties.bigQueryLinks.patch",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Output only. Resource name of this BigQuery link. Format: 'properties/{property_id}/bigQueryLinks/{bigquery_link_id}' Format: 'properties/1234/bigQueryLinks/abc567'",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/bigQueryLinks/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "updateMask": {
+                                    "description": "Required. The list of fields to be updated. Field names must be in snake case (e.g., \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                                    "format": "google-fieldmask",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaBigQueryLink"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaBigQueryLink"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
                             ]
                         }
                     }
@@ -2093,7 +2120,7 @@
                     "methods": {
                         "create": {
                             "deprecated": true,
-                            "description": "Creates a conversion event with the specified attributes.",
+                            "description": "Deprecated: Use `CreateKeyEvent` instead. Creates a conversion event with the specified attributes.",
                             "flatPath": "v1alpha/properties/{propertiesId}/conversionEvents",
                             "httpMethod": "POST",
                             "id": "analyticsadmin.properties.conversionEvents.create",
@@ -2122,7 +2149,7 @@
                         },
                         "delete": {
                             "deprecated": true,
-                            "description": "Deletes a conversion event in a property.",
+                            "description": "Deprecated: Use `DeleteKeyEvent` instead. Deletes a conversion event in a property.",
                             "flatPath": "v1alpha/properties/{propertiesId}/conversionEvents/{conversionEventsId}",
                             "httpMethod": "DELETE",
                             "id": "analyticsadmin.properties.conversionEvents.delete",
@@ -2148,7 +2175,7 @@
                         },
                         "get": {
                             "deprecated": true,
-                            "description": "Retrieve a single conversion event.",
+                            "description": "Deprecated: Use `GetKeyEvent` instead. Retrieve a single conversion event.",
                             "flatPath": "v1alpha/properties/{propertiesId}/conversionEvents/{conversionEventsId}",
                             "httpMethod": "GET",
                             "id": "analyticsadmin.properties.conversionEvents.get",
@@ -2175,7 +2202,7 @@
                         },
                         "list": {
                             "deprecated": true,
-                            "description": "Returns a list of conversion events in the specified parent property. Returns an empty list if no conversion events are found.",
+                            "description": "Deprecated: Use `ListKeyEvents` instead. Returns a list of conversion events in the specified parent property. Returns an empty list if no conversion events are found.",
                             "flatPath": "v1alpha/properties/{propertiesId}/conversionEvents",
                             "httpMethod": "GET",
                             "id": "analyticsadmin.properties.conversionEvents.list",
@@ -2213,7 +2240,7 @@
                         },
                         "patch": {
                             "deprecated": true,
-                            "description": "Updates a conversion event with the specified attributes.",
+                            "description": "Deprecated: Use `UpdateKeyEvent` instead. Updates a conversion event with the specified attributes.",
                             "flatPath": "v1alpha/properties/{propertiesId}/conversionEvents/{conversionEventsId}",
                             "httpMethod": "PATCH",
                             "id": "analyticsadmin.properties.conversionEvents.patch",
@@ -2705,7 +2732,7 @@
                             ],
                             "parameters": {
                                 "name": {
-                                    "description": "Required. The name of the site tag to lookup. Note that site tags are singletons and do not have unique IDs. Format: properties/{property_id}/dataStreams/{stream_id}/globalSiteTag Example: \"properties/123/dataStreams/456/globalSiteTag\"",
+                                    "description": "Required. The name of the site tag to lookup. Note that site tags are singletons and do not have unique IDs. Format: properties/{property_id}/dataStreams/{stream_id}/globalSiteTag Example: `properties/123/dataStreams/456/globalSiteTag`",
                                     "location": "path",
                                     "pattern": "^properties/[^/]+/dataStreams/[^/]+/globalSiteTag$",
                                     "required": true,
@@ -3018,6 +3045,156 @@
                         },
                         "eventEditRules": {
                             "methods": {
+                                "create": {
+                                    "description": "Creates an EventEditRule.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/eventEditRules",
+                                    "httpMethod": "POST",
+                                    "id": "analyticsadmin.properties.dataStreams.eventEditRules.create",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "parent": {
+                                            "description": "Required. Example format: properties/123/dataStreams/456",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+parent}/eventEditRules",
+                                    "request": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaEventEditRule"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaEventEditRule"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit"
+                                    ]
+                                },
+                                "delete": {
+                                    "description": "Deletes an EventEditRule.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/eventEditRules/{eventEditRulesId}",
+                                    "httpMethod": "DELETE",
+                                    "id": "analyticsadmin.properties.dataStreams.eventEditRules.delete",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. Example format: properties/123/dataStreams/456/eventEditRules/789",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+/eventEditRules/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+name}",
+                                    "response": {
+                                        "$ref": "GoogleProtobufEmpty"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit"
+                                    ]
+                                },
+                                "get": {
+                                    "description": "Lookup for a single EventEditRule.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/eventEditRules/{eventEditRulesId}",
+                                    "httpMethod": "GET",
+                                    "id": "analyticsadmin.properties.dataStreams.eventEditRules.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the EventEditRule to get. Example format: properties/123/dataStreams/456/eventEditRules/789",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+/eventEditRules/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+name}",
+                                    "response": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaEventEditRule"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit",
+                                        "https://www.googleapis.com/auth/analytics.readonly"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Lists EventEditRules on a web data stream.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/eventEditRules",
+                                    "httpMethod": "GET",
+                                    "id": "analyticsadmin.properties.dataStreams.eventEditRules.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "pageSize": {
+                                            "description": "Optional. The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "Optional. A page token, received from a previous `ListEventEditRules` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListEventEditRules` must match the call that provided the page token.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. Example format: properties/123/dataStreams/456",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+parent}/eventEditRules",
+                                    "response": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaListEventEditRulesResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit",
+                                        "https://www.googleapis.com/auth/analytics.readonly"
+                                    ]
+                                },
+                                "patch": {
+                                    "description": "Updates an EventEditRule.",
+                                    "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/eventEditRules/{eventEditRulesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "analyticsadmin.properties.dataStreams.eventEditRules.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Identifier. Resource name for this EventEditRule resource. Format: properties/{property}/dataStreams/{data_stream}/eventEditRules/{event_edit_rule}",
+                                            "location": "path",
+                                            "pattern": "^properties/[^/]+/dataStreams/[^/]+/eventEditRules/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Required. The list of fields to be updated. Field names must be in snake case (e.g., \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1alpha/{+name}",
+                                    "request": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaEventEditRule"
+                                    },
+                                    "response": {
+                                        "$ref": "GoogleAnalyticsAdminV1alphaEventEditRule"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit"
+                                    ]
+                                },
                                 "reorder": {
                                     "description": "Changes the processing order of event edit rules on the specified stream.",
                                     "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/eventEditRules:reorder",
@@ -3041,7 +3218,10 @@
                                     },
                                     "response": {
                                         "$ref": "GoogleProtobufEmpty"
-                                    }
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/analytics.edit"
+                                    ]
                                 }
                             }
                         },
@@ -3101,7 +3281,7 @@
                                     ]
                                 },
                                 "get": {
-                                    "description": "Lookup for a single \"GA4\" MeasurementProtocolSecret.",
+                                    "description": "Lookup for a single MeasurementProtocolSecret.",
                                     "flatPath": "v1alpha/properties/{propertiesId}/dataStreams/{dataStreamsId}/measurementProtocolSecrets/{measurementProtocolSecretsId}",
                                     "httpMethod": "GET",
                                     "id": "analyticsadmin.properties.dataStreams.measurementProtocolSecrets.get",
@@ -3851,7 +4031,7 @@
                             ],
                             "parameters": {
                                 "parent": {
-                                    "description": "Required. Format: properties/{property_id} Example: properties/1234",
+                                    "description": "Required. Format: properties/{property_id} Example: `properties/1234`",
                                     "location": "path",
                                     "pattern": "^properties/[^/]+$",
                                     "required": true,
@@ -3879,7 +4059,7 @@
                             ],
                             "parameters": {
                                 "name": {
-                                    "description": "Required. Format: properties/{property_id}/firebaseLinks/{firebase_link_id} Example: properties/1234/firebaseLinks/5678",
+                                    "description": "Required. Format: properties/{property_id}/firebaseLinks/{firebase_link_id} Example: `properties/1234/firebaseLinks/5678`",
                                     "location": "path",
                                     "pattern": "^properties/[^/]+/firebaseLinks/[^/]+$",
                                     "required": true,
@@ -3915,7 +4095,7 @@
                                     "type": "string"
                                 },
                                 "parent": {
-                                    "description": "Required. Format: properties/{property_id} Example: properties/1234",
+                                    "description": "Required. Format: properties/{property_id} Example: `properties/1234`",
                                     "location": "path",
                                     "pattern": "^properties/[^/]+$",
                                     "required": true,
@@ -4208,6 +4388,165 @@
                             },
                             "response": {
                                 "$ref": "GoogleAnalyticsAdminV1alphaKeyEvent"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        }
+                    }
+                },
+                "reportingDataAnnotations": {
+                    "methods": {
+                        "create": {
+                            "description": "Creates a Reporting Data Annotation.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/reportingDataAnnotations",
+                            "httpMethod": "POST",
+                            "id": "analyticsadmin.properties.reportingDataAnnotations.create",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "parent": {
+                                    "description": "Required. The property for which to create a Reporting Data Annotation. Format: properties/property_id Example: properties/123",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/reportingDataAnnotations",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaReportingDataAnnotation"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaReportingDataAnnotation"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "delete": {
+                            "description": "Deletes a Reporting Data Annotation.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/reportingDataAnnotations/{reportingDataAnnotationsId}",
+                            "httpMethod": "DELETE",
+                            "id": "analyticsadmin.properties.reportingDataAnnotations.delete",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. Resource name of the Reporting Data Annotation to delete. Format: properties/property_id/reportingDataAnnotations/reporting_data_annotation Example: properties/123/reportingDataAnnotations/456",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/reportingDataAnnotations/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleProtobufEmpty"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        },
+                        "get": {
+                            "description": "Lookup a single Reporting Data Annotation.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/reportingDataAnnotations/{reportingDataAnnotationsId}",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.reportingDataAnnotations.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. Resource name of the Reporting Data Annotation to lookup. Format: properties/property_id/reportingDataAnnotations/reportingDataAnnotation Example: properties/123/reportingDataAnnotations/456",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/reportingDataAnnotations/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaReportingDataAnnotation"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "list": {
+                            "description": "List all Reporting Data Annotations on a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/reportingDataAnnotations",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.reportingDataAnnotations.list",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "filter": {
+                                    "description": "Optional. Filter that restricts which reporting data annotations under the parent property are listed. Supported fields are: * 'name' * `title` * `description` * `annotation_date` * `annotation_date_range` * `color` Additionally, this API provides the following helper functions: * annotation_duration() : the duration that this annotation marks, [durations](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/duration.proto). expect a numeric representation of seconds followed by an `s` suffix. * is_annotation_in_range(start_date, end_date) : if the annotation is in the range specified by the `start_date` and `end_date`. The dates are in ISO-8601 format, for example `2031-06-28`. Supported operations: * `=` : equals * `!=` : not equals * `<` : less than * `>` : greater than * `<=` : less than or equals * `>=` : greater than or equals * `:` : has operator * `=~` : [regular expression](https://github.com/google/re2/wiki/Syntax) match * `!~` : [regular expression](https://github.com/google/re2/wiki/Syntax) does not match * `NOT` : Logical not * `AND` : Logical and * `OR` : Logical or Examples: 1. `title=\"Holiday Sale\"` 2. `description=~\"[Bb]ig [Gg]ame.*[Ss]ale\"` 3. `is_annotation_in_range(\"2025-12-25\", \"2026-01-16\") = true` 4. `annotation_duration() >= 172800s AND title:BOGO`",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "pageSize": {
+                                    "description": "Optional. The maximum number of resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "Optional. A page token, received from a previous `ListReportingDataAnnotations` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListReportingDataAnnotations` must match the call that provided the page token.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "parent": {
+                                    "description": "Required. Resource name of the property. Format: properties/property_id Example: properties/123",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/reportingDataAnnotations",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaListReportingDataAnnotationsResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "patch": {
+                            "description": "Updates a Reporting Data Annotation.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/reportingDataAnnotations/{reportingDataAnnotationsId}",
+                            "httpMethod": "PATCH",
+                            "id": "analyticsadmin.properties.reportingDataAnnotations.patch",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. Identifier. Resource name of this Reporting Data Annotation. Format: 'properties/{property_id}/reportingDataAnnotations/{reporting_data_annotation}' Format: 'properties/123/reportingDataAnnotations/456'",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/reportingDataAnnotations/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "updateMask": {
+                                    "description": "Optional. The list of fields to update. Field names must be in snake case (for example, \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                                    "format": "google-fieldmask",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaReportingDataAnnotation"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaReportingDataAnnotation"
                             },
                             "scopes": [
                                 "https://www.googleapis.com/auth/analytics.edit"
@@ -4642,11 +4981,112 @@
                             ]
                         }
                     }
+                },
+                "subpropertySyncConfigs": {
+                    "methods": {
+                        "get": {
+                            "description": "Lookup for a single `SubpropertySyncConfig`.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/subpropertySyncConfigs/{subpropertySyncConfigsId}",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.subpropertySyncConfigs.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. Resource name of the SubpropertySyncConfig to lookup. Format: properties/{ordinary_property_id}/subpropertySyncConfigs/{subproperty_id} Example: properties/1234/subpropertySyncConfigs/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/subpropertySyncConfigs/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaSubpropertySyncConfig"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "list": {
+                            "description": "List all `SubpropertySyncConfig` resources for a property.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/subpropertySyncConfigs",
+                            "httpMethod": "GET",
+                            "id": "analyticsadmin.properties.subpropertySyncConfigs.list",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "pageSize": {
+                                    "description": "Optional. The maximum number of resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "Optional. A page token, received from a previous `ListSubpropertySyncConfig` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListSubpropertySyncConfig` must match the call that provided the page token.",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "parent": {
+                                    "description": "Required. Resource name of the property. Format: properties/property_id Example: properties/123",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+parent}/subpropertySyncConfigs",
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaListSubpropertySyncConfigsResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit",
+                                "https://www.googleapis.com/auth/analytics.readonly"
+                            ]
+                        },
+                        "patch": {
+                            "description": "Updates a `SubpropertySyncConfig`.",
+                            "flatPath": "v1alpha/properties/{propertiesId}/subpropertySyncConfigs/{subpropertySyncConfigsId}",
+                            "httpMethod": "PATCH",
+                            "id": "analyticsadmin.properties.subpropertySyncConfigs.patch",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Output only. Identifier. Format: properties/{ordinary_property_id}/subpropertySyncConfigs/{subproperty_id} Example: properties/1234/subpropertySyncConfigs/5678",
+                                    "location": "path",
+                                    "pattern": "^properties/[^/]+/subpropertySyncConfigs/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "updateMask": {
+                                    "description": "Optional. The list of fields to update. Field names must be in snake case (for example, \"field_to_update\"). Omitted fields will not be updated. To replace the entire entity, use one path with the string \"*\" to match all fields.",
+                                    "format": "google-fieldmask",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1alpha/{+name}",
+                            "request": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaSubpropertySyncConfig"
+                            },
+                            "response": {
+                                "$ref": "GoogleAnalyticsAdminV1alphaSubpropertySyncConfig"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/analytics.edit"
+                            ]
+                        }
+                    }
                 }
             }
         }
     },
-    "revision": "20240625",
+    "revision": "20251028",
     "rootUrl": "https://analyticsadmin.googleapis.com/",
     "schemas": {
         "GoogleAnalyticsAdminV1alphaAccessBetweenFilter": {
@@ -5083,7 +5523,7 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaAccountSummary": {
-            "description": "A virtual resource representing an overview of an account and all its child GA4 properties.",
+            "description": "A virtual resource representing an overview of an account and all its child Google Analytics properties.",
             "id": "GoogleAnalyticsAdminV1alphaAccountSummary",
             "properties": {
                 "account": {
@@ -5126,11 +5566,11 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaAdSenseLink": {
-            "description": "A link between a GA4 Property and an AdSense for Content ad client.",
+            "description": "A link between a Google Analytics property and an AdSense for Content ad client.",
             "id": "GoogleAnalyticsAdminV1alphaAdSenseLink",
             "properties": {
                 "adClientCode": {
-                    "description": "Immutable. The AdSense ad client code that the GA4 property is linked to. Example format: \"ca-pub-1234567890\"",
+                    "description": "Immutable. The AdSense ad client code that the Google Analytics property is linked to. Example format: \"ca-pub-1234567890\"",
                     "type": "string"
                 },
                 "name": {
@@ -5251,7 +5691,7 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaAudience": {
-            "description": "A resource message representing a GA4 Audience.",
+            "description": "A resource message representing an Audience.",
             "id": "GoogleAnalyticsAdminV1alphaAudience",
             "properties": {
                 "adsPersonalizationEnabled": {
@@ -5752,7 +6192,7 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaBigQueryLink": {
-            "description": "A link between a GA4 Property and BigQuery project.",
+            "description": "A link between a Google Analytics property and BigQuery project.",
             "id": "GoogleAnalyticsAdminV1alphaBigQueryLink",
             "properties": {
                 "createTime": {
@@ -5764,6 +6204,10 @@
                 "dailyExportEnabled": {
                     "description": "If set true, enables daily data export to the linked Google Cloud project.",
                     "type": "boolean"
+                },
+                "datasetLocation": {
+                    "description": "Required. Immutable. The geographic location where the created BigQuery dataset should reside. See https://cloud.google.com/bigquery/docs/locations for supported locations.",
+                    "type": "string"
                 },
                 "excludedEvents": {
                     "description": "The list of event names that will be excluded from exports.",
@@ -6014,6 +6458,10 @@
                     "$ref": "GoogleAnalyticsAdminV1alphaGoogleSignalsSettings",
                     "description": "A snapshot of a GoogleSignalsSettings resource in change history."
                 },
+                "keyEvent": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaKeyEvent",
+                    "description": "A snapshot of a KeyEvent resource in change history."
+                },
                 "measurementProtocolSecret": {
                     "$ref": "GoogleAnalyticsAdminV1alphaMeasurementProtocolSecret",
                     "description": "A snapshot of a MeasurementProtocolSecret resource in change history."
@@ -6022,6 +6470,14 @@
                     "$ref": "GoogleAnalyticsAdminV1alphaProperty",
                     "description": "A snapshot of a Property resource in change history."
                 },
+                "reportingDataAnnotation": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaReportingDataAnnotation",
+                    "description": "A snapshot of a ReportingDataAnnotation resource in change history."
+                },
+                "reportingIdentitySettings": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaReportingIdentitySettings",
+                    "description": "A snapshot of a ReportingIdentitySettings resource in change history."
+                },
                 "searchAds360Link": {
                     "$ref": "GoogleAnalyticsAdminV1alphaSearchAds360Link",
                     "description": "A snapshot of a SearchAds360Link resource in change history."
@@ -6029,6 +6485,10 @@
                 "skadnetworkConversionValueSchema": {
                     "$ref": "GoogleAnalyticsAdminV1alphaSKAdNetworkConversionValueSchema",
                     "description": "A snapshot of SKAdNetworkConversionValueSchema resource in change history."
+                },
+                "subpropertySyncConfig": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaSubpropertySyncConfig",
+                    "description": "A snapshot of a SubpropertySyncConfig resource in change history."
                 }
             },
             "type": "object"
@@ -6219,21 +6679,6 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaConnectedSiteTag": {
-            "description": "Configuration for a specific Connected Site Tag.",
-            "id": "GoogleAnalyticsAdminV1alphaConnectedSiteTag",
-            "properties": {
-                "displayName": {
-                    "description": "Required. User-provided display name for the connected site tag. Must be less than 256 characters.",
-                    "type": "string"
-                },
-                "tagId": {
-                    "description": "Required. \"Tag ID to forward events to. Also known as the Measurement ID, or the \"G-ID\" (For example: G-12345).",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "GoogleAnalyticsAdminV1alphaConversionEvent": {
             "description": "A conversion event in a Google Analytics property.",
             "id": "GoogleAnalyticsAdminV1alphaConversionEvent",
@@ -6358,27 +6803,6 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaCreateConnectedSiteTagRequest": {
-            "description": "Request message for CreateConnectedSiteTag RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaCreateConnectedSiteTagRequest",
-            "properties": {
-                "connectedSiteTag": {
-                    "$ref": "GoogleAnalyticsAdminV1alphaConnectedSiteTag",
-                    "description": "Required. The tag to add to the Universal Analytics property"
-                },
-                "property": {
-                    "description": "The Universal Analytics property to create connected site tags for. This API does not support GA4 properties. Format: properties/{universalAnalyticsPropertyId} Example: properties/1234",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleAnalyticsAdminV1alphaCreateConnectedSiteTagResponse": {
-            "description": "Response message for CreateConnectedSiteTag RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaCreateConnectedSiteTagResponse",
-            "properties": {},
-            "type": "object"
-        },
         "GoogleAnalyticsAdminV1alphaCreateRollupPropertyRequest": {
             "description": "Request message for CreateRollupProperty RPC.",
             "id": "GoogleAnalyticsAdminV1alphaCreateRollupPropertyRequest",
@@ -6411,36 +6835,6 @@
                         "$ref": "GoogleAnalyticsAdminV1alphaRollupPropertySourceLink"
                     },
                     "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleAnalyticsAdminV1alphaCreateSubpropertyRequest": {
-            "description": "Request message for CreateSubproperty RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaCreateSubpropertyRequest",
-            "properties": {
-                "subproperty": {
-                    "$ref": "GoogleAnalyticsAdminV1alphaProperty",
-                    "description": "Required. The subproperty to create."
-                },
-                "subpropertyEventFilter": {
-                    "$ref": "GoogleAnalyticsAdminV1alphaSubpropertyEventFilter",
-                    "description": "Optional. The subproperty event filter to create on an ordinary property."
-                }
-            },
-            "type": "object"
-        },
-        "GoogleAnalyticsAdminV1alphaCreateSubpropertyResponse": {
-            "description": "Response message for CreateSubproperty RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaCreateSubpropertyResponse",
-            "properties": {
-                "subproperty": {
-                    "$ref": "GoogleAnalyticsAdminV1alphaProperty",
-                    "description": "The created subproperty."
-                },
-                "subpropertyEventFilter": {
-                    "$ref": "GoogleAnalyticsAdminV1alphaSubpropertyEventFilter",
-                    "description": "The created subproperty event filter."
                 }
             },
             "type": "object"
@@ -6604,7 +6998,7 @@
             "id": "GoogleAnalyticsAdminV1alphaDataRetentionSettings",
             "properties": {
                 "eventDataRetention": {
-                    "description": "The length of time that event-level data is retained.",
+                    "description": "Required. The length of time that event-level data is retained.",
                     "enum": [
                         "RETENTION_DURATION_UNSPECIFIED",
                         "TWO_MONTHS",
@@ -6617,9 +7011,9 @@
                         "Data retention time duration is not specified.",
                         "The data retention time duration is 2 months.",
                         "The data retention time duration is 14 months.",
-                        "The data retention time duration is 26 months. Available to 360 properties only.",
-                        "The data retention time duration is 38 months. Available to 360 properties only.",
-                        "The data retention time duration is 50 months. Available to 360 properties only."
+                        "The data retention time duration is 26 months. Available to 360 properties only. Available for event data only.",
+                        "The data retention time duration is 38 months. Available to 360 properties only. Available for event data only.",
+                        "The data retention time duration is 50 months. Available to 360 properties only. Available for event data only."
                     ],
                     "type": "string"
                 },
@@ -6631,6 +7025,26 @@
                 "resetUserDataOnNewActivity": {
                     "description": "If true, reset the retention period for the user identifier with every event from that user.",
                     "type": "boolean"
+                },
+                "userDataRetention": {
+                    "description": "Required. The length of time that user-level data is retained.",
+                    "enum": [
+                        "RETENTION_DURATION_UNSPECIFIED",
+                        "TWO_MONTHS",
+                        "FOURTEEN_MONTHS",
+                        "TWENTY_SIX_MONTHS",
+                        "THIRTY_EIGHT_MONTHS",
+                        "FIFTY_MONTHS"
+                    ],
+                    "enumDescriptions": [
+                        "Data retention time duration is not specified.",
+                        "The data retention time duration is 2 months.",
+                        "The data retention time duration is 14 months.",
+                        "The data retention time duration is 26 months. Available to 360 properties only. Available for event data only.",
+                        "The data retention time duration is 38 months. Available to 360 properties only. Available for event data only.",
+                        "The data retention time duration is 50 months. Available to 360 properties only. Available for event data only."
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -6645,23 +7059,24 @@
                     "type": "string"
                 },
                 "sharingWithGoogleAnySalesEnabled": {
-                    "description": "Allows any of Google sales to access the data in order to suggest configuration changes to improve results.",
+                    "deprecated": true,
+                    "description": "Deprecated. This field is no longer used and always returns false.",
                     "type": "boolean"
                 },
                 "sharingWithGoogleAssignedSalesEnabled": {
-                    "description": "Allows Google sales teams that are assigned to the customer to access the data in order to suggest configuration changes to improve results. Sales team restrictions still apply when enabled.",
+                    "description": "Allows Google access to your Google Analytics account data, including account usage and configuration data, product spending, and users associated with your Google Analytics account, so that Google can help you make the most of Google products, providing you with insights, offers, recommendations, and optimization tips across Google Analytics and other Google products for business. This field maps to the \"Recommendations for your business\" field in the Google Analytics Admin UI.",
                     "type": "boolean"
                 },
                 "sharingWithGoogleProductsEnabled": {
-                    "description": "Allows Google to use the data to improve other Google products or services.",
+                    "description": "Allows Google to use the data to improve other Google products or services. This fields maps to the \"Google products & services\" field in the Google Analytics Admin UI.",
                     "type": "boolean"
                 },
                 "sharingWithGoogleSupportEnabled": {
-                    "description": "Allows Google support to access the data in order to help troubleshoot issues.",
+                    "description": "Allows Google technical support representatives access to your Google Analytics data and account when necessary to provide service and find solutions to technical issues. This field maps to the \"Technical support\" field in the Google Analytics Admin UI.",
                     "type": "boolean"
                 },
                 "sharingWithOthersEnabled": {
-                    "description": "Allows Google to share the data anonymously in aggregate form with others.",
+                    "description": "Enable features like predictions, modeled data, and benchmarking that can provide you with richer business insights when you contribute aggregated measurement data. The data you share (including information about the property from which it is shared) is aggregated and de-identified before being used to generate business insights. This field maps to the \"Modeling contributions & business insights\" field in the Google Analytics Admin UI.",
                     "type": "boolean"
                 }
             },
@@ -6787,23 +7202,8 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaDeleteConnectedSiteTagRequest": {
-            "description": "Request message for DeleteConnectedSiteTag RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaDeleteConnectedSiteTagRequest",
-            "properties": {
-                "property": {
-                    "description": "The Universal Analytics property to delete connected site tags for. This API does not support GA4 properties. Format: properties/{universalAnalyticsPropertyId} Example: properties/1234",
-                    "type": "string"
-                },
-                "tagId": {
-                    "description": "Tag ID to forward events to. Also known as the Measurement ID, or the \"G-ID\" (For example: G-12345).",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink": {
-            "description": "A link between a GA4 property and a Display & Video 360 advertiser.",
+            "description": "A link between a Google Analytics property and a Display & Video 360 advertiser.",
             "id": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLink",
             "properties": {
                 "adsPersonalizationEnabled": {
@@ -6820,11 +7220,11 @@
                     "type": "string"
                 },
                 "campaignDataSharingEnabled": {
-                    "description": "Immutable. Enables the import of campaign data from Display & Video 360 into the GA4 property. After link creation, this can only be updated from the Display & Video 360 product. If this field is not set on create, it will be defaulted to true.",
+                    "description": "Immutable. Enables the import of campaign data from Display & Video 360 into the Google Analytics property. After link creation, this can only be updated from the Display & Video 360 product. If this field is not set on create, it will be defaulted to true.",
                     "type": "boolean"
                 },
                 "costDataSharingEnabled": {
-                    "description": "Immutable. Enables the import of cost data from Display & Video 360 into the GA4 property. This can only be enabled if campaign_data_sharing_enabled is enabled. After link creation, this can only be updated from the Display & Video 360 product. If this field is not set on create, it will be defaulted to true.",
+                    "description": "Immutable. Enables the import of cost data from Display & Video 360 into the Google Analytics property. This can only be enabled if `campaign_data_sharing_enabled` is true. After link creation, this can only be updated from the Display & Video 360 product. If this field is not set on create, it will be defaulted to true.",
                     "type": "boolean"
                 },
                 "name": {
@@ -6836,7 +7236,7 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal": {
-            "description": "A proposal for a link between a GA4 property and a Display & Video 360 advertiser. A proposal is converted to a DisplayVideo360AdvertiserLink once approved. Google Analytics admins approve inbound proposals while Display & Video 360 admins approve outbound proposals.",
+            "description": "A proposal for a link between a Google Analytics property and a Display & Video 360 advertiser. A proposal is converted to a DisplayVideo360AdvertiserLink once approved. Google Analytics admins approve inbound proposals while Display & Video 360 admins approve outbound proposals.",
             "id": "GoogleAnalyticsAdminV1alphaDisplayVideo360AdvertiserLinkProposal",
             "properties": {
                 "adsPersonalizationEnabled": {
@@ -6963,12 +7363,47 @@
             },
             "type": "object"
         },
+        "GoogleAnalyticsAdminV1alphaEventEditRule": {
+            "description": "An Event Edit Rule defines conditions that will trigger the creation of an entirely new event based upon matched criteria of a source event. Additional mutations of the parameters from the source event can be defined. Unlike Event Create rules, Event Edit Rules are applied in their defined order. Event Edit rules can't be used to modify an event created from an Event Create rule.",
+            "id": "GoogleAnalyticsAdminV1alphaEventEditRule",
+            "properties": {
+                "displayName": {
+                    "description": "Required. The display name of this event edit rule. Maximum of 255 characters.",
+                    "type": "string"
+                },
+                "eventConditions": {
+                    "description": "Required. Conditions on the source event must match for this rule to be applied. Must have at least one condition, and can have up to 10 max.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaMatchingCondition"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "Identifier. Resource name for this EventEditRule resource. Format: properties/{property}/dataStreams/{data_stream}/eventEditRules/{event_edit_rule}",
+                    "type": "string"
+                },
+                "parameterMutations": {
+                    "description": "Required. Parameter mutations define parameter behavior on the new event, and are applied in order. A maximum of 20 mutations can be applied.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaParameterMutation"
+                    },
+                    "type": "array"
+                },
+                "processingOrder": {
+                    "description": "Output only. The order for which this rule will be processed. Rules with an order value lower than this will be processed before this rule, rules with an order value higher than this will be processed after this rule. New event edit rules will be assigned an order value at the end of the order. This value does not apply to event create rules.",
+                    "format": "int64",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleAnalyticsAdminV1alphaEventMapping": {
             "description": "Event setting conditions to match an event.",
             "id": "GoogleAnalyticsAdminV1alphaEventMapping",
             "properties": {
                 "eventName": {
-                    "description": "Required. Name of the GA4 event. It must always be set. The max allowed display name length is 40 UTF-16 code units.",
+                    "description": "Required. Name of the Google Analytics event. It must always be set. The max allowed display name length is 40 UTF-16 code units.",
                     "type": "string"
                 },
                 "maxEventCount": {
@@ -6995,7 +7430,7 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaExpandedDataSet": {
-            "description": "A resource message representing a GA4 ExpandedDataSet.",
+            "description": "A resource message representing an `ExpandedDataSet`.",
             "id": "GoogleAnalyticsAdminV1alphaExpandedDataSet",
             "properties": {
                 "dataCollectionStartTime": {
@@ -7137,41 +7572,8 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaFetchAutomatedGa4ConfigurationOptOutRequest": {
-            "description": "Request for fetching the opt out status for the automated GA4 setup process.",
-            "id": "GoogleAnalyticsAdminV1alphaFetchAutomatedGa4ConfigurationOptOutRequest",
-            "properties": {
-                "property": {
-                    "description": "Required. The UA property to get the opt out status. Note this request uses the internal property ID, not the tracking ID of the form UA-XXXXXX-YY. Format: properties/{internalWebPropertyId} Example: properties/1234",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleAnalyticsAdminV1alphaFetchAutomatedGa4ConfigurationOptOutResponse": {
-            "description": "Response message for fetching the opt out status for the automated GA4 setup process.",
-            "id": "GoogleAnalyticsAdminV1alphaFetchAutomatedGa4ConfigurationOptOutResponse",
-            "properties": {
-                "optOut": {
-                    "description": "The opt out status for the UA property.",
-                    "type": "boolean"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleAnalyticsAdminV1alphaFetchConnectedGa4PropertyResponse": {
-            "description": "Response for looking up GA4 property connected to a UA property.",
-            "id": "GoogleAnalyticsAdminV1alphaFetchConnectedGa4PropertyResponse",
-            "properties": {
-                "property": {
-                    "description": "The GA4 property connected to the UA property. An empty string is returned when there is no connected GA4 property. Format: properties/{property_id} Example: properties/1234",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "GoogleAnalyticsAdminV1alphaFirebaseLink": {
-            "description": "A link between a GA4 property and a Firebase project.",
+            "description": "A link between a Google Analytics property and a Firebase project.",
             "id": "GoogleAnalyticsAdminV1alphaFirebaseLink",
             "properties": {
                 "createTime": {
@@ -7209,7 +7611,7 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaGoogleAdsLink": {
-            "description": "A link between a GA4 property and a Google Ads account.",
+            "description": "A link between a Google Analytics property and a Google Ads account.",
             "id": "GoogleAnalyticsAdminV1alphaGoogleAdsLink",
             "properties": {
                 "adsPersonalizationEnabled": {
@@ -7566,31 +7968,6 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaListConnectedSiteTagsRequest": {
-            "description": "Request message for ListConnectedSiteTags RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaListConnectedSiteTagsRequest",
-            "properties": {
-                "property": {
-                    "description": "The Universal Analytics property to fetch connected site tags for. This does not work on GA4 properties. A maximum of 20 connected site tags will be returned. Example Format: `properties/1234`",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleAnalyticsAdminV1alphaListConnectedSiteTagsResponse": {
-            "description": "Response message for ListConnectedSiteTags RPC.",
-            "id": "GoogleAnalyticsAdminV1alphaListConnectedSiteTagsResponse",
-            "properties": {
-                "connectedSiteTags": {
-                    "description": "The site tags for the Universal Analytics property. A maximum of 20 connected site tags will be returned.",
-                    "items": {
-                        "$ref": "GoogleAnalyticsAdminV1alphaConnectedSiteTag"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
         "GoogleAnalyticsAdminV1alphaListConversionEventsResponse": {
             "description": "Response message for ListConversionEvents RPC.",
             "id": "GoogleAnalyticsAdminV1alphaListConversionEventsResponse",
@@ -7717,6 +8094,24 @@
             },
             "type": "object"
         },
+        "GoogleAnalyticsAdminV1alphaListEventEditRulesResponse": {
+            "description": "Response message for ListEventEditRules RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaListEventEditRulesResponse",
+            "properties": {
+                "eventEditRules": {
+                    "description": "List of EventEditRules. These will be ordered stably, but in an arbitrary order.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaEventEditRule"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleAnalyticsAdminV1alphaListExpandedDataSetsResponse": {
             "description": "Response message for ListExpandedDataSets RPC.",
             "id": "GoogleAnalyticsAdminV1alphaListExpandedDataSetsResponse",
@@ -7825,6 +8220,24 @@
             },
             "type": "object"
         },
+        "GoogleAnalyticsAdminV1alphaListReportingDataAnnotationsResponse": {
+            "description": "Response message for ListReportingDataAnnotation RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaListReportingDataAnnotationsResponse",
+            "properties": {
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                },
+                "reportingDataAnnotations": {
+                    "description": "List of Reporting Data Annotations.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaReportingDataAnnotation"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "GoogleAnalyticsAdminV1alphaListRollupPropertySourceLinksResponse": {
             "description": "Response message for ListRollupPropertySourceLinks RPC.",
             "id": "GoogleAnalyticsAdminV1alphaListRollupPropertySourceLinksResponse",
@@ -7891,6 +8304,24 @@
                     "description": "List of subproperty event filters.",
                     "items": {
                         "$ref": "GoogleAnalyticsAdminV1alphaSubpropertyEventFilter"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaListSubpropertySyncConfigsResponse": {
+            "description": "Response message for ListSubpropertySyncConfigs RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaListSubpropertySyncConfigsResponse",
+            "properties": {
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                },
+                "subpropertySyncConfigs": {
+                    "description": "List of `SubpropertySyncConfig` resources.",
+                    "items": {
+                        "$ref": "GoogleAnalyticsAdminV1alphaSubpropertySyncConfig"
                     },
                     "type": "array"
                 }
@@ -8026,7 +8457,7 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaProperty": {
-            "description": "A resource message representing a Google Analytics GA4 property.",
+            "description": "A resource message representing a Google Analytics property.",
             "id": "GoogleAnalyticsAdminV1alphaProperty",
             "properties": {
                 "account": {
@@ -8140,9 +8571,9 @@
                     ],
                     "enumDescriptions": [
                         "Unknown or unspecified property type",
-                        "Ordinary GA4 property",
-                        "GA4 subproperty",
-                        "GA4 rollup property"
+                        "Ordinary Google Analytics property",
+                        "Google Analytics subproperty",
+                        "Google Analytics rollup property"
                     ],
                     "type": "string"
                 },
@@ -8175,7 +8606,7 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaPropertySummary": {
-            "description": "A virtual resource representing metadata for a GA4 property.",
+            "description": "A virtual resource representing metadata for a Google Analytics property.",
             "id": "GoogleAnalyticsAdminV1alphaPropertySummary",
             "properties": {
                 "displayName": {
@@ -8200,9 +8631,9 @@
                     ],
                     "enumDescriptions": [
                         "Unknown or unspecified property type",
-                        "Ordinary GA4 property",
-                        "GA4 subproperty",
-                        "GA4 rollup property"
+                        "Ordinary Google Analytics property",
+                        "Google Analytics subproperty",
+                        "Google Analytics rollup property"
                     ],
                     "type": "string"
                 }
@@ -8235,6 +8666,50 @@
             },
             "type": "object"
         },
+        "GoogleAnalyticsAdminV1alphaProvisionSubpropertyRequest": {
+            "description": "Request message for CreateSubproperty RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaProvisionSubpropertyRequest",
+            "properties": {
+                "customDimensionAndMetricSynchronizationMode": {
+                    "description": "Optional. The subproperty feature synchronization mode for Custom Dimensions and Metrics",
+                    "enum": [
+                        "SYNCHRONIZATION_MODE_UNSPECIFIED",
+                        "NONE",
+                        "ALL"
+                    ],
+                    "enumDescriptions": [
+                        "Synchronization mode unknown or not specified.",
+                        "Entities are not synchronized. Local edits are allowed on the subproperty.",
+                        "Entities are synchronized from parent property. Local mutations are not allowed on the subproperty (Create / Update / Delete)"
+                    ],
+                    "type": "string"
+                },
+                "subproperty": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaProperty",
+                    "description": "Required. The subproperty to create."
+                },
+                "subpropertyEventFilter": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaSubpropertyEventFilter",
+                    "description": "Optional. The subproperty event filter to create on an ordinary property."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaProvisionSubpropertyResponse": {
+            "description": "Response message for ProvisionSubproperty RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaProvisionSubpropertyResponse",
+            "properties": {
+                "subproperty": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaProperty",
+                    "description": "The created subproperty."
+                },
+                "subpropertyEventFilter": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaSubpropertyEventFilter",
+                    "description": "The created subproperty event filter."
+                }
+            },
+            "type": "object"
+        },
         "GoogleAnalyticsAdminV1alphaReorderEventEditRulesRequest": {
             "description": "Request message for ReorderEventEditRules RPC.",
             "id": "GoogleAnalyticsAdminV1alphaReorderEventEditRulesRequest",
@@ -8245,6 +8720,105 @@
                         "type": "string"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaReportingDataAnnotation": {
+            "description": "A Reporting Data Annotation is a comment connected to certain dates for reporting data.",
+            "id": "GoogleAnalyticsAdminV1alphaReportingDataAnnotation",
+            "properties": {
+                "annotationDate": {
+                    "$ref": "GoogleTypeDate",
+                    "description": "If set, the Reporting Data Annotation is for a specific date represented by this field. The date must be a valid date with year, month and day set. The date may be in the past, present, or future."
+                },
+                "annotationDateRange": {
+                    "$ref": "GoogleAnalyticsAdminV1alphaReportingDataAnnotationDateRange",
+                    "description": "If set, the Reporting Data Annotation is for a range of dates represented by this field."
+                },
+                "color": {
+                    "description": "Required. The color used for display of this Reporting Data Annotation.",
+                    "enum": [
+                        "COLOR_UNSPECIFIED",
+                        "PURPLE",
+                        "BROWN",
+                        "BLUE",
+                        "GREEN",
+                        "RED",
+                        "CYAN",
+                        "ORANGE"
+                    ],
+                    "enumDescriptions": [
+                        "Color unknown or not specified.",
+                        "Purple color.",
+                        "Brown color.",
+                        "Blue color.",
+                        "Green color.",
+                        "Red color.",
+                        "Cyan color.",
+                        "Orange color. (Only used for system-generated annotations)"
+                    ],
+                    "type": "string"
+                },
+                "description": {
+                    "description": "Optional. Description for this Reporting Data Annotation.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Required. Identifier. Resource name of this Reporting Data Annotation. Format: 'properties/{property_id}/reportingDataAnnotations/{reporting_data_annotation}' Format: 'properties/123/reportingDataAnnotations/456'",
+                    "type": "string"
+                },
+                "systemGenerated": {
+                    "description": "Output only. If true, this annotation was generated by the Google Analytics system. System-generated annotations cannot be updated or deleted.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "title": {
+                    "description": "Required. Human-readable title for this Reporting Data Annotation.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaReportingDataAnnotationDateRange": {
+            "description": "Represents a Reporting Data Annotation's date range, both start and end dates are inclusive. Time zones are based on the parent property.",
+            "id": "GoogleAnalyticsAdminV1alphaReportingDataAnnotationDateRange",
+            "properties": {
+                "endDate": {
+                    "$ref": "GoogleTypeDate",
+                    "description": "Required. The end date for this range. Must be a valid date with year, month, and day set. This date must be greater than or equal to the start date."
+                },
+                "startDate": {
+                    "$ref": "GoogleTypeDate",
+                    "description": "Required. The start date for this range. Must be a valid date with year, month, and day set. The date may be in the past, present, or future."
+                }
+            },
+            "type": "object"
+        },
+        "GoogleAnalyticsAdminV1alphaReportingIdentitySettings": {
+            "description": "A resource containing settings related to reporting identity.",
+            "id": "GoogleAnalyticsAdminV1alphaReportingIdentitySettings",
+            "properties": {
+                "name": {
+                    "description": "Output only. Identifier. Resource name for this reporting identity settings singleton resource. Format: properties/{property_id}/reportingIdentitySettings Example: \"properties/1234/reportingIdentitySettings\"",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "reportingIdentity": {
+                    "description": "The strategy used for identifying user identities in reports.",
+                    "enum": [
+                        "IDENTITY_BLENDING_STRATEGY_UNSPECIFIED",
+                        "BLENDED",
+                        "OBSERVED",
+                        "DEVICE_BASED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified blending strategy.",
+                        "Blended reporting identity strategy.",
+                        "Observed reporting identity strategy.",
+                        "Device-based reporting identity strategy."
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -8400,7 +8974,7 @@
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaSearchAds360Link": {
-            "description": "A link between a GA4 property and a Search Ads 360 entity.",
+            "description": "A link between a Google Analytics property and a Search Ads 360 entity.",
             "id": "GoogleAnalyticsAdminV1alphaSearchAds360Link",
             "properties": {
                 "adsPersonalizationEnabled": {
@@ -8417,11 +8991,11 @@
                     "type": "string"
                 },
                 "campaignDataSharingEnabled": {
-                    "description": "Immutable. Enables the import of campaign data from Search Ads 360 into the GA4 property. After link creation, this can only be updated from the Search Ads 360 product. If this field is not set on create, it will be defaulted to true.",
+                    "description": "Immutable. Enables the import of campaign data from Search Ads 360 into the Google Analytics property. After link creation, this can only be updated from the Search Ads 360 product. If this field is not set on create, it will be defaulted to true.",
                     "type": "boolean"
                 },
                 "costDataSharingEnabled": {
-                    "description": "Immutable. Enables the import of cost data from Search Ads 360 to the GA4 property. This can only be enabled if campaign_data_sharing_enabled is enabled. After link creation, this can only be updated from the Search Ads 360 product. If this field is not set on create, it will be defaulted to true.",
+                    "description": "Immutable. Enables the import of cost data from Search Ads 360 to the Google Analytics property. This can only be enabled if campaign_data_sharing_enabled is enabled. After link creation, this can only be updated from the Search Ads 360 product. If this field is not set on create, it will be defaulted to true.",
                     "type": "boolean"
                 },
                 "name": {
@@ -8477,7 +9051,7 @@
                     "type": "string"
                 },
                 "pageSize": {
-                    "description": "Optional. The maximum number of ChangeHistoryEvent items to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 items will be returned. The maximum value is 200 (higher values will be coerced to the maximum).",
+                    "description": "Optional. The maximum number of ChangeHistoryEvent items to return. If unspecified, at most 50 items will be returned. The maximum value is 200 (higher values will be coerced to the maximum). Note that the service may return a page with fewer items than this value specifies (potentially even zero), and that there still may be additional pages. If you want a particular number of items, you'll need to continue requesting additional pages using `page_token` until you get the needed number.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -8486,7 +9060,7 @@
                     "type": "string"
                 },
                 "property": {
-                    "description": "Optional. Resource name for a child property. If set, only return changes made to this property or its child resources. Format: properties/{propertyId} Example: \"properties/100\"",
+                    "description": "Optional. Resource name for a child property. If set, only return changes made to this property or its child resources. Format: properties/{propertyId} Example: `properties/100`",
                     "type": "string"
                 },
                 "resourceType": {
@@ -8511,13 +9085,18 @@
                             "ATTRIBUTION_SETTINGS",
                             "EXPANDED_DATA_SET",
                             "CHANNEL_GROUP",
+                            "BIGQUERY_LINK",
                             "ENHANCED_MEASUREMENT_SETTINGS",
                             "DATA_REDACTION_SETTINGS",
                             "SKADNETWORK_CONVERSION_VALUE_SCHEMA",
                             "ADSENSE_LINK",
                             "AUDIENCE",
                             "EVENT_CREATE_RULE",
-                            "CALCULATED_METRIC"
+                            "KEY_EVENT",
+                            "CALCULATED_METRIC",
+                            "REPORTING_DATA_ANNOTATION",
+                            "SUBPROPERTY_SYNC_CONFIG",
+                            "REPORTING_IDENTITY_SETTINGS"
                         ],
                         "enumDescriptions": [
                             "Resource type unknown or not specified.",
@@ -8538,13 +9117,18 @@
                             "AttributionSettings resource",
                             "ExpandedDataSet resource",
                             "ChannelGroup resource",
+                            "BigQuery link resource",
                             "EnhancedMeasurementSettings resource",
                             "DataRedactionSettings resource",
                             "SKAdNetworkConversionValueSchema resource",
                             "AdSenseLink resource",
                             "Audience resource",
                             "EventCreateRule resource",
-                            "CalculatedMetric resource"
+                            "KeyEvent resource",
+                            "CalculatedMetric resource",
+                            "ReportingDataAnnotation resource",
+                            "SubpropertySyncConfig resource",
+                            "ReportingIdentitySettings resource"
                         ],
                         "type": "string"
                     },
@@ -8571,29 +9155,43 @@
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaSetAutomatedGa4ConfigurationOptOutRequest": {
-            "description": "Request for setting the opt out status for the automated GA4 setup process.",
-            "id": "GoogleAnalyticsAdminV1alphaSetAutomatedGa4ConfigurationOptOutRequest",
+        "GoogleAnalyticsAdminV1alphaSubmitUserDeletionRequest": {
+            "description": "Request message for SubmitUserDeletion RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaSubmitUserDeletionRequest",
             "properties": {
-                "optOut": {
-                    "description": "The status to set.",
-                    "type": "boolean"
+                "appInstanceId": {
+                    "description": "Firebase [application instance ID](https://firebase.google.com/docs/reference/android/com/google/firebase/analytics/FirebaseAnalytics.html#getAppInstanceId).",
+                    "type": "string"
                 },
-                "property": {
-                    "description": "Required. The UA property to set the opt out status. Note this request uses the internal property ID, not the tracking ID of the form UA-XXXXXX-YY. Format: properties/{internalWebPropertyId} Example: properties/1234",
+                "clientId": {
+                    "description": "Google Analytics [client ID](https://support.google.com/analytics/answer/11593727).",
+                    "type": "string"
+                },
+                "userId": {
+                    "description": "Google Analytics [user ID](https://firebase.google.com/docs/analytics/userid).",
+                    "type": "string"
+                },
+                "userProvidedData": {
+                    "description": "[User-provided data](https://support.google.com/analytics/answer/14077171). May contain either one email address or one phone number. Email addresses should be normalized as such: * lowercase * remove periods before @ for gmail.com/googlemail.com addresses * remove all spaces Phone numbers should be normalized as such: * remove all non digit characters * add + prefix",
                     "type": "string"
                 }
             },
             "type": "object"
         },
-        "GoogleAnalyticsAdminV1alphaSetAutomatedGa4ConfigurationOptOutResponse": {
-            "description": "Response message for setting the opt out status for the automated GA4 setup process.",
-            "id": "GoogleAnalyticsAdminV1alphaSetAutomatedGa4ConfigurationOptOutResponse",
-            "properties": {},
+        "GoogleAnalyticsAdminV1alphaSubmitUserDeletionResponse": {
+            "description": "Response message for SubmitUserDeletion RPC.",
+            "id": "GoogleAnalyticsAdminV1alphaSubmitUserDeletionResponse",
+            "properties": {
+                "deletionRequestTime": {
+                    "description": "Marks the moment for which all visitor data before this point should be deleted. This is set to the time at which the deletion request was received.",
+                    "format": "google-datetime",
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "GoogleAnalyticsAdminV1alphaSubpropertyEventFilter": {
-            "description": "A resource message representing a GA4 Subproperty event filter.",
+            "description": "A resource message representing a Google Analytics subproperty event filter.",
             "id": "GoogleAnalyticsAdminV1alphaSubpropertyEventFilter",
             "properties": {
                 "applyToProperty": {
@@ -8729,6 +9327,37 @@
             },
             "type": "object"
         },
+        "GoogleAnalyticsAdminV1alphaSubpropertySyncConfig": {
+            "description": "Subproperty synchronization configuration controls how ordinary property configurations are synchronized to subproperties. This resource is provisioned automatically for each subproperty.",
+            "id": "GoogleAnalyticsAdminV1alphaSubpropertySyncConfig",
+            "properties": {
+                "applyToProperty": {
+                    "description": "Output only. Immutable. Resource name of the subproperty that these settings apply to.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "customDimensionAndMetricSyncMode": {
+                    "description": "Required. Specifies the Custom Dimension / Metric synchronization mode for the subproperty. If set to ALL, Custom Dimension / Metric synchronization will be immediately enabled. Local configuration of Custom Dimensions / Metrics will not be allowed on the subproperty so long as the synchronization mode is set to ALL. If set to NONE, Custom Dimensions / Metric synchronization is disabled. Custom Dimensions / Metrics must be configured explicitly on the Subproperty.",
+                    "enum": [
+                        "SYNCHRONIZATION_MODE_UNSPECIFIED",
+                        "NONE",
+                        "ALL"
+                    ],
+                    "enumDescriptions": [
+                        "Synchronization mode unknown or not specified.",
+                        "Entities are not synchronized. Local edits are allowed on the subproperty.",
+                        "Entities are synchronized from parent property. Local mutations are not allowed on the subproperty (Create / Update / Delete)"
+                    ],
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Output only. Identifier. Format: properties/{ordinary_property_id}/subpropertySyncConfigs/{subproperty_id} Example: properties/1234/subpropertySyncConfigs/5678",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "GoogleAnalyticsAdminV1alphaUpdateAccessBindingRequest": {
             "description": "Request message for UpdateAccessBinding RPC.",
             "id": "GoogleAnalyticsAdminV1alphaUpdateAccessBindingRequest",
@@ -8744,6 +9373,28 @@
             "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "GoogleProtobufEmpty",
             "properties": {},
+            "type": "object"
+        },
+        "GoogleTypeDate": {
+            "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
+            "id": "GoogleTypeDate",
+            "properties": {
+                "day": {
+                    "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "month": {
+                    "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "year": {
+                    "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
             "type": "object"
         }
     },
