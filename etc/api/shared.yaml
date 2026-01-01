@@ -51,6 +51,12 @@ api:
     - youtubeanalytics
     # returned by google APIs, but can't be fetched
     - osconfig
+    # redefined ProjectMethods
+    - aiplatform
+    # AssertionError: 'google.protobuf.Any': Property type 'object' unknown - add new type mapping: {'additionalProperties': {'description': 'Properties of the object. Contains field @type with type URL.', 'type': 'any', 'used_by': [], 'parents': ['Status']}, 'format': 'google.protobuf.Any', 'type': 'object', 'used_by': [], 'parents': ['Status']}
+    - compute
+    # recursive types `GoogleCloudDialogflowCxV3InlineSchema` and `GoogleCloudDialogflowCxV3TypeSchema` have infinite size
+    - dialogflow
   manually_added:
     - name: mybusiness
       version: v4
