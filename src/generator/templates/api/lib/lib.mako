@@ -8,9 +8,37 @@
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
                       upload_action_fn, METHODS_BUILDER_MARKER_TRAIT, DELEGATE_TYPE,
                       to_extern_crate_name, rust_doc_sanitize)
+    import os
 
     def pretty_name(name):
         return ' '.join(split_camelcase_s(name).split('.'))
+
+    def deduplicated_scope_variants(api_name, scopes):
+        """Build a mapping from URL to unique variant name, handling duplicates."""
+        url_to_variant = {}
+        seen_variants = {}  # variant_name -> list of urls
+
+        # First pass: generate initial variant names
+        for url in scopes.keys():
+            variant = scope_url_to_variant(api_name, url, fully_qualified=False)
+            url_to_variant[url] = variant
+            if variant not in seen_variants:
+                seen_variants[variant] = []
+            seen_variants[variant].append(url)
+
+        # Second pass: fix duplicates by using more of the URL path
+        for variant, urls in seen_variants.items():
+            if len(urls) > 1:
+                for url in urls:
+                    # Extract more path segments to make unique
+                    path_parts = url.rstrip('/').split('/')
+                    # Try using second-to-last + last segment
+                    if len(path_parts) >= 2:
+                        combined = path_parts[-2] + '_' + path_parts[-1]
+                        new_variant = ''.join(word.capitalize() for word in combined.replace('-', '_').replace('.', '_').split('_'))
+                        url_to_variant[url] = new_variant
+
+        return url_to_variant
 %>\
 <%namespace name="util" file="../../../lib/util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
@@ -358,6 +386,13 @@ You can read the full text at the repository's [license file][repo-license].
 % if not supports_scopes(auth):
 <% return '' %>\
 % endif
+<%
+    # Pre-compute deduplicated variant names for all scopes
+    _scope_variants = deduplicated_scope_variants(name, auth.oauth2.scopes)
+    def get_scope_variant(url, fully_qualified=True):
+        variant = _scope_variants.get(url, scope_url_to_variant(name, url, fully_qualified=False))
+        return ("Scope::" + variant) if fully_qualified else variant
+%>\
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
@@ -365,7 +400,7 @@ You can read the full text at the repository's [license file][repo-license].
 pub enum Scope {
 % for url, scope in auth.oauth2.scopes.items():
     ${scope.description | rust_doc_sanitize(documentationLink), rust_doc_comment}
-    ${scope_url_to_variant(name, url, fully_qualified=False)},
+    ${get_scope_variant(url, fully_qualified=False)},
     % if not loop.last:
 
     % endif
@@ -376,7 +411,7 @@ impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
             % for url in auth.oauth2.scopes.keys():
-            ${scope_url_to_variant(name, url)} => "${url}",
+            ${get_scope_variant(url)} => "${url}",
             % endfor
         }
     }
@@ -396,7 +431,7 @@ impl Default for Scope {
             # end for each url
             default_url = default_url or shortest_url
 %>\
-        ${scope_url_to_variant(name, default_url)}
+        ${get_scope_variant(default_url)}
     }
 }
 </%def>
