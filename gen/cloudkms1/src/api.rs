@@ -62,9 +62,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -75,7 +86,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = CloudKMS::new(client, auth);
@@ -121,7 +132,7 @@ impl<'a, C> CloudKMS<C> {
         CloudKMS {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://cloudkms.googleapis.com/".to_string(),
             _root_url: "https://cloudkms.googleapis.com/".to_string(),
         }
@@ -130,12 +141,15 @@ impl<'a, C> CloudKMS<C> {
     pub fn folders(&'a self) -> FolderMethods<'a, C> {
         FolderMethods { hub: self }
     }
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, C> {
+        OrganizationMethods { hub: self }
+    }
     pub fn projects(&'a self) -> ProjectMethods<'a, C> {
         ProjectMethods { hub: self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -325,11 +339,15 @@ impl common::Part for AuditLogConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AutokeyConfig {
+    /// Optional. A checksum computed by the server based on the value of other fields. This may be sent on update requests to ensure that the client has an up-to-date value before proceeding. The request will be rejected with an ABORTED error on a mismatched etag.
+    pub etag: Option<String>,
     /// Optional. Name of the key project, e.g. `projects/{PROJECT_ID}` or `projects/{PROJECT_NUMBER}`, where Cloud KMS Autokey will provision a new CryptoKey when a KeyHandle is created. On UpdateAutokeyConfig, the caller will require `cloudkms.cryptoKeys.setIamPolicy` permission on this key project. Once configured, for Cloud KMS Autokey to function properly, this key project must have the Cloud KMS API activated and the Cloud KMS Service Agent for this key project must be granted the `cloudkms.admin` role (or pertinent permissions). A request with an empty key project field will clear the configuration.
     #[serde(rename = "keyProject")]
     pub key_project: Option<String>,
-    /// Identifier. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`.
+    /// Identifier. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`
     pub name: Option<String>,
+    /// Output only. The state for the AutokeyConfig.
+    pub state: Option<String>,
 }
 
 impl common::RequestValue for AutokeyConfig {}
@@ -411,6 +429,25 @@ pub struct CertificateChains {
 
 impl common::Part for CertificateChains {}
 
+/// Data with integrity verification field.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ChecksummedData {
+    /// Integrity verification field. A CRC32C checksum of the returned ChecksummedData.data. An integrity check of ChecksummedData.data can be performed by computing the CRC32C checksum of ChecksummedData.data and comparing your results to this field. Discard the response in case of non-matching checksum values, and perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed `2^32-1`, and can be safely downconverted to uint32 in languages that support this type.
+    #[serde(rename = "crc32cChecksum")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub crc32c_checksum: Option<i64>,
+    /// Raw Data.
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
+    pub data: Option<Vec<u8>>,
+}
+
+impl common::Part for ChecksummedData {}
+
 /// A CryptoKey represents a logical key that can be used for cryptographic operations. A CryptoKey is made up of zero or more versions, which represent the actual key material used in cryptographic operations.
 ///
 /// # Activities
@@ -429,10 +466,10 @@ pub struct CryptoKey {
     /// Output only. The time at which this CryptoKey was created.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
-    /// Immutable. The resource name of the backend environment where the key material for all CryptoKeyVersions associated with this CryptoKey reside and where all related cryptographic operations are performed. Only applicable if CryptoKeyVersions have a ProtectionLevel of EXTERNAL_VPC, with the resource name in the format `projects/*/locations/*/ekmConnections/*`. Note, this list is non-exhaustive and may apply to additional ProtectionLevels in the future.
+    /// Immutable. The resource name of the backend environment where the key material for all CryptoKeyVersions associated with this CryptoKey reside and where all related cryptographic operations are performed. Only applicable if CryptoKeyVersions have a ProtectionLevel of EXTERNAL_VPC, with the resource name in the format `projects/*/locations/*/ekmConnections/*`. Only applicable if CryptoKeyVersions have a ProtectionLevel of HSM_SINGLE_TENANT, with the resource name in the format `projects/*/locations/*/singleTenantHsmInstances/*`. Note, this list is non-exhaustive and may apply to additional ProtectionLevels in the future.
     #[serde(rename = "cryptoKeyBackend")]
     pub crypto_key_backend: Option<String>,
-    /// Immutable. The period of time that versions of this key spend in the DESTROY_SCHEDULED state before transitioning to DESTROYED. If not specified at creation time, the default duration is 24 hours.
+    /// Immutable. The period of time that versions of this key spend in the DESTROY_SCHEDULED state before transitioning to DESTROYED. If not specified at creation time, the default duration is 30 days.
     #[serde(rename = "destroyScheduledDuration")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
     pub destroy_scheduled_duration: Option<chrono::Duration>,
@@ -547,6 +584,61 @@ pub struct CryptoKeyVersionTemplate {
 }
 
 impl common::Part for CryptoKeyVersionTemplate {}
+
+/// Request message for KeyManagementService.Decapsulate.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations key rings crypto keys crypto key versions decapsulate projects](ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DecapsulateRequest {
+    /// Required. The ciphertext produced from encapsulation with the named CryptoKeyVersion public key(s).
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
+    pub ciphertext: Option<Vec<u8>>,
+    /// Optional. A CRC32C checksum of the DecapsulateRequest.ciphertext. If specified, KeyManagementService will verify the integrity of the received DecapsulateRequest.ciphertext using this checksum. KeyManagementService will report an error if the checksum verification fails. If you receive a checksum error, your client should verify that CRC32C(DecapsulateRequest.ciphertext) is equal to DecapsulateRequest.ciphertext_crc32c, and if so, perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed 2^32-1, and can be safely downconverted to uint32 in languages that support this type.
+    #[serde(rename = "ciphertextCrc32c")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub ciphertext_crc32c: Option<i64>,
+}
+
+impl common::RequestValue for DecapsulateRequest {}
+
+/// Response message for KeyManagementService.Decapsulate.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations key rings crypto keys crypto key versions decapsulate projects](ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DecapsulateResponse {
+    /// The resource name of the CryptoKeyVersion used for decapsulation. Check this field to verify that the intended resource was used for decapsulation.
+    pub name: Option<String>,
+    /// The ProtectionLevel of the CryptoKeyVersion used in decapsulation.
+    #[serde(rename = "protectionLevel")]
+    pub protection_level: Option<String>,
+    /// The decapsulated shared_secret originally encapsulated with the matching public key.
+    #[serde(rename = "sharedSecret")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
+    pub shared_secret: Option<Vec<u8>>,
+    /// Integrity verification field. A CRC32C checksum of the returned DecapsulateResponse.shared_secret. An integrity check of DecapsulateResponse.shared_secret can be performed by computing the CRC32C checksum of DecapsulateResponse.shared_secret and comparing your results to this field. Discard the response in case of non-matching checksum values, and perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: receiving this response message indicates that KeyManagementService is able to successfully decrypt the ciphertext. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed 2^32-1, and can be safely downconverted to uint32 in languages that support this type.
+    #[serde(rename = "sharedSecretCrc32c")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub shared_secret_crc32c: Option<i64>,
+    /// Integrity verification field. A flag indicating whether DecapsulateRequest.ciphertext_crc32c was received by KeyManagementService and used for the integrity verification of the ciphertext. A false value of this field indicates either that DecapsulateRequest.ciphertext_crc32c was left unset or that it was not delivered to KeyManagementService. If you've set DecapsulateRequest.ciphertext_crc32c but this field is still false, discard the response and perform a limited number of retries.
+    #[serde(rename = "verifiedCiphertextCrc32c")]
+    pub verified_ciphertext_crc32c: Option<bool>,
+}
+
+impl common::ResponseResult for DecapsulateResponse {}
 
 /// Request message for KeyManagementService.Decrypt.
 ///
@@ -696,7 +788,7 @@ pub struct EkmConnection {
     pub key_management_mode: Option<String>,
     /// Output only. The resource name for the EkmConnection in the format `projects/*/locations/*/ekmConnections/*`.
     pub name: Option<String>,
-    /// A list of ServiceResolvers where the EKM can be reached. There should be one ServiceResolver per EKM replica. Currently, only a single ServiceResolver is supported.
+    /// Optional. A list of ServiceResolvers where the EKM can be reached. There should be one ServiceResolver per EKM replica. Currently, only a single ServiceResolver is supported.
     #[serde(rename = "serviceResolvers")]
     pub service_resolvers: Option<Vec<ServiceResolver>>,
 }
@@ -902,6 +994,9 @@ pub struct ImportJob {
     /// Output only. The time at which this ImportJob was created.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Immutable. The resource name of the backend environment where the key material for the wrapping key resides and where all related cryptographic operations are performed. Currently, this field is only populated for keys stored in HSM_SINGLE_TENANT. Note, this list is non-exhaustive and may apply to additional ProtectionLevels in the future.
+    #[serde(rename = "cryptoKeyBackend")]
+    pub crypto_key_backend: Option<String>,
     /// Output only. The time this ImportJob expired. Only present if state is EXPIRED.
     #[serde(rename = "expireEventTime")]
     pub expire_event_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -929,6 +1024,24 @@ pub struct ImportJob {
 impl common::RequestValue for ImportJob {}
 impl common::ResponseResult for ImportJob {}
 
+/// The configuration of a protection level for a project's Key Access Justifications enrollment.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct KeyAccessJustificationsEnrollmentConfig {
+    /// Whether the project has KAJ logging enabled.
+    #[serde(rename = "auditLogging")]
+    pub audit_logging: Option<bool>,
+    /// Whether the project is enrolled in KAJ policy enforcement.
+    #[serde(rename = "policyEnforcement")]
+    pub policy_enforcement: Option<bool>,
+}
+
+impl common::Part for KeyAccessJustificationsEnrollmentConfig {}
+
 /// A KeyAccessJustificationsPolicy specifies zero or more allowed AccessReason values for encrypt, decrypt, and sign operations on a CryptoKey.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -943,6 +1056,33 @@ pub struct KeyAccessJustificationsPolicy {
 }
 
 impl common::Part for KeyAccessJustificationsPolicy {}
+
+/// A singleton configuration for Key Access Justifications policies.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [get kaj policy config folders](FolderGetKajPolicyConfigCall) (response)
+/// * [update kaj policy config folders](FolderUpdateKajPolicyConfigCall) (request|response)
+/// * [get kaj policy config organizations](OrganizationGetKajPolicyConfigCall) (response)
+/// * [update kaj policy config organizations](OrganizationUpdateKajPolicyConfigCall) (request|response)
+/// * [get kaj policy config projects](ProjectGetKajPolicyConfigCall) (response)
+/// * [update kaj policy config projects](ProjectUpdateKajPolicyConfigCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct KeyAccessJustificationsPolicyConfig {
+    /// Optional. The default key access justification policy used when a CryptoKey is created in this folder. This is only used when a Key Access Justifications policy is not provided in the CreateCryptoKeyRequest. This overrides any default policies in its ancestry.
+    #[serde(rename = "defaultKeyAccessJustificationPolicy")]
+    pub default_key_access_justification_policy: Option<KeyAccessJustificationsPolicy>,
+    /// Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig".
+    pub name: Option<String>,
+}
+
+impl common::RequestValue for KeyAccessJustificationsPolicyConfig {}
+impl common::ResponseResult for KeyAccessJustificationsPolicyConfig {}
 
 /// Resource-oriented representation of a request to Cloud KMS Autokey and the resulting provisioning of a CryptoKey.
 ///
@@ -1031,7 +1171,7 @@ pub struct ListCryptoKeyVersionsResponse {
     /// A token to retrieve next page of results. Pass this value in ListCryptoKeyVersionsRequest.page_token to retrieve the next page of results.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The total number of CryptoKeyVersions that matched the query.
+    /// The total number of CryptoKeyVersions that matched the query. This field is not populated if ListCryptoKeyVersionsRequest.filter is applied.
     #[serde(rename = "totalSize")]
     pub total_size: Option<i32>,
 }
@@ -1056,7 +1196,7 @@ pub struct ListCryptoKeysResponse {
     /// A token to retrieve next page of results. Pass this value in ListCryptoKeysRequest.page_token to retrieve the next page of results.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The total number of CryptoKeys that matched the query.
+    /// The total number of CryptoKeys that matched the query. This field is not populated if ListCryptoKeysRequest.filter is applied.
     #[serde(rename = "totalSize")]
     pub total_size: Option<i32>,
 }
@@ -1081,7 +1221,7 @@ pub struct ListEkmConnectionsResponse {
     /// A token to retrieve next page of results. Pass this value in ListEkmConnectionsRequest.page_token to retrieve the next page of results.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The total number of EkmConnections that matched the query.
+    /// The total number of EkmConnections that matched the query. This field is not populated if ListEkmConnectionsRequest.filter is applied.
     #[serde(rename = "totalSize")]
     pub total_size: Option<i32>,
 }
@@ -1106,7 +1246,7 @@ pub struct ListImportJobsResponse {
     /// A token to retrieve next page of results. Pass this value in ListImportJobsRequest.page_token to retrieve the next page of results.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The total number of ImportJobs that matched the query.
+    /// The total number of ImportJobs that matched the query. This field is not populated if ListImportJobsRequest.filter is applied.
     #[serde(rename = "totalSize")]
     pub total_size: Option<i32>,
 }
@@ -1128,6 +1268,9 @@ pub struct ListKeyHandlesResponse {
     /// Resulting KeyHandles.
     #[serde(rename = "keyHandles")]
     pub key_handles: Option<Vec<KeyHandle>>,
+    /// A token to retrieve next page of results. Pass this value in ListKeyHandlesRequest.page_token to retrieve the next page of results.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
 }
 
 impl common::ResponseResult for ListKeyHandlesResponse {}
@@ -1150,7 +1293,7 @@ pub struct ListKeyRingsResponse {
     /// A token to retrieve next page of results. Pass this value in ListKeyRingsRequest.page_token to retrieve the next page of results.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The total number of KeyRings that matched the query.
+    /// The total number of KeyRings that matched the query. This field is not populated if ListKeyRingsRequest.filter is applied.
     #[serde(rename = "totalSize")]
     pub total_size: Option<i32>,
 }
@@ -1282,7 +1425,7 @@ pub struct MacVerifyRequest {
     /// Required. The signature to verify.
     #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub mac: Option<Vec<u8>>,
-    /// Optional. An optional CRC32C checksum of the MacVerifyRequest.mac. If specified, KeyManagementService will verify the integrity of the received MacVerifyRequest.mac using this checksum. KeyManagementService will report an error if the checksum verification fails. If you receive a checksum error, your client should verify that CRC32C(MacVerifyRequest.tag) is equal to MacVerifyRequest.mac_crc32c, and if so, perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed 2^32-1, and can be safely downconverted to uint32 in languages that support this type.
+    /// Optional. An optional CRC32C checksum of the MacVerifyRequest.mac. If specified, KeyManagementService will verify the integrity of the received MacVerifyRequest.mac using this checksum. KeyManagementService will report an error if the checksum verification fails. If you receive a checksum error, your client should verify that CRC32C(MacVerifyRequest.mac) is equal to MacVerifyRequest.mac_crc32c, and if so, perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed 2^32-1, and can be safely downconverted to uint32 in languages that support this type.
     #[serde(rename = "macCrc32c")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub mac_crc32c: Option<i64>,
@@ -1402,13 +1545,19 @@ pub struct PublicKey {
     pub name: Option<String>,
     /// The public key, encoded in PEM format. For more information, see the [RFC 7468](https://tools.ietf.org/html/rfc7468) sections for [General Considerations](https://tools.ietf.org/html/rfc7468#section-2) and [Textual Encoding of Subject Public Key Info] (https://tools.ietf.org/html/rfc7468#section-13).
     pub pem: Option<String>,
-    /// Integrity verification field. A CRC32C checksum of the returned PublicKey.pem. An integrity check of PublicKey.pem can be performed by computing the CRC32C checksum of PublicKey.pem and comparing your results to this field. Discard the response in case of non-matching checksum values, and perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed 2^32-1, and can be safely downconverted to uint32 in languages that support this type. NOTE: This field is in Beta.
+    /// Integrity verification field. A CRC32C checksum of the returned PublicKey.pem. An integrity check of PublicKey.pem can be performed by computing the CRC32C checksum of PublicKey.pem and comparing your results to this field. Discard the response in case of non-matching checksum values, and perform a limited number of retries. A persistent mismatch may indicate an issue in your computation of the CRC32C checksum. Note: This field is defined as int64 for reasons of compatibility across different languages. However, it is a non-negative integer, which will never exceed `2^32-1`, and can be safely downconverted to uint32 in languages that support this type. NOTE: This field is in Beta.
     #[serde(rename = "pemCrc32c")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub pem_crc32c: Option<i64>,
     /// The ProtectionLevel of the CryptoKeyVersion public key.
     #[serde(rename = "protectionLevel")]
     pub protection_level: Option<String>,
+    /// This field contains the public key (with integrity verification), formatted according to the public_key_format field.
+    #[serde(rename = "publicKey")]
+    pub public_key: Option<ChecksummedData>,
+    /// The PublicKey format specified by the customer through the public_key_format field.
+    #[serde(rename = "publicKeyFormat")]
+    pub public_key_format: Option<String>,
 }
 
 impl common::ResponseResult for PublicKey {}
@@ -1661,6 +1810,50 @@ pub struct ShowEffectiveAutokeyConfigResponse {
 
 impl common::ResponseResult for ShowEffectiveAutokeyConfigResponse {}
 
+/// Response message for KeyAccessJustificationsConfig.ShowEffectiveKeyAccessJustificationsEnrollmentConfig
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [show effective key access justifications enrollment config projects](ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ShowEffectiveKeyAccessJustificationsEnrollmentConfigResponse {
+    /// The effective KeyAccessJustificationsEnrollmentConfig for external keys.
+    #[serde(rename = "externalConfig")]
+    pub external_config: Option<KeyAccessJustificationsEnrollmentConfig>,
+    /// The effective KeyAccessJustificationsEnrollmentConfig for hardware keys.
+    #[serde(rename = "hardwareConfig")]
+    pub hardware_config: Option<KeyAccessJustificationsEnrollmentConfig>,
+    /// The effective KeyAccessJustificationsEnrollmentConfig for software keys.
+    #[serde(rename = "softwareConfig")]
+    pub software_config: Option<KeyAccessJustificationsEnrollmentConfig>,
+}
+
+impl common::ResponseResult for ShowEffectiveKeyAccessJustificationsEnrollmentConfigResponse {}
+
+/// Response message for KeyAccessJustificationsConfig.ShowEffectiveKeyAccessJustificationsPolicyConfig.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [show effective key access justifications policy config projects](ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ShowEffectiveKeyAccessJustificationsPolicyConfigResponse {
+    /// The effective KeyAccessJustificationsPolicyConfig.
+    #[serde(rename = "effectiveKajPolicy")]
+    pub effective_kaj_policy: Option<KeyAccessJustificationsPolicyConfig>,
+}
+
+impl common::ResponseResult for ShowEffectiveKeyAccessJustificationsPolicyConfigResponse {}
+
 /// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1793,9 +1986,20 @@ impl common::Part for WrappingPublicKey {}
 /// use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -1806,12 +2010,12 @@ impl common::Part for WrappingPublicKey {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = CloudKMS::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_autokey_config(...)` and `update_autokey_config(...)`
+/// // like `get_autokey_config(...)`, `get_kaj_policy_config(...)`, `update_autokey_config(...)` and `update_kaj_policy_config(...)`
 /// // to build up your call.
 /// let rb = hub.folders();
 /// # }
@@ -1845,18 +2049,161 @@ impl<'a, C> FolderMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the KeyAccessJustificationsPolicyConfig to get.
+    pub fn get_kaj_policy_config(&self, name: &str) -> FolderGetKajPolicyConfigCall<'a, C> {
+        FolderGetKajPolicyConfigCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates the AutokeyConfig for a folder. The caller must have both `cloudkms.autokeyConfigs.update` permission on the parent folder and `cloudkms.cryptoKeys.setIamPolicy` permission on the provided key project. A KeyHandle creation in the folder's descendant projects will use this configuration to determine where to create the resulting CryptoKey.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Identifier. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`.
+    /// * `name` - Identifier. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`
     pub fn update_autokey_config(
         &self,
         request: AutokeyConfig,
         name: &str,
     ) -> FolderUpdateAutokeyConfigCall<'a, C> {
         FolderUpdateAutokeyConfigCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig".
+    pub fn update_kaj_policy_config(
+        &self,
+        request: KeyAccessJustificationsPolicyConfig,
+        name: &str,
+    ) -> FolderUpdateKajPolicyConfigCall<'a, C> {
+        FolderUpdateKajPolicyConfigCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+}
+
+/// A builder providing access to all methods supported on *organization* resources.
+/// It is not used directly, but through the [`CloudKMS`] hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate google_cloudkms1 as cloudkms1;
+///
+/// # async fn dox() {
+/// use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http2()
+///         .build()
+/// );
+/// let mut hub = CloudKMS::new(client, auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get_kaj_policy_config(...)` and `update_kaj_policy_config(...)`
+/// // to build up your call.
+/// let rb = hub.organizations();
+/// # }
+/// ```
+pub struct OrganizationMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+}
+
+impl<'a, C> common::MethodsBuilder for OrganizationMethods<'a, C> {}
+
+impl<'a, C> OrganizationMethods<'a, C> {
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the KeyAccessJustificationsPolicyConfig to get.
+    pub fn get_kaj_policy_config(&self, name: &str) -> OrganizationGetKajPolicyConfigCall<'a, C> {
+        OrganizationGetKajPolicyConfigCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig".
+    pub fn update_kaj_policy_config(
+        &self,
+        request: KeyAccessJustificationsPolicyConfig,
+        name: &str,
+    ) -> OrganizationUpdateKajPolicyConfigCall<'a, C> {
+        OrganizationUpdateKajPolicyConfigCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
@@ -1884,9 +2231,20 @@ impl<'a, C> FolderMethods<'a, C> {
 /// use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -1897,12 +2255,12 @@ impl<'a, C> FolderMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = CloudKMS::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_ekm_config_get_iam_policy(...)`, `locations_ekm_config_set_iam_policy(...)`, `locations_ekm_config_test_iam_permissions(...)`, `locations_ekm_connections_create(...)`, `locations_ekm_connections_get(...)`, `locations_ekm_connections_get_iam_policy(...)`, `locations_ekm_connections_list(...)`, `locations_ekm_connections_patch(...)`, `locations_ekm_connections_set_iam_policy(...)`, `locations_ekm_connections_test_iam_permissions(...)`, `locations_ekm_connections_verify_connectivity(...)`, `locations_generate_random_bytes(...)`, `locations_get(...)`, `locations_get_ekm_config(...)`, `locations_key_handles_create(...)`, `locations_key_handles_get(...)`, `locations_key_handles_list(...)`, `locations_key_rings_create(...)`, `locations_key_rings_crypto_keys_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_destroy(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_import(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_list(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_mac_sign(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_mac_verify(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_patch(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_raw_decrypt(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_raw_encrypt(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_restore(...)`, `locations_key_rings_crypto_keys_decrypt(...)`, `locations_key_rings_crypto_keys_encrypt(...)`, `locations_key_rings_crypto_keys_get(...)`, `locations_key_rings_crypto_keys_get_iam_policy(...)`, `locations_key_rings_crypto_keys_list(...)`, `locations_key_rings_crypto_keys_patch(...)`, `locations_key_rings_crypto_keys_set_iam_policy(...)`, `locations_key_rings_crypto_keys_test_iam_permissions(...)`, `locations_key_rings_crypto_keys_update_primary_version(...)`, `locations_key_rings_get(...)`, `locations_key_rings_get_iam_policy(...)`, `locations_key_rings_import_jobs_create(...)`, `locations_key_rings_import_jobs_get(...)`, `locations_key_rings_import_jobs_get_iam_policy(...)`, `locations_key_rings_import_jobs_list(...)`, `locations_key_rings_import_jobs_set_iam_policy(...)`, `locations_key_rings_import_jobs_test_iam_permissions(...)`, `locations_key_rings_list(...)`, `locations_key_rings_set_iam_policy(...)`, `locations_key_rings_test_iam_permissions(...)`, `locations_list(...)`, `locations_operations_get(...)`, `locations_update_ekm_config(...)` and `show_effective_autokey_config(...)`
+/// // like `get_kaj_policy_config(...)`, `locations_ekm_config_get_iam_policy(...)`, `locations_ekm_config_set_iam_policy(...)`, `locations_ekm_config_test_iam_permissions(...)`, `locations_ekm_connections_create(...)`, `locations_ekm_connections_get(...)`, `locations_ekm_connections_get_iam_policy(...)`, `locations_ekm_connections_list(...)`, `locations_ekm_connections_patch(...)`, `locations_ekm_connections_set_iam_policy(...)`, `locations_ekm_connections_test_iam_permissions(...)`, `locations_ekm_connections_verify_connectivity(...)`, `locations_generate_random_bytes(...)`, `locations_get(...)`, `locations_get_ekm_config(...)`, `locations_key_handles_create(...)`, `locations_key_handles_get(...)`, `locations_key_handles_list(...)`, `locations_key_rings_create(...)`, `locations_key_rings_crypto_keys_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_decrypt(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_asymmetric_sign(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_create(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_decapsulate(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_destroy(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_get_public_key(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_import(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_list(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_mac_sign(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_mac_verify(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_patch(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_raw_decrypt(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_raw_encrypt(...)`, `locations_key_rings_crypto_keys_crypto_key_versions_restore(...)`, `locations_key_rings_crypto_keys_decrypt(...)`, `locations_key_rings_crypto_keys_encrypt(...)`, `locations_key_rings_crypto_keys_get(...)`, `locations_key_rings_crypto_keys_get_iam_policy(...)`, `locations_key_rings_crypto_keys_list(...)`, `locations_key_rings_crypto_keys_patch(...)`, `locations_key_rings_crypto_keys_set_iam_policy(...)`, `locations_key_rings_crypto_keys_test_iam_permissions(...)`, `locations_key_rings_crypto_keys_update_primary_version(...)`, `locations_key_rings_get(...)`, `locations_key_rings_get_iam_policy(...)`, `locations_key_rings_import_jobs_create(...)`, `locations_key_rings_import_jobs_get(...)`, `locations_key_rings_import_jobs_get_iam_policy(...)`, `locations_key_rings_import_jobs_list(...)`, `locations_key_rings_import_jobs_set_iam_policy(...)`, `locations_key_rings_import_jobs_test_iam_permissions(...)`, `locations_key_rings_list(...)`, `locations_key_rings_set_iam_policy(...)`, `locations_key_rings_test_iam_permissions(...)`, `locations_list(...)`, `locations_operations_get(...)`, `locations_update_ekm_config(...)`, `show_effective_autokey_config(...)`, `show_effective_key_access_justifications_enrollment_config(...)`, `show_effective_key_access_justifications_policy_config(...)` and `update_kaj_policy_config(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2218,6 +2576,8 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationKeyHandleListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -2296,6 +2656,29 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Decapsulates data that was encapsulated with a public key retrieved from GetPublicKey corresponding to a CryptoKeyVersion with CryptoKey.purpose KEY_ENCAPSULATION.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The resource name of the CryptoKeyVersion to use for decapsulation.
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_decapsulate(
+        &self,
+        request: DecapsulateRequest,
+        name: &str,
+    ) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C> {
+        ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Schedule a CryptoKeyVersion for destruction. Upon calling this method, CryptoKeyVersion.state will be set to DESTROY_SCHEDULED, and destroy_time will be set to the time destroy_scheduled_duration in the future. At that time, the state will automatically change to DESTROYED, and the key material will be irrevocably destroyed. Before the destroy_time is reached, RestoreCryptoKeyVersion may be called to reverse the process.
     ///
     /// # Arguments
@@ -2351,6 +2734,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall {
             hub: self.hub,
             _name: name.to_string(),
+            _public_key_format: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3126,6 +3510,7 @@ impl<'a, C> ProjectMethods<'a, C> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _extra_location_types: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3158,6 +3543,23 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the KeyAccessJustificationsPolicyConfig to get.
+    pub fn get_kaj_policy_config(&self, name: &str) -> ProjectGetKajPolicyConfigCall<'a, C> {
+        ProjectGetKajPolicyConfigCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Returns the effective Cloud KMS Autokey configuration for a given project.
     ///
     /// # Arguments
@@ -3170,6 +3572,70 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectShowEffectiveAutokeyConfigCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the KeyAccessJustificationsEnrollmentConfig of the resource closest to the given project in hierarchy.
+    ///
+    /// # Arguments
+    ///
+    /// * `project` - Required. The number or id of the project to get the effective KeyAccessJustificationsEnrollmentConfig for.
+    pub fn show_effective_key_access_justifications_enrollment_config(
+        &self,
+        project: &str,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C> {
+        ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall {
+            hub: self.hub,
+            _project: project.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the KeyAccessJustificationsPolicyConfig of the resource closest to the given project in hierarchy.
+    ///
+    /// # Arguments
+    ///
+    /// * `project` - Required. The number or id of the project to get the effective KeyAccessJustificationsPolicyConfig. In the format of "projects/{|}"
+    pub fn show_effective_key_access_justifications_policy_config(
+        &self,
+        project: &str,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C> {
+        ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall {
+            hub: self.hub,
+            _project: project.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig".
+    pub fn update_kaj_policy_config(
+        &self,
+        request: KeyAccessJustificationsPolicyConfig,
+        name: &str,
+    ) -> ProjectUpdateKajPolicyConfigCall<'a, C> {
+        ProjectUpdateKajPolicyConfigCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3198,9 +3664,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3211,7 +3688,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -3467,6 +3944,305 @@ where
     }
 }
 
+/// Gets the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+///
+/// A builder for the *getKajPolicyConfig* method supported by a *folder* resource.
+/// It is not used directly, but through a [`FolderMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// # async fn dox() {
+/// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudKMS::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.folders().get_kaj_policy_config("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct FolderGetKajPolicyConfigCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for FolderGetKajPolicyConfigCall<'a, C> {}
+
+impl<'a, C> FolderGetKajPolicyConfigCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, KeyAccessJustificationsPolicyConfig)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudkms.folders.getKajPolicyConfig",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the KeyAccessJustificationsPolicyConfig to get.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> FolderGetKajPolicyConfigCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderGetKajPolicyConfigCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> FolderGetKajPolicyConfigCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> FolderGetKajPolicyConfigCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderGetKajPolicyConfigCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FolderGetKajPolicyConfigCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Updates the AutokeyConfig for a folder. The caller must have both `cloudkms.autokeyConfigs.update` permission on the parent folder and `cloudkms.cryptoKeys.setIamPolicy` permission on the provided key project. A KeyHandle creation in the folder's descendant projects will use this configuration to determine where to create the resulting CryptoKey.
 ///
 /// A builder for the *updateAutokeyConfig* method supported by a *folder* resource.
@@ -3485,9 +4261,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3498,7 +4285,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -3700,7 +4487,7 @@ where
         self._request = new_value;
         self
     }
-    /// Identifier. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`.
+    /// Identifier. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3805,6 +4592,1013 @@ where
     }
 }
 
+/// Updates the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+///
+/// A builder for the *updateKajPolicyConfig* method supported by a *folder* resource.
+/// It is not used directly, but through a [`FolderMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// use cloudkms1::api::KeyAccessJustificationsPolicyConfig;
+/// # async fn dox() {
+/// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudKMS::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = KeyAccessJustificationsPolicyConfig::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.folders().update_kaj_policy_config(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct FolderUpdateKajPolicyConfigCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+    _request: KeyAccessJustificationsPolicyConfig,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for FolderUpdateKajPolicyConfigCall<'a, C> {}
+
+impl<'a, C> FolderUpdateKajPolicyConfigCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, KeyAccessJustificationsPolicyConfig)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudkms.folders.updateKajPolicyConfig",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: KeyAccessJustificationsPolicyConfig,
+    ) -> FolderUpdateKajPolicyConfigCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig".
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> FolderUpdateKajPolicyConfigCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of fields to update.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> FolderUpdateKajPolicyConfigCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderUpdateKajPolicyConfigCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> FolderUpdateKajPolicyConfigCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> FolderUpdateKajPolicyConfigCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderUpdateKajPolicyConfigCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FolderUpdateKajPolicyConfigCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+///
+/// A builder for the *getKajPolicyConfig* method supported by a *organization* resource.
+/// It is not used directly, but through a [`OrganizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// # async fn dox() {
+/// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudKMS::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().get_kaj_policy_config("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct OrganizationGetKajPolicyConfigCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for OrganizationGetKajPolicyConfigCall<'a, C> {}
+
+impl<'a, C> OrganizationGetKajPolicyConfigCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, KeyAccessJustificationsPolicyConfig)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudkms.organizations.getKajPolicyConfig",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the KeyAccessJustificationsPolicyConfig to get.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OrganizationGetKajPolicyConfigCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationGetKajPolicyConfigCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetKajPolicyConfigCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationGetKajPolicyConfigCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationGetKajPolicyConfigCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> OrganizationGetKajPolicyConfigCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Updates the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+///
+/// A builder for the *updateKajPolicyConfig* method supported by a *organization* resource.
+/// It is not used directly, but through a [`OrganizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// use cloudkms1::api::KeyAccessJustificationsPolicyConfig;
+/// # async fn dox() {
+/// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudKMS::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = KeyAccessJustificationsPolicyConfig::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().update_kaj_policy_config(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct OrganizationUpdateKajPolicyConfigCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+    _request: KeyAccessJustificationsPolicyConfig,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for OrganizationUpdateKajPolicyConfigCall<'a, C> {}
+
+impl<'a, C> OrganizationUpdateKajPolicyConfigCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, KeyAccessJustificationsPolicyConfig)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudkms.organizations.updateKajPolicyConfig",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: KeyAccessJustificationsPolicyConfig,
+    ) -> OrganizationUpdateKajPolicyConfigCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig".
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OrganizationUpdateKajPolicyConfigCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of fields to update.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> OrganizationUpdateKajPolicyConfigCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationUpdateKajPolicyConfigCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationUpdateKajPolicyConfigCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationUpdateKajPolicyConfigCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationUpdateKajPolicyConfigCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> OrganizationUpdateKajPolicyConfigCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
 ///
 /// A builder for the *locations.ekmConfig.getIamPolicy* method supported by a *project* resource.
@@ -3822,9 +5616,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3835,7 +5640,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -3843,7 +5648,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_ekm_config_get_iam_policy("resource")
-///              .options_requested_policy_version(-59)
+///              .options_requested_policy_version(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4124,9 +5929,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4137,7 +5953,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -4450,9 +6266,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4463,7 +6290,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -4789,9 +6616,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4802,7 +6640,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -4815,7 +6653,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_ekm_connections_create(req, "parent")
-///              .ekm_connection_id("gubergren")
+///              .ekm_connection_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5129,9 +6967,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5142,7 +6991,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -5415,9 +7264,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5428,7 +7288,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -5436,7 +7296,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_ekm_connections_get_iam_policy("resource")
-///              .options_requested_policy_version(-75)
+///              .options_requested_policy_version(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5726,9 +7586,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5739,7 +7610,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -5747,10 +7618,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_ekm_connections_list("parent")
-///              .page_token("ea")
-///              .page_size(-55)
-///              .order_by("invidunt")
-///              .filter("amet")
+///              .page_token("duo")
+///              .page_size(-50)
+///              .order_by("sed")
+///              .filter("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6070,9 +7941,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6083,7 +7965,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -6411,9 +8293,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6424,7 +8317,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -6747,9 +8640,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6760,7 +8664,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -7085,9 +8989,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7098,7 +9013,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -7385,9 +9300,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7398,7 +9324,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -7411,7 +9337,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_handles_create(req, "parent")
-///              .key_handle_id("rebum.")
+///              .key_handle_id("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7719,9 +9645,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7732,7 +9669,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -8005,9 +9942,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8018,7 +9966,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -8026,7 +9974,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_handles_list("parent")
-///              .filter("ipsum")
+///              .page_token("dolor")
+///              .page_size(-56)
+///              .filter("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8036,6 +9986,8 @@ where
 {
     hub: &'a CloudKMS<C>,
     _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -8063,15 +10015,21 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "filter"].iter() {
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
         if let Some(value) = self._filter.as_ref() {
             params.push("filter", value);
         }
@@ -8194,6 +10152,20 @@ where
         self._parent = new_value.to_string();
         self
     }
+    /// Optional. Optional pagination token, returned earlier via ListKeyHandlesResponse.next_page_token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyHandleListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Optional limit on the number of KeyHandles to include in the response. The service may return fewer than this value. Further KeyHandles can subsequently be obtained by including the ListKeyHandlesResponse.next_page_token in a subsequent request. If unspecified, at most 100 KeyHandles will be returned.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyHandleListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
     /// Optional. Filter to apply when listing KeyHandles, e.g. `resource_type_selector="{SERVICE}.googleapis.com/{TYPE}"`.
     ///
     /// Sets the *filter* query property to the given value.
@@ -8304,9 +10276,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8317,7 +10300,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -8646,9 +10629,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8659,7 +10653,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -8990,9 +10984,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9003,7 +11008,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -9316,6 +11321,361 @@ where
     }
 }
 
+/// Decapsulates data that was encapsulated with a public key retrieved from GetPublicKey corresponding to a CryptoKeyVersion with CryptoKey.purpose KEY_ENCAPSULATION.
+///
+/// A builder for the *locations.keyRings.cryptoKeys.cryptoKeyVersions.decapsulate* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// use cloudkms1::api::DecapsulateRequest;
+/// # async fn dox() {
+/// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudKMS::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = DecapsulateRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_decapsulate(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+    _request: DecapsulateRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, DecapsulateResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudkms.projects.locations.keyRings.cryptoKeys.cryptoKeyVersions.decapsulate",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:decapsulate";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: DecapsulateRequest,
+    ) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The resource name of the CryptoKeyVersion to use for decapsulation.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDecapsulateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Schedule a CryptoKeyVersion for destruction. Upon calling this method, CryptoKeyVersion.state will be set to DESTROY_SCHEDULED, and destroy_time will be set to the time destroy_scheduled_duration in the future. At that time, the state will automatically change to DESTROYED, and the key material will be irrevocably destroyed. Before the destroy_time is reached, RestoreCryptoKeyVersion may be called to reverse the process.
 ///
 /// A builder for the *locations.keyRings.cryptoKeys.cryptoKeyVersions.destroy* method supported by a *project* resource.
@@ -9334,9 +11694,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9347,7 +11718,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -9677,9 +12048,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9690,7 +12072,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -9976,9 +12358,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9989,7 +12382,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -9997,6 +12390,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_get_public_key("name")
+///              .public_key_format("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10006,6 +12400,7 @@ where
 {
     hub: &'a CloudKMS<C>,
     _name: String,
+    _public_key_format: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -10035,15 +12430,18 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name"].iter() {
+        for &field in ["alt", "name", "publicKeyFormat"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._public_key_format.as_ref() {
+            params.push("publicKeyFormat", value);
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -10166,6 +12564,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// Optional. The PublicKey format specified by the user. This field is required for PQC algorithms. If specified, the public key will be exported through the public_key field in the requested format. Otherwise, the pem field will be populated for non-PQC algorithms, and an error will be returned for PQC algorithms.
+    ///
+    /// Sets the *public key format* query property to the given value.
+    pub fn public_key_format(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetPublicKeyCall<'a, C> {
+        self._public_key_format = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -10281,9 +12689,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10294,7 +12713,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -10624,9 +13043,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10637,7 +13067,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -10645,11 +13075,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_crypto_key_versions_list("parent")
-///              .view("duo")
-///              .page_token("sed")
-///              .page_size(-61)
-///              .order_by("Stet")
-///              .filter("kasd")
+///              .view("et")
+///              .page_token("vero")
+///              .page_size(-31)
+///              .order_by("sed")
+///              .filter("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11013,9 +13443,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11026,7 +13467,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -11357,9 +13798,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11370,7 +13822,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -11701,9 +14153,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11714,7 +14177,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -12060,9 +14523,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12073,7 +14547,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -12404,9 +14878,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12417,7 +14902,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -12748,9 +15233,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12761,7 +15257,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -13092,9 +15588,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13105,7 +15612,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -13119,7 +15626,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_create(req, "parent")
 ///              .skip_initial_version_creation(false)
-///              .crypto_key_id("diam")
+///              .crypto_key_id("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13451,9 +15958,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13464,7 +15982,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -13784,9 +16302,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13797,7 +16326,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -14116,9 +16645,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14129,7 +16669,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -14402,9 +16942,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14415,7 +16966,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -14423,7 +16974,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_get_iam_policy("resource")
-///              .options_requested_policy_version(-15)
+///              .options_requested_policy_version(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14716,9 +17267,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14729,7 +17291,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -14737,11 +17299,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_crypto_keys_list("parent")
-///              .version_view("duo")
-///              .page_token("vero")
-///              .page_size(-76)
-///              .order_by("invidunt")
-///              .filter("Stet")
+///              .version_view("vero")
+///              .page_token("elitr")
+///              .page_size(-6)
+///              .order_by("diam")
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15076,9 +17638,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15089,7 +17662,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -15417,9 +17990,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15430,7 +18014,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -15756,9 +18340,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15769,7 +18364,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -16095,9 +18690,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16108,7 +18714,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -16436,9 +19042,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16449,7 +19066,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -16462,7 +19079,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_import_jobs_create(req, "parent")
-///              .import_job_id("ipsum")
+///              .import_job_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16779,9 +19396,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16792,7 +19420,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -17065,9 +19693,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17078,7 +19717,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -17086,7 +19725,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_import_jobs_get_iam_policy("resource")
-///              .options_requested_policy_version(-46)
+///              .options_requested_policy_version(-2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17379,9 +20018,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17392,7 +20042,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -17400,10 +20050,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_import_jobs_list("parent")
-///              .page_token("et")
-///              .page_size(-31)
-///              .order_by("consetetur")
-///              .filter("amet.")
+///              .page_token("takimata")
+///              .page_size(-19)
+///              .order_by("gubergren")
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17723,9 +20373,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17736,7 +20397,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -18062,9 +20723,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18075,7 +20747,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -18401,9 +21073,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18414,7 +21097,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -18427,7 +21110,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_create(req, "parent")
-///              .key_ring_id("gubergren")
+///              .key_ring_id("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18735,9 +21418,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18748,7 +21442,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -19021,9 +21715,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19034,7 +21739,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -19042,7 +21747,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_get_iam_policy("resource")
-///              .options_requested_policy_version(-78)
+///              .options_requested_policy_version(-2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19322,9 +22027,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19335,7 +22051,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -19343,10 +22059,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_key_rings_list("parent")
-///              .page_token("dolore")
-///              .page_size(-34)
-///              .order_by("voluptua.")
-///              .filter("amet.")
+///              .page_token("sadipscing")
+///              .page_size(-6)
+///              .order_by("invidunt")
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19666,9 +22382,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19679,7 +22406,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -19992,9 +22719,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20005,7 +22743,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -20327,9 +23065,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20340,7 +23089,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -20614,9 +23363,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20627,7 +23387,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -20939,9 +23699,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20952,7 +23723,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -21225,9 +23996,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21238,7 +24020,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -21511,9 +24293,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21524,7 +24317,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -21532,9 +24325,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("sed")
-///              .page_size(-98)
-///              .filter("et")
+///              .page_token("ipsum")
+///              .page_size(-18)
+///              .filter("sanctus")
+///              .add_extra_location_types("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21547,6 +24341,7 @@ where
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
+    _extra_location_types: Vec<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -21573,14 +24368,23 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "pageToken",
+            "pageSize",
+            "filter",
+            "extraLocationTypes",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
@@ -21590,6 +24394,11 @@ where
         }
         if let Some(value) = self._filter.as_ref() {
             params.push("filter", value);
+        }
+        if !self._extra_location_types.is_empty() {
+            for f in self._extra_location_types.iter() {
+                params.push("extraLocationTypes", f);
+            }
         }
 
         params.extend(self._additional_params.iter());
@@ -21731,6 +24540,14 @@ where
         self._filter = Some(new_value.to_string());
         self
     }
+    /// Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.
+    ///
+    /// Append the given value to the *extra location types* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_extra_location_types(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+        self._extra_location_types.push(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -21834,9 +24651,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21847,7 +24675,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -22154,6 +24982,305 @@ where
     }
 }
 
+/// Gets the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+///
+/// A builder for the *getKajPolicyConfig* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// # async fn dox() {
+/// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudKMS::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().get_kaj_policy_config("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectGetKajPolicyConfigCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectGetKajPolicyConfigCall<'a, C> {}
+
+impl<'a, C> ProjectGetKajPolicyConfigCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, KeyAccessJustificationsPolicyConfig)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudkms.projects.getKajPolicyConfig",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the KeyAccessJustificationsPolicyConfig to get.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectGetKajPolicyConfigCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectGetKajPolicyConfigCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetKajPolicyConfigCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectGetKajPolicyConfigCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectGetKajPolicyConfigCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectGetKajPolicyConfigCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Returns the effective Cloud KMS Autokey configuration for a given project.
 ///
 /// A builder for the *showEffectiveAutokeyConfig* method supported by a *project* resource.
@@ -22171,9 +25298,20 @@ where
 /// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22184,7 +25322,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudKMS::new(client, auth);
@@ -22437,6 +25575,1002 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> ProjectShowEffectiveAutokeyConfigCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Returns the KeyAccessJustificationsEnrollmentConfig of the resource closest to the given project in hierarchy.
+///
+/// A builder for the *showEffectiveKeyAccessJustificationsEnrollmentConfig* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// # async fn dox() {
+/// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudKMS::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().show_effective_key_access_justifications_enrollment_config("project")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+    _project: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        ShowEffectiveKeyAccessJustificationsEnrollmentConfigResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudkms.projects.showEffectiveKeyAccessJustificationsEnrollmentConfig",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "project"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("project", self._project);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone()
+            + "v1/{+project}:showEffectiveKeyAccessJustificationsEnrollmentConfig";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+project}", "project")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["project"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The number or id of the project to get the effective KeyAccessJustificationsEnrollmentConfig for.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(
+        mut self,
+        new_value: &str,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsEnrollmentConfigCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Returns the KeyAccessJustificationsPolicyConfig of the resource closest to the given project in hierarchy.
+///
+/// A builder for the *showEffectiveKeyAccessJustificationsPolicyConfig* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// # async fn dox() {
+/// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudKMS::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().show_effective_key_access_justifications_policy_config("project")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+    _project: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        ShowEffectiveKeyAccessJustificationsPolicyConfigResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudkms.projects.showEffectiveKeyAccessJustificationsPolicyConfig",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "project"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("project", self._project);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone()
+            + "v1/{+project}:showEffectiveKeyAccessJustificationsPolicyConfig";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+project}", "project")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["project"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The number or id of the project to get the effective KeyAccessJustificationsPolicyConfig. In the format of "projects/{|}"
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(
+        mut self,
+        new_value: &str,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectShowEffectiveKeyAccessJustificationsPolicyConfigCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Updates the KeyAccessJustificationsPolicyConfig for a given organization, folder, or project.
+///
+/// A builder for the *updateKajPolicyConfig* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudkms1 as cloudkms1;
+/// use cloudkms1::api::KeyAccessJustificationsPolicyConfig;
+/// # async fn dox() {
+/// # use cloudkms1::{CloudKMS, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudKMS::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = KeyAccessJustificationsPolicyConfig::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().update_kaj_policy_config(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectUpdateKajPolicyConfigCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudKMS<C>,
+    _request: KeyAccessJustificationsPolicyConfig,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectUpdateKajPolicyConfigCall<'a, C> {}
+
+impl<'a, C> ProjectUpdateKajPolicyConfigCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, KeyAccessJustificationsPolicyConfig)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudkms.projects.updateKajPolicyConfig",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: KeyAccessJustificationsPolicyConfig,
+    ) -> ProjectUpdateKajPolicyConfigCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier. The resource name for this KeyAccessJustificationsPolicyConfig in the format of "{organizations|folders|projects}/*/kajPolicyConfig".
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectUpdateKajPolicyConfigCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of fields to update.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectUpdateKajPolicyConfigCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectUpdateKajPolicyConfigCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateKajPolicyConfigCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectUpdateKajPolicyConfigCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectUpdateKajPolicyConfigCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectUpdateKajPolicyConfigCall<'a, C> {
         self._scopes.clear();
         self
     }

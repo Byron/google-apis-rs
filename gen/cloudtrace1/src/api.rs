@@ -66,9 +66,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -79,7 +90,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = CloudTrace::new(client, auth);
@@ -124,7 +135,7 @@ impl<'a, C> CloudTrace<C> {
         CloudTrace {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://cloudtrace.googleapis.com/".to_string(),
             _root_url: "https://cloudtrace.googleapis.com/".to_string(),
         }
@@ -135,7 +146,7 @@ impl<'a, C> CloudTrace<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -237,7 +248,7 @@ pub struct TraceSpan {
     pub end_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Distinguishes between spans generated in a particular context. For example, two spans with the same name may be distinguished using `RPC_CLIENT` and `RPC_SERVER` to identify queueing latency associated with the span.
     pub kind: Option<String>,
-    /// Collection of labels associated with the span. Label keys must be less than 128 bytes. Label values must be less than 16 kilobytes (10MB for `/stacktrace` values). Some predefined label keys exist, or you may create your own. When creating your own, we recommend the following formats: * `/category/product/key` for agents of well-known products (e.g. `/db/mongodb/read_size`). * `short_host/path/key` for domain-specific keys (e.g. `foo.com/myproduct/bar`) Predefined labels include: * `/agent` * `/component` * `/error/message` * `/error/name` * `/http/client_city` * `/http/client_country` * `/http/client_protocol` * `/http/client_region` * `/http/host` * `/http/method` * `/http/path` * `/http/redirected_url` * `/http/request/size` * `/http/response/size` * `/http/route` * `/http/status_code` * `/http/url` * `/http/user_agent` * `/pid` * `/stacktrace` * `/tid`
+    /// Collection of labels associated with the span. Label keys must be less than 128 bytes. Label values must be less than 16 KiB. Some keys might have predefined meaning, and you can also create your own. For more information, see [Cloud Trace labels](https://cloud.google.com/trace/docs/trace-labels).
     pub labels: Option<HashMap<String, String>>,
     /// Name of the span. Must be less than 128 bytes. The span name is sanitized and displayed in the Trace tool in the Google Cloud Platform Console. The name may be a method name or some other per-call site name. For the same executable and the same call point, a best practice is to use a consistent name, which makes it easier to correlate cross-trace spans.
     pub name: Option<String>,
@@ -294,9 +305,20 @@ impl common::RequestValue for Traces {}
 /// use cloudtrace1::{CloudTrace, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -307,7 +329,7 @@ impl common::RequestValue for Traces {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = CloudTrace::new(client, auth);
@@ -372,7 +394,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Sends new traces to Cloud Trace or updates existing traces. If the ID of a trace that you send matches that of an existing trace, any fields in the existing trace and its spans are overwritten by the provided values, and any new fields provided are merged with the existing trace data. If the ID does not match, a new trace is created.
+    /// Sends trace spans to Cloud Trace. Spans cannot be updated. If the trace ID and span ID already exist, an additional copy of the span will be stored.
     ///
     /// # Arguments
     ///
@@ -411,9 +433,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use cloudtrace1::{CloudTrace, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -424,7 +457,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudTrace::new(client, auth);
@@ -711,9 +744,20 @@ where
 /// # use cloudtrace1::{CloudTrace, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -724,7 +768,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudTrace::new(client, auth);
@@ -980,7 +1024,7 @@ where
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// Optional. A filter against labels for the request. By default, searches use prefix matching. To specify exact match, prepend a plus symbol (`+`) to the search term. Multiple terms are ANDed. Syntax: * `root:NAME_PREFIX` or `NAME_PREFIX`: Return traces where any root span starts with `NAME_PREFIX`. * `+root:NAME` or `+NAME`: Return traces where any root span's name is exactly `NAME`. * `span:NAME_PREFIX`: Return traces where any span starts with `NAME_PREFIX`. * `+span:NAME`: Return traces where any span's name is exactly `NAME`. * `latency:DURATION`: Return traces whose overall latency is greater or equal to than `DURATION`. Accepted units are nanoseconds (`ns`), milliseconds (`ms`), and seconds (`s`). Default is `ms`. For example, `latency:24ms` returns traces whose overall latency is greater than or equal to 24 milliseconds. * `label:LABEL_KEY`: Return all traces containing the specified label key (exact match, case-sensitive) regardless of the key:value pair's value (including empty values). * `LABEL_KEY:VALUE_PREFIX`: Return all traces containing the specified label key (exact match, case-sensitive) whose value starts with `VALUE_PREFIX`. Both a key and a value must be specified. * `+LABEL_KEY:VALUE`: Return all traces containing a key:value pair exactly matching the specified text. Both a key and a value must be specified. * `method:VALUE`: Equivalent to `/http/method:VALUE`. * `url:VALUE`: Equivalent to `/http/url:VALUE`.
+    /// Optional. A filter against properties of the trace. See [filter syntax documentation](https://cloud.google.com/trace/docs/trace-filters) for details.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectTraceListCall<'a, C> {
@@ -1082,7 +1126,7 @@ where
     }
 }
 
-/// Sends new traces to Cloud Trace or updates existing traces. If the ID of a trace that you send matches that of an existing trace, any fields in the existing trace and its spans are overwritten by the provided values, and any new fields provided are merged with the existing trace data. If the ID does not match, a new trace is created.
+/// Sends trace spans to Cloud Trace. Spans cannot be updated. If the trace ID and span ID already exist, an additional copy of the span will be stored.
 ///
 /// A builder for the *patchTraces* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -1100,9 +1144,20 @@ where
 /// # use cloudtrace1::{CloudTrace, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -1113,7 +1168,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudTrace::new(client, auth);

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Authorized Buyers Marketplace* crate version *6.0.0+20240625*, where *20240625* is the exact revision of the *authorizedbuyersmarketplace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Authorized Buyers Marketplace* crate version *7.0.0+20251211*, where *20251211* is the exact revision of the *authorizedbuyersmarketplace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Authorized Buyers Marketplace* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/authorized-buyers/apis/marketplace/reference/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](AuthorizedBuyersMarketplace) ...
 //!
 //! * bidders
-//!  * [*auction packages list*](api::BidderAuctionPackageListCall) and [*finalized deals list*](api::BidderFinalizedDealListCall)
+//!  * [*auction packages list*](api::BidderAuctionPackageListCall), [*finalized deals list*](api::BidderFinalizedDealListCall) and [*finalized deals set ready to serve*](api::BidderFinalizedDealSetReadyToServeCall)
 //! * buyers
 //!  * [*auction packages get*](api::BuyerAuctionPackageGetCall), [*auction packages list*](api::BuyerAuctionPackageListCall), [*auction packages subscribe*](api::BuyerAuctionPackageSubscribeCall), [*auction packages subscribe clients*](api::BuyerAuctionPackageSubscribeClientCall), [*auction packages unsubscribe*](api::BuyerAuctionPackageUnsubscribeCall), [*auction packages unsubscribe clients*](api::BuyerAuctionPackageUnsubscribeClientCall), [*clients activate*](api::BuyerClientActivateCall), [*clients create*](api::BuyerClientCreateCall), [*clients deactivate*](api::BuyerClientDeactivateCall), [*clients get*](api::BuyerClientGetCall), [*clients list*](api::BuyerClientListCall), [*clients patch*](api::BuyerClientPatchCall), [*clients users activate*](api::BuyerClientUserActivateCall), [*clients users create*](api::BuyerClientUserCreateCall), [*clients users deactivate*](api::BuyerClientUserDeactivateCall), [*clients users delete*](api::BuyerClientUserDeleteCall), [*clients users get*](api::BuyerClientUserGetCall), [*clients users list*](api::BuyerClientUserListCall), [*finalized deals add creative*](api::BuyerFinalizedDealAddCreativeCall), [*finalized deals get*](api::BuyerFinalizedDealGetCall), [*finalized deals list*](api::BuyerFinalizedDealListCall), [*finalized deals pause*](api::BuyerFinalizedDealPauseCall), [*finalized deals resume*](api::BuyerFinalizedDealResumeCall), [*finalized deals set ready to serve*](api::BuyerFinalizedDealSetReadyToServeCall), [*proposals accept*](api::BuyerProposalAcceptCall), [*proposals add note*](api::BuyerProposalAddNoteCall), [*proposals cancel negotiation*](api::BuyerProposalCancelNegotiationCall), [*proposals deals batch update*](api::BuyerProposalDealBatchUpdateCall), [*proposals deals get*](api::BuyerProposalDealGetCall), [*proposals deals list*](api::BuyerProposalDealListCall), [*proposals deals patch*](api::BuyerProposalDealPatchCall), [*proposals get*](api::BuyerProposalGetCall), [*proposals list*](api::BuyerProposalListCall), [*proposals patch*](api::BuyerProposalPatchCall), [*proposals send rfp*](api::BuyerProposalSendRfpCall), [*publisher profiles get*](api::BuyerPublisherProfileGetCall) and [*publisher profiles list*](api::BuyerPublisherProfileListCall)
 //!
@@ -94,9 +94,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -107,7 +118,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = AuthorizedBuyersMarketplace::new(client, auth);

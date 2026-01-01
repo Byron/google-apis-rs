@@ -60,9 +60,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -73,7 +84,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Dfareporting::new(client, auth);
@@ -126,7 +137,7 @@ impl<'a, C> Dfareporting<C> {
         Dfareporting {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://dfareporting.googleapis.com/dfareporting/v3.5/".to_string(),
             _root_url: "https://dfareporting.googleapis.com/".to_string(),
         }
@@ -137,7 +148,7 @@ impl<'a, C> Dfareporting<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -236,12 +247,6 @@ pub struct CreativeAssetMetadata {
     pub id_dimension_value: Option<DimensionValue>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#creativeAssetMetadata".
     pub kind: Option<String>,
-    /// no description provided
-    #[serde(rename = "mediaRequestInfo")]
-    pub media_request_info: Option<MediaRequestInfo>,
-    /// no description provided
-    #[serde(rename = "mediaResponseInfo")]
-    pub media_response_info: Option<MediaResponseInfo>,
     /// True if the uploaded asset is a rich media asset. This is a read-only, auto-generated field.
     #[serde(rename = "richMedia")]
     pub rich_media: Option<bool>,
@@ -347,91 +352,6 @@ pub struct DimensionValue {
 
 impl common::Part for DimensionValue {}
 
-/// Extra information added to operations that support Scotty media requests.
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct MediaRequestInfo {
-    /// The number of current bytes uploaded or downloaded.
-    #[serde(rename = "currentBytes")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub current_bytes: Option<i64>,
-    /// Data to be copied to backend requests. Custom data is returned to Scotty in the agent_state field, which Scotty will then provide in subsequent upload notifications.
-    #[serde(rename = "customData")]
-    pub custom_data: Option<String>,
-    /// Set if the http request info is diff encoded. The value of this field is the version number of the base revision. This is corresponding to Apiary's mediaDiffObjectVersion (//depot/google3/java/com/google/api/server/media/variable/DiffObjectVersionVariable.java). See go/esf-scotty-diff-upload for more information.
-    #[serde(rename = "diffObjectVersion")]
-    pub diff_object_version: Option<String>,
-    /// The existence of the final_status field indicates that this is the last call to the agent for this request_id. http://google3/uploader/agent/scotty_agent.proto?l=737&rcl=347601929
-    #[serde(rename = "finalStatus")]
-    pub final_status: Option<i32>,
-    /// The type of notification received from Scotty.
-    #[serde(rename = "notificationType")]
-    pub notification_type: Option<String>,
-    /// The Scotty request ID.
-    #[serde(rename = "requestId")]
-    pub request_id: Option<String>,
-    /// The partition of the Scotty server handling this request. type is uploader_service.RequestReceivedParamsServingInfo LINT.IfChange(request_received_params_serving_info_annotations) LINT.ThenChange()
-    #[serde(rename = "requestReceivedParamsServingInfo")]
-    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
-    pub request_received_params_serving_info: Option<Vec<u8>>,
-    /// The total size of the file.
-    #[serde(rename = "totalBytes")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub total_bytes: Option<i64>,
-    /// Whether the total bytes field contains an estimated data.
-    #[serde(rename = "totalBytesIsEstimated")]
-    pub total_bytes_is_estimated: Option<bool>,
-}
-
-impl common::Part for MediaRequestInfo {}
-
-/// This message is for backends to pass their scotty media specific fields to ESF. Backend will include this in their response message to ESF. Example: ExportFile is an rpc defined for upload using scotty from ESF. rpc ExportFile(ExportFileRequest) returns (ExportFileResponse) Message ExportFileResponse will include apiserving.MediaResponseInfo to tell ESF about data like dynamic_dropzone it needs to pass to Scotty. message ExportFileResponse { optional gdata.Media blob = 1; optional apiserving.MediaResponseInfo media_response_info = 2 }
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct MediaResponseInfo {
-    /// Data to copy from backend response to the next backend requests. Custom data is returned to Scotty in the agent_state field, which Scotty will then provide in subsequent upload notifications.
-    #[serde(rename = "customData")]
-    pub custom_data: Option<String>,
-    /// Specifies any transformation to be applied to data before persisting it or retrieving from storage. E.g., encryption options for blobstore2. This should be of the form uploader_service.DataStorageTransform.
-    #[serde(rename = "dataStorageTransform")]
-    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
-    pub data_storage_transform: Option<Vec<u8>>,
-    /// Specifies the Scotty Drop Target to use for uploads. If present in a media response, Scotty does not upload to a standard drop zone. Instead, Scotty saves the upload directly to the location specified in this drop target. Unlike drop zones, the drop target is the final storage location for an upload. So, the agent does not need to clone the blob at the end of the upload. The agent is responsible for garbage collecting any orphaned blobs that may occur due to aborted uploads. For more information, see the drop target design doc here: http://goto/ScottyDropTarget This field will be preferred to dynamicDropzone. If provided, the identified field in the response must be of the type uploader.agent.DropTarget.
-    #[serde(rename = "dynamicDropTarget")]
-    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
-    pub dynamic_drop_target: Option<Vec<u8>>,
-    /// Specifies the Scotty dropzone to use for uploads.
-    #[serde(rename = "dynamicDropzone")]
-    pub dynamic_dropzone: Option<String>,
-    /// Request class to use for all Blobstore operations for this request.
-    #[serde(rename = "requestClass")]
-    pub request_class: Option<String>,
-    /// Requester ID passed along to be recorded in the Scotty logs
-    #[serde(rename = "scottyAgentUserId")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub scotty_agent_user_id: Option<i64>,
-    /// Customer-specific data to be recorded in the Scotty logs type is logs_proto_scotty.CustomerLog
-    #[serde(rename = "scottyCustomerLog")]
-    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
-    pub scotty_customer_log: Option<Vec<u8>>,
-    /// Specifies the TrafficClass that Scotty should use for any RPCs to fetch the response bytes. Will override the traffic class GTOS of the incoming http request. This is a temporary field to facilitate whitelisting and experimentation by the bigstore agent only. For instance, this does not apply to RTMP reads. WARNING: DO NOT USE WITHOUT PERMISSION FROM THE SCOTTY TEAM.
-    #[serde(rename = "trafficClassField")]
-    pub traffic_class_field: Option<String>,
-    /// Tells Scotty to verify hashes on the agent's behalf by parsing out the X-Goog-Hash header.
-    #[serde(rename = "verifyHashFromHeader")]
-    pub verify_hash_from_header: Option<bool>,
-}
-
-impl common::Part for MediaResponseInfo {}
-
 /// Offset Position.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -527,9 +447,20 @@ impl common::Part for Size {}
 /// use dfareporting3d5::{Dfareporting, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -540,7 +471,7 @@ impl common::Part for Size {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Dfareporting::new(client, auth);
@@ -610,9 +541,20 @@ impl<'a, C> MediaMethods<'a, C> {
 /// # use dfareporting3d5::{Dfareporting, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -623,7 +565,7 @@ impl<'a, C> MediaMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Dfareporting::new(client, auth);

@@ -63,9 +63,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -76,7 +87,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Firestore::new(client, auth);
@@ -127,7 +138,7 @@ impl<'a, C> Firestore<C> {
         Firestore {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://firestore.googleapis.com/".to_string(),
             _root_url: "https://firestore.googleapis.com/".to_string(),
         }
@@ -138,7 +149,7 @@ impl<'a, C> Firestore<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -533,7 +544,7 @@ pub struct Document {
 impl common::RequestValue for Document {}
 impl common::ResponseResult for Document {}
 
-/// A Document has changed. May be the result of multiple writes, including deletes, that ultimately resulted in a new value for the Document. Multiple DocumentChange messages may be returned for the same logical change, if multiple targets are affected. For PipelineQueryTargets, `document` will be in the new pipeline format, For a Listen stream with both QueryTargets and PipelineQueryTargets present, if a document matches both types of queries, then a separate DocumentChange messages will be sent out one for each set.
+/// A Document has changed. May be the result of multiple writes, including deletes, that ultimately resulted in a new value for the Document. Multiple DocumentChange messages may be returned for the same logical change, if multiple targets are affected.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -652,6 +663,7 @@ impl common::Part for DocumentsTarget {}
 /// * [databases documents rollback projects](ProjectDatabaseDocumentRollbackCall) (response)
 /// * [databases operations cancel projects](ProjectDatabaseOperationCancelCall) (response)
 /// * [databases operations delete projects](ProjectDatabaseOperationDeleteCall) (response)
+/// * [databases user creds delete projects](ProjectDatabaseUserCredDeleteCall) (response)
 /// * [locations backups delete projects](ProjectLocationBackupDeleteCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
@@ -661,6 +673,61 @@ pub struct Empty {
 }
 
 impl common::ResponseResult for Empty {}
+
+/// The request for Firestore.ExecutePipeline.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [databases documents execute pipeline projects](ProjectDatabaseDocumentExecutePipelineCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExecutePipelineRequest {
+    /// Execute the pipeline in a new transaction. The identifier of the newly created transaction will be returned in the first response on the stream. This defaults to a read-only transaction.
+    #[serde(rename = "newTransaction")]
+    pub new_transaction: Option<TransactionOptions>,
+    /// Execute the pipeline in a snapshot transaction at the given time. This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
+    #[serde(rename = "readTime")]
+    pub read_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// A pipelined operation.
+    #[serde(rename = "structuredPipeline")]
+    pub structured_pipeline: Option<StructuredPipeline>,
+    /// Run the query within an already active transaction. The value here is the opaque transaction ID to execute the query in.
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
+    pub transaction: Option<Vec<u8>>,
+}
+
+impl common::RequestValue for ExecutePipelineRequest {}
+
+/// The response for Firestore.Execute.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [databases documents execute pipeline projects](ProjectDatabaseDocumentExecutePipelineCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExecutePipelineResponse {
+    /// The time at which the results are valid. This is a (not strictly) monotonically increasing value across multiple responses in the same stream. The API guarantees that all previously returned results are still valid at the latest `execution_time`. This allows the API consumer to treat the query if it ran at the latest `execution_time` returned. If the query returns no results, a response with `execution_time` and no `results` will be sent, and this represents the time at which the operation was run.
+    #[serde(rename = "executionTime")]
+    pub execution_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Query explain stats. This is present on the **last** response if the request configured explain to run in 'analyze' or 'explain' mode in the pipeline options. If the query does not return any results, a response with `explain_stats` and no `results` will still be sent.
+    #[serde(rename = "explainStats")]
+    pub explain_stats: Option<ExplainStats>,
+    /// An ordered batch of results returned executing a pipeline. The batch size is variable, and can even be zero for when only a partial progress message is returned. The fields present in the returned documents are only those that were explicitly requested in the pipeline, this includes those like `__name__` and `__update_time__`. This is explicitly a divergence from `Firestore.RunQuery` / `Firestore.GetDocument` RPCs which always return such fields even when they are not specified in the `mask`.
+    pub results: Option<Vec<Document>>,
+    /// Newly created transaction identifier. This field is only specified as part of the first response from the server, alongside the `results` field when the original request specified ExecuteRequest.new_transaction.
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
+    pub transaction: Option<Vec<u8>>,
+}
+
+impl common::ResponseResult for ExecutePipelineResponse {}
 
 /// Execution statistics for the query.
 ///
@@ -740,6 +807,20 @@ pub struct ExplainOptions {
 }
 
 impl common::Part for ExplainOptions {}
+
+/// Pipeline explain stats. Depending on the explain options in the original request, this can contain the optimized plan and / or execution stats.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExplainStats {
+    /// The format depends on the `output_format` options in the request. Currently there are two supported options: `TEXT` and `JSON`. Both supply a `google.protobuf.StringValue`.
+    pub data: Option<HashMap<String, serde_json::Value>>,
+}
+
+impl common::Part for ExplainStats {}
 
 /// A filter on a specific field.
 ///
@@ -825,7 +906,7 @@ pub struct Filter {
 
 impl common::Part for Filter {}
 
-/// Nearest Neighbors search config.
+/// Nearest Neighbors search config. The ordering provided by FindNearest supersedes the order_by stage. If multiple documents have the same vector distance, the returned document order is not guaranteed to be stable between queries.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -836,6 +917,12 @@ pub struct FindNearest {
     /// Required. The distance measure to use, required.
     #[serde(rename = "distanceMeasure")]
     pub distance_measure: Option<String>,
+    /// Optional. Optional name of the field to output the result of the vector distance calculation. Must conform to document field name limitations.
+    #[serde(rename = "distanceResultField")]
+    pub distance_result_field: Option<String>,
+    /// Optional. Option to specify a threshold for which no less similar documents will be returned. The behavior of the specified `distance_measure` will affect the meaning of the distance threshold. Since DOT_PRODUCT distances increase when the vectors are more similar, the comparison is inverted. * For EUCLIDEAN, COSINE: `WHERE distance <= distance_threshold` * For DOT_PRODUCT: `WHERE distance >= distance_threshold`
+    #[serde(rename = "distanceThreshold")]
+    pub distance_threshold: Option<f64>,
     /// Required. The number of nearest neighbors to return. Must be a positive integer of no more than 1000.
     pub limit: Option<i32>,
     /// Required. The query vector that we are searching on. Must be a vector of no more than 2048 dimensions.
@@ -847,6 +934,24 @@ pub struct FindNearest {
 }
 
 impl common::Part for FindNearest {}
+
+/// Represents an unevaluated scalar expression. For example, the expression `like(user_name, "%alice%")` is represented as: ``` name: "like" args { field_reference: "user_name" } args { string_value: "%alice%" } ```
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Function {
+    /// Optional. Ordered list of arguments the given function expects.
+    pub args: Option<Vec<Value>>,
+    /// Required. The name of the function to evaluate. **Requires:** * must be in snake case (lower case with underscore separator).
+    pub name: Option<String>,
+    /// Optional. Optional named arguments that certain functions may support.
+    pub options: Option<HashMap<String, Value>>,
+}
+
+impl common::Part for Function {}
 
 /// A Backup of a Cloud Firestore Database. The backup contains all documents and index configurations for the given database at a specific point in time.
 ///
@@ -903,7 +1008,7 @@ pub struct GoogleFirestoreAdminV1BackupSchedule {
     pub daily_recurrence: Option<GoogleFirestoreAdminV1DailyRecurrence>,
     /// Output only. The unique backup schedule identifier across all locations and databases for the given project. This will be auto-assigned. Format is `projects/{project}/databases/{database}/backupSchedules/{backup_schedule}`
     pub name: Option<String>,
-    /// At what relative time in the future, compared to its creation time, the backup should be deleted, e.g. keep backups for 7 days.
+    /// At what relative time in the future, compared to its creation time, the backup should be deleted, e.g. keep backups for 7 days. The maximum supported retention period is 14 weeks.
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
     pub retention: Option<chrono::Duration>,
     /// Output only. The timestamp at which this backup schedule was most recently updated. When a backup schedule is first created, this is the same as create_time.
@@ -916,6 +1021,20 @@ pub struct GoogleFirestoreAdminV1BackupSchedule {
 
 impl common::RequestValue for GoogleFirestoreAdminV1BackupSchedule {}
 impl common::ResponseResult for GoogleFirestoreAdminV1BackupSchedule {}
+
+/// Information about a backup that was used to restore a database.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1BackupSource {
+    /// The resource name of the backup that was used to restore this database. Format: `projects/{project}/locations/{location}/backups/{backup}`.
+    pub backup: Option<String>,
+}
+
+impl common::Part for GoogleFirestoreAdminV1BackupSource {}
 
 /// The request for FirestoreAdmin.BulkDeleteDocuments. When both collection_ids and namespace_ids are set, only documents satisfying both conditions will be deleted. Requests with namespace_ids and collection_ids both empty will be rejected. Please use FirestoreAdmin.DeleteDatabase instead.
 ///
@@ -939,6 +1058,33 @@ pub struct GoogleFirestoreAdminV1BulkDeleteDocumentsRequest {
 
 impl common::RequestValue for GoogleFirestoreAdminV1BulkDeleteDocumentsRequest {}
 
+/// The request message for FirestoreAdmin.CloneDatabase.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [databases clone projects](ProjectDatabaseCloneCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1CloneDatabaseRequest {
+    /// Required. The ID to use for the database, which will become the final component of the database's resource name. This database ID must not be associated with an existing database. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. "(default)" database ID is also valid if the database is Standard edition.
+    #[serde(rename = "databaseId")]
+    pub database_id: Option<String>,
+    /// Optional. Encryption configuration for the cloned database. If this field is not specified, the cloned database will use the same encryption configuration as the source database, namely use_source_encryption.
+    #[serde(rename = "encryptionConfig")]
+    pub encryption_config: Option<GoogleFirestoreAdminV1EncryptionConfig>,
+    /// Required. Specification of the PITR data to clone from. The source database must exist. The cloned database will be created in the same location as the source database.
+    #[serde(rename = "pitrSnapshot")]
+    pub pitr_snapshot: Option<GoogleFirestoreAdminV1PitrSnapshot>,
+    /// Optional. Immutable. Tags to be bound to the cloned database. The tags should be provided in the format of `tagKeys/{tag_key_id} -> tagValues/{tag_value_id}`.
+    pub tags: Option<HashMap<String, String>>,
+}
+
+impl common::RequestValue for GoogleFirestoreAdminV1CloneDatabaseRequest {}
+
 /// The CMEK (Customer Managed Encryption Key) configuration for a Firestore database. If not present, the database is secured by the default Google encryption key.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -957,6 +1103,21 @@ pub struct GoogleFirestoreAdminV1CmekConfig {
 
 impl common::Part for GoogleFirestoreAdminV1CmekConfig {}
 
+/// The configuration options for using CMEK (Customer Managed Encryption Key) encryption.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1CustomerManagedEncryptionOptions {
+    /// Required. Only keys in the same location as the database are allowed to be used for encryption. For Firestore's nam5 multi-region, this corresponds to Cloud KMS multi-region us. For Firestore's eur3 multi-region, this corresponds to Cloud KMS multi-region europe. See https://cloud.google.com/kms/docs/locations. The expected format is `projects/{project_id}/locations/{kms_location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`.
+    #[serde(rename = "kmsKeyName")]
+    pub kms_key_name: Option<String>,
+}
+
+impl common::Part for GoogleFirestoreAdminV1CustomerManagedEncryptionOptions {}
+
 /// Represents a recurring schedule that runs every day. The time zone is UTC.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -965,8 +1126,7 @@ impl common::Part for GoogleFirestoreAdminV1CmekConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleFirestoreAdminV1DailyRecurrence {
-    /// Time of the day. The first run scheduled will be either on the same day if schedule creation time precedes time_of_day or the next day otherwise.
-    pub time: Option<TimeOfDay>,
+    _never_set: Option<bool>,
 }
 
 impl common::Part for GoogleFirestoreAdminV1DailyRecurrence {}
@@ -991,12 +1151,15 @@ pub struct GoogleFirestoreAdminV1Database {
     /// Optional. Presence indicates CMEK is enabled for this database.
     #[serde(rename = "cmekConfig")]
     pub cmek_config: Option<GoogleFirestoreAdminV1CmekConfig>,
-    /// The concurrency control mode to use for this database.
+    /// The concurrency control mode to use for this database. If unspecified in a CreateDatabase request, this will default based on the database edition: Optimistic for Enterprise and Pessimistic for all other databases.
     #[serde(rename = "concurrencyMode")]
     pub concurrency_mode: Option<String>,
     /// Output only. The timestamp at which this database was created. Databases created before 2016 do not populate create_time.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Immutable. The edition of the database.
+    #[serde(rename = "databaseEdition")]
+    pub database_edition: Option<String>,
     /// State of delete protection for the database.
     #[serde(rename = "deleteProtectionState")]
     pub delete_protection_state: Option<String>,
@@ -1008,12 +1171,21 @@ pub struct GoogleFirestoreAdminV1Database {
     pub earliest_version_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
     pub etag: Option<String>,
-    /// Output only. The key_prefix for this database. This key_prefix is used, in combination with the project id ("~") to construct the application id that is returned from the Cloud Datastore APIs in Google App Engine first generation runtimes. This value may be empty in which case the appid to use for URL-encoded keys is the project_id (eg: foo instead of v~foo).
+    /// Optional. The Firestore API data access mode to use for this database. If not set on write: - the default value is DATA_ACCESS_MODE_DISABLED for Enterprise Edition. - the default value is DATA_ACCESS_MODE_ENABLED for Standard Edition.
+    #[serde(rename = "firestoreDataAccessMode")]
+    pub firestore_data_access_mode: Option<String>,
+    /// Output only. Background: Free tier is the ability of a Firestore database to use a small amount of resources every day without being charged. Once usage exceeds the free tier limit further usage is charged. Whether this database can make use of the free tier. Only one database per project can be eligible for the free tier. The first (or next) database that is created in a project without a free tier database will be marked as eligible for the free tier. Databases that are created while there is a free tier database will not be eligible for the free tier.
+    #[serde(rename = "freeTier")]
+    pub free_tier: Option<bool>,
+    /// Output only. The key_prefix for this database. This key_prefix is used, in combination with the project ID ("~") to construct the application ID that is returned from the Cloud Datastore APIs in Google App Engine first generation runtimes. This value may be empty in which case the appid to use for URL-encoded keys is the project_id (eg: foo instead of v~foo).
     #[serde(rename = "keyPrefix")]
     pub key_prefix: Option<String>,
     /// The location of the database. Available locations are listed at https://cloud.google.com/firestore/docs/locations.
     #[serde(rename = "locationId")]
     pub location_id: Option<String>,
+    /// Optional. The MongoDB compatible API data access mode to use for this database. If not set on write, the default value is DATA_ACCESS_MODE_ENABLED for Enterprise Edition. The value is always DATA_ACCESS_MODE_DISABLED for Standard Edition.
+    #[serde(rename = "mongodbCompatibleDataAccessMode")]
+    pub mongodb_compatible_data_access_mode: Option<String>,
     /// The resource name of the Database. Format: `projects/{project}/databases/{database}`
     pub name: Option<String>,
     /// Whether to enable the PITR feature on this database.
@@ -1022,6 +1194,14 @@ pub struct GoogleFirestoreAdminV1Database {
     /// Output only. The database resource's prior database ID. This field is only populated for deleted databases.
     #[serde(rename = "previousId")]
     pub previous_id: Option<String>,
+    /// Immutable. The default Realtime Updates mode to use for this database.
+    #[serde(rename = "realtimeUpdatesMode")]
+    pub realtime_updates_mode: Option<String>,
+    /// Output only. Information about the provenance of this database.
+    #[serde(rename = "sourceInfo")]
+    pub source_info: Option<GoogleFirestoreAdminV1SourceInfo>,
+    /// Optional. Input only. Immutable. Tag keys/values directly bound to this resource. For example: "123/environment": "production", "123/costCenter": "marketing"
+    pub tags: Option<HashMap<String, String>>,
     /// The type of the database. See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.
     #[serde(rename = "type")]
     pub type_: Option<String>,
@@ -1039,6 +1219,61 @@ pub struct GoogleFirestoreAdminV1Database {
 impl common::RequestValue for GoogleFirestoreAdminV1Database {}
 impl common::ResponseResult for GoogleFirestoreAdminV1Database {}
 
+/// The request for FirestoreAdmin.DisableUserCreds.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [databases user creds disable projects](ProjectDatabaseUserCredDisableCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1DisableUserCredsRequest {
+    _never_set: Option<bool>,
+}
+
+impl common::RequestValue for GoogleFirestoreAdminV1DisableUserCredsRequest {}
+
+/// The request for FirestoreAdmin.EnableUserCreds.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [databases user creds enable projects](ProjectDatabaseUserCredEnableCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1EnableUserCredsRequest {
+    _never_set: Option<bool>,
+}
+
+impl common::RequestValue for GoogleFirestoreAdminV1EnableUserCredsRequest {}
+
+/// Encryption configuration for a new database being created from another source. The source could be a Backup or a PitrSnapshot.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1EncryptionConfig {
+    /// Use Customer Managed Encryption Keys (CMEK) for encryption.
+    #[serde(rename = "customerManagedEncryption")]
+    pub customer_managed_encryption: Option<GoogleFirestoreAdminV1CustomerManagedEncryptionOptions>,
+    /// Use Google default encryption.
+    #[serde(rename = "googleDefaultEncryption")]
+    pub google_default_encryption: Option<GoogleFirestoreAdminV1GoogleDefaultEncryptionOptions>,
+    /// The database will use the same encryption configuration as the source.
+    #[serde(rename = "useSourceEncryption")]
+    pub use_source_encryption: Option<GoogleFirestoreAdminV1SourceEncryptionOptions>,
+}
+
+impl common::Part for GoogleFirestoreAdminV1EncryptionConfig {}
+
 /// The request for FirestoreAdmin.ExportDocuments.
 ///
 /// # Activities
@@ -1051,7 +1286,7 @@ impl common::ResponseResult for GoogleFirestoreAdminV1Database {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleFirestoreAdminV1ExportDocumentsRequest {
-    /// Which collection ids to export. Unspecified means all collections. Each collection id in this list must be unique.
+    /// IDs of the collection groups to export. Unspecified means all collection groups. Each collection group in this list must be unique.
     #[serde(rename = "collectionIds")]
     pub collection_ids: Option<Vec<String>>,
     /// An empty list represents all namespaces. This is the preferred usage for databases that don't use namespaces. An empty string element represents the default namespace. This should be used if the database has data in non-default namespaces, but doesn't want to include them. Each namespace in this list must be unique.
@@ -1067,7 +1302,7 @@ pub struct GoogleFirestoreAdminV1ExportDocumentsRequest {
 
 impl common::RequestValue for GoogleFirestoreAdminV1ExportDocumentsRequest {}
 
-/// Represents a single field in the database. Fields are grouped by their “Collection Group”, which represent all collections in the database with the same id.
+/// Represents a single field in the database. Fields are grouped by their “Collection Group”, which represent all collections in the database with the same ID.
 ///
 /// # Activities
 ///
@@ -1106,6 +1341,19 @@ pub struct GoogleFirestoreAdminV1FlatIndex {
 
 impl common::Part for GoogleFirestoreAdminV1FlatIndex {}
 
+/// The configuration options for using Google default encryption.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1GoogleDefaultEncryptionOptions {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for GoogleFirestoreAdminV1GoogleDefaultEncryptionOptions {}
+
 /// The request for FirestoreAdmin.ImportDocuments.
 ///
 /// # Activities
@@ -1118,7 +1366,7 @@ impl common::Part for GoogleFirestoreAdminV1FlatIndex {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleFirestoreAdminV1ImportDocumentsRequest {
-    /// Which collection ids to import. Unspecified means all collections included in the import. Each collection id in this list must be unique.
+    /// IDs of the collection groups to import. Unspecified means all collection groups that were included in the export. Each collection group in this list must be unique.
     #[serde(rename = "collectionIds")]
     pub collection_ids: Option<Vec<String>>,
     /// Location of the exported files. This must match the output_uri_prefix of an ExportDocumentsResponse from an export that has completed successfully. See: google.firestore.admin.v1.ExportDocumentsResponse.output_uri_prefix.
@@ -1147,15 +1395,24 @@ pub struct GoogleFirestoreAdminV1Index {
     /// The API scope supported by this index.
     #[serde(rename = "apiScope")]
     pub api_scope: Option<String>,
+    /// Immutable. The density configuration of the index.
+    pub density: Option<String>,
     /// The fields supported by this index. For composite indexes, this requires a minimum of 2 and a maximum of 100 fields. The last field entry is always for the field path `__name__`. If, on creation, `__name__` was not specified as the last field, it will be added automatically with the same direction as that of the last field defined. If the final field in a composite index is not directional, the `__name__` will be ordered ASCENDING (unless explicitly specified). For single field indexes, this will always be exactly one entry with a field path equal to the field path of the associated field.
     pub fields: Option<Vec<GoogleFirestoreAdminV1IndexField>>,
+    /// Optional. Whether the index is multikey. By default, the index is not multikey. For non-multikey indexes, none of the paths in the index definition reach or traverse an array, except via an explicit array index. For multikey indexes, at most one of the paths in the index definition reach or traverse an array, except via an explicit array index. Violations will result in errors. Note this field only applies to index with MONGODB_COMPATIBLE_API ApiScope.
+    pub multikey: Option<bool>,
     /// Output only. A server defined name for this index. The form of this name for composite indexes will be: `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/indexes/{composite_index_id}` For single field indexes, this field will be empty.
     pub name: Option<String>,
-    /// Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id. Indexes with a collection group query scope specified allow queries against all collections descended from a specific document, specified at query time, and that have the same collection id as this index.
+    /// Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection ID. Indexes with a collection group query scope specified allow queries against all collections descended from a specific document, specified at query time, and that have the same collection ID as this index.
     #[serde(rename = "queryScope")]
     pub query_scope: Option<String>,
+    /// Optional. The number of shards for the index.
+    #[serde(rename = "shardCount")]
+    pub shard_count: Option<i32>,
     /// Output only. The serving state of the index.
     pub state: Option<String>,
+    /// Optional. Whether it is an unique index. Unique index ensures all values for the indexed field(s) are unique across documents.
+    pub unique: Option<bool>,
 }
 
 impl common::RequestValue for GoogleFirestoreAdminV1Index {}
@@ -1307,6 +1564,77 @@ pub struct GoogleFirestoreAdminV1ListIndexesResponse {
 
 impl common::ResponseResult for GoogleFirestoreAdminV1ListIndexesResponse {}
 
+/// The response for FirestoreAdmin.ListUserCreds.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [databases user creds list projects](ProjectDatabaseUserCredListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1ListUserCredsResponse {
+    /// The user creds for the database.
+    #[serde(rename = "userCreds")]
+    pub user_creds: Option<Vec<GoogleFirestoreAdminV1UserCreds>>,
+}
+
+impl common::ResponseResult for GoogleFirestoreAdminV1ListUserCredsResponse {}
+
+/// A consistent snapshot of a database at a specific point in time. A PITR (Point-in-time recovery) snapshot with previous versions of a database's data is available for every minute up to the associated database's data retention period. If the PITR feature is enabled, the retention period is 7 days; otherwise, it is one hour.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1PitrSnapshot {
+    /// Required. The name of the database that this was a snapshot of. Format: `projects/{project}/databases/{database}`.
+    pub database: Option<String>,
+    /// Output only. Public UUID of the database the snapshot was associated with.
+    #[serde(rename = "databaseUid")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
+    pub database_uid: Option<Vec<u8>>,
+    /// Required. Snapshot time of the database.
+    #[serde(rename = "snapshotTime")]
+    pub snapshot_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::Part for GoogleFirestoreAdminV1PitrSnapshot {}
+
+/// The request for FirestoreAdmin.ResetUserPassword.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [databases user creds reset password projects](ProjectDatabaseUserCredResetPasswordCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1ResetUserPasswordRequest {
+    _never_set: Option<bool>,
+}
+
+impl common::RequestValue for GoogleFirestoreAdminV1ResetUserPasswordRequest {}
+
+/// Describes a Resource Identity principal.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1ResourceIdentity {
+    /// Output only. Principal identifier string. See: https://cloud.google.com/iam/docs/principal-identifiers
+    pub principal: Option<String>,
+}
+
+impl common::Part for GoogleFirestoreAdminV1ResourceIdentity {}
+
 /// The request message for FirestoreAdmin.RestoreDatabase.
 ///
 /// # Activities
@@ -1319,23 +1647,48 @@ impl common::ResponseResult for GoogleFirestoreAdminV1ListIndexesResponse {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleFirestoreAdminV1RestoreDatabaseRequest {
-    /// Backup to restore from. Must be from the same project as the parent. Format is: `projects/{project_id}/locations/{location}/backups/{backup}`
+    /// Required. Backup to restore from. Must be from the same project as the parent. The restored database will be created in the same location as the source backup. Format is: `projects/{project_id}/locations/{location}/backups/{backup}`
     pub backup: Option<String>,
-    /// Required. The ID to use for the database, which will become the final component of the database's resource name. This database id must not be associated with an existing database. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. "(default)" database id is also valid.
+    /// Required. The ID to use for the database, which will become the final component of the database's resource name. This database ID must not be associated with an existing database. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. "(default)" database ID is also valid if the database is Standard edition.
     #[serde(rename = "databaseId")]
     pub database_id: Option<String>,
-    /// Use Customer Managed Encryption Keys (CMEK) for encryption. Only keys in the same location as this database are allowed to be used for encryption. For Firestore's nam5 multi-region, this corresponds to Cloud KMS multi-region us. For Firestore's eur3 multi-region, this corresponds to Cloud KMS multi-region europe. See https://cloud.google.com/kms/docs/locations. The expected format is `projects/{project_id}/locations/{kms_location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`.
-    #[serde(rename = "kmsKeyName")]
-    pub kms_key_name: Option<String>,
-    /// The restored database will use the same encryption configuration as the backup. This is the default option when no `encryption_config` is specified.
-    #[serde(rename = "useBackupEncryption")]
-    pub use_backup_encryption: Option<Empty>,
-    /// Use Google default encryption.
-    #[serde(rename = "useGoogleDefaultEncryption")]
-    pub use_google_default_encryption: Option<Empty>,
+    /// Optional. Encryption configuration for the restored database. If this field is not specified, the restored database will use the same encryption configuration as the backup, namely use_source_encryption.
+    #[serde(rename = "encryptionConfig")]
+    pub encryption_config: Option<GoogleFirestoreAdminV1EncryptionConfig>,
+    /// Optional. Immutable. Tags to be bound to the restored database. The tags should be provided in the format of `tagKeys/{tag_key_id} -> tagValues/{tag_value_id}`.
+    pub tags: Option<HashMap<String, String>>,
 }
 
 impl common::RequestValue for GoogleFirestoreAdminV1RestoreDatabaseRequest {}
+
+/// The configuration options for using the same encryption method as the source.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1SourceEncryptionOptions {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for GoogleFirestoreAdminV1SourceEncryptionOptions {}
+
+/// Information about the provenance of this database.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1SourceInfo {
+    /// If set, this database was restored from the specified backup (or a snapshot thereof).
+    pub backup: Option<GoogleFirestoreAdminV1BackupSource>,
+    /// The associated long-running operation. This field may not be set after the operation has completed. Format: `projects/{project}/databases/{database}/operations/{operation}`.
+    pub operation: Option<String>,
+}
+
+impl common::Part for GoogleFirestoreAdminV1SourceInfo {}
 
 /// Backup specific statistics.
 ///
@@ -1375,6 +1728,43 @@ pub struct GoogleFirestoreAdminV1TtlConfig {
 
 impl common::Part for GoogleFirestoreAdminV1TtlConfig {}
 
+/// A Cloud Firestore User Creds.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [databases user creds create projects](ProjectDatabaseUserCredCreateCall) (request|response)
+/// * [databases user creds disable projects](ProjectDatabaseUserCredDisableCall) (response)
+/// * [databases user creds enable projects](ProjectDatabaseUserCredEnableCall) (response)
+/// * [databases user creds get projects](ProjectDatabaseUserCredGetCall) (response)
+/// * [databases user creds reset password projects](ProjectDatabaseUserCredResetPasswordCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleFirestoreAdminV1UserCreds {
+    /// Output only. The time the user creds were created.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Identifier. The resource name of the UserCreds. Format: `projects/{project}/databases/{database}/userCreds/{user_creds}`
+    pub name: Option<String>,
+    /// Resource Identity descriptor.
+    #[serde(rename = "resourceIdentity")]
+    pub resource_identity: Option<GoogleFirestoreAdminV1ResourceIdentity>,
+    /// Output only. The plaintext server-generated password for the user creds. Only populated in responses for CreateUserCreds and ResetUserPassword.
+    #[serde(rename = "securePassword")]
+    pub secure_password: Option<String>,
+    /// Output only. Whether the user creds are enabled or disabled. Defaults to ENABLED on creation.
+    pub state: Option<String>,
+    /// Output only. The time the user creds were last updated.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::RequestValue for GoogleFirestoreAdminV1UserCreds {}
+impl common::ResponseResult for GoogleFirestoreAdminV1UserCreds {}
+
 /// The index configuration to support vector search operations
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1401,8 +1791,6 @@ impl common::Part for GoogleFirestoreAdminV1VectorConfig {}
 pub struct GoogleFirestoreAdminV1WeeklyRecurrence {
     /// The day of week to run. DAY_OF_WEEK_UNSPECIFIED is not allowed.
     pub day: Option<String>,
-    /// Time of the day. If day is today, the first run will happen today if schedule creation time precedes time_of_day, and the next week otherwise.
-    pub time: Option<TimeOfDay>,
 }
 
 impl common::Part for GoogleFirestoreAdminV1WeeklyRecurrence {}
@@ -1441,6 +1829,8 @@ pub struct GoogleLongrunningListOperationsResponse {
     pub next_page_token: Option<String>,
     /// A list of operations that matches the specified filter in the request.
     pub operations: Option<Vec<GoogleLongrunningOperation>>,
+    /// Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for GoogleLongrunningListOperationsResponse {}
@@ -1456,6 +1846,7 @@ impl common::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// * [databases collection groups indexes create projects](ProjectDatabaseCollectionGroupIndexCreateCall) (response)
 /// * [databases operations get projects](ProjectDatabaseOperationGetCall) (response)
 /// * [databases bulk delete documents projects](ProjectDatabaseBulkDeleteDocumentCall) (response)
+/// * [databases clone projects](ProjectDatabaseCloneCall) (response)
 /// * [databases create projects](ProjectDatabaseCreateCall) (response)
 /// * [databases delete projects](ProjectDatabaseDeleteCall) (response)
 /// * [databases export documents projects](ProjectDatabaseExportDocumentCall) (response)
@@ -1751,6 +2142,20 @@ pub struct PartitionQueryResponse {
 
 impl common::ResponseResult for PartitionQueryResponse {}
 
+/// A Firestore query represented as an ordered list of operations / stages.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Pipeline {
+    /// Required. Ordered list of stages to evaluate.
+    pub stages: Option<Vec<Stage>>,
+}
+
+impl common::Part for Pipeline {}
+
 /// Planning phase information for the query.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1985,6 +2390,24 @@ pub struct RunQueryResponse {
 
 impl common::ResponseResult for RunQueryResponse {}
 
+/// A single operation within a pipeline. A stage is made up of a unique name, and a list of arguments. The exact number of arguments & types is dependent on the stage type. To give an example, the stage `filter(state = "MD")` would be encoded as: ``` name: "filter" args { function_value { name: "eq" args { field_reference_value: "state" } args { string_value: "MD" } } } ``` See public documentation for the full list.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Stage {
+    /// Optional. Ordered list of arguments the given stage expects.
+    pub args: Option<Vec<Value>>,
+    /// Required. The name of the stage to evaluate. **Requires:** * must be in snake case (lower case with underscore separator).
+    pub name: Option<String>,
+    /// Optional. Optional named arguments that certain functions may support.
+    pub options: Option<HashMap<String, Value>>,
+}
+
+impl common::Part for Stage {}
+
 /// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2020,7 +2443,23 @@ pub struct StructuredAggregationQuery {
 
 impl common::Part for StructuredAggregationQuery {}
 
-/// A Firestore query. The query stages are executed in the following order: 1. from 2. where 3. select 4. order_by + start_at + end_at 5. offset 6. limit
+/// A Firestore query represented as an ordered list of operations / stages. This is considered the top-level function which plans and executes a query. It is logically equivalent to `query(stages, options)`, but prevents the client from having to build a function wrapper.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StructuredPipeline {
+    /// Optional. Optional query-level arguments.
+    pub options: Option<HashMap<String, Value>>,
+    /// Required. The pipeline query to execute.
+    pub pipeline: Option<Pipeline>,
+}
+
+impl common::Part for StructuredPipeline {}
+
+/// A Firestore query. The query stages are executed in the following order: 1. from 2. where 3. select 4. order_by + start_at + end_at 5. offset 6. limit 7. find_nearest
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -2093,7 +2532,7 @@ pub struct Target {
     #[serde(rename = "resumeToken")]
     #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub resume_token: Option<Vec<u8>>,
-    /// The target ID that identifies the target on the stream. Must be a positive number and non-zero. If `target_id` is 0 (or unspecified), the server will assign an ID for this target and return that in a `TargetChange::ADD` event. Once a target with `target_id=0` is added, all subsequent targets must also have `target_id=0`. If an `AddTarget` request with `target_id != 0` is sent to the server after a target with `target_id=0` is added, the server will immediately send a response with a `TargetChange::Remove` event. Note that if the client sends multiple `AddTarget` requests without an ID, the order of IDs returned in `TargetChage.target_ids` are undefined. Therefore, clients should provide a target ID instead of relying on the server to assign one. If `target_id` is non-zero, there must not be an existing active target on this stream with the same ID.
+    /// The target ID that identifies the target on the stream. Must be a positive number and non-zero. If `target_id` is 0 (or unspecified), the server will assign an ID for this target and return that in a `TargetChange::ADD` event. Once a target with `target_id=0` is added, all subsequent targets must also have `target_id=0`. If an `AddTarget` request with `target_id != 0` is sent to the server after a target with `target_id=0` is added, the server will immediately send a response with a `TargetChange::Remove` event. Note that if the client sends multiple `AddTarget` requests without an ID, the order of IDs returned in `TargetChange.target_ids` are undefined. Therefore, clients should provide a target ID instead of relying on the server to assign one. If `target_id` is non-zero, there must not be an existing active target on this stream with the same ID.
     #[serde(rename = "targetId")]
     pub target_id: Option<i32>,
 }
@@ -2126,26 +2565,6 @@ pub struct TargetChange {
 }
 
 impl common::Part for TargetChange {}
-
-/// Represents a time of day. The date and time zone are either not significant or are specified elsewhere. An API may choose to allow leap seconds. Related types are google.type.Date and `google.protobuf.Timestamp`.
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct TimeOfDay {
-    /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value "24:00:00" for scenarios like business closing time.
-    pub hours: Option<i32>,
-    /// Minutes of hour of day. Must be from 0 to 59.
-    pub minutes: Option<i32>,
-    /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
-    pub nanos: Option<i32>,
-    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.
-    pub seconds: Option<i32>,
-}
-
-impl common::Part for TimeOfDay {}
 
 /// Options for creating a new transaction.
 ///
@@ -2202,6 +2621,12 @@ pub struct Value {
     /// A double value.
     #[serde(rename = "doubleValue")]
     pub double_value: Option<f64>,
+    /// Value which references a field. This is considered relative (vs absolute) since it only refers to a field and not a field within a particular document. **Requires:** * Must follow field reference limitations. * Not allowed to be used when writing documents.
+    #[serde(rename = "fieldReferenceValue")]
+    pub field_reference_value: Option<String>,
+    /// A value that represents an unevaluated expression. **Requires:** * Not allowed to be used when writing documents.
+    #[serde(rename = "functionValue")]
+    pub function_value: Option<Function>,
     /// A geo point value representing a point on the surface of Earth.
     #[serde(rename = "geoPointValue")]
     pub geo_point_value: Option<LatLng>,
@@ -2215,6 +2640,9 @@ pub struct Value {
     /// A null value.
     #[serde(rename = "nullValue")]
     pub null_value: Option<String>,
+    /// A value that represents an unevaluated pipeline. **Requires:** * Not allowed to be used when writing documents.
+    #[serde(rename = "pipelineValue")]
+    pub pipeline_value: Option<Pipeline>,
     /// A reference to a document. For example: `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     #[serde(rename = "referenceValue")]
     pub reference_value: Option<String>,
@@ -2349,9 +2777,20 @@ impl common::Part for WriteResult {}
 /// use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2362,12 +2801,12 @@ impl common::Part for WriteResult {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Firestore::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `databases_backup_schedules_create(...)`, `databases_backup_schedules_delete(...)`, `databases_backup_schedules_get(...)`, `databases_backup_schedules_list(...)`, `databases_backup_schedules_patch(...)`, `databases_bulk_delete_documents(...)`, `databases_collection_groups_fields_get(...)`, `databases_collection_groups_fields_list(...)`, `databases_collection_groups_fields_patch(...)`, `databases_collection_groups_indexes_create(...)`, `databases_collection_groups_indexes_delete(...)`, `databases_collection_groups_indexes_get(...)`, `databases_collection_groups_indexes_list(...)`, `databases_create(...)`, `databases_delete(...)`, `databases_documents_batch_get(...)`, `databases_documents_batch_write(...)`, `databases_documents_begin_transaction(...)`, `databases_documents_commit(...)`, `databases_documents_create_document(...)`, `databases_documents_delete(...)`, `databases_documents_get(...)`, `databases_documents_list(...)`, `databases_documents_list_collection_ids(...)`, `databases_documents_list_documents(...)`, `databases_documents_listen(...)`, `databases_documents_partition_query(...)`, `databases_documents_patch(...)`, `databases_documents_rollback(...)`, `databases_documents_run_aggregation_query(...)`, `databases_documents_run_query(...)`, `databases_documents_write(...)`, `databases_export_documents(...)`, `databases_get(...)`, `databases_import_documents(...)`, `databases_list(...)`, `databases_operations_cancel(...)`, `databases_operations_delete(...)`, `databases_operations_get(...)`, `databases_operations_list(...)`, `databases_patch(...)`, `databases_restore(...)`, `locations_backups_delete(...)`, `locations_backups_get(...)`, `locations_backups_list(...)`, `locations_get(...)` and `locations_list(...)`
+/// // like `databases_backup_schedules_create(...)`, `databases_backup_schedules_delete(...)`, `databases_backup_schedules_get(...)`, `databases_backup_schedules_list(...)`, `databases_backup_schedules_patch(...)`, `databases_bulk_delete_documents(...)`, `databases_clone(...)`, `databases_collection_groups_fields_get(...)`, `databases_collection_groups_fields_list(...)`, `databases_collection_groups_fields_patch(...)`, `databases_collection_groups_indexes_create(...)`, `databases_collection_groups_indexes_delete(...)`, `databases_collection_groups_indexes_get(...)`, `databases_collection_groups_indexes_list(...)`, `databases_create(...)`, `databases_delete(...)`, `databases_documents_batch_get(...)`, `databases_documents_batch_write(...)`, `databases_documents_begin_transaction(...)`, `databases_documents_commit(...)`, `databases_documents_create_document(...)`, `databases_documents_delete(...)`, `databases_documents_execute_pipeline(...)`, `databases_documents_get(...)`, `databases_documents_list(...)`, `databases_documents_list_collection_ids(...)`, `databases_documents_list_documents(...)`, `databases_documents_listen(...)`, `databases_documents_partition_query(...)`, `databases_documents_patch(...)`, `databases_documents_rollback(...)`, `databases_documents_run_aggregation_query(...)`, `databases_documents_run_query(...)`, `databases_documents_write(...)`, `databases_export_documents(...)`, `databases_get(...)`, `databases_import_documents(...)`, `databases_list(...)`, `databases_operations_cancel(...)`, `databases_operations_delete(...)`, `databases_operations_get(...)`, `databases_operations_list(...)`, `databases_patch(...)`, `databases_restore(...)`, `databases_user_creds_create(...)`, `databases_user_creds_delete(...)`, `databases_user_creds_disable(...)`, `databases_user_creds_enable(...)`, `databases_user_creds_get(...)`, `databases_user_creds_list(...)`, `databases_user_creds_reset_password(...)`, `locations_backups_delete(...)`, `locations_backups_get(...)`, `locations_backups_list(...)`, `locations_get(...)` and `locations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2786,6 +3225,29 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Executes a pipeline query.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `database` - Required. Database identifier, in the form `projects/{project}/databases/{database}`.
+    pub fn databases_documents_execute_pipeline(
+        &self,
+        request: ExecutePipelineRequest,
+        database: &str,
+    ) -> ProjectDatabaseDocumentExecutePipelineCall<'a, C> {
+        ProjectDatabaseDocumentExecutePipelineCall {
+            hub: self.hub,
+            _request: request,
+            _database: database.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets a single document.
     ///
     /// # Arguments
@@ -3054,7 +3516,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
     ///
     /// # Arguments
     ///
@@ -3123,9 +3585,160 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectDatabaseOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Create a user creds.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. A parent name of the form `projects/{project_id}/databases/{database_id}`
+    pub fn databases_user_creds_create(
+        &self,
+        request: GoogleFirestoreAdminV1UserCreds,
+        parent: &str,
+    ) -> ProjectDatabaseUserCredCreateCall<'a, C> {
+        ProjectDatabaseUserCredCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _user_creds_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a user creds.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    pub fn databases_user_creds_delete(
+        &self,
+        name: &str,
+    ) -> ProjectDatabaseUserCredDeleteCall<'a, C> {
+        ProjectDatabaseUserCredDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Disables a user creds. No-op if the user creds are already disabled.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    pub fn databases_user_creds_disable(
+        &self,
+        request: GoogleFirestoreAdminV1DisableUserCredsRequest,
+        name: &str,
+    ) -> ProjectDatabaseUserCredDisableCall<'a, C> {
+        ProjectDatabaseUserCredDisableCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Enables a user creds. No-op if the user creds are already enabled.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    pub fn databases_user_creds_enable(
+        &self,
+        request: GoogleFirestoreAdminV1EnableUserCredsRequest,
+        name: &str,
+    ) -> ProjectDatabaseUserCredEnableCall<'a, C> {
+        ProjectDatabaseUserCredEnableCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a user creds resource. Note that the returned resource does not contain the secret value itself.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    pub fn databases_user_creds_get(&self, name: &str) -> ProjectDatabaseUserCredGetCall<'a, C> {
+        ProjectDatabaseUserCredGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List all user creds in the database. Note that the returned resource does not contain the secret value itself.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. A parent database name of the form `projects/{project_id}/databases/{database_id}`
+    pub fn databases_user_creds_list(
+        &self,
+        parent: &str,
+    ) -> ProjectDatabaseUserCredListCall<'a, C> {
+        ProjectDatabaseUserCredListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Resets the password of a user creds.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    pub fn databases_user_creds_reset_password(
+        &self,
+        request: GoogleFirestoreAdminV1ResetUserPasswordRequest,
+        name: &str,
+    ) -> ProjectDatabaseUserCredResetPasswordCall<'a, C> {
+        ProjectDatabaseUserCredResetPasswordCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3149,6 +3762,29 @@ impl<'a, C> ProjectMethods<'a, C> {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new database by cloning an existing one. The new database must be in the same cloud region or multi-region location as the existing database. This behaves similar to FirestoreAdmin.CreateDatabase except instead of creating a new empty database, a new database is created with the database type, index configuration, and documents from an existing database. The long-running operation can be used to track the progress of the clone, with the Operation's metadata field type being the CloneDatabaseMetadata. The response type is the Database if the clone was successful. The new database is not readable or writeable until the LRO has completed.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The project to clone the database in. Format is `projects/{project_id}`.
+    pub fn databases_clone(
+        &self,
+        request: GoogleFirestoreAdminV1CloneDatabaseRequest,
+        parent: &str,
+    ) -> ProjectDatabaseCloneCall<'a, C> {
+        ProjectDatabaseCloneCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3370,6 +4006,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationBackupListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3407,6 +4044,7 @@ impl<'a, C> ProjectMethods<'a, C> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _extra_location_types: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3436,9 +4074,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3449,7 +4098,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -3763,9 +4412,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3776,7 +4436,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -4049,9 +4709,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4062,7 +4733,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -4337,9 +5008,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4350,7 +5032,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -4629,9 +5311,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4642,7 +5335,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -4971,9 +5664,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4984,7 +5688,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -5264,9 +5968,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5277,7 +5992,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -5602,9 +6317,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5615,7 +6341,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -5950,9 +6676,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5963,7 +6700,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -6288,9 +7025,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6301,7 +7049,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -6584,9 +7332,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6597,7 +7356,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -6877,9 +7636,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6890,7 +7660,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -7215,9 +7985,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7228,7 +8009,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -7541,9 +8322,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7554,7 +8346,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -7867,9 +8659,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7880,7 +8683,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -8203,9 +9006,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8216,7 +9030,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -8526,9 +9340,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8539,7 +9364,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -8912,9 +9737,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8925,7 +9761,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -9221,6 +10057,353 @@ where
     }
 }
 
+/// Executes a pipeline query.
+///
+/// A builder for the *databases.documents.executePipeline* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_firestore1 as firestore1;
+/// use firestore1::api::ExecutePipelineRequest;
+/// # async fn dox() {
+/// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Firestore::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ExecutePipelineRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_documents_execute_pipeline(req, "database")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectDatabaseDocumentExecutePipelineCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Firestore<C>,
+    _request: ExecutePipelineRequest,
+    _database: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectDatabaseDocumentExecutePipelineCall<'a, C> {}
+
+impl<'a, C> ProjectDatabaseDocumentExecutePipelineCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ExecutePipelineResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "firestore.projects.databases.documents.executePipeline",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "database"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("database", self._database);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+database}/documents:executePipeline";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+database}", "database")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["database"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: ExecutePipelineRequest,
+    ) -> ProjectDatabaseDocumentExecutePipelineCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Database identifier, in the form `projects/{project}/databases/{database}`.
+    ///
+    /// Sets the *database* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn database(
+        mut self,
+        new_value: &str,
+    ) -> ProjectDatabaseDocumentExecutePipelineCall<'a, C> {
+        self._database = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectDatabaseDocumentExecutePipelineCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectDatabaseDocumentExecutePipelineCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectDatabaseDocumentExecutePipelineCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectDatabaseDocumentExecutePipelineCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectDatabaseDocumentExecutePipelineCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets a single document.
 ///
 /// A builder for the *databases.documents.get* method supported by a *project* resource.
@@ -9238,9 +10421,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9251,7 +10445,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -9261,7 +10455,7 @@ where
 /// let result = hub.projects().databases_documents_get("name")
 ///              .transaction(vec![0, 1, 2, 3])
 ///              .read_time(chrono::Utc::now())
-///              .add_mask_field_paths("gubergren")
+///              .add_mask_field_paths("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9572,9 +10766,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9585,7 +10790,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -9594,12 +10799,12 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_documents_list("parent", "collectionId")
 ///              .transaction(vec![0, 1, 2, 3])
-///              .show_missing(true)
+///              .show_missing(false)
 ///              .read_time(chrono::Utc::now())
-///              .page_token("eos")
-///              .page_size(-86)
+///              .page_token("sed")
+///              .page_size(-70)
 ///              .order_by("sed")
-///              .add_mask_field_paths("duo")
+///              .add_mask_field_paths("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9982,9 +11187,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9995,7 +11211,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -10314,9 +11530,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10327,7 +11554,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -10733,9 +11960,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10746,7 +11984,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -11056,9 +12294,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11069,7 +12318,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -11385,9 +12634,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11398,7 +12658,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -11786,9 +13046,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11799,7 +13070,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -12112,9 +13383,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12125,7 +13407,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -12451,9 +13733,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12464,7 +13757,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -12777,9 +14070,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12790,7 +14094,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -13082,7 +14386,7 @@ where
     }
 }
 
-/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
 ///
 /// A builder for the *databases.operations.cancel* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -13100,9 +14404,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13113,7 +14428,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -13425,9 +14740,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13438,7 +14764,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -13711,9 +15037,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13724,7 +15061,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -13997,9 +15334,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14010,7 +15358,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -14018,9 +15366,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_operations_list("name")
+///              .return_partial_success(false)
 ///              .page_token("vero")
-///              .page_size(-76)
-///              .filter("invidunt")
+///              .page_size(-88)
+///              .filter("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14030,6 +15379,7 @@ where
 {
     hub: &'a Firestore<C>,
     _name: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -14061,15 +15411,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -14198,6 +15560,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `"projects/example/locations/-"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectDatabaseOperationListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -14304,6 +15676,2272 @@ where
     }
 }
 
+/// Create a user creds.
+///
+/// A builder for the *databases.userCreds.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_firestore1 as firestore1;
+/// use firestore1::api::GoogleFirestoreAdminV1UserCreds;
+/// # async fn dox() {
+/// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Firestore::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFirestoreAdminV1UserCreds::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_user_creds_create(req, "parent")
+///              .user_creds_id("elitr")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectDatabaseUserCredCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Firestore<C>,
+    _request: GoogleFirestoreAdminV1UserCreds,
+    _parent: String,
+    _user_creds_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectDatabaseUserCredCreateCall<'a, C> {}
+
+impl<'a, C> ProjectDatabaseUserCredCreateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleFirestoreAdminV1UserCreds)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "firestore.projects.databases.userCreds.create",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent", "userCredsId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._user_creds_id.as_ref() {
+            params.push("userCredsId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/userCreds";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleFirestoreAdminV1UserCreds,
+    ) -> ProjectDatabaseUserCredCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. A parent name of the form `projects/{project_id}/databases/{database_id}`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectDatabaseUserCredCreateCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. The ID to use for the user creds, which will become the final component of the user creds's resource name. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/.
+    ///
+    /// Sets the *user creds id* query property to the given value.
+    pub fn user_creds_id(mut self, new_value: &str) -> ProjectDatabaseUserCredCreateCall<'a, C> {
+        self._user_creds_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectDatabaseUserCredCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseUserCredCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectDatabaseUserCredCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectDatabaseUserCredCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectDatabaseUserCredCreateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes a user creds.
+///
+/// A builder for the *databases.userCreds.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_firestore1 as firestore1;
+/// # async fn dox() {
+/// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Firestore::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_user_creds_delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectDatabaseUserCredDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Firestore<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectDatabaseUserCredDeleteCall<'a, C> {}
+
+impl<'a, C> ProjectDatabaseUserCredDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Empty)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "firestore.projects.databases.userCreds.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectDatabaseUserCredDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectDatabaseUserCredDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseUserCredDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectDatabaseUserCredDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectDatabaseUserCredDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectDatabaseUserCredDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Disables a user creds. No-op if the user creds are already disabled.
+///
+/// A builder for the *databases.userCreds.disable* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_firestore1 as firestore1;
+/// use firestore1::api::GoogleFirestoreAdminV1DisableUserCredsRequest;
+/// # async fn dox() {
+/// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Firestore::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFirestoreAdminV1DisableUserCredsRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_user_creds_disable(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectDatabaseUserCredDisableCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Firestore<C>,
+    _request: GoogleFirestoreAdminV1DisableUserCredsRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectDatabaseUserCredDisableCall<'a, C> {}
+
+impl<'a, C> ProjectDatabaseUserCredDisableCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleFirestoreAdminV1UserCreds)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "firestore.projects.databases.userCreds.disable",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:disable";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleFirestoreAdminV1DisableUserCredsRequest,
+    ) -> ProjectDatabaseUserCredDisableCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectDatabaseUserCredDisableCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectDatabaseUserCredDisableCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseUserCredDisableCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectDatabaseUserCredDisableCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectDatabaseUserCredDisableCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectDatabaseUserCredDisableCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Enables a user creds. No-op if the user creds are already enabled.
+///
+/// A builder for the *databases.userCreds.enable* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_firestore1 as firestore1;
+/// use firestore1::api::GoogleFirestoreAdminV1EnableUserCredsRequest;
+/// # async fn dox() {
+/// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Firestore::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFirestoreAdminV1EnableUserCredsRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_user_creds_enable(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectDatabaseUserCredEnableCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Firestore<C>,
+    _request: GoogleFirestoreAdminV1EnableUserCredsRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectDatabaseUserCredEnableCall<'a, C> {}
+
+impl<'a, C> ProjectDatabaseUserCredEnableCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleFirestoreAdminV1UserCreds)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "firestore.projects.databases.userCreds.enable",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:enable";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleFirestoreAdminV1EnableUserCredsRequest,
+    ) -> ProjectDatabaseUserCredEnableCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectDatabaseUserCredEnableCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectDatabaseUserCredEnableCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseUserCredEnableCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectDatabaseUserCredEnableCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectDatabaseUserCredEnableCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectDatabaseUserCredEnableCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets a user creds resource. Note that the returned resource does not contain the secret value itself.
+///
+/// A builder for the *databases.userCreds.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_firestore1 as firestore1;
+/// # async fn dox() {
+/// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Firestore::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_user_creds_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectDatabaseUserCredGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Firestore<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectDatabaseUserCredGetCall<'a, C> {}
+
+impl<'a, C> ProjectDatabaseUserCredGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleFirestoreAdminV1UserCreds)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "firestore.projects.databases.userCreds.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectDatabaseUserCredGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectDatabaseUserCredGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseUserCredGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectDatabaseUserCredGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectDatabaseUserCredGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectDatabaseUserCredGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// List all user creds in the database. Note that the returned resource does not contain the secret value itself.
+///
+/// A builder for the *databases.userCreds.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_firestore1 as firestore1;
+/// # async fn dox() {
+/// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Firestore::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_user_creds_list("parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectDatabaseUserCredListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Firestore<C>,
+    _parent: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectDatabaseUserCredListCall<'a, C> {}
+
+impl<'a, C> ProjectDatabaseUserCredListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleFirestoreAdminV1ListUserCredsResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "firestore.projects.databases.userCreds.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/userCreds";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. A parent database name of the form `projects/{project_id}/databases/{database_id}`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectDatabaseUserCredListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectDatabaseUserCredListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseUserCredListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectDatabaseUserCredListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectDatabaseUserCredListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectDatabaseUserCredListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Resets the password of a user creds.
+///
+/// A builder for the *databases.userCreds.resetPassword* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_firestore1 as firestore1;
+/// use firestore1::api::GoogleFirestoreAdminV1ResetUserPasswordRequest;
+/// # async fn dox() {
+/// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Firestore::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFirestoreAdminV1ResetUserPasswordRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_user_creds_reset_password(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectDatabaseUserCredResetPasswordCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Firestore<C>,
+    _request: GoogleFirestoreAdminV1ResetUserPasswordRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectDatabaseUserCredResetPasswordCall<'a, C> {}
+
+impl<'a, C> ProjectDatabaseUserCredResetPasswordCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleFirestoreAdminV1UserCreds)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "firestore.projects.databases.userCreds.resetPassword",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:resetPassword";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleFirestoreAdminV1ResetUserPasswordRequest,
+    ) -> ProjectDatabaseUserCredResetPasswordCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. A name of the form `projects/{project_id}/databases/{database_id}/userCreds/{user_creds_id}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectDatabaseUserCredResetPasswordCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectDatabaseUserCredResetPasswordCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseUserCredResetPasswordCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectDatabaseUserCredResetPasswordCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectDatabaseUserCredResetPasswordCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectDatabaseUserCredResetPasswordCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Bulk deletes a subset of documents from Google Cloud Firestore. Documents created or updated after the underlying system starts to process the request will not be deleted. The bulk delete occurs in the background and its progress can be monitored and managed via the Operation resource that is created. For more details on bulk delete behavior, refer to: https://cloud.google.com/firestore/docs/manage-data/bulk-delete
 ///
 /// A builder for the *databases.bulkDeleteDocuments* method supported by a *project* resource.
@@ -14322,9 +17960,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14335,7 +17984,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -14630,6 +18279,343 @@ where
     }
 }
 
+/// Creates a new database by cloning an existing one. The new database must be in the same cloud region or multi-region location as the existing database. This behaves similar to FirestoreAdmin.CreateDatabase except instead of creating a new empty database, a new database is created with the database type, index configuration, and documents from an existing database. The long-running operation can be used to track the progress of the clone, with the Operation's metadata field type being the CloneDatabaseMetadata. The response type is the Database if the clone was successful. The new database is not readable or writeable until the LRO has completed.
+///
+/// A builder for the *databases.clone* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_firestore1 as firestore1;
+/// use firestore1::api::GoogleFirestoreAdminV1CloneDatabaseRequest;
+/// # async fn dox() {
+/// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Firestore::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFirestoreAdminV1CloneDatabaseRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_clone(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectDatabaseCloneCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Firestore<C>,
+    _request: GoogleFirestoreAdminV1CloneDatabaseRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectDatabaseCloneCall<'a, C> {}
+
+impl<'a, C> ProjectDatabaseCloneCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleLongrunningOperation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "firestore.projects.databases.clone",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/databases:clone";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleFirestoreAdminV1CloneDatabaseRequest,
+    ) -> ProjectDatabaseCloneCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The project to clone the database in. Format is `projects/{project_id}`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectDatabaseCloneCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectDatabaseCloneCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseCloneCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectDatabaseCloneCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectDatabaseCloneCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectDatabaseCloneCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Create a database.
 ///
 /// A builder for the *databases.create* method supported by a *project* resource.
@@ -14648,9 +18634,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14661,7 +18658,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -14674,7 +18671,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_create(req, "parent")
-///              .database_id("elitr")
+///              .database_id("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14876,7 +18873,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// Required. The ID to use for the database, which will become the final component of the database's resource name. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. "(default)" database id is also valid.
+    /// Required. The ID to use for the database, which will become the final component of the database's resource name. This value should be 4-63 characters. Valid characters are /a-z-/ with first character a letter and the last a letter or a number. Must not be UUID-like /[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}/. "(default)" database ID is also valid if the database is Standard edition.
     ///
     /// Sets the *database id* query property to the given value.
     pub fn database_id(mut self, new_value: &str) -> ProjectDatabaseCreateCall<'a, C> {
@@ -14985,9 +18982,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14998,7 +19006,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -15006,7 +19014,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_delete("name")
-///              .etag("diam")
+///              .etag("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15284,9 +19292,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15297,7 +19316,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -15609,9 +19628,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15622,7 +19652,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -15898,9 +19928,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15911,7 +19952,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -16223,9 +20264,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16236,7 +20288,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -16244,7 +20296,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_list("parent")
-///              .show_deleted(true)
+///              .show_deleted(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16527,9 +20579,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16540,7 +20603,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -16865,9 +20928,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16878,7 +20952,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -17190,9 +21264,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17203,7 +21288,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -17476,9 +21561,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17489,7 +21585,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -17764,9 +21860,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17777,7 +21884,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -17785,6 +21892,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_backups_list("parent")
+///              .filter("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17794,6 +21902,7 @@ where
 {
     hub: &'a Firestore<C>,
     _parent: String,
+    _filter: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -17822,15 +21931,18 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent"].iter() {
+        for &field in ["alt", "parent", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -17950,6 +22062,13 @@ where
         self._parent = new_value.to_string();
         self
     }
+    /// An expression that filters the list of returned backups. A filter expression consists of a field name, a comparison operator, and a value for filtering. The value must be a string, a number, or a boolean. The comparison operator must be one of: `<`, `>`, `<=`, `>=`, `!=`, `=`, or `:`. Colon `:` is the contains operator. Filter rules are not case sensitive. The following fields in the Backup are eligible for filtering: * `database_uid` (supports `=` only)
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationBackupListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -18052,9 +22171,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18065,7 +22195,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -18338,9 +22468,20 @@ where
 /// # use firestore1::{Firestore, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18351,7 +22492,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Firestore::new(client, auth);
@@ -18359,9 +22500,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("dolores")
-///              .page_size(-62)
-///              .filter("et")
+///              .page_token("sadipscing")
+///              .page_size(-6)
+///              .filter("invidunt")
+///              .add_extra_location_types("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18374,6 +22516,7 @@ where
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
+    _extra_location_types: Vec<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -18400,14 +22543,23 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "pageToken",
+            "pageSize",
+            "filter",
+            "extraLocationTypes",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
@@ -18417,6 +22569,11 @@ where
         }
         if let Some(value) = self._filter.as_ref() {
             params.push("filter", value);
+        }
+        if !self._extra_location_types.is_empty() {
+            for f in self._extra_location_types.iter() {
+                params.push("extraLocationTypes", f);
+            }
         }
 
         params.extend(self._additional_params.iter());
@@ -18556,6 +22713,14 @@ where
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
         self._filter = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.
+    ///
+    /// Append the given value to the *extra location types* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_extra_location_types(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+        self._extra_location_types.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

@@ -46,7 +46,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_run2 as run2;
-/// use run2::api::GoogleCloudRunV2Service;
+/// use run2::api::GoogleCloudRunV2WorkerPool;
 /// use run2::{Result, Error};
 /// # async fn dox() {
 /// use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -59,9 +59,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -72,22 +83,23 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = CloudRun::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleCloudRunV2Service::default();
+/// let mut req = GoogleCloudRunV2WorkerPool::default();
 ///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_services_patch(req, "name")
-///              .validate_only(true)
+/// let result = hub.projects().locations_worker_pools_patch(req, "name")
+///              .validate_only(false)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .allow_missing(true)
+///              .force_new_revision(true)
+///              .allow_missing(false)
 ///              .doit().await;
 ///
 /// match result {
@@ -125,7 +137,7 @@ impl<'a, C> CloudRun<C> {
         CloudRun {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://run.googleapis.com/".to_string(),
             _root_url: "https://run.googleapis.com/".to_string(),
         }
@@ -136,7 +148,7 @@ impl<'a, C> CloudRun<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -174,7 +186,7 @@ pub struct GoogleCloudRunV2BinaryAuthorization {
     /// Optional. If present, indicates to use Breakglass using this justification. If use_default is False, then it must be empty. For more information on breakglass, see https://cloud.google.com/binary-authorization/docs/using-breakglass
     #[serde(rename = "breakglassJustification")]
     pub breakglass_justification: Option<String>,
-    /// Optional. The path to a binary authorization policy. Format: projects/{project}/platforms/cloudRun/{policy-name}
+    /// Optional. The path to a binary authorization policy. Format: `projects/{project}/platforms/cloudRun/{policy-name}`
     pub policy: Option<String>,
     /// Optional. If True, indicates to use the default project's binary authorization policy. If False, binary authorization will be disabled.
     #[serde(rename = "useDefault")]
@@ -182,6 +194,94 @@ pub struct GoogleCloudRunV2BinaryAuthorization {
 }
 
 impl common::Part for GoogleCloudRunV2BinaryAuthorization {}
+
+/// Describes the Build step of the function that builds a container from the given source.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2BuildConfig {
+    /// Optional. The base image used to build the function.
+    #[serde(rename = "baseImage")]
+    pub base_image: Option<String>,
+    /// Optional. Sets whether the function will receive automatic base image updates.
+    #[serde(rename = "enableAutomaticUpdates")]
+    pub enable_automatic_updates: Option<bool>,
+    /// Optional. User-provided build-time environment variables for the function
+    #[serde(rename = "environmentVariables")]
+    pub environment_variables: Option<HashMap<String, String>>,
+    /// Optional. The name of the function (as defined in source code) that will be executed. Defaults to the resource name suffix, if not specified. For backward compatibility, if function with given name is not found, then the system will try to use function named "function".
+    #[serde(rename = "functionTarget")]
+    pub function_target: Option<String>,
+    /// Optional. Artifact Registry URI to store the built image.
+    #[serde(rename = "imageUri")]
+    pub image_uri: Option<String>,
+    /// Output only. The Cloud Build name of the latest successful deployment of the function.
+    pub name: Option<String>,
+    /// Optional. Service account to be used for building the container. The format of this field is `projects/{projectId}/serviceAccounts/{serviceAccountEmail}`.
+    #[serde(rename = "serviceAccount")]
+    pub service_account: Option<String>,
+    /// The Cloud Storage bucket URI where the function source code is located.
+    #[serde(rename = "sourceLocation")]
+    pub source_location: Option<String>,
+    /// Optional. Name of the Cloud Build Custom Worker Pool that should be used to build the Cloud Run function. The format of this field is `projects/{project}/locations/{region}/workerPools/{workerPool}` where `{project}` and `{region}` are the project id and region respectively where the worker pool is defined and `{workerPool}` is the short name of the worker pool.
+    #[serde(rename = "workerPool")]
+    pub worker_pool: Option<String>,
+}
+
+impl common::Part for GoogleCloudRunV2BuildConfig {}
+
+/// Build information of the image.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2BuildInfo {
+    /// Output only. Entry point of the function when the image is a Cloud Run function.
+    #[serde(rename = "functionTarget")]
+    pub function_target: Option<String>,
+    /// Output only. Source code location of the image.
+    #[serde(rename = "sourceLocation")]
+    pub source_location: Option<String>,
+}
+
+impl common::Part for GoogleCloudRunV2BuildInfo {}
+
+/// Build the source using Buildpacks.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2BuildpacksBuild {
+    /// Optional. The base image to use for the build.
+    #[serde(rename = "baseImage")]
+    pub base_image: Option<String>,
+    /// Optional. cache_image_uri is the GCR/AR URL where the cache image will be stored. cache_image_uri is optional and omitting it will disable caching. This URL must be stable across builds. It is used to derive a build-specific temporary URL by substituting the tag with the build ID. The build will clean up the temporary image on a best-effort basis.
+    #[serde(rename = "cacheImageUri")]
+    pub cache_image_uri: Option<String>,
+    /// Optional. Whether or not the application container will be enrolled in automatic base image updates. When true, the application will be built on a scratch base image, so the base layers can be appended at run time.
+    #[serde(rename = "enableAutomaticUpdates")]
+    pub enable_automatic_updates: Option<bool>,
+    /// Optional. User-provided build-time environment variables.
+    #[serde(rename = "environmentVariables")]
+    pub environment_variables: Option<HashMap<String, String>>,
+    /// Optional. Name of the function target if the source is a function source. Required for function builds.
+    #[serde(rename = "functionTarget")]
+    pub function_target: Option<String>,
+    /// Optional. project_descriptor stores the path to the project descriptor file. When empty, it means that there is no project descriptor file in the source.
+    #[serde(rename = "projectDescriptor")]
+    pub project_descriptor: Option<String>,
+    /// The runtime name, e.g. 'go113'. Leave blank for generic builds.
+    pub runtime: Option<String>,
+}
+
+impl common::Part for GoogleCloudRunV2BuildpacksBuild {}
 
 /// Request message for deleting an Execution.
 ///
@@ -217,6 +317,25 @@ pub struct GoogleCloudRunV2CloudSqlInstance {
 }
 
 impl common::Part for GoogleCloudRunV2CloudSqlInstance {}
+
+/// Cloud Storage source.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2CloudStorageSource {
+    /// Required. The Cloud Storage bucket name.
+    pub bucket: Option<String>,
+    /// Optional. The Cloud Storage object generation.
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub generation: Option<i64>,
+    /// Required. The Cloud Storage object name.
+    pub object: Option<String>,
+}
+
+impl common::Part for GoogleCloudRunV2CloudStorageSource {}
 
 /// Defines a status condition for a resource.
 ///
@@ -260,6 +379,12 @@ impl common::Part for GoogleCloudRunV2Condition {}
 pub struct GoogleCloudRunV2Container {
     /// Arguments to the entrypoint. The docker image's CMD is used if this is not provided.
     pub args: Option<Vec<String>>,
+    /// Base image for this container. Only supported for services. If set, it indicates that the service is enrolled into automatic base image update.
+    #[serde(rename = "baseImageUri")]
+    pub base_image_uri: Option<String>,
+    /// Output only. The build info of the container image.
+    #[serde(rename = "buildInfo")]
+    pub build_info: Option<GoogleCloudRunV2BuildInfo>,
     /// Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided.
     pub command: Option<Vec<String>>,
     /// Names of the containers that must start before this container.
@@ -278,6 +403,9 @@ pub struct GoogleCloudRunV2Container {
     pub ports: Option<Vec<GoogleCloudRunV2ContainerPort>>,
     /// Compute Resource requirements by this container.
     pub resources: Option<GoogleCloudRunV2ResourceRequirements>,
+    /// Optional. Location of the source.
+    #[serde(rename = "sourceCode")]
+    pub source_code: Option<GoogleCloudRunV2SourceCode>,
     /// Startup probe of application within the container. All other probes are disabled if a startup probe is provided, until it succeeds. Container will not be added to service endpoints if the probe fails.
     #[serde(rename = "startupProbe")]
     pub startup_probe: Option<GoogleCloudRunV2Probe>,
@@ -329,6 +457,19 @@ pub struct GoogleCloudRunV2ContainerPort {
 
 impl common::Part for GoogleCloudRunV2ContainerPort {}
 
+/// Build the source using Docker. This means the source has a Dockerfile.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2DockerBuild {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for GoogleCloudRunV2DockerBuild {}
+
 /// In memory (tmpfs) ephemeral storage. It is ephemeral in the sense that when the sandbox is taken down, the data is destroyed with it (it does not persist across sandbox runs).
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -356,7 +497,7 @@ impl common::Part for GoogleCloudRunV2EmptyDirVolumeSource {}
 pub struct GoogleCloudRunV2EnvVar {
     /// Required. Name of the environment variable. Must not exceed 32768 characters.
     pub name: Option<String>,
-    /// Variable references $(VAR_NAME) are expanded using the previous defined environment variables in the container and any route environment variables. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Defaults to "", and the maximum length is 32768 bytes.
+    /// Literal value of the environment variable. Defaults to "", and the maximum length is 32768 bytes. Variable references are not supported in Cloud Run.
     pub value: Option<String>,
     /// Source for the environment variable's value.
     #[serde(rename = "valueSource")]
@@ -405,6 +546,8 @@ pub struct GoogleCloudRunV2Execution {
     /// Output only. Represents time when the execution was acknowledged by the execution controller. It is not guaranteed to be set in happens-before order across separate operations.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Output only. Email address of the authenticated creator.
+    pub creator: Option<String>,
     /// Output only. For a deleted resource, the deletion time. It is only populated as a response to a Delete request.
     #[serde(rename = "deleteTime")]
     pub delete_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -476,12 +619,18 @@ impl common::ResponseResult for GoogleCloudRunV2Execution {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRunV2ExecutionReference {
+    /// Status for the execution completion.
+    #[serde(rename = "completionStatus")]
+    pub completion_status: Option<String>,
     /// Creation timestamp of the execution.
     #[serde(rename = "completionTime")]
     pub completion_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Creation timestamp of the execution.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The deletion time of the execution. It is only populated as a response to a Delete request.
+    #[serde(rename = "deleteTime")]
+    pub delete_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Name of the execution.
     pub name: Option<String>,
 }
@@ -500,7 +649,7 @@ pub struct GoogleCloudRunV2ExecutionTemplate {
     pub annotations: Option<HashMap<String, String>>,
     /// Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google's billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels. Cloud Run API v2 does not support labels with `run.googleapis.com`, `cloud.googleapis.com`, `serving.knative.dev`, or `autoscaling.knative.dev` namespaces, and they will be rejected. All system labels in v1 now have a corresponding field in v2 ExecutionTemplate.
     pub labels: Option<HashMap<String, String>>,
-    /// Specifies the maximum desired number of tasks the execution should run at given time. Must be <= task_count. When the job is run, if this field is 0 or unset, the maximum possible value will be used for that execution. The actual number of tasks running in steady state will be less than this number when there are fewer tasks waiting to be completed remaining, i.e. when the work left to do is less than max parallelism.
+    /// Optional. Specifies the maximum desired number of tasks the execution should run at given time. When the job is run, if this field is 0 or unset, the maximum possible value will be used for that execution. The actual number of tasks running in steady state will be less than this number when there are fewer tasks waiting to be completed remaining, i.e. when the work left to do is less than max parallelism.
     pub parallelism: Option<i32>,
     /// Specifies the desired number of tasks the execution should run. Setting to 1 means that parallelism is limited to 1 and the success of that task signals the success of the execution. Defaults to 1.
     #[serde(rename = "taskCount")]
@@ -583,8 +732,11 @@ impl common::ResponseResult for GoogleCloudRunV2ExportStatusResponse {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRunV2GCSVolumeSource {
-    /// Cloud Storage Bucket name. TODO (b/344678062) Fix the error validation once dynamic mounting is public.
+    /// Cloud Storage Bucket name.
     pub bucket: Option<String>,
+    /// A list of additional flags to pass to the gcsfuse CLI. Options should be specified without the leading "--".
+    #[serde(rename = "mountOptions")]
+    pub mount_options: Option<Vec<String>>,
     /// If true, the volume will be mounted as read only for all mounts.
     #[serde(rename = "readOnly")]
     pub read_only: Option<bool>,
@@ -665,6 +817,44 @@ pub struct GoogleCloudRunV2ImageExportStatus {
 
 impl common::Part for GoogleCloudRunV2ImageExportStatus {}
 
+/// Holds a single instance split entry for the Worker. Allocations can be done to a specific Revision name, or pointing to the latest Ready Revision.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2InstanceSplit {
+    /// Specifies percent of the instance split to this Revision. This defaults to zero if unspecified.
+    pub percent: Option<i32>,
+    /// Revision to which to assign this portion of instances, if split allocation is by revision.
+    pub revision: Option<String>,
+    /// The allocation type for this instance split.
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+}
+
+impl common::Part for GoogleCloudRunV2InstanceSplit {}
+
+/// Represents the observed state of a single `InstanceSplit` entry.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2InstanceSplitStatus {
+    /// Specifies percent of the instance split to this Revision.
+    pub percent: Option<i32>,
+    /// Revision to which this instance split is assigned.
+    pub revision: Option<String>,
+    /// The allocation type for this instance split.
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+}
+
+impl common::Part for GoogleCloudRunV2InstanceSplitStatus {}
+
 /// Job represents the configuration of a single job, which references a container image that is run to completion.
 ///
 /// # Activities
@@ -699,7 +889,7 @@ pub struct GoogleCloudRunV2Job {
     /// Output only. The deletion time. It is only populated as a response to a Delete request.
     #[serde(rename = "deleteTime")]
     pub delete_time: Option<chrono::DateTime<chrono::offset::Utc>>,
-    /// Output only. A system-generated fingerprint for this version of the resource. May be used to detect modification conflict during updates.
+    /// Optional. A system-generated fingerprint for this version of the resource. May be used to detect modification conflict during updates.
     pub etag: Option<String>,
     /// Output only. Number of executions created for this job.
     #[serde(rename = "executionCount")]
@@ -803,6 +993,7 @@ impl common::ResponseResult for GoogleCloudRunV2ListJobsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
 /// * [locations services revisions list projects](ProjectLocationServiceRevisionListCall) (response)
+/// * [locations worker pools revisions list projects](ProjectLocationWorkerPoolRevisionListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -833,6 +1024,8 @@ pub struct GoogleCloudRunV2ListServicesResponse {
     pub next_page_token: Option<String>,
     /// The resulting list of Services.
     pub services: Option<Vec<GoogleCloudRunV2Service>>,
+    /// Output only. For global requests, returns the list of regions that could not be reached within the deadline.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for GoogleCloudRunV2ListServicesResponse {}
@@ -858,6 +1051,28 @@ pub struct GoogleCloudRunV2ListTasksResponse {
 
 impl common::ResponseResult for GoogleCloudRunV2ListTasksResponse {}
 
+/// Response message containing a list of WorkerPools.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations worker pools list projects](ProjectLocationWorkerPoolListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2ListWorkerPoolsResponse {
+    /// A token indicating there are more items than page_size. Use it in the next ListWorkerPools request to continue.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The resulting list of WorkerPools.
+    #[serde(rename = "workerPools")]
+    pub worker_pools: Option<Vec<GoogleCloudRunV2WorkerPool>>,
+}
+
+impl common::ResponseResult for GoogleCloudRunV2ListWorkerPoolsResponse {}
+
 /// Metadata represents the JSON encoded generated customer metadata.
 ///
 /// # Activities
@@ -867,6 +1082,7 @@ impl common::ResponseResult for GoogleCloudRunV2ListTasksResponse {}
 ///
 /// * [locations export image metadata projects](ProjectLocationExportImageMetadataCall) (response)
 /// * [locations export metadata projects](ProjectLocationExportMetadataCall) (response)
+/// * [locations export project metadata projects](ProjectLocationExportProjectMetadataCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -876,6 +1092,23 @@ pub struct GoogleCloudRunV2Metadata {
 }
 
 impl common::ResponseResult for GoogleCloudRunV2Metadata {}
+
+/// Settings for multi-region deployment.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2MultiRegionSettings {
+    /// Optional. System-generated unique id for the multi-region Service.
+    #[serde(rename = "multiRegionId")]
+    pub multi_region_id: Option<String>,
+    /// Required. List of regions to deploy to, including primary region.
+    pub regions: Option<Vec<String>>,
+}
+
+impl common::Part for GoogleCloudRunV2MultiRegionSettings {}
 
 /// Represents an NFS mount.
 ///
@@ -992,7 +1225,7 @@ pub struct GoogleCloudRunV2ResourceRequirements {
     /// Determines whether CPU is only allocated during requests (true by default). However, if ResourceRequirements is set, the caller must explicitly set this field to true to preserve the default behavior.
     #[serde(rename = "cpuIdle")]
     pub cpu_idle: Option<bool>,
-    /// Only `memory` and `cpu` keys in the map are supported. Notes: * The only supported values for CPU are '1', '2', '4', and '8'. Setting 4 CPU requires at least 2Gi of memory. For more information, go to https://cloud.google.com/run/docs/configuring/cpu. * For supported 'memory' values and syntax, go to https://cloud.google.com/run/docs/configuring/memory-limits
+    /// Only `memory`, `cpu` and `nvidia.com/gpu` keys in the map are supported. Notes: * The only supported values for CPU are '1', '2', '4', and '8'. Setting 4 CPU requires at least 2Gi of memory. For more information, go to https://cloud.google.com/run/docs/configuring/cpu. * For supported 'memory' values and syntax, go to https://cloud.google.com/run/docs/configuring/memory-limits * The only supported 'nvidia.com/gpu' value is '1'.
     pub limits: Option<HashMap<String, String>>,
     /// Determines whether CPU should be boosted on startup of a new container instance above the requested CPU threshold, this can help reduce cold-start latency.
     #[serde(rename = "startupCpuBoost")]
@@ -1009,6 +1242,7 @@ impl common::Part for GoogleCloudRunV2ResourceRequirements {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
 /// * [locations services revisions get projects](ProjectLocationServiceRevisionGetCall) (response)
+/// * [locations worker pools revisions get projects](ProjectLocationWorkerPoolRevisionGetCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1022,6 +1256,8 @@ pub struct GoogleCloudRunV2Revision {
     /// Output only. The creation time.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Output only. Email address of the authenticated creator.
+    pub creator: Option<String>,
     /// Output only. For a deleted resource, the deletion time. It is only populated as a response to a Delete request.
     #[serde(rename = "deleteTime")]
     pub delete_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -1046,6 +1282,9 @@ pub struct GoogleCloudRunV2Revision {
     /// Output only. A number that monotonically increases every time the user modifies the desired state.
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub generation: Option<i64>,
+    /// Optional. Output only. True if GPU zonal redundancy is disabled on this revision.
+    #[serde(rename = "gpuZonalRedundancyDisabled")]
+    pub gpu_zonal_redundancy_disabled: Option<bool>,
     /// Output only. Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google's billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels.
     pub labels: Option<HashMap<String, String>>,
     /// The least stable launch stage needed to create this resource, as defined by [Google Cloud Platform Launch Stages](https://cloud.google.com/terms/launch-stages). Cloud Run supports `ALPHA`, `BETA`, and `GA`. Note that this value might not be what was used as input. For example, if ALPHA was provided as input in the parent resource, but only BETA and GA-level features are were, this field will be BETA.
@@ -1081,6 +1320,9 @@ pub struct GoogleCloudRunV2Revision {
     /// Email address of the IAM service account associated with the revision of the service. The service account represents the identity of the running revision, and determines what permissions the revision has.
     #[serde(rename = "serviceAccount")]
     pub service_account: Option<String>,
+    /// Enables service mesh connectivity.
+    #[serde(rename = "serviceMesh")]
+    pub service_mesh: Option<GoogleCloudRunV2ServiceMesh>,
     /// Enable session affinity.
     #[serde(rename = "sessionAffinity")]
     pub session_affinity: Option<bool>,
@@ -1109,7 +1351,7 @@ impl common::ResponseResult for GoogleCloudRunV2Revision {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRunV2RevisionScaling {
-    /// Optional. Maximum number of serving instances that this resource should have.
+    /// Optional. Maximum number of serving instances that this resource should have. When unspecified, the field is set to the server default value of 100. For more information see https://cloud.google.com/run/docs/configuring/max-instances
     #[serde(rename = "maxInstanceCount")]
     pub max_instance_count: Option<i32>,
     /// Optional. Minimum number of serving instances that this resource should have.
@@ -1149,15 +1391,25 @@ pub struct GoogleCloudRunV2RevisionTemplate {
     /// A reference to a customer managed encryption key (CMEK) to use to encrypt this container image. For more information, go to https://cloud.google.com/run/docs/securing/using-cmek
     #[serde(rename = "encryptionKey")]
     pub encryption_key: Option<String>,
+    /// Optional. The action to take if the encryption key is revoked.
+    #[serde(rename = "encryptionKeyRevocationAction")]
+    pub encryption_key_revocation_action: Option<String>,
+    /// Optional. If encryption_key_revocation_action is SHUTDOWN, the duration before shutting down all instances. The minimum increment is 1 hour.
+    #[serde(rename = "encryptionKeyShutdownDuration")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub encryption_key_shutdown_duration: Option<chrono::Duration>,
     /// Optional. The sandbox environment to host this Revision.
     #[serde(rename = "executionEnvironment")]
     pub execution_environment: Option<String>,
+    /// Optional. True if GPU zonal redundancy is disabled on this revision.
+    #[serde(rename = "gpuZonalRedundancyDisabled")]
+    pub gpu_zonal_redundancy_disabled: Option<bool>,
     /// Optional. Disables health checking containers during deployment.
     #[serde(rename = "healthCheckDisabled")]
     pub health_check_disabled: Option<bool>,
     /// Optional. Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google's billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels. Cloud Run API v2 does not support labels with `run.googleapis.com`, `cloud.googleapis.com`, `serving.knative.dev`, or `autoscaling.knative.dev` namespaces, and they will be rejected. All system labels in v1 now have a corresponding field in v2 RevisionTemplate.
     pub labels: Option<HashMap<String, String>>,
-    /// Optional. Sets the maximum number of requests that each serving instance can receive.
+    /// Optional. Sets the maximum number of requests that each serving instance can receive. If not specified or 0, concurrency defaults to 80 when requested `CPU >= 1` and defaults to 1 when requested `CPU < 1`.
     #[serde(rename = "maxInstanceRequestConcurrency")]
     pub max_instance_request_concurrency: Option<i32>,
     /// Optional. The node selector for the revision template.
@@ -1170,6 +1422,9 @@ pub struct GoogleCloudRunV2RevisionTemplate {
     /// Optional. Email address of the IAM service account associated with the revision of the service. The service account represents the identity of the running revision, and determines what permissions the revision has. If not provided, the revision will use the project's default service account.
     #[serde(rename = "serviceAccount")]
     pub service_account: Option<String>,
+    /// Optional. Enables service mesh connectivity.
+    #[serde(rename = "serviceMesh")]
+    pub service_mesh: Option<GoogleCloudRunV2ServiceMesh>,
     /// Optional. Enable session affinity.
     #[serde(rename = "sessionAffinity")]
     pub session_affinity: Option<bool>,
@@ -1232,10 +1487,10 @@ impl common::Part for GoogleCloudRunV2SecretKeySelector {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRunV2SecretVolumeSource {
-    /// Integer representation of mode bits to use on created files by default. Must be a value between 0000 and 0777 (octal), defaulting to 0444. Directories within the path are not affected by this setting. Notes * Internally, a umask of 0222 will be applied to any non-zero value. * This is an integer representation of the mode bits. So, the octal integer value should look exactly as the chmod numeric notation with a leading zero. Some examples: for chmod 777 (a=rwx), set to 0777 (octal) or 511 (base-10). For chmod 640 (u=rw,g=r), set to 0640 (octal) or 416 (base-10). For chmod 755 (u=rwx,g=rx,o=rx), set to 0755 (octal) or 493 (base-10). * This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set. This might be in conflict with other options that affect the file mode, like fsGroup, and as a result, other mode bits could be set.
+    /// Integer representation of mode bits to use on created files by default. Must be a value between 0000 and 0777 (octal), defaulting to 0444. Directories within the path are not affected by this setting. Notes * Internally, a umask of 0222 will be applied to any non-zero value. * This is an integer representation of the mode bits. So, the octal integer value should look exactly as the chmod numeric notation with a leading zero. Some examples: for chmod 640 (u=rw,g=r), set to 0640 (octal) or 416 (base-10). For chmod 755 (u=rwx,g=rx,o=rx), set to 0755 (octal) or 493 (base-10). * This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set. This might be in conflict with other options that affect the file mode, like fsGroup, and as a result, other mode bits could be set.
     #[serde(rename = "defaultMode")]
     pub default_mode: Option<i32>,
-    /// If unspecified, the volume will expose a file whose name is the secret, relative to VolumeMount.mount_path. If specified, the key will be used as the version to fetch from Cloud Secret Manager and the path will be the name of the file exposed in the volume. When items are defined, they must specify a path and a version.
+    /// If unspecified, the volume will expose a file whose name is the secret, relative to VolumeMount.mount_path + VolumeMount.sub_path. If specified, the key will be used as the version to fetch from Cloud Secret Manager and the path will be the name of the file exposed in the volume. When items are defined, they must specify a path and a version.
     pub items: Option<Vec<GoogleCloudRunV2VersionToPath>>,
     /// Required. The name of the secret in Cloud Secret Manager. Format: {secret} if the secret is in the same project. projects/{project}/secrets/{secret} if the secret is in a different project.
     pub secret: Option<String>,
@@ -1262,6 +1517,9 @@ pub struct GoogleCloudRunV2Service {
     /// Optional. Settings for the Binary Authorization feature.
     #[serde(rename = "binaryAuthorization")]
     pub binary_authorization: Option<GoogleCloudRunV2BinaryAuthorization>,
+    /// Optional. Configuration for building a Cloud Run function.
+    #[serde(rename = "buildConfig")]
+    pub build_config: Option<GoogleCloudRunV2BuildConfig>,
     /// Arbitrary identifier for the API client.
     pub client: Option<String>,
     /// Arbitrary version identifier for the API client.
@@ -1285,16 +1543,22 @@ pub struct GoogleCloudRunV2Service {
     pub delete_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// User-provided description of the Service. This field currently has a 512-character limit.
     pub description: Option<String>,
-    /// Output only. A system-generated fingerprint for this version of the resource. May be used to detect modification conflict during updates.
+    /// Optional. A system-generated fingerprint for this version of the resource. May be used to detect modification conflict during updates.
     pub etag: Option<String>,
-    /// Output only. For a deleted resource, the time after which it will be permamently deleted.
+    /// Output only. For a deleted resource, the time after which it will be permanently deleted.
     #[serde(rename = "expireTime")]
     pub expire_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Output only. A number that monotonically increases every time the user modifies the desired state. Please note that unlike v1, this is an int64 value. As with most Google APIs, its JSON representation will be a `string` instead of an `integer`.
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub generation: Option<i64>,
+    /// Optional. IAP settings on the Service.
+    #[serde(rename = "iapEnabled")]
+    pub iap_enabled: Option<bool>,
     /// Optional. Provides the ingress settings for this Service. On output, returns the currently observed ingress settings, or INGRESS_TRAFFIC_UNSPECIFIED if no revision is active.
     pub ingress: Option<String>,
+    /// Optional. Disables IAM permission check for run.routes.invoke for callers of this service. For more information, visit https://cloud.google.com/run/docs/securing/managing-access#invoker_check.
+    #[serde(rename = "invokerIamDisabled")]
+    pub invoker_iam_disabled: Option<bool>,
     /// Optional. Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google's billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels. Cloud Run API v2 does not support labels with `run.googleapis.com`, `cloud.googleapis.com`, `serving.knative.dev`, or `autoscaling.knative.dev` namespaces, and they will be rejected. All system labels in v1 now have a corresponding field in v2 Service.
     pub labels: Option<HashMap<String, String>>,
     /// Output only. Email address of the last authenticated modifier.
@@ -1309,13 +1573,16 @@ pub struct GoogleCloudRunV2Service {
     /// Optional. The launch stage as defined by [Google Cloud Platform Launch Stages](https://cloud.google.com/terms/launch-stages). Cloud Run supports `ALPHA`, `BETA`, and `GA`. If no value is specified, GA is assumed. Set the launch stage to a preview stage on input to allow use of preview features in that stage. On read (or output), describes whether the resource uses preview features. For example, if ALPHA is provided as input, but only BETA and GA-level features are used, this field will be BETA on output.
     #[serde(rename = "launchStage")]
     pub launch_stage: Option<String>,
-    /// The fully qualified name of this Service. In CreateServiceRequest, this field is ignored, and instead composed from CreateServiceRequest.parent and CreateServiceRequest.service_id. Format: projects/{project}/locations/{location}/services/{service_id}
+    /// Optional. Settings for multi-region deployment.
+    #[serde(rename = "multiRegionSettings")]
+    pub multi_region_settings: Option<GoogleCloudRunV2MultiRegionSettings>,
+    /// Identifier. The fully qualified name of this Service. In CreateServiceRequest, this field is ignored, and instead composed from CreateServiceRequest.parent and CreateServiceRequest.service_id. Format: projects/{project}/locations/{location}/services/{service_id}
     pub name: Option<String>,
     /// Output only. The generation of this Service currently serving traffic. See comments in `reconciling` for additional information on reconciliation process in Cloud Run. Please note that unlike v1, this is an int64 value. As with most Google APIs, its JSON representation will be a `string` instead of an `integer`.
     #[serde(rename = "observedGeneration")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub observed_generation: Option<i64>,
-    /// Output only. Returns true if the Service is currently being acted upon by the system to bring it into the desired state. When a new Service is created, or an existing one is updated, Cloud Run will asynchronously perform all necessary steps to bring the Service to the desired serving state. This process is called reconciliation. While reconciliation is in process, `observed_generation`, `latest_ready_revison`, `traffic_statuses`, and `uri` will have transient values that might mismatch the intended state: Once reconciliation is over (and this field is false), there are two possible outcomes: reconciliation succeeded and the serving state matches the Service, or there was an error, and reconciliation failed. This state can be found in `terminal_condition.state`. If reconciliation succeeded, the following fields will match: `traffic` and `traffic_statuses`, `observed_generation` and `generation`, `latest_ready_revision` and `latest_created_revision`. If reconciliation failed, `traffic_statuses`, `observed_generation`, and `latest_ready_revision` will have the state of the last serving revision, or empty for newly created Services. Additional information on the failure can be found in `terminal_condition` and `conditions`.
+    /// Output only. Returns true if the Service is currently being acted upon by the system to bring it into the desired state. When a new Service is created, or an existing one is updated, Cloud Run will asynchronously perform all necessary steps to bring the Service to the desired serving state. This process is called reconciliation. While reconciliation is in process, `observed_generation`, `latest_ready_revision`, `traffic_statuses`, and `uri` will have transient values that might mismatch the intended state: Once reconciliation is over (and this field is false), there are two possible outcomes: reconciliation succeeded and the serving state matches the Service, or there was an error, and reconciliation failed. This state can be found in `terminal_condition.state`. If reconciliation succeeded, the following fields will match: `traffic` and `traffic_statuses`, `observed_generation` and `generation`, `latest_ready_revision` and `latest_created_revision`. If reconciliation failed, `traffic_statuses`, `observed_generation`, and `latest_ready_revision` will have the state of the last serving revision, or empty for newly created Services. Additional information on the failure can be found in `terminal_condition` and `conditions`.
     pub reconciling: Option<bool>,
     /// Output only. Reserved for future use.
     #[serde(rename = "satisfiesPzs")]
@@ -1327,6 +1594,9 @@ pub struct GoogleCloudRunV2Service {
     /// Output only. The Condition of this Service, containing its readiness status, and detailed error information in case it did not reach a serving state. See comments in `reconciling` for additional information on reconciliation process in Cloud Run.
     #[serde(rename = "terminalCondition")]
     pub terminal_condition: Option<GoogleCloudRunV2Condition>,
+    /// Output only. True if Cloud Run Threat Detection monitoring is enabled for the parent project of this Service.
+    #[serde(rename = "threatDetectionEnabled")]
+    pub threat_detection_enabled: Option<bool>,
     /// Optional. Specifies how to distribute traffic over a collection of Revisions belonging to the Service. If traffic is empty or not provided, defaults to 100% traffic to the latest `Ready` Revision.
     pub traffic: Option<Vec<GoogleCloudRunV2TrafficTarget>>,
     /// Output only. Detailed status information for corresponding traffic targets. See comments in `reconciling` for additional information on reconciliation process in Cloud Run.
@@ -1339,10 +1609,26 @@ pub struct GoogleCloudRunV2Service {
     pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Output only. The main URI in which this Service is serving traffic.
     pub uri: Option<String>,
+    /// Output only. All URLs serving traffic for this Service.
+    pub urls: Option<Vec<String>>,
 }
 
 impl common::RequestValue for GoogleCloudRunV2Service {}
 impl common::ResponseResult for GoogleCloudRunV2Service {}
+
+/// Settings for Cloud Service Mesh. For more information see https://cloud.google.com/service-mesh/docs/overview.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2ServiceMesh {
+    /// The Mesh resource name. Format: `projects/{project}/locations/global/meshes/{mesh}`, where `{project}` can be project id or number.
+    pub mesh: Option<String>,
+}
+
+impl common::Part for GoogleCloudRunV2ServiceMesh {}
 
 /// Scaling settings applied at the service level rather than at the revision level.
 ///
@@ -1352,12 +1638,124 @@ impl common::ResponseResult for GoogleCloudRunV2Service {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRunV2ServiceScaling {
-    /// Optional. total min instances for the service. This number of instances is divided among all revisions with specified traffic based on the percent of traffic they are receiving. (BETA)
+    /// Optional. total instance count for the service in manual scaling mode. This number of instances is divided among all revisions with specified traffic based on the percent of traffic they are receiving.
+    #[serde(rename = "manualInstanceCount")]
+    pub manual_instance_count: Option<i32>,
+    /// Optional. total max instances for the service. This number of instances is divided among all revisions with specified traffic based on the percent of traffic they are receiving.
+    #[serde(rename = "maxInstanceCount")]
+    pub max_instance_count: Option<i32>,
+    /// Optional. total min instances for the service. This number of instances is divided among all revisions with specified traffic based on the percent of traffic they are receiving.
     #[serde(rename = "minInstanceCount")]
     pub min_instance_count: Option<i32>,
+    /// Optional. The scaling mode for the service.
+    #[serde(rename = "scalingMode")]
+    pub scaling_mode: Option<String>,
 }
 
 impl common::Part for GoogleCloudRunV2ServiceScaling {}
+
+/// Source type for the container.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2SourceCode {
+    /// The source is a Cloud Storage bucket.
+    #[serde(rename = "cloudStorageSource")]
+    pub cloud_storage_source: Option<GoogleCloudRunV2CloudStorageSource>,
+}
+
+impl common::Part for GoogleCloudRunV2SourceCode {}
+
+/// Location of the source in an archive file in Google Cloud Storage.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2StorageSource {
+    /// Required. Google Cloud Storage bucket containing the source (see [Bucket Name Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
+    pub bucket: Option<String>,
+    /// Optional. Google Cloud Storage generation for the object. If the generation is omitted, the latest generation will be used.
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub generation: Option<i64>,
+    /// Required. Google Cloud Storage object containing the source. This object must be a gzipped archive file (`.tar.gz`) containing source to build.
+    pub object: Option<String>,
+}
+
+impl common::Part for GoogleCloudRunV2StorageSource {}
+
+/// Request message for submitting a Build.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations builds submit projects](ProjectLocationBuildSubmitCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2SubmitBuildRequest {
+    /// Build the source using Buildpacks.
+    #[serde(rename = "buildpackBuild")]
+    pub buildpack_build: Option<GoogleCloudRunV2BuildpacksBuild>,
+    /// Optional. The client that initiated the build request.
+    pub client: Option<String>,
+    /// Build the source using Docker. This means the source has a Dockerfile.
+    #[serde(rename = "dockerBuild")]
+    pub docker_build: Option<GoogleCloudRunV2DockerBuild>,
+    /// Required. Artifact Registry URI to store the built image.
+    #[serde(rename = "imageUri")]
+    pub image_uri: Option<String>,
+    /// Optional. The machine type from default pool to use for the build. If left blank, cloudbuild will use a sensible default. Currently only E2_HIGHCPU_8 is supported. If worker_pool is set, this field will be ignored.
+    #[serde(rename = "machineType")]
+    pub machine_type: Option<String>,
+    /// Optional. The release track of the client that initiated the build request.
+    #[serde(rename = "releaseTrack")]
+    pub release_track: Option<String>,
+    /// Optional. The service account to use for the build. If not set, the default Cloud Build service account for the project will be used.
+    #[serde(rename = "serviceAccount")]
+    pub service_account: Option<String>,
+    /// Required. Source for the build.
+    #[serde(rename = "storageSource")]
+    pub storage_source: Option<GoogleCloudRunV2StorageSource>,
+    /// Optional. Additional tags to annotate the build.
+    pub tags: Option<Vec<String>>,
+    /// Optional. Name of the Cloud Build Custom Worker Pool that should be used to build the function. The format of this field is `projects/{project}/locations/{region}/workerPools/{workerPool}` where `{project}` and `{region}` are the project id and region respectively where the worker pool is defined and `{workerPool}` is the short name of the worker pool.
+    #[serde(rename = "workerPool")]
+    pub worker_pool: Option<String>,
+}
+
+impl common::RequestValue for GoogleCloudRunV2SubmitBuildRequest {}
+
+/// Response message for submitting a Build.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations builds submit projects](ProjectLocationBuildSubmitCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2SubmitBuildResponse {
+    /// URI of the base builder image in Artifact Registry being used in the build. Used to opt into automatic base image updates.
+    #[serde(rename = "baseImageUri")]
+    pub base_image_uri: Option<String>,
+    /// Warning message for the base image.
+    #[serde(rename = "baseImageWarning")]
+    pub base_image_warning: Option<String>,
+    /// Cloud Build operation to be polled via CloudBuild API.
+    #[serde(rename = "buildOperation")]
+    pub build_operation: Option<GoogleLongrunningOperation>,
+}
+
+impl common::ResponseResult for GoogleCloudRunV2SubmitBuildResponse {}
 
 /// TCPSocketAction describes an action based on opening a socket
 ///
@@ -1416,6 +1814,9 @@ pub struct GoogleCloudRunV2Task {
     /// Output only. A number that monotonically increases every time the user modifies the desired state.
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub generation: Option<i64>,
+    /// Optional. Output only. True if GPU zonal redundancy is disabled on this task.
+    #[serde(rename = "gpuZonalRedundancyDisabled")]
+    pub gpu_zonal_redundancy_disabled: Option<bool>,
     /// Output only. Index of the Task, unique per execution, and beginning at 0.
     pub index: Option<i32>,
     /// Output only. The name of the parent Job.
@@ -1433,6 +1834,9 @@ pub struct GoogleCloudRunV2Task {
     pub max_retries: Option<i32>,
     /// Output only. The unique name of this Task.
     pub name: Option<String>,
+    /// Output only. The node selector for the task.
+    #[serde(rename = "nodeSelector")]
+    pub node_selector: Option<GoogleCloudRunV2NodeSelector>,
     /// Output only. The generation of this Task. See comments in `Job.reconciling` for additional information on reconciliation process in Cloud Run.
     #[serde(rename = "observedGeneration")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -1478,11 +1882,14 @@ impl common::ResponseResult for GoogleCloudRunV2Task {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRunV2TaskAttemptResult {
-    /// Output only. The exit code of this attempt. This may be unset if the container was unable to exit cleanly with a code due to some other failure. See status field for possible failure details.
+    /// Output only. The exit code of this attempt. This may be unset if the container was unable to exit cleanly with a code due to some other failure. See status field for possible failure details. At most one of exit_code or term_signal will be set.
     #[serde(rename = "exitCode")]
     pub exit_code: Option<i32>,
     /// Output only. The status of this attempt. If the status code is OK, then the attempt succeeded.
     pub status: Option<GoogleRpcStatus>,
+    /// Output only. Termination signal of the container. This is set to non-zero if the container is terminated by the system. At most one of exit_code or term_signal will be set.
+    #[serde(rename = "termSignal")]
+    pub term_signal: Option<i32>,
 }
 
 impl common::Part for GoogleCloudRunV2TaskAttemptResult {}
@@ -1503,9 +1910,15 @@ pub struct GoogleCloudRunV2TaskTemplate {
     /// Optional. The execution environment being used to host this Task.
     #[serde(rename = "executionEnvironment")]
     pub execution_environment: Option<String>,
+    /// Optional. True if GPU zonal redundancy is disabled on this task template.
+    #[serde(rename = "gpuZonalRedundancyDisabled")]
+    pub gpu_zonal_redundancy_disabled: Option<bool>,
     /// Number of retries allowed per Task, before marking this Task failed. Defaults to 3.
     #[serde(rename = "maxRetries")]
     pub max_retries: Option<i32>,
+    /// Optional. The node selector for the task template.
+    #[serde(rename = "nodeSelector")]
+    pub node_selector: Option<GoogleCloudRunV2NodeSelector>,
     /// Optional. Email address of the IAM service account associated with the Task of a Job. The service account represents the identity of the running task, and determines what permissions the task has. If not provided, the task will use the project's default service account.
     #[serde(rename = "serviceAccount")]
     pub service_account: Option<String>,
@@ -1573,7 +1986,7 @@ impl common::Part for GoogleCloudRunV2TrafficTargetStatus {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRunV2VersionToPath {
-    /// Integer octal mode bits to use on this file, must be a value between 01 and 0777 (octal). If 0 or not set, the Volume's default mode will be used. Notes * Internally, a umask of 0222 will be applied to any non-zero value. * This is an integer representation of the mode bits. So, the octal integer value should look exactly as the chmod numeric notation with a leading zero. Some examples: for chmod 777 (a=rwx), set to 0777 (octal) or 511 (base-10). For chmod 640 (u=rw,g=r), set to 0640 (octal) or 416 (base-10). For chmod 755 (u=rwx,g=rx,o=rx), set to 0755 (octal) or 493 (base-10). * This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
+    /// Integer octal mode bits to use on this file, must be a value between 01 and 0777 (octal). If 0 or not set, the Volume's default mode will be used. Notes * Internally, a umask of 0222 will be applied to any non-zero value. * This is an integer representation of the mode bits. So, the octal integer value should look exactly as the chmod numeric notation with a leading zero. Some examples: for chmod 640 (u=rw,g=r), set to 0640 (octal) or 416 (base-10). For chmod 755 (u=rwx,g=rx,o=rx), set to 0755 (octal) or 493 (base-10). * This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set.
     pub mode: Option<i32>,
     /// Required. The relative path of the secret in the container.
     pub path: Option<String>,
@@ -1622,6 +2035,9 @@ pub struct GoogleCloudRunV2VolumeMount {
     pub mount_path: Option<String>,
     /// Required. This must match the Name of a Volume.
     pub name: Option<String>,
+    /// Optional. Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
+    #[serde(rename = "subPath")]
+    pub sub_path: Option<String>,
 }
 
 impl common::Part for GoogleCloudRunV2VolumeMount {}
@@ -1634,7 +2050,7 @@ impl common::Part for GoogleCloudRunV2VolumeMount {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRunV2VpcAccess {
-    /// VPC Access connector name. Format: projects/{project}/locations/{location}/connectors/{connector}, where {project} can be project id or number. For more information on sending traffic to a VPC network via a connector, visit https://cloud.google.com/run/docs/configuring/vpc-connectors.
+    /// VPC Access connector name. Format: `projects/{project}/locations/{location}/connectors/{connector}`, where `{project}` can be project id or number. For more information on sending traffic to a VPC network via a connector, visit https://cloud.google.com/run/docs/configuring/vpc-connectors.
     pub connector: Option<String>,
     /// Optional. Traffic VPC egress settings. If not provided, it defaults to PRIVATE_RANGES_ONLY.
     pub egress: Option<String>,
@@ -1644,6 +2060,166 @@ pub struct GoogleCloudRunV2VpcAccess {
 }
 
 impl common::Part for GoogleCloudRunV2VpcAccess {}
+
+/// WorkerPool acts as a top-level container that manages a set of configurations and revision templates which implement a pull-based workload. WorkerPool exists to provide a singular abstraction which can be access controlled, reasoned about, and which encapsulates software lifecycle decisions such as rollout policy and team resource ownership.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations worker pools create projects](ProjectLocationWorkerPoolCreateCall) (request)
+/// * [locations worker pools get projects](ProjectLocationWorkerPoolGetCall) (response)
+/// * [locations worker pools patch projects](ProjectLocationWorkerPoolPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2WorkerPool {
+    /// Optional. Unstructured key value map that may be set by external tools to store and arbitrary metadata. They are not queryable and should be preserved when modifying objects. Cloud Run API v2 does not support annotations with `run.googleapis.com`, `cloud.googleapis.com`, `serving.knative.dev`, or `autoscaling.knative.dev` namespaces, and they will be rejected in new resources. All system annotations in v1 now have a corresponding field in v2 WorkerPool. This field follows Kubernetes annotations' namespacing, limits, and rules.
+    pub annotations: Option<HashMap<String, String>>,
+    /// Optional. Settings for the Binary Authorization feature.
+    #[serde(rename = "binaryAuthorization")]
+    pub binary_authorization: Option<GoogleCloudRunV2BinaryAuthorization>,
+    /// Arbitrary identifier for the API client.
+    pub client: Option<String>,
+    /// Arbitrary version identifier for the API client.
+    #[serde(rename = "clientVersion")]
+    pub client_version: Option<String>,
+    /// Output only. The Conditions of all other associated sub-resources. They contain additional diagnostics information in case the WorkerPool does not reach its Serving state. See comments in `reconciling` for additional information on reconciliation process in Cloud Run.
+    pub conditions: Option<Vec<GoogleCloudRunV2Condition>>,
+    /// Output only. The creation time.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Output only. Email address of the authenticated creator.
+    pub creator: Option<String>,
+    /// Not supported, and ignored by Cloud Run.
+    #[serde(rename = "customAudiences")]
+    pub custom_audiences: Option<Vec<String>>,
+    /// Output only. The deletion time. It is only populated as a response to a Delete request.
+    #[serde(rename = "deleteTime")]
+    pub delete_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// User-provided description of the WorkerPool. This field currently has a 512-character limit.
+    pub description: Option<String>,
+    /// Optional. A system-generated fingerprint for this version of the resource. May be used to detect modification conflict during updates.
+    pub etag: Option<String>,
+    /// Output only. For a deleted resource, the time after which it will be permamently deleted.
+    #[serde(rename = "expireTime")]
+    pub expire_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Output only. A number that monotonically increases every time the user modifies the desired state. Please note that unlike v1, this is an int64 value. As with most Google APIs, its JSON representation will be a `string` instead of an `integer`.
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub generation: Option<i64>,
+    /// Output only. Detailed status information for corresponding instance splits. See comments in `reconciling` for additional information on reconciliation process in Cloud Run.
+    #[serde(rename = "instanceSplitStatuses")]
+    pub instance_split_statuses: Option<Vec<GoogleCloudRunV2InstanceSplitStatus>>,
+    /// Optional. Specifies how to distribute instances over a collection of Revisions belonging to the WorkerPool. If instance split is empty or not provided, defaults to 100% instances assigned to the latest `Ready` Revision.
+    #[serde(rename = "instanceSplits")]
+    pub instance_splits: Option<Vec<GoogleCloudRunV2InstanceSplit>>,
+    /// Optional. Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google's billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels. Cloud Run API v2 does not support labels with `run.googleapis.com`, `cloud.googleapis.com`, `serving.knative.dev`, or `autoscaling.knative.dev` namespaces, and they will be rejected. All system labels in v1 now have a corresponding field in v2 WorkerPool.
+    pub labels: Option<HashMap<String, String>>,
+    /// Output only. Email address of the last authenticated modifier.
+    #[serde(rename = "lastModifier")]
+    pub last_modifier: Option<String>,
+    /// Output only. Name of the last created revision. See comments in `reconciling` for additional information on reconciliation process in Cloud Run.
+    #[serde(rename = "latestCreatedRevision")]
+    pub latest_created_revision: Option<String>,
+    /// Output only. Name of the latest revision that is serving workloads. See comments in `reconciling` for additional information on reconciliation process in Cloud Run.
+    #[serde(rename = "latestReadyRevision")]
+    pub latest_ready_revision: Option<String>,
+    /// Optional. The launch stage as defined by [Google Cloud Platform Launch Stages](https://cloud.google.com/terms/launch-stages). Cloud Run supports `ALPHA`, `BETA`, and `GA`. If no value is specified, GA is assumed. Set the launch stage to a preview stage on input to allow use of preview features in that stage. On read (or output), describes whether the resource uses preview features. For example, if ALPHA is provided as input, but only BETA and GA-level features are used, this field will be BETA on output.
+    #[serde(rename = "launchStage")]
+    pub launch_stage: Option<String>,
+    /// The fully qualified name of this WorkerPool. In CreateWorkerPoolRequest, this field is ignored, and instead composed from CreateWorkerPoolRequest.parent and CreateWorkerPoolRequest.worker_id. Format: `projects/{project}/locations/{location}/workerPools/{worker_id}`
+    pub name: Option<String>,
+    /// Output only. The generation of this WorkerPool currently serving workloads. See comments in `reconciling` for additional information on reconciliation process in Cloud Run. Please note that unlike v1, this is an int64 value. As with most Google APIs, its JSON representation will be a `string` instead of an `integer`.
+    #[serde(rename = "observedGeneration")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub observed_generation: Option<i64>,
+    /// Output only. Returns true if the WorkerPool is currently being acted upon by the system to bring it into the desired state. When a new WorkerPool is created, or an existing one is updated, Cloud Run will asynchronously perform all necessary steps to bring the WorkerPool to the desired serving state. This process is called reconciliation. While reconciliation is in process, `observed_generation`, `latest_ready_revison`, `instance_split_statuses`, and `uri` will have transient values that might mismatch the intended state: Once reconciliation is over (and this field is false), there are two possible outcomes: reconciliation succeeded and the serving state matches the WorkerPool, or there was an error, and reconciliation failed. This state can be found in `terminal_condition.state`. If reconciliation succeeded, the following fields will match: `instance_splits` and `instance_split_statuses`, `observed_generation` and `generation`, `latest_ready_revision` and `latest_created_revision`. If reconciliation failed, `instance_split_statuses`, `observed_generation`, and `latest_ready_revision` will have the state of the last serving revision, or empty for newly created WorkerPools. Additional information on the failure can be found in `terminal_condition` and `conditions`.
+    pub reconciling: Option<bool>,
+    /// Output only. Reserved for future use.
+    #[serde(rename = "satisfiesPzs")]
+    pub satisfies_pzs: Option<bool>,
+    /// Optional. Specifies worker-pool-level scaling settings
+    pub scaling: Option<GoogleCloudRunV2WorkerPoolScaling>,
+    /// Required. The template used to create revisions for this WorkerPool.
+    pub template: Option<GoogleCloudRunV2WorkerPoolRevisionTemplate>,
+    /// Output only. The Condition of this WorkerPool, containing its readiness status, and detailed error information in case it did not reach a serving state. See comments in `reconciling` for additional information on reconciliation process in Cloud Run.
+    #[serde(rename = "terminalCondition")]
+    pub terminal_condition: Option<GoogleCloudRunV2Condition>,
+    /// Output only. Indicates whether Cloud Run Threat Detection monitoring is enabled for the parent project of this worker pool.
+    #[serde(rename = "threatDetectionEnabled")]
+    pub threat_detection_enabled: Option<bool>,
+    /// Output only. Server assigned unique identifier for the trigger. The value is a UUID4 string and guaranteed to remain unchanged until the resource is deleted.
+    pub uid: Option<String>,
+    /// Output only. The last-modified time.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::RequestValue for GoogleCloudRunV2WorkerPool {}
+impl common::ResponseResult for GoogleCloudRunV2WorkerPool {}
+
+/// WorkerPoolRevisionTemplate describes the data a worker pool revision should have when created from a template.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2WorkerPoolRevisionTemplate {
+    /// Optional. Unstructured key value map that may be set by external tools to store and arbitrary metadata. They are not queryable and should be preserved when modifying objects. Cloud Run API v2 does not support annotations with `run.googleapis.com`, `cloud.googleapis.com`, `serving.knative.dev`, or `autoscaling.knative.dev` namespaces, and they will be rejected. All system annotations in v1 now have a corresponding field in v2 WorkerPoolRevisionTemplate. This field follows Kubernetes annotations' namespacing, limits, and rules.
+    pub annotations: Option<HashMap<String, String>>,
+    /// Holds list of the containers that defines the unit of execution for this Revision.
+    pub containers: Option<Vec<GoogleCloudRunV2Container>>,
+    /// A reference to a customer managed encryption key (CMEK) to use to encrypt this container image. For more information, go to https://cloud.google.com/run/docs/securing/using-cmek
+    #[serde(rename = "encryptionKey")]
+    pub encryption_key: Option<String>,
+    /// Optional. The action to take if the encryption key is revoked.
+    #[serde(rename = "encryptionKeyRevocationAction")]
+    pub encryption_key_revocation_action: Option<String>,
+    /// Optional. If encryption_key_revocation_action is SHUTDOWN, the duration before shutting down all instances. The minimum increment is 1 hour.
+    #[serde(rename = "encryptionKeyShutdownDuration")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub encryption_key_shutdown_duration: Option<chrono::Duration>,
+    /// Optional. True if GPU zonal redundancy is disabled on this worker pool.
+    #[serde(rename = "gpuZonalRedundancyDisabled")]
+    pub gpu_zonal_redundancy_disabled: Option<bool>,
+    /// Optional. Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google's billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels. Cloud Run API v2 does not support labels with `run.googleapis.com`, `cloud.googleapis.com`, `serving.knative.dev`, or `autoscaling.knative.dev` namespaces, and they will be rejected. All system labels in v1 now have a corresponding field in v2 WorkerPoolRevisionTemplate.
+    pub labels: Option<HashMap<String, String>>,
+    /// Optional. The node selector for the revision template.
+    #[serde(rename = "nodeSelector")]
+    pub node_selector: Option<GoogleCloudRunV2NodeSelector>,
+    /// Optional. The unique name for the revision. If this field is omitted, it will be automatically generated based on the WorkerPool name.
+    pub revision: Option<String>,
+    /// Optional. Email address of the IAM service account associated with the revision of the service. The service account represents the identity of the running revision, and determines what permissions the revision has. If not provided, the revision will use the project's default service account.
+    #[serde(rename = "serviceAccount")]
+    pub service_account: Option<String>,
+    /// Optional. Enables service mesh connectivity.
+    #[serde(rename = "serviceMesh")]
+    pub service_mesh: Option<GoogleCloudRunV2ServiceMesh>,
+    /// Optional. A list of Volumes to make available to containers.
+    pub volumes: Option<Vec<GoogleCloudRunV2Volume>>,
+    /// Optional. VPC Access configuration to use for this Revision. For more information, visit https://cloud.google.com/run/docs/configuring/connecting-vpc.
+    #[serde(rename = "vpcAccess")]
+    pub vpc_access: Option<GoogleCloudRunV2VpcAccess>,
+}
+
+impl common::Part for GoogleCloudRunV2WorkerPoolRevisionTemplate {}
+
+/// Worker pool scaling settings.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRunV2WorkerPoolScaling {
+    /// Optional. The total number of instances in manual scaling mode.
+    #[serde(rename = "manualInstanceCount")]
+    pub manual_instance_count: Option<i32>,
+}
+
+impl common::Part for GoogleCloudRunV2WorkerPoolScaling {}
 
 /// Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs. If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditLogConfig are exempted. Example Policy with multiple AuditConfigs: { "audit_configs": [ { "service": "allServices", "audit_log_configs": [ { "log_type": "DATA_READ", "exempted_members": [ "user:jose@example.com" ] }, { "log_type": "DATA_WRITE" }, { "log_type": "ADMIN_READ" } ] }, { "service": "sampleservice.googleapis.com", "audit_log_configs": [ { "log_type": "DATA_READ" }, { "log_type": "DATA_WRITE", "exempted_members": [ "user:aliya@example.com" ] } ] } ] } For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ logging. It also exempts `jose@example.com` from DATA_READ logging, and `aliya@example.com` from DATA_WRITE logging.
 ///
@@ -1709,6 +2285,8 @@ impl common::Part for GoogleIamV1Binding {}
 /// * [locations jobs set iam policy projects](ProjectLocationJobSetIamPolicyCall) (response)
 /// * [locations services get iam policy projects](ProjectLocationServiceGetIamPolicyCall) (response)
 /// * [locations services set iam policy projects](ProjectLocationServiceSetIamPolicyCall) (response)
+/// * [locations worker pools get iam policy projects](ProjectLocationWorkerPoolGetIamPolicyCall) (response)
+/// * [locations worker pools set iam policy projects](ProjectLocationWorkerPoolSetIamPolicyCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1736,6 +2314,7 @@ impl common::ResponseResult for GoogleIamV1Policy {}
 ///
 /// * [locations jobs set iam policy projects](ProjectLocationJobSetIamPolicyCall) (request)
 /// * [locations services set iam policy projects](ProjectLocationServiceSetIamPolicyCall) (request)
+/// * [locations worker pools set iam policy projects](ProjectLocationWorkerPoolSetIamPolicyCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1758,6 +2337,7 @@ impl common::RequestValue for GoogleIamV1SetIamPolicyRequest {}
 ///
 /// * [locations jobs test iam permissions projects](ProjectLocationJobTestIamPermissionCall) (request)
 /// * [locations services test iam permissions projects](ProjectLocationServiceTestIamPermissionCall) (request)
+/// * [locations worker pools test iam permissions projects](ProjectLocationWorkerPoolTestIamPermissionCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1777,6 +2357,7 @@ impl common::RequestValue for GoogleIamV1TestIamPermissionsRequest {}
 ///
 /// * [locations jobs test iam permissions projects](ProjectLocationJobTestIamPermissionCall) (response)
 /// * [locations services test iam permissions projects](ProjectLocationServiceTestIamPermissionCall) (response)
+/// * [locations worker pools test iam permissions projects](ProjectLocationWorkerPoolTestIamPermissionCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1804,6 +2385,8 @@ pub struct GoogleLongrunningListOperationsResponse {
     pub next_page_token: Option<String>,
     /// A list of operations that matches the specified filter in the request.
     pub operations: Option<Vec<GoogleLongrunningOperation>>,
+    /// Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for GoogleLongrunningListOperationsResponse {}
@@ -1827,6 +2410,10 @@ impl common::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// * [locations services create projects](ProjectLocationServiceCreateCall) (response)
 /// * [locations services delete projects](ProjectLocationServiceDeleteCall) (response)
 /// * [locations services patch projects](ProjectLocationServicePatchCall) (response)
+/// * [locations worker pools revisions delete projects](ProjectLocationWorkerPoolRevisionDeleteCall) (response)
+/// * [locations worker pools create projects](ProjectLocationWorkerPoolCreateCall) (response)
+/// * [locations worker pools delete projects](ProjectLocationWorkerPoolDeleteCall) (response)
+/// * [locations worker pools patch projects](ProjectLocationWorkerPoolPatchCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1919,7 +2506,7 @@ pub struct GoogleTypeExpr {
 
 impl common::Part for GoogleTypeExpr {}
 
-/// This is proto2's version of MessageSet.
+/// This is proto2's version of MessageSet. DEPRECATED: DO NOT USE FOR NEW FIELDS. If you are using editions or proto2, please make your own extendable messages for your use case. If you are using proto3, please use `Any` instead. MessageSet was the implementation of extensions for proto1. When proto2 was introduced, extensions were implemented as a first-class feature. This schema for MessageSet was meant to be a "bridge" solution to migrate MessageSet-bearing messages from proto1 to proto2. This schema has been open-sourced only to facilitate the migration of Google products with MessageSet-bearing messages to open-source environments.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1940,17 +2527,17 @@ impl common::Part for Proto2BridgeMessageSet {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct UtilStatusProto {
-    /// The canonical error code (see codes.proto) that most closely corresponds to this status. This may be missing, and in the common case of the generic space, it definitely will be.
+    /// copybara:strip_begin(b/383363683) copybara:strip_end_and_replace optional int32 canonical_code = 6;
     #[serde(rename = "canonicalCode")]
     pub canonical_code: Option<i32>,
-    /// Numeric code drawn from the space specified below. Often, this is the canonical error space, and code is drawn from google3/util/task/codes.proto
+    /// Numeric code drawn from the space specified below. Often, this is the canonical error space, and code is drawn from google3/util/task/codes.proto copybara:strip_begin(b/383363683) copybara:strip_end_and_replace optional int32 code = 1;
     pub code: Option<i32>,
-    /// Detail message
+    /// Detail message copybara:strip_begin(b/383363683) copybara:strip_end_and_replace optional string message = 3;
     pub message: Option<String>,
-    /// message_set associates an arbitrary proto message with the status.
+    /// message_set associates an arbitrary proto message with the status. copybara:strip_begin(b/383363683) copybara:strip_end_and_replace optional proto2.bridge.MessageSet message_set = 5;
     #[serde(rename = "messageSet")]
     pub message_set: Option<Proto2BridgeMessageSet>,
-    /// The following are usually only present when code != 0 Space to which this status belongs
+    /// copybara:strip_begin(b/383363683) Space to which this status belongs copybara:strip_end_and_replace optional string space = 2; // Space to which this status belongs
     pub space: Option<String>,
 }
 
@@ -1976,9 +2563,20 @@ impl common::Part for UtilStatusProto {}
 /// use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -1989,12 +2587,12 @@ impl common::Part for UtilStatusProto {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = CloudRun::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_export_image(...)`, `locations_export_image_metadata(...)`, `locations_export_metadata(...)`, `locations_jobs_create(...)`, `locations_jobs_delete(...)`, `locations_jobs_executions_cancel(...)`, `locations_jobs_executions_delete(...)`, `locations_jobs_executions_export_status(...)`, `locations_jobs_executions_get(...)`, `locations_jobs_executions_list(...)`, `locations_jobs_executions_tasks_get(...)`, `locations_jobs_executions_tasks_list(...)`, `locations_jobs_get(...)`, `locations_jobs_get_iam_policy(...)`, `locations_jobs_list(...)`, `locations_jobs_patch(...)`, `locations_jobs_run(...)`, `locations_jobs_set_iam_policy(...)`, `locations_jobs_test_iam_permissions(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_operations_wait(...)`, `locations_services_create(...)`, `locations_services_delete(...)`, `locations_services_get(...)`, `locations_services_get_iam_policy(...)`, `locations_services_list(...)`, `locations_services_patch(...)`, `locations_services_revisions_delete(...)`, `locations_services_revisions_export_status(...)`, `locations_services_revisions_get(...)`, `locations_services_revisions_list(...)`, `locations_services_set_iam_policy(...)` and `locations_services_test_iam_permissions(...)`
+/// // like `locations_builds_submit(...)`, `locations_export_image(...)`, `locations_export_image_metadata(...)`, `locations_export_metadata(...)`, `locations_export_project_metadata(...)`, `locations_jobs_create(...)`, `locations_jobs_delete(...)`, `locations_jobs_executions_cancel(...)`, `locations_jobs_executions_delete(...)`, `locations_jobs_executions_export_status(...)`, `locations_jobs_executions_get(...)`, `locations_jobs_executions_list(...)`, `locations_jobs_executions_tasks_get(...)`, `locations_jobs_executions_tasks_list(...)`, `locations_jobs_get(...)`, `locations_jobs_get_iam_policy(...)`, `locations_jobs_list(...)`, `locations_jobs_patch(...)`, `locations_jobs_run(...)`, `locations_jobs_set_iam_policy(...)`, `locations_jobs_test_iam_permissions(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_operations_wait(...)`, `locations_services_create(...)`, `locations_services_delete(...)`, `locations_services_get(...)`, `locations_services_get_iam_policy(...)`, `locations_services_list(...)`, `locations_services_patch(...)`, `locations_services_revisions_delete(...)`, `locations_services_revisions_export_status(...)`, `locations_services_revisions_get(...)`, `locations_services_revisions_list(...)`, `locations_services_set_iam_policy(...)`, `locations_services_test_iam_permissions(...)`, `locations_worker_pools_create(...)`, `locations_worker_pools_delete(...)`, `locations_worker_pools_get(...)`, `locations_worker_pools_get_iam_policy(...)`, `locations_worker_pools_list(...)`, `locations_worker_pools_patch(...)`, `locations_worker_pools_revisions_delete(...)`, `locations_worker_pools_revisions_get(...)`, `locations_worker_pools_revisions_list(...)`, `locations_worker_pools_set_iam_policy(...)` and `locations_worker_pools_test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2009,6 +2607,29 @@ where
 impl<'a, C> common::MethodsBuilder for ProjectMethods<'a, C> {}
 
 impl<'a, C> ProjectMethods<'a, C> {
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Submits a build in a given project.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The project and location to build in. Location must be a region, e.g., 'us-central1' or 'global' if the global builder is to be used. Format: `projects/{project}/locations/{location}`
+    pub fn locations_builds_submit(
+        &self,
+        request: GoogleCloudRunV2SubmitBuildRequest,
+        parent: &str,
+    ) -> ProjectLocationBuildSubmitCall<'a, C> {
+        ProjectLocationBuildSubmitCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
     /// Create a builder to help you perform the following task:
     ///
     /// Gets information about a Task.
@@ -2407,6 +3028,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
@@ -2636,7 +3258,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The fully qualified name of this Service. In CreateServiceRequest, this field is ignored, and instead composed from CreateServiceRequest.parent and CreateServiceRequest.service_id. Format: projects/{project}/locations/{location}/services/{service_id}
+    /// * `name` - Identifier. The fully qualified name of this Service. In CreateServiceRequest, this field is ignored, and instead composed from CreateServiceRequest.parent and CreateServiceRequest.service_id. Format: projects/{project}/locations/{location}/services/{service_id}
     pub fn locations_services_patch(
         &self,
         request: GoogleCloudRunV2Service,
@@ -2703,6 +3325,255 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Deletes a Revision.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the Revision to delete. Format: projects/{project}/locations/{location}/services/{service}/revisions/{revision}
+    pub fn locations_worker_pools_revisions_delete(
+        &self,
+        name: &str,
+    ) -> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C> {
+        ProjectLocationWorkerPoolRevisionDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _validate_only: Default::default(),
+            _etag: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets information about a Revision.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The full name of the Revision. Format: projects/{project}/locations/{location}/services/{service}/revisions/{revision}
+    pub fn locations_worker_pools_revisions_get(
+        &self,
+        name: &str,
+    ) -> ProjectLocationWorkerPoolRevisionGetCall<'a, C> {
+        ProjectLocationWorkerPoolRevisionGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists Revisions from a given Service, or from a given location. Results are sorted by creation time, descending.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The Service from which the Revisions should be listed. To list all Revisions across Services, use "-" instead of Service name. Format: projects/{project}/locations/{location}/services/{service}
+    pub fn locations_worker_pools_revisions_list(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationWorkerPoolRevisionListCall<'a, C> {
+        ProjectLocationWorkerPoolRevisionListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _show_deleted: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new WorkerPool in a given project and location.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The location and project in which this worker pool should be created. Format: `projects/{project}/locations/{location}`, where `{project}` can be project id or number. Only lowercase characters, digits, and hyphens.
+    pub fn locations_worker_pools_create(
+        &self,
+        request: GoogleCloudRunV2WorkerPool,
+        parent: &str,
+    ) -> ProjectLocationWorkerPoolCreateCall<'a, C> {
+        ProjectLocationWorkerPoolCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _worker_pool_id: Default::default(),
+            _validate_only: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a WorkerPool.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The full name of the WorkerPool. Format: `projects/{project}/locations/{location}/workerPools/{worker_pool}`, where `{project}` can be project id or number.
+    pub fn locations_worker_pools_delete(
+        &self,
+        name: &str,
+    ) -> ProjectLocationWorkerPoolDeleteCall<'a, C> {
+        ProjectLocationWorkerPoolDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _validate_only: Default::default(),
+            _etag: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets information about a WorkerPool.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The full name of the WorkerPool. Format: `projects/{project}/locations/{location}/workerPools/{worker_pool}`, where `{project}` can be project id or number.
+    pub fn locations_worker_pools_get(
+        &self,
+        name: &str,
+    ) -> ProjectLocationWorkerPoolGetCall<'a, C> {
+        ProjectLocationWorkerPoolGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the IAM Access Control policy currently in effect for the given Cloud Run WorkerPool. This result does not include any inherited policies.
+    ///
+    /// # Arguments
+    ///
+    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn locations_worker_pools_get_iam_policy(
+        &self,
+        resource: &str,
+    ) -> ProjectLocationWorkerPoolGetIamPolicyCall<'a, C> {
+        ProjectLocationWorkerPoolGetIamPolicyCall {
+            hub: self.hub,
+            _resource: resource.to_string(),
+            _options_requested_policy_version: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists WorkerPools. Results are sorted by creation time, descending.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The location and project to list resources on. Location must be a valid Google Cloud region, and cannot be the "-" wildcard. Format: `projects/{project}/locations/{location}`, where `{project}` can be project id or number.
+    pub fn locations_worker_pools_list(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationWorkerPoolListCall<'a, C> {
+        ProjectLocationWorkerPoolListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _show_deleted: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a WorkerPool.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The fully qualified name of this WorkerPool. In CreateWorkerPoolRequest, this field is ignored, and instead composed from CreateWorkerPoolRequest.parent and CreateWorkerPoolRequest.worker_id. Format: `projects/{project}/locations/{location}/workerPools/{worker_id}`
+    pub fn locations_worker_pools_patch(
+        &self,
+        request: GoogleCloudRunV2WorkerPool,
+        name: &str,
+    ) -> ProjectLocationWorkerPoolPatchCall<'a, C> {
+        ProjectLocationWorkerPoolPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _validate_only: Default::default(),
+            _update_mask: Default::default(),
+            _force_new_revision: Default::default(),
+            _allow_missing: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the IAM Access control policy for the specified WorkerPool. Overwrites any existing policy.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn locations_worker_pools_set_iam_policy(
+        &self,
+        request: GoogleIamV1SetIamPolicyRequest,
+        resource: &str,
+    ) -> ProjectLocationWorkerPoolSetIamPolicyCall<'a, C> {
+        ProjectLocationWorkerPoolSetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns permissions that a caller has on the specified Project. There are no permissions required for making this API call.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn locations_worker_pools_test_iam_permissions(
+        &self,
+        request: GoogleIamV1TestIamPermissionsRequest,
+        resource: &str,
+    ) -> ProjectLocationWorkerPoolTestIamPermissionCall<'a, C> {
+        ProjectLocationWorkerPoolTestIamPermissionCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Export image for a given resource.
     ///
     /// # Arguments
@@ -2750,7 +3621,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the resource of which metadata should be exported. Format: `projects/{project_id_or_number}/locations/{location}/services/{service}` for Service `projects/{project_id_or_number}/locations/{location}/services/{service}/revisions/{revision}` for Revision `projects/{project_id_or_number}/locations/{location}/jobs/{job}/executions/{execution}` for Execution
+    /// * `name` - Required. The name of the resource of which metadata should be exported. Format: `projects/{project_id_or_number}/locations/{location}/services/{service}` for Service `projects/{project_id_or_number}/locations/{location}/services/{service}/revisions/{revision}` for Revision `projects/{project_id_or_number}/locations/{location}/jobs/{job}/executions/{execution}` for Execution {project_id_or_number} may contains domain-scoped project IDs
     pub fn locations_export_metadata(
         &self,
         name: &str,
@@ -2763,11 +3634,370 @@ impl<'a, C> ProjectMethods<'a, C> {
             _scopes: Default::default(),
         }
     }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Export generated customer metadata for a given project.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the project of which metadata should be exported. Format: `projects/{project_id_or_number}/locations/{location}` for Project in a given location.
+    pub fn locations_export_project_metadata(
+        &self,
+        name: &str,
+    ) -> ProjectLocationExportProjectMetadataCall<'a, C> {
+        ProjectLocationExportProjectMetadataCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
 }
 
 // ###################
 // CallBuilders   ###
 // #################
+
+/// Submits a build in a given project.
+///
+/// A builder for the *locations.builds.submit* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// use run2::api::GoogleCloudRunV2SubmitBuildRequest;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudRunV2SubmitBuildRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_builds_submit(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationBuildSubmitCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _request: GoogleCloudRunV2SubmitBuildRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationBuildSubmitCall<'a, C> {}
+
+impl<'a, C> ProjectLocationBuildSubmitCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudRunV2SubmitBuildResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.builds.submit",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/builds:submit";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudRunV2SubmitBuildRequest,
+    ) -> ProjectLocationBuildSubmitCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The project and location to build in. Location must be a region, e.g., 'us-central1' or 'global' if the global builder is to be used. Format: `projects/{project}/locations/{location}`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationBuildSubmitCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationBuildSubmitCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationBuildSubmitCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationBuildSubmitCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationBuildSubmitCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationBuildSubmitCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
 
 /// Gets information about a Task.
 ///
@@ -2786,9 +4016,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2799,7 +4040,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -3072,9 +4313,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3085,7 +4337,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -3094,8 +4346,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_jobs_executions_tasks_list("parent")
 ///              .show_deleted(false)
-///              .page_token("dolor")
-///              .page_size(-17)
+///              .page_token("ut")
+///              .page_size(-12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3400,9 +4652,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3413,7 +4676,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -3725,9 +4988,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3738,7 +5012,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -3747,7 +5021,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_jobs_executions_delete("name")
 ///              .validate_only(true)
-///              .etag("duo")
+///              .etag("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4038,9 +5312,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4051,7 +5336,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -4350,9 +5635,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4363,7 +5659,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -4636,9 +5932,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4649,7 +5956,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -4658,8 +5965,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_jobs_executions_list("parent")
 ///              .show_deleted(true)
-///              .page_token("ipsum")
-///              .page_size(-50)
+///              .page_token("eos")
+///              .page_size(-86)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4961,9 +6268,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4974,7 +6292,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -4987,8 +6305,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_jobs_create(req, "parent")
-///              .validate_only(true)
-///              .job_id("ea")
+///              .validate_only(false)
+///              .job_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5310,9 +6628,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5323,7 +6652,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -5332,7 +6661,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_jobs_delete("name")
 ///              .validate_only(true)
-///              .etag("eos")
+///              .etag("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5620,9 +6949,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5633,7 +6973,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -5906,9 +7246,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5919,7 +7270,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -5927,7 +7278,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_jobs_get_iam_policy("resource")
-///              .options_requested_policy_version(-70)
+///              .options_requested_policy_version(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6207,9 +7558,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6220,7 +7582,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -6228,9 +7590,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_jobs_list("parent")
-///              .show_deleted(true)
-///              .page_token("Stet")
-///              .page_size(-13)
+///              .show_deleted(false)
+///              .page_token("diam")
+///              .page_size(-49)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6532,9 +7894,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6545,7 +7918,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -6558,8 +7931,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_jobs_patch(req, "name")
-///              .validate_only(true)
-///              .allow_missing(true)
+///              .validate_only(false)
+///              .allow_missing(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6879,9 +8252,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6892,7 +8276,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -7205,9 +8589,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7218,7 +8613,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -7531,9 +8926,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7544,7 +8950,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -7858,9 +9264,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7871,7 +9288,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -8144,9 +9561,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8157,7 +9585,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -8430,9 +9858,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8443,7 +9882,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -8451,9 +9890,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("voluptua.")
-///              .page_size(-2)
-///              .filter("consetetur")
+///              .return_partial_success(true)
+///              .page_token("Lorem")
+///              .page_size(-29)
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8463,6 +9903,7 @@ where
 {
     hub: &'a CloudRun<C>,
     _name: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -8494,15 +9935,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8631,6 +10084,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `"projects/example/locations/-"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationOperationListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// Token identifying which result to start with, which is returned by a previous list call.
     ///
     /// Sets the *page token* query property to the given value.
@@ -8755,9 +10218,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8768,7 +10242,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -9080,9 +10554,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9093,7 +10578,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -9101,8 +10586,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_services_revisions_delete("name")
-///              .validate_only(false)
-///              .etag("Stet")
+///              .validate_only(true)
+///              .etag("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9393,9 +10878,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9406,7 +10902,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -9708,9 +11204,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9721,7 +11228,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -9994,9 +11501,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10007,7 +11525,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -10015,9 +11533,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_services_revisions_list("parent")
-///              .show_deleted(false)
-///              .page_token("Stet")
-///              .page_size(-76)
+///              .show_deleted(true)
+///              .page_token("et")
+///              .page_size(-23)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10322,9 +11840,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10335,7 +11864,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -10348,8 +11877,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_services_create(req, "parent")
-///              .validate_only(true)
-///              .service_id("ipsum")
+///              .validate_only(false)
+///              .service_id("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10671,9 +12200,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10684,7 +12224,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -10692,8 +12232,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_services_delete("name")
-///              .validate_only(true)
-///              .etag("consetetur")
+///              .validate_only(false)
+///              .etag("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10981,9 +12521,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10994,7 +12545,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -11267,9 +12818,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11280,7 +12842,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -11288,7 +12850,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_services_get_iam_policy("resource")
-///              .options_requested_policy_version(-31)
+///              .options_requested_policy_version(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11568,9 +13130,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11581,7 +13154,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -11590,8 +13163,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_services_list("parent")
 ///              .show_deleted(true)
-///              .page_token("et")
-///              .page_size(-23)
+///              .page_token("sit")
+///              .page_size(-35)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11893,9 +13466,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11906,7 +13490,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -11919,9 +13503,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_services_patch(req, "name")
-///              .validate_only(false)
+///              .validate_only(true)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .allow_missing(false)
+///              .allow_missing(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12121,7 +13705,7 @@ where
         self._request = new_value;
         self
     }
-    /// The fully qualified name of this Service. In CreateServiceRequest, this field is ignored, and instead composed from CreateServiceRequest.parent and CreateServiceRequest.service_id. Format: projects/{project}/locations/{location}/services/{service_id}
+    /// Identifier. The fully qualified name of this Service. In CreateServiceRequest, this field is ignored, and instead composed from CreateServiceRequest.parent and CreateServiceRequest.service_id. Format: projects/{project}/locations/{location}/services/{service_id}
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12258,9 +13842,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12271,7 +13866,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -12584,9 +14179,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12597,7 +14203,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -12904,6 +14510,3699 @@ where
     }
 }
 
+/// Deletes a Revision.
+///
+/// A builder for the *locations.workerPools.revisions.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_revisions_delete("name")
+///              .validate_only(false)
+///              .etag("elitr")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolRevisionDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _name: String,
+    _validate_only: Option<bool>,
+    _etag: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolRevisionDeleteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleLongrunningOperation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.revisions.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["alt", "name", "validateOnly", "etag"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._validate_only.as_ref() {
+            params.push("validateOnly", value.to_string());
+        }
+        if let Some(value) = self._etag.as_ref() {
+            params.push("etag", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the Revision to delete. Format: projects/{project}/locations/{location}/services/{service}/revisions/{revision}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Indicates that the request should be validated without actually deleting any resources.
+    ///
+    /// Sets the *validate only* query property to the given value.
+    pub fn validate_only(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C> {
+        self._validate_only = Some(new_value);
+        self
+    }
+    /// A system-generated fingerprint for this version of the resource. This may be used to detect modification conflict during updates.
+    ///
+    /// Sets the *etag* query property to the given value.
+    pub fn etag(mut self, new_value: &str) -> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C> {
+        self._etag = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolRevisionDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets information about a Revision.
+///
+/// A builder for the *locations.workerPools.revisions.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_revisions_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolRevisionGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolRevisionGetCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolRevisionGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleCloudRunV2Revision)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.revisions.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The full name of the Revision. Format: projects/{project}/locations/{location}/services/{service}/revisions/{revision}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkerPoolRevisionGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolRevisionGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkerPoolRevisionGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolRevisionGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWorkerPoolRevisionGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolRevisionGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Lists Revisions from a given Service, or from a given location. Results are sorted by creation time, descending.
+///
+/// A builder for the *locations.workerPools.revisions.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_revisions_list("parent")
+///              .show_deleted(false)
+///              .page_token("At")
+///              .page_size(-45)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolRevisionListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _parent: String,
+    _show_deleted: Option<bool>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolRevisionListCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolRevisionListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudRunV2ListRevisionsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.revisions.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent", "showDeleted", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._show_deleted.as_ref() {
+            params.push("showDeleted", value.to_string());
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/revisions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The Service from which the Revisions should be listed. To list all Revisions across Services, use "-" instead of Service name. Format: projects/{project}/locations/{location}/services/{service}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkerPoolRevisionListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// If true, returns deleted (but unexpired) resources along with active ones.
+    ///
+    /// Sets the *show deleted* query property to the given value.
+    pub fn show_deleted(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationWorkerPoolRevisionListCall<'a, C> {
+        self._show_deleted = Some(new_value);
+        self
+    }
+    /// A page token received from a previous call to ListRevisions. All other parameters must match.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationWorkerPoolRevisionListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of revisions to return in this call.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationWorkerPoolRevisionListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolRevisionListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkerPoolRevisionListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolRevisionListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationWorkerPoolRevisionListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolRevisionListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Creates a new WorkerPool in a given project and location.
+///
+/// A builder for the *locations.workerPools.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// use run2::api::GoogleCloudRunV2WorkerPool;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudRunV2WorkerPool::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_create(req, "parent")
+///              .worker_pool_id("dolores")
+///              .validate_only(false)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _request: GoogleCloudRunV2WorkerPool,
+    _parent: String,
+    _worker_pool_id: Option<String>,
+    _validate_only: Option<bool>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolCreateCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolCreateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleLongrunningOperation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.create",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent", "workerPoolId", "validateOnly"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._worker_pool_id.as_ref() {
+            params.push("workerPoolId", value);
+        }
+        if let Some(value) = self._validate_only.as_ref() {
+            params.push("validateOnly", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/workerPools";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudRunV2WorkerPool,
+    ) -> ProjectLocationWorkerPoolCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The location and project in which this worker pool should be created. Format: `projects/{project}/locations/{location}`, where `{project}` can be project id or number. Only lowercase characters, digits, and hyphens.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkerPoolCreateCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. The unique identifier for the WorkerPool. It must begin with letter, and cannot end with hyphen; must contain fewer than 50 characters. The name of the worker pool becomes `{parent}/workerPools/{worker_pool_id}`.
+    ///
+    /// Sets the *worker pool id* query property to the given value.
+    pub fn worker_pool_id(mut self, new_value: &str) -> ProjectLocationWorkerPoolCreateCall<'a, C> {
+        self._worker_pool_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Indicates that the request should be validated and default values populated, without persisting the request or creating any resources.
+    ///
+    /// Sets the *validate only* query property to the given value.
+    pub fn validate_only(mut self, new_value: bool) -> ProjectLocationWorkerPoolCreateCall<'a, C> {
+        self._validate_only = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkerPoolCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWorkerPoolCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolCreateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes a WorkerPool.
+///
+/// A builder for the *locations.workerPools.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_delete("name")
+///              .validate_only(false)
+///              .etag("amet")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _name: String,
+    _validate_only: Option<bool>,
+    _etag: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolDeleteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleLongrunningOperation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["alt", "name", "validateOnly", "etag"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._validate_only.as_ref() {
+            params.push("validateOnly", value.to_string());
+        }
+        if let Some(value) = self._etag.as_ref() {
+            params.push("etag", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The full name of the WorkerPool. Format: `projects/{project}/locations/{location}/workerPools/{worker_pool}`, where `{project}` can be project id or number.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkerPoolDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. Indicates that the request should be validated without actually deleting any resources.
+    ///
+    /// Sets the *validate only* query property to the given value.
+    pub fn validate_only(mut self, new_value: bool) -> ProjectLocationWorkerPoolDeleteCall<'a, C> {
+        self._validate_only = Some(new_value);
+        self
+    }
+    /// A system-generated fingerprint for this version of the resource. May be used to detect modification conflict during updates.
+    ///
+    /// Sets the *etag* query property to the given value.
+    pub fn etag(mut self, new_value: &str) -> ProjectLocationWorkerPoolDeleteCall<'a, C> {
+        self._etag = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkerPoolDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWorkerPoolDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets information about a WorkerPool.
+///
+/// A builder for the *locations.workerPools.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolGetCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleCloudRunV2WorkerPool)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The full name of the WorkerPool. Format: `projects/{project}/locations/{location}/workerPools/{worker_pool}`, where `{project}` can be project id or number.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkerPoolGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkerPoolGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWorkerPoolGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets the IAM Access Control policy currently in effect for the given Cloud Run WorkerPool. This result does not include any inherited policies.
+///
+/// A builder for the *locations.workerPools.getIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_get_iam_policy("resource")
+///              .options_requested_policy_version(-10)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolGetIamPolicyCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _resource: String,
+    _options_requested_policy_version: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolGetIamPolicyCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolGetIamPolicyCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleIamV1Policy)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.getIamPolicy",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+        if let Some(value) = self._options_requested_policy_version.as_ref() {
+            params.push("options.requestedPolicyVersion", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+resource}:getIamPolicy";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationWorkerPoolGetIamPolicyCall<'a, C> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+    ///
+    /// Sets the *options.requested policy version* query property to the given value.
+    pub fn options_requested_policy_version(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationWorkerPoolGetIamPolicyCall<'a, C> {
+        self._options_requested_policy_version = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolGetIamPolicyCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkerPoolGetIamPolicyCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolGetIamPolicyCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationWorkerPoolGetIamPolicyCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolGetIamPolicyCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Lists WorkerPools. Results are sorted by creation time, descending.
+///
+/// A builder for the *locations.workerPools.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_list("parent")
+///              .show_deleted(true)
+///              .page_token("Stet")
+///              .page_size(-7)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _parent: String,
+    _show_deleted: Option<bool>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolListCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudRunV2ListWorkerPoolsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent", "showDeleted", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._show_deleted.as_ref() {
+            params.push("showDeleted", value.to_string());
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/workerPools";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The location and project to list resources on. Location must be a valid Google Cloud region, and cannot be the "-" wildcard. Format: `projects/{project}/locations/{location}`, where `{project}` can be project id or number.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWorkerPoolListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// If true, returns deleted (but unexpired) resources along with active ones.
+    ///
+    /// Sets the *show deleted* query property to the given value.
+    pub fn show_deleted(mut self, new_value: bool) -> ProjectLocationWorkerPoolListCall<'a, C> {
+        self._show_deleted = Some(new_value);
+        self
+    }
+    /// A page token received from a previous call to ListWorkerPools. All other parameters must match.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationWorkerPoolListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of WorkerPools to return in this call.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationWorkerPoolListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkerPoolListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWorkerPoolListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Updates a WorkerPool.
+///
+/// A builder for the *locations.workerPools.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// use run2::api::GoogleCloudRunV2WorkerPool;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudRunV2WorkerPool::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_patch(req, "name")
+///              .validate_only(false)
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .force_new_revision(true)
+///              .allow_missing(true)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolPatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _request: GoogleCloudRunV2WorkerPool,
+    _name: String,
+    _validate_only: Option<bool>,
+    _update_mask: Option<common::FieldMask>,
+    _force_new_revision: Option<bool>,
+    _allow_missing: Option<bool>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolPatchCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolPatchCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleLongrunningOperation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.patch",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in [
+            "alt",
+            "name",
+            "validateOnly",
+            "updateMask",
+            "forceNewRevision",
+            "allowMissing",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._validate_only.as_ref() {
+            params.push("validateOnly", value.to_string());
+        }
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._force_new_revision.as_ref() {
+            params.push("forceNewRevision", value.to_string());
+        }
+        if let Some(value) = self._allow_missing.as_ref() {
+            params.push("allowMissing", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudRunV2WorkerPool,
+    ) -> ProjectLocationWorkerPoolPatchCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// The fully qualified name of this WorkerPool. In CreateWorkerPoolRequest, this field is ignored, and instead composed from CreateWorkerPoolRequest.parent and CreateWorkerPoolRequest.worker_id. Format: `projects/{project}/locations/{location}/workerPools/{worker_id}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWorkerPoolPatchCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. Indicates that the request should be validated and default values populated, without persisting the request or updating any resources.
+    ///
+    /// Sets the *validate only* query property to the given value.
+    pub fn validate_only(mut self, new_value: bool) -> ProjectLocationWorkerPoolPatchCall<'a, C> {
+        self._validate_only = Some(new_value);
+        self
+    }
+    /// Optional. The list of fields to be updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationWorkerPoolPatchCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Optional. If set to true, a new revision will be created from the template even if the system doesn't detect any changes from the previously deployed revision. This may be useful for cases where the underlying resources need to be recreated or reinitialized. For example if the image is specified by label, but the underlying image digest has changed) or if the container performs deployment initialization work that needs to be performed again.
+    ///
+    /// Sets the *force new revision* query property to the given value.
+    pub fn force_new_revision(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationWorkerPoolPatchCall<'a, C> {
+        self._force_new_revision = Some(new_value);
+        self
+    }
+    /// Optional. If set to true, and if the WorkerPool does not exist, it will create a new one. The caller must have 'run.workerpools.create' permissions if this is set to true and the WorkerPool does not exist.
+    ///
+    /// Sets the *allow missing* query property to the given value.
+    pub fn allow_missing(mut self, new_value: bool) -> ProjectLocationWorkerPoolPatchCall<'a, C> {
+        self._allow_missing = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolPatchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkerPoolPatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolPatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWorkerPoolPatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolPatchCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Sets the IAM Access control policy for the specified WorkerPool. Overwrites any existing policy.
+///
+/// A builder for the *locations.workerPools.setIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// use run2::api::GoogleIamV1SetIamPolicyRequest;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleIamV1SetIamPolicyRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_set_iam_policy(req, "resource")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolSetIamPolicyCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _request: GoogleIamV1SetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolSetIamPolicyCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolSetIamPolicyCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleIamV1Policy)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.setIamPolicy",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+resource}:setIamPolicy";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleIamV1SetIamPolicyRequest,
+    ) -> ProjectLocationWorkerPoolSetIamPolicyCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationWorkerPoolSetIamPolicyCall<'a, C> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolSetIamPolicyCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWorkerPoolSetIamPolicyCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWorkerPoolSetIamPolicyCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationWorkerPoolSetIamPolicyCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolSetIamPolicyCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Returns permissions that a caller has on the specified Project. There are no permissions required for making this API call.
+///
+/// A builder for the *locations.workerPools.testIamPermissions* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// use run2::api::GoogleIamV1TestIamPermissionsRequest;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleIamV1TestIamPermissionsRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_worker_pools_test_iam_permissions(req, "resource")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWorkerPoolTestIamPermissionCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _request: GoogleIamV1TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWorkerPoolTestIamPermissionCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWorkerPoolTestIamPermissionCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleIamV1TestIamPermissionsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.workerPools.testIamPermissions",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+resource}:testIamPermissions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleIamV1TestIamPermissionsRequest,
+    ) -> ProjectLocationWorkerPoolTestIamPermissionCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationWorkerPoolTestIamPermissionCall<'a, C> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWorkerPoolTestIamPermissionCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationWorkerPoolTestIamPermissionCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationWorkerPoolTestIamPermissionCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationWorkerPoolTestIamPermissionCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWorkerPoolTestIamPermissionCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Export image for a given resource.
 ///
 /// A builder for the *locations.exportImage* method supported by a *project* resource.
@@ -12922,9 +18221,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12935,7 +18245,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -13249,9 +18559,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13262,7 +18583,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -13535,9 +18856,20 @@ where
 /// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13548,7 +18880,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CloudRun::new(client, auth);
@@ -13709,7 +19041,7 @@ where
         }
     }
 
-    /// Required. The name of the resource of which metadata should be exported. Format: `projects/{project_id_or_number}/locations/{location}/services/{service}` for Service `projects/{project_id_or_number}/locations/{location}/services/{service}/revisions/{revision}` for Revision `projects/{project_id_or_number}/locations/{location}/jobs/{job}/executions/{execution}` for Execution
+    /// Required. The name of the resource of which metadata should be exported. Format: `projects/{project_id_or_number}/locations/{location}/services/{service}` for Service `projects/{project_id_or_number}/locations/{location}/services/{service}/revisions/{revision}` for Revision `projects/{project_id_or_number}/locations/{location}/jobs/{job}/executions/{execution}` for Execution {project_id_or_number} may contains domain-scoped project IDs
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -13799,6 +19131,303 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> ProjectLocationExportMetadataCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Export generated customer metadata for a given project.
+///
+/// A builder for the *locations.exportProjectMetadata* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_run2 as run2;
+/// # async fn dox() {
+/// # use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudRun::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_export_project_metadata("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationExportProjectMetadataCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudRun<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationExportProjectMetadataCall<'a, C> {}
+
+impl<'a, C> ProjectLocationExportProjectMetadataCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleCloudRunV2Metadata)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "run.projects.locations.exportProjectMetadata",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+name}:exportProjectMetadata";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the project of which metadata should be exported. Format: `projects/{project_id_or_number}/locations/{location}` for Project in a given location.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationExportProjectMetadataCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationExportProjectMetadataCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationExportProjectMetadataCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationExportProjectMetadataCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationExportProjectMetadataCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationExportProjectMetadataCall<'a, C> {
         self._scopes.clear();
         self
     }

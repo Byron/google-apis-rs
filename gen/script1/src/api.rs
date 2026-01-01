@@ -266,7 +266,7 @@ pub struct Content {
 impl common::RequestValue for Content {}
 impl common::ResponseResult for Content {}
 
-/// Request to create a script project. Request to create a script project.
+/// Request to create a script project.
 ///
 /// # Activities
 ///
@@ -419,13 +419,13 @@ impl common::RequestValue for ExecutionRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct File {
-    /// Creation date timestamp. This read-only field is only visible to users who have WRITER permission for the script project.
+    /// Creation date timestamp.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// The defined set of functions in the script file, if any.
     #[serde(rename = "functionSet")]
     pub function_set: Option<GoogleAppsScriptTypeFunctionSet>,
-    /// The user who modified the file most recently. This read-only field is only visible to users who have WRITER permission for the script project.
+    /// The user who modified the file most recently. The details visible in this object are controlled by the profile visibility settings of the last modifying user.
     #[serde(rename = "lastModifyUser")]
     pub last_modify_user: Option<GoogleAppsScriptTypeUser>,
     /// The name of the file. The file extension is not part of the file name, which can be identified from the type field.
@@ -435,7 +435,7 @@ pub struct File {
     /// The type of the file.
     #[serde(rename = "type")]
     pub type_: Option<String>,
-    /// Last modified date timestamp. This read-only field is only visible to users who have WRITER permission for the script project.
+    /// Last modified date timestamp.
     #[serde(rename = "updateTime")]
     pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
@@ -804,7 +804,7 @@ pub struct Project {
     /// User who last modified the script.
     #[serde(rename = "lastModifyUser")]
     pub last_modify_user: Option<GoogleAppsScriptTypeUser>,
-    /// The parent's Drive ID that the script will be attached to. This is usually the ID of a Google Document or Google Sheet. This filed is optional, and if not set, a stand-alone script will be created.
+    /// The parent's Drive ID that the script will be attached to. This is usually the ID of a Google Document or Google Sheet. This field is optional, and if not set, a stand-alone script will be created.
     #[serde(rename = "parentId")]
     pub parent_id: Option<String>,
     /// The script project's Drive ID.
@@ -1392,7 +1392,7 @@ impl<'a, C> common::MethodsBuilder for ScriptMethods<'a, C> {}
 impl<'a, C> ScriptMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Runs a function in an Apps Script project. The script project must be deployed for use with the Apps Script API and the calling application must share the same Cloud Platform project. This method requires authorization with an OAuth 2.0 token that includes at least one of the scopes listed in the [Authorization](#authorization-scopes) section; script projects that do not require authorization cannot be executed through this API. To find the correct scopes to include in the authentication token, open the script project **Overview** page and scroll down to “Project OAuth Scopes.” The error `403, PERMISSION_DENIED: The caller does not have permission` indicates that the Cloud Platform project used to authorize the request is not the same as the one used by the script.
+    ///
     ///
     /// # Arguments
     ///
@@ -6485,7 +6485,7 @@ where
     }
 }
 
-/// Runs a function in an Apps Script project. The script project must be deployed for use with the Apps Script API and the calling application must share the same Cloud Platform project. This method requires authorization with an OAuth 2.0 token that includes at least one of the scopes listed in the [Authorization](#authorization-scopes) section; script projects that do not require authorization cannot be executed through this API. To find the correct scopes to include in the authentication token, open the script project **Overview** page and scroll down to “Project OAuth Scopes.” The error `403, PERMISSION_DENIED: The caller does not have permission` indicates that the Cloud Platform project used to authorize the request is not the same as the one used by the script.
+///
 ///
 /// A builder for the *run* method supported by a *script* resource.
 /// It is not used directly, but through a [`ScriptMethods`] instance.

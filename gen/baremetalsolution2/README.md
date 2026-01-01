@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-baremetalsolution2` library allows access to all features of the *Google baremetalsolution* service.
 
-This documentation was generated from *baremetalsolution* crate version *6.0.0+20240617*, where *20240617* is the exact revision of the *baremetalsolution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+This documentation was generated from *baremetalsolution* crate version *7.0.0+20251008*, where *20251008* is the exact revision of the *baremetalsolution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 
 Everything else about the *baremetalsolution* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/bare-metal).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/Baremetalsolution) ...
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/Baremetalsolution) ...
 
 * projects
- * [*locations get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationGetCall), [*locations instances detach lun*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceDetachLunCall), [*locations instances disable hyperthreading*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceDisableHyperthreadingCall), [*locations instances disable interactive serial console*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceDisableInteractiveSerialConsoleCall), [*locations instances enable hyperthreading*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceEnableHyperthreadingCall), [*locations instances enable interactive serial console*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceEnableInteractiveSerialConsoleCall), [*locations instances get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceGetCall), [*locations instances list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceListCall), [*locations instances load auth info*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceLoadAuthInfoCall), [*locations instances patch*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstancePatchCall), [*locations instances reimage*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceReimageCall), [*locations instances rename*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceRenameCall), [*locations instances reset*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceResetCall), [*locations instances start*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceStartCall), [*locations instances stop*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationInstanceStopCall), [*locations list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationListCall), [*locations networks get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNetworkGetCall), [*locations networks list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNetworkListCall), [*locations networks list network usage*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNetworkListNetworkUsageCall), [*locations networks patch*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNetworkPatchCall), [*locations networks rename*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNetworkRenameCall), [*locations nfs shares create*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNfsShareCreateCall), [*locations nfs shares delete*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNfsShareDeleteCall), [*locations nfs shares get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNfsShareGetCall), [*locations nfs shares list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNfsShareListCall), [*locations nfs shares patch*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNfsSharePatchCall), [*locations nfs shares rename*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationNfsShareRenameCall), [*locations operations get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationOperationGetCall), [*locations os images get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationOsImageGetCall), [*locations os images list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationOsImageListCall), [*locations provisioning configs create*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationProvisioningConfigCreateCall), [*locations provisioning configs get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationProvisioningConfigGetCall), [*locations provisioning configs patch*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationProvisioningConfigPatchCall), [*locations provisioning configs submit*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationProvisioningConfigSubmitCall), [*locations provisioning quotas list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationProvisioningQuotaListCall), [*locations ssh keys create*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationSshKeyCreateCall), [*locations ssh keys delete*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationSshKeyDeleteCall), [*locations ssh keys list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationSshKeyListCall), [*locations volumes evict*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeEvictCall), [*locations volumes get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeGetCall), [*locations volumes list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeListCall), [*locations volumes luns evict*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeLunEvictCall), [*locations volumes luns get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeLunGetCall), [*locations volumes luns list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeLunListCall), [*locations volumes patch*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumePatchCall), [*locations volumes rename*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeRenameCall), [*locations volumes resize*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeResizeCall), [*locations volumes snapshots create*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotCreateCall), [*locations volumes snapshots delete*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotDeleteCall), [*locations volumes snapshots get*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotGetCall), [*locations volumes snapshots list*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotListCall) and [*locations volumes snapshots restore volume snapshot*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotRestoreVolumeSnapshotCall)
+ * [*locations get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationGetCall), [*locations instances detach lun*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceDetachLunCall), [*locations instances disable hyperthreading*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceDisableHyperthreadingCall), [*locations instances disable interactive serial console*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceDisableInteractiveSerialConsoleCall), [*locations instances enable hyperthreading*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceEnableHyperthreadingCall), [*locations instances enable interactive serial console*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceEnableInteractiveSerialConsoleCall), [*locations instances get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceGetCall), [*locations instances list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceListCall), [*locations instances load auth info*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceLoadAuthInfoCall), [*locations instances patch*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstancePatchCall), [*locations instances reimage*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceReimageCall), [*locations instances rename*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceRenameCall), [*locations instances reset*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceResetCall), [*locations instances start*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceStartCall), [*locations instances stop*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationInstanceStopCall), [*locations list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationListCall), [*locations networks get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNetworkGetCall), [*locations networks list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNetworkListCall), [*locations networks list network usage*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNetworkListNetworkUsageCall), [*locations networks patch*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNetworkPatchCall), [*locations networks rename*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNetworkRenameCall), [*locations nfs shares create*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNfsShareCreateCall), [*locations nfs shares delete*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNfsShareDeleteCall), [*locations nfs shares get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNfsShareGetCall), [*locations nfs shares list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNfsShareListCall), [*locations nfs shares patch*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNfsSharePatchCall), [*locations nfs shares rename*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationNfsShareRenameCall), [*locations operations get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationOperationGetCall), [*locations os images get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationOsImageGetCall), [*locations os images list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationOsImageListCall), [*locations provisioning configs create*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationProvisioningConfigCreateCall), [*locations provisioning configs get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationProvisioningConfigGetCall), [*locations provisioning configs patch*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationProvisioningConfigPatchCall), [*locations provisioning configs submit*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationProvisioningConfigSubmitCall), [*locations provisioning quotas list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationProvisioningQuotaListCall), [*locations ssh keys create*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationSshKeyCreateCall), [*locations ssh keys delete*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationSshKeyDeleteCall), [*locations ssh keys list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationSshKeyListCall), [*locations volumes evict*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeEvictCall), [*locations volumes get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeGetCall), [*locations volumes list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeListCall), [*locations volumes luns evict*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeLunEvictCall), [*locations volumes luns get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeLunGetCall), [*locations volumes luns list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeLunListCall), [*locations volumes patch*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumePatchCall), [*locations volumes rename*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeRenameCall), [*locations volumes resize*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeResizeCall), [*locations volumes snapshots create*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotCreateCall), [*locations volumes snapshots delete*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotDeleteCall), [*locations volumes snapshots get*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotGetCall), [*locations volumes snapshots list*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotListCall) and [*locations volumes snapshots restore volume snapshot*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/api::ProjectLocationVolumeSnapshotRestoreVolumeSnapshotCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/Baremetalsolution)**
+* **[Hub](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/Baremetalsolution)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::CallBuilder)
-* **[Resources](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::CallBuilder)
+* **[Resources](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::Part)**
+    * **[Parts](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::CallBuilder)**
+* **[Activities](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -105,9 +105,20 @@ let secret: yup_oauth2::ApplicationSecret = Default::default();
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+let connector = hyper_rustls::HttpsConnectorBuilder::new()
+    .with_native_roots()
+    .unwrap()
+    .https_only()
+    .enable_http2()
+    .build();
+
+let executor = hyper_util::rt::TokioExecutor::new();
+let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
     secret,
     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    yup_oauth2::client::CustomHyperClientBuilder::from(
+        hyper_util::client::legacy::Client::builder(executor).build(connector),
+    ),
 ).build().await.unwrap();
 
 let client = hyper_util::client::legacy::Client::builder(
@@ -118,7 +129,7 @@ let client = hyper_util::client::legacy::Client::builder(
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build()
 );
 let mut hub = Baremetalsolution::new(client, auth);
@@ -155,17 +166,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the
-[Hub Delegate](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -175,29 +186,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::Delegate) to the
-[Method Builder](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::CallBuilder) before making the final `doit()` call.
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::Delegate) to the
+[Method Builder](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::CallBuilder) before making the final `doit()` call.
 Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::RequestValue) and
-[decodable](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
+All structures provided by this library are made to be [encodable](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::RequestValue) and
+[decodable](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::Part) which are identifiable by name, which will be sent to
+Most optionals are are considered [Parts](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-baremetalsolution2/6.0.0+20240617/google_baremetalsolution2/common::RequestValue) are moved
+* [request values](https://docs.rs/google-baremetalsolution2/7.0.0+20251008/google_baremetalsolution2/common::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

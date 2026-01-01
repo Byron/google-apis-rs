@@ -86,9 +86,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -99,7 +110,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Bigquery::new(client, auth);
@@ -146,7 +157,7 @@ impl<'a, C> Bigquery<C> {
         Bigquery {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://bigquery.googleapis.com/bigquery/v2/".to_string(),
             _root_url: "https://bigquery.googleapis.com/".to_string(),
         }
@@ -178,7 +189,7 @@ impl<'a, C> Bigquery<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -228,7 +239,7 @@ pub struct AggregateClassificationMetrics {
     /// Area Under a ROC Curve. For multiclass this is a macro-averaged metric.
     #[serde(rename = "rocAuc")]
     pub roc_auc: Option<f64>,
-    /// Threshold at which the metrics are computed. For binary classification models this is the positive class threshold. For multi-class classfication models this is the confidence threshold.
+    /// Threshold at which the metrics are computed. For binary classification models this is the positive class threshold. For multi-class classification models this is the confidence threshold.
     pub threshold: Option<f64>,
 }
 
@@ -263,7 +274,7 @@ pub struct Argument {
     /// Optional. Defaults to FIXED_TYPE.
     #[serde(rename = "argumentKind")]
     pub argument_kind: Option<String>,
-    /// Required unless argument_kind = ANY_TYPE.
+    /// Set if argument_kind == FIXED_TYPE.
     #[serde(rename = "dataType")]
     pub data_type: Option<StandardSqlDataType>,
     /// Optional. Whether the argument is an aggregate function parameter. Must be Unset for routine types other than AGGREGATE_FUNCTION. For AGGREGATE_FUNCTION, if set to false, it is equivalent to adding "NOT AGGREGATE" clause in DDL; Otherwise, it is equivalent to omitting "NOT AGGREGATE" clause in DDL.
@@ -517,6 +528,27 @@ pub struct AvroOptions {
 
 impl common::Part for AvroOptions {}
 
+/// Request message for the BatchDeleteRowAccessPoliciesRequest method.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [batch delete row access policies](RowAccessPolicyBatchDeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BatchDeleteRowAccessPoliciesRequest {
+    /// If set to true, it deletes the row access policy even if it's the last row access policy on the table and the deletion will widen the access rather narrowing it.
+    pub force: Option<bool>,
+    /// Required. Policy IDs of the row access policies.
+    #[serde(rename = "policyIds")]
+    pub policy_ids: Option<Vec<String>>,
+}
+
+impl common::RequestValue for BatchDeleteRowAccessPoliciesRequest {}
+
 /// Reason why BI Engine didn't accelerate the query (or sub-query).
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -554,7 +586,7 @@ pub struct BiEngineStatistics {
 
 impl common::Part for BiEngineStatistics {}
 
-/// Configuration for BigLake managed tables.
+/// Configuration for BigQuery tables for Apache Iceberg (formerly BigLake managed tables.)
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -562,16 +594,16 @@ impl common::Part for BiEngineStatistics {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BigLakeConfiguration {
-    /// Required. The connection specifying the credentials to be used to read and write to external storage, such as Cloud Storage. The connection_id can have the form "<project\_id>.<location\_id>.<connection\_id>" or "projects/<project\_id>/locations/<location\_id>/connections/<connection\_id>".
+    /// Optional. The connection specifying the credentials to be used to read and write to external storage, such as Cloud Storage. The connection_id can have the form `{project}.{location}.{connection_id}` or `projects/{project}/locations/{location}/connections/{connection_id}".
     #[serde(rename = "connectionId")]
     pub connection_id: Option<String>,
-    /// Required. The file format the table data is stored in.
+    /// Optional. The file format the table data is stored in.
     #[serde(rename = "fileFormat")]
     pub file_format: Option<String>,
-    /// Required. The fully qualified location prefix of the external folder where table data is stored. The '*' wildcard character is not allowed. The URI should be in the format "gs://bucket/path_to_table/"
+    /// Optional. The fully qualified location prefix of the external folder where table data is stored. The '*' wildcard character is not allowed. The URI should be in the format `gs://bucket/path_to_table/`
     #[serde(rename = "storageUri")]
     pub storage_uri: Option<String>,
-    /// Required. The table format the metadata only snapshots are stored in.
+    /// Optional. The table format the metadata only snapshots are stored in.
     #[serde(rename = "tableFormat")]
     pub table_format: Option<String>,
 }
@@ -605,7 +637,7 @@ impl common::Part for BigQueryModelTraining {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BigtableColumn {
-    /// Optional. The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. 'encoding' can also be set at the column family level. However, the setting at this level takes precedence if 'encoding' is set at both levels.
+    /// Optional. The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. PROTO_BINARY - indicates values are encoded using serialized proto messages. This can only be used in combination with JSON type. 'encoding' can also be set at the column family level. However, the setting at this level takes precedence if 'encoding' is set at both levels.
     pub encoding: Option<String>,
     /// Optional. If the qualifier is not a valid BigQuery field identifier i.e. does not match a-zA-Z*, a valid identifier must be provided as the column field name and is used as field name in queries.
     #[serde(rename = "fieldName")]
@@ -613,7 +645,10 @@ pub struct BigtableColumn {
     /// Optional. If this is set, only the latest version of value in this column are exposed. 'onlyReadLatest' can also be set at the column family level. However, the setting at this level takes precedence if 'onlyReadLatest' is set at both levels.
     #[serde(rename = "onlyReadLatest")]
     pub only_read_latest: Option<bool>,
-    /// [Required] Qualifier of the column. Columns in the parent column family that has this exact qualifier are exposed as . field. If the qualifier is valid UTF-8 string, it can be specified in the qualifier_string field. Otherwise, a base-64 encoded value must be set to qualifier_encoded. The column field name is the same as the column qualifier. However, if the qualifier is not a valid BigQuery field identifier i.e. does not match a-zA-Z*, a valid identifier must be provided as field_name.
+    /// Optional. Protobuf-specific configurations, only takes effect when the encoding is PROTO_BINARY.
+    #[serde(rename = "protoConfig")]
+    pub proto_config: Option<BigtableProtoConfig>,
+    /// [Required] Qualifier of the column. Columns in the parent column family that has this exact qualifier are exposed as `.` field. If the qualifier is valid UTF-8 string, it can be specified in the qualifier_string field. Otherwise, a base-64 encoded value must be set to qualifier_encoded. The column field name is the same as the column qualifier. However, if the qualifier is not a valid BigQuery field identifier i.e. does not match a-zA-Z*, a valid identifier must be provided as field_name.
     #[serde(rename = "qualifierEncoded")]
     #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub qualifier_encoded: Option<Vec<u8>>,
@@ -635,9 +670,9 @@ impl common::Part for BigtableColumn {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BigtableColumnFamily {
-    /// Optional. Lists of columns that should be exposed as individual fields as opposed to a list of (column name, value) pairs. All columns whose qualifier matches a qualifier in this list can be accessed as .. Other columns can be accessed as a list through .Column field.
+    /// Optional. Lists of columns that should be exposed as individual fields as opposed to a list of (column name, value) pairs. All columns whose qualifier matches a qualifier in this list can be accessed as `.`. Other columns can be accessed as a list through the `.Column` field.
     pub columns: Option<Vec<BigtableColumn>>,
-    /// Optional. The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. This can be overridden for a specific column by listing that column in 'columns' and specifying an encoding for it.
+    /// Optional. The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. PROTO_BINARY - indicates values are encoded using serialized proto messages. This can only be used in combination with JSON type. This can be overridden for a specific column by listing that column in 'columns' and specifying an encoding for it.
     pub encoding: Option<String>,
     /// Identifier of the column family.
     #[serde(rename = "familyId")]
@@ -645,6 +680,9 @@ pub struct BigtableColumnFamily {
     /// Optional. If this is set only the latest version of value are exposed for all columns in this column family. This can be overridden for a specific column by listing that column in 'columns' and specifying a different setting for that column.
     #[serde(rename = "onlyReadLatest")]
     pub only_read_latest: Option<bool>,
+    /// Optional. Protobuf-specific configurations, only takes effect when the encoding is PROTO_BINARY.
+    #[serde(rename = "protoConfig")]
+    pub proto_config: Option<BigtableProtoConfig>,
     /// Optional. The type to convert the value in cells of this column family. The values are expected to be encoded using HBase Bytes.toBytes function when using the BINARY encoding value. Following BigQuery types are allowed (case-sensitive): * BYTES * STRING * INTEGER * FLOAT * BOOLEAN * JSON Default type is BYTES. This can be overridden for a specific column by listing that column in 'columns' and specifying a type for it.
     #[serde(rename = "type")]
     pub type_: Option<String>,
@@ -675,6 +713,24 @@ pub struct BigtableOptions {
 }
 
 impl common::Part for BigtableOptions {}
+
+/// Information related to a Bigtable protobuf column.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BigtableProtoConfig {
+    /// Optional. The fully qualified proto message name of the protobuf. In the format of "foo.bar.Message".
+    #[serde(rename = "protoMessageName")]
+    pub proto_message_name: Option<String>,
+    /// Optional. The ID of the Bigtable SchemaBundle resource associated with this protobuf. The ID should be referred to within the parent table, e.g., `foo` rather than `projects/{project}/instances/{instance}/tables/{table}/schemaBundles/foo`. See [more details on Bigtable SchemaBundles](https://docs.cloud.google.com/bigtable/docs/create-manage-protobuf-schemas).
+    #[serde(rename = "schemaBundleId")]
+    pub schema_bundle_id: Option<String>,
+}
+
+impl common::Part for BigtableProtoConfig {}
 
 /// Evaluation metrics for binary classification/classifier models.
 ///
@@ -911,7 +967,7 @@ impl common::Part for ClusterInfo {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Clustering {
-    /// One or more fields on which data should be clustered. Only top-level, non-repeated, simple-type fields are supported. The ordering of the clustering fields should be prioritized from most to least important for filtering purposes. Additional information on limitations can be found here: https://cloud.google.com/bigquery/docs/creating-clustered-tables#limitations
+    /// One or more fields on which data should be clustered. Only top-level, non-repeated, simple-type fields are supported. The ordering of the clustering fields should be prioritized from most to least important for filtering purposes. For additional information, see [Introduction to clustered tables](https://cloud.google.com/bigquery/docs/clustered-tables#limitations).
     pub fields: Option<Vec<String>>,
 }
 
@@ -992,6 +1048,9 @@ pub struct CsvOptions {
     /// Optional. Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when querying a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
     #[serde(rename = "nullMarker")]
     pub null_marker: Option<String>,
+    /// Optional. A list of strings represented as SQL NULL value in a CSV file. null_marker and null_markers can't be set at the same time. If null_marker is set, null_markers has to be not set. If null_markers is set, null_marker has to be not set. If both null_marker and null_markers are set at the same time, a user error would be thrown. Any strings listed in null_markers, including empty string would be interpreted as SQL NULL. This applies to all column types.
+    #[serde(rename = "nullMarkers")]
+    pub null_markers: Option<Vec<String>>,
     /// Optional. Indicates if the embedded ASCII control characters (the first 32 characters in the ASCII-table, from '\x00' to '\x1F') are preserved.
     #[serde(rename = "preserveAsciiControlCharacters")]
     pub preserve_ascii_control_characters: Option<bool>,
@@ -1001,6 +1060,9 @@ pub struct CsvOptions {
     #[serde(rename = "skipLeadingRows")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub skip_leading_rows: Option<i64>,
+    /// Optional. Controls the strategy used to match loaded columns to the schema. If not set, a sensible default is chosen based on how the schema is provided. If autodetect is used, then columns are matched by name. Otherwise, columns are matched by position. This is done to keep the behavior backward-compatible. Acceptable values are: POSITION - matches by position. This assumes that the columns are ordered the same way as the schema. NAME - matches by name. This reads the header row as column names and reorders columns to match the field names in the schema.
+    #[serde(rename = "sourceColumnMatch")]
+    pub source_column_match: Option<String>,
 }
 
 impl common::Part for CsvOptions {}
@@ -1013,6 +1075,9 @@ impl common::Part for CsvOptions {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DataFormatOptions {
+    /// Optional. The API output format for a timestamp. This offers more explicit control over the timestamp output format as compared to the existing `use_int64_timestamp` option.
+    #[serde(rename = "timestampOutputFormat")]
+    pub timestamp_output_format: Option<String>,
     /// Optional. Output timestamp as usec int64. Default is false.
     #[serde(rename = "useInt64Timestamp")]
     pub use_int64_timestamp: Option<bool>,
@@ -1035,6 +1100,20 @@ pub struct DataMaskingStatistics {
 
 impl common::Part for DataMaskingStatistics {}
 
+/// Data policy option. For more information, see [Mask data by applying data policies to a column](https://cloud.google.com/bigquery/docs/column-data-masking#data-policies-on-column/).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DataPolicyOption {
+    /// Data policy resource name in the form of projects/project_id/locations/location_id/dataPolicies/data_policy_id.
+    pub name: Option<String>,
+}
+
+impl common::Part for DataPolicyOption {}
+
 /// Data split result. This contains references to the training and evaluation data tables that were used to train the model.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1056,7 +1135,7 @@ pub struct DataSplitResult {
 
 impl common::Part for DataSplitResult {}
 
-/// There is no detailed description.
+/// Represents a BigQuery dataset.
 ///
 /// # Activities
 ///
@@ -1074,7 +1153,7 @@ impl common::Part for DataSplitResult {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Dataset {
-    /// Optional. An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
+    /// Optional. An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER; If you patch a dataset, then this field is overwritten by the patched dataset's access field. To add entities, you must supply the entire existing access array in addition to any new entities that you want to add.
     pub access: Option<Vec<DatasetAccess>>,
     /// Output only. The time when this dataset was created, in milliseconds since the epoch.
     #[serde(rename = "creationTime")]
@@ -1120,7 +1199,7 @@ pub struct Dataset {
     pub is_case_insensitive: Option<bool>,
     /// Output only. The resource type.
     pub kind: Option<String>,
-    /// The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.
+    /// The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See [Creating and Updating Dataset Labels](https://cloud.google.com/bigquery/docs/creating-managing-labels#creating_and_updating_dataset_labels) for more information.
     pub labels: Option<HashMap<String, String>>,
     /// Output only. The date when this dataset was last modified, in milliseconds since the epoch.
     #[serde(rename = "lastModifiedTime")]
@@ -1138,7 +1217,7 @@ pub struct Dataset {
     #[serde(rename = "maxTimeTravelHours")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub max_time_travel_hours: Option<i64>,
-    /// Optional. The [tags](https://cloud.google.com/bigquery/docs/tags) attached to this dataset. Tag keys are globally unique. Tag key is expected to be in the namespaced format, for example “123456789012/environment” where 123456789012 is the ID of the parent organization or project resource for this tag key. Tag value is expected to be the short name, for example “Production”. See [Tag definitions](https://cloud.google.com/iam/docs/tags-access-control#definitions) for more details.
+    /// Optional. The [tags](https://cloud.google.com/bigquery/docs/tags) attached to this dataset. Tag keys are globally unique. Tag key is expected to be in the namespaced format, for example "123456789012/environment" where 123456789012 is the ID of the parent organization or project resource for this tag key. Tag value is expected to be the short name, for example "Production". See [Tag definitions](https://cloud.google.com/iam/docs/tags-access-control#definitions) for more details.
     #[serde(rename = "resourceTags")]
     pub resource_tags: Option<HashMap<String, String>>,
     /// Optional. Output only. Restriction config for all tables and dataset. If set, restrict certain accesses on the dataset and all its tables based on the config. See [Data egress](https://cloud.google.com/bigquery/docs/analytics-hub-introduction#data_egress) for more details.
@@ -1155,7 +1234,7 @@ pub struct Dataset {
     /// Optional. Updates storage_billing_model for the dataset.
     #[serde(rename = "storageBillingModel")]
     pub storage_billing_model: Option<String>,
-    /// Output only. Tags for the Dataset.
+    /// Output only. Tags for the dataset. To provide tags as inputs, use the `resourceTags` field.
     pub tags: Option<Vec<DatasetTags>>,
     /// Output only. Same as `type` in `ListFormatDataset`. The type of the dataset, one of: * DEFAULT - only accessible by owner and authorized accounts, * PUBLIC - accessible by everyone, * LINKED - linked dataset, * EXTERNAL - dataset with definition in external metadata catalog.
     #[serde(rename = "type")]
@@ -1210,7 +1289,7 @@ pub struct DatasetList {
 
 impl common::ResponseResult for DatasetList {}
 
-/// There is no detailed description.
+/// Identifier for a dataset.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1372,7 +1451,7 @@ pub struct DoubleRange {
 
 impl common::Part for DoubleRange {}
 
-/// There is no detailed description.
+/// Configuration for Cloud KMS encryption settings.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1653,7 +1732,7 @@ pub struct Expr {
 
 impl common::Part for Expr {}
 
-/// Options defining open source compatible datasets living in the BigQuery catalog. Contains metadata of open source database, schema or namespace represented by the current dataset.
+/// Options defining open source compatible datasets living in the BigQuery catalog. Contains metadata of open source database, schema, or namespace represented by the current dataset.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1664,13 +1743,13 @@ pub struct ExternalCatalogDatasetOptions {
     /// Optional. The storage location URI for all tables in the dataset. Equivalent to hive metastore's database locationUri. Maximum length of 1024 characters.
     #[serde(rename = "defaultStorageLocationUri")]
     pub default_storage_location_uri: Option<String>,
-    /// Optional. A map of key value pairs defining the parameters and properties of the open source schema. Maximum size of 2Mib.
+    /// Optional. A map of key value pairs defining the parameters and properties of the open source schema. Maximum size of 2MiB.
     pub parameters: Option<HashMap<String, String>>,
 }
 
 impl common::Part for ExternalCatalogDatasetOptions {}
 
-/// Metadata about open source compatible table. The fields contained in these options correspond to hive metastore's table level properties.
+/// Metadata about open source compatible table. The fields contained in these options correspond to Hive metastore's table-level properties.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1678,10 +1757,10 @@ impl common::Part for ExternalCatalogDatasetOptions {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExternalCatalogTableOptions {
-    /// Optional. The connection specifying the credentials to be used to read external storage, such as Azure Blob, Cloud Storage, or S3. The connection is needed to read the open source table from BigQuery Engine. The connection_id can have the form `..` or `projects//locations//connections/`.
+    /// Optional. A connection ID that specifies the credentials to be used to read external storage, such as Azure Blob, Cloud Storage, or Amazon S3. This connection is needed to read the open source table from BigQuery. The connection_id format must be either `..` or `projects//locations//connections/`.
     #[serde(rename = "connectionId")]
     pub connection_id: Option<String>,
-    /// Optional. A map of key value pairs defining the parameters and properties of the open source table. Corresponds with hive meta store table parameters. Maximum size of 4Mib.
+    /// Optional. A map of the key-value pairs defining the parameters and properties of the open source table. Corresponds with Hive metastore table parameters. Maximum size of 4MiB.
     pub parameters: Option<HashMap<String, String>>,
     /// Optional. A storage descriptor containing information about the physical storage of this table.
     #[serde(rename = "storageDescriptor")]
@@ -1708,13 +1787,19 @@ pub struct ExternalDataConfiguration {
     pub bigtable_options: Option<BigtableOptions>,
     /// Optional. The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups, Avro, ORC and Parquet formats. An empty string is an invalid value.
     pub compression: Option<String>,
-    /// Optional. The connection specifying the credentials to be used to read external storage, such as Azure Blob, Cloud Storage, or S3. The connection_id can have the form "<project\_id>.<location\_id>.<connection\_id>" or "projects/<project\_id>/locations/<location\_id>/connections/<connection\_id>".
+    /// Optional. The connection specifying the credentials to be used to read external storage, such as Azure Blob, Cloud Storage, or S3. The connection_id can have the form `{project_id}.{location_id};{connection_id}` or `projects/{project_id}/locations/{location_id}/connections/{connection_id}`.
     #[serde(rename = "connectionId")]
     pub connection_id: Option<String>,
     /// Optional. Additional properties to set if sourceFormat is set to CSV.
     #[serde(rename = "csvOptions")]
     pub csv_options: Option<CsvOptions>,
-    /// Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exeeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
+    /// Optional. Format used to parse DATE values. Supports C-style and SQL-style values.
+    #[serde(rename = "dateFormat")]
+    pub date_format: Option<String>,
+    /// Optional. Format used to parse DATETIME values. Supports C-style and SQL-style values.
+    #[serde(rename = "datetimeFormat")]
+    pub datetime_format: Option<String>,
+    /// Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exceeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
     #[serde(rename = "decimalTargetTypes")]
     pub decimal_target_types: Option<Vec<String>>,
     /// Optional. Specifies how source URIs are interpreted for constructing the file set to load. By default source URIs are expanded against the underlying storage. Other options include specifying manifest files. Only applicable to object storage systems.
@@ -1758,6 +1843,18 @@ pub struct ExternalDataConfiguration {
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups, exactly one URI can be specified. Also, the '*' wildcard character is not allowed.
     #[serde(rename = "sourceUris")]
     pub source_uris: Option<Vec<String>>,
+    /// Optional. Format used to parse TIME values. Supports C-style and SQL-style values.
+    #[serde(rename = "timeFormat")]
+    pub time_format: Option<String>,
+    /// Optional. Time zone used when parsing timestamp values that do not have specific time zone information (e.g. 2024-04-20 12:34:56). The expected format is a IANA timezone string (e.g. America/Los_Angeles).
+    #[serde(rename = "timeZone")]
+    pub time_zone: Option<String>,
+    /// Optional. Format used to parse TIMESTAMP values. Supports C-style and SQL-style values.
+    #[serde(rename = "timestampFormat")]
+    pub timestamp_format: Option<String>,
+    /// Precisions (maximum number of total digits in base 10) for seconds of TIMESTAMP types that are allowed to the destination table for autodetection mode. Available for the formats: CSV. For the CSV Format, Possible values include: Not Specified, [], or [6]: timestamp(6) for all auto detected TIMESTAMP columns [6, 12]: timestamp(6) for all auto detected TIMESTAMP columns that have less than 6 digits of subseconds. timestamp(12) for all auto detected TIMESTAMP columns that have more than 6 digits of subseconds. [12]: timestamp(12) for all auto detected TIMESTAMP columns. The order of the elements in this array is ignored. Inputs that have higher precision than the highest target precision in this array will be truncated.
+    #[serde(rename = "timestampTargetPrecision")]
+    pub timestamp_target_precision: Option<Vec<i32>>,
 }
 
 impl common::Part for ExternalDataConfiguration {}
@@ -1779,6 +1876,34 @@ pub struct ExternalDatasetReference {
 
 impl common::Part for ExternalDatasetReference {}
 
+/// Options for the runtime of the external system.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExternalRuntimeOptions {
+    /// Optional. Amount of CPU provisioned for a Python UDF container instance. For more information, see [Configure container limits for Python UDFs](https://cloud.google.com/bigquery/docs/user-defined-functions-python#configure-container-limits)
+    #[serde(rename = "containerCpu")]
+    pub container_cpu: Option<f64>,
+    /// Optional. Amount of memory provisioned for a Python UDF container instance. Format: {number}{unit} where unit is one of "M", "G", "Mi" and "Gi" (e.g. 1G, 512Mi). If not specified, the default value is 512Mi. For more information, see [Configure container limits for Python UDFs](https://cloud.google.com/bigquery/docs/user-defined-functions-python#configure-container-limits)
+    #[serde(rename = "containerMemory")]
+    pub container_memory: Option<String>,
+    /// Optional. Maximum number of rows in each batch sent to the external runtime. If absent or if 0, BigQuery dynamically decides the number of rows in a batch.
+    #[serde(rename = "maxBatchingRows")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub max_batching_rows: Option<i64>,
+    /// Optional. Fully qualified name of the connection whose service account will be used to execute the code in the container. Format: ```"projects/{project_id}/locations/{location_id}/connections/{connection_id}"```
+    #[serde(rename = "runtimeConnection")]
+    pub runtime_connection: Option<String>,
+    /// Optional. Language runtime version. Example: `python-3.11`.
+    #[serde(rename = "runtimeVersion")]
+    pub runtime_version: Option<String>,
+}
+
+impl common::Part for ExternalRuntimeOptions {}
+
 /// The external service cost is a portion of the total cost, these costs are not additive with total_bytes_billed. Moreover, this field only track external service costs that will show up as BigQuery costs (e.g. training BigQuery ML job with google cloud CAIP or Automl Tables services), not other costs which may be accrued by running the query (e.g. reading from Bigtable or Cloud Storage). The external service costs with different billing sku (e.g. CAIP job is charged based on VM usage) are converted to BigQuery billed_bytes and slot_ms with equivalent amount of US dollars. Services may not directly correlate to these metrics, but these are the equivalents for billing purposes. Output only.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1787,6 +1912,9 @@ impl common::Part for ExternalDatasetReference {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExternalServiceCost {
+    /// The billing method used for the external job. This field, set to `SERVICES_SKU`, is only used when billing under the services SKU. Otherwise, it is unspecified for backward compatibility.
+    #[serde(rename = "billingMethod")]
+    pub billing_method: Option<String>,
     /// External service cost in terms of bigquery bytes billed.
     #[serde(rename = "bytesBilled")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -2129,6 +2257,7 @@ impl common::Part for HparamSearchSpaces {}
 /// Training info of a trial in [hyperparameter tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview) models.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -2167,6 +2296,53 @@ pub struct HparamTuningTrial {
 }
 
 impl common::Part for HparamTuningTrial {}
+
+/// Statistics related to Incremental Query Results. Populated as part of JobStatistics2. This feature is not yet available.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct IncrementalResultStats {
+    /// Reason why incremental query results are/were not written by the query.
+    #[serde(rename = "disabledReason")]
+    pub disabled_reason: Option<String>,
+    /// The time at which the result table's contents were modified. May be absent if no results have been written or the query has completed.
+    #[serde(rename = "resultSetLastModifyTime")]
+    pub result_set_last_modify_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The time at which the result table's contents were completely replaced. May be absent if no results have been written or the query has completed.
+    #[serde(rename = "resultSetLastReplaceTime")]
+    pub result_set_last_replace_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::Part for IncrementalResultStats {}
+
+/// Statistics for index pruning.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct IndexPruningStats {
+    /// The base table reference.
+    #[serde(rename = "baseTable")]
+    pub base_table: Option<TableReference>,
+    /// The index id.
+    #[serde(rename = "indexId")]
+    pub index_id: Option<String>,
+    /// The number of parallel inputs after index pruning.
+    #[serde(rename = "postIndexPruningParallelInputCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub post_index_pruning_parallel_input_count: Option<i64>,
+    /// The number of parallel inputs before index pruning.
+    #[serde(rename = "preIndexPruningParallelInputCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub pre_index_pruning_parallel_input_count: Option<i64>,
+}
+
+impl common::Part for IndexPruningStats {}
 
 /// Reason about why no search index was used in the search query (or sub-query).
 ///
@@ -2343,7 +2519,7 @@ pub struct Job {
     pub etag: Option<String>,
     /// Output only. Opaque ID field of the job.
     pub id: Option<String>,
-    /// Output only. If set, it provides the reason why a Job was created. If not set, it should be treated as the default: REQUESTED. This feature is not yet available. Jobs will always be created.
+    /// Output only. The reason why a Job was created.
     #[serde(rename = "jobCreationReason")]
     pub job_creation_reason: Option<JobCreationReason>,
     /// Optional. Reference describing the unique-per-user name of the job.
@@ -2403,7 +2579,7 @@ pub struct JobConfiguration {
     pub dry_run: Option<bool>,
     /// [Pick one] Configures an extract job.
     pub extract: Option<JobConfigurationExtract>,
-    /// Optional. Job timeout in milliseconds. If this time limit is exceeded, BigQuery will attempt to stop a longer job, but may not always succeed in canceling it before the job completes. For example, a job that takes more than 60 seconds to complete has a better chance of being stopped than a job that takes 10 seconds to complete.
+    /// Optional. Job timeout in milliseconds relative to the job creation time. If this time limit is exceeded, BigQuery attempts to stop the job, but might not always succeed in canceling it before the job completes. For example, a job that takes more than 60 seconds to complete has a better chance of being stopped than a job that takes 10 seconds to complete.
     #[serde(rename = "jobTimeoutMs")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub job_timeout_ms: Option<i64>,
@@ -2414,8 +2590,13 @@ pub struct JobConfiguration {
     pub labels: Option<HashMap<String, String>>,
     /// [Pick one] Configures a load job.
     pub load: Option<JobConfigurationLoad>,
+    /// Optional. A target limit on the rate of slot consumption by this job. If set to a value > 0, BigQuery will attempt to limit the rate of slot consumption by this job to keep it below the configured limit, even if the job is eligible for more slots based on fair scheduling. The unused slots will be available for other jobs and queries to use. Note: This feature is not yet generally available.
+    #[serde(rename = "maxSlots")]
+    pub max_slots: Option<i32>,
     /// [Pick one] Configures a query job.
     pub query: Option<JobConfigurationQuery>,
+    /// Optional. The reservation that job would use. User can specify a reservation to execute the job. If reservation is not set, reservation is determined based on the rules defined by the reservation assignments. The expected format is `projects/{project}/locations/{location}/reservations/{reservation}`.
+    pub reservation: Option<String>,
 }
 
 impl common::Part for JobConfiguration {}
@@ -2494,7 +2675,13 @@ pub struct JobConfigurationLoad {
     /// Optional. If this property is true, the job creates a new session using a randomly generated session_id. To continue using a created session with subsequent queries, pass the existing session identifier as a `ConnectionProperty` value. The session identifier is returned as part of the `SessionInfo` message within the query statistics. The new session's location will be set to `Job.JobReference.location` if it is present, otherwise it's set to the default location based on existing routing logic.
     #[serde(rename = "createSession")]
     pub create_session: Option<bool>,
-    /// Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exeeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
+    /// Optional. Date format used for parsing DATE values.
+    #[serde(rename = "dateFormat")]
+    pub date_format: Option<String>,
+    /// Optional. Date format used for parsing DATETIME values.
+    #[serde(rename = "datetimeFormat")]
+    pub datetime_format: Option<String>,
+    /// Defines the list of possible SQL data types to which the source decimal values are converted. This list and the precision and the scale parameters of the decimal field determine the target type. In the order of NUMERIC, BIGNUMERIC, and STRING, a type is picked if it is in the specified list and if it supports the precision and the scale. STRING supports all precision and scale values. If none of the listed types supports the precision and the scale, the type supporting the widest range in the specified list is picked, and if a value exceeds the supported range when reading the data, an error will be thrown. Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"]. If (precision,scale) is: * (38,9) -> NUMERIC; * (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits); * (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits); * (76,38) -> BIGNUMERIC; * (77,38) -> BIGNUMERIC (error if value exceeds supported range). This field cannot contain duplicate types. The order of the types in this field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as ["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over BIGNUMERIC. Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other file formats.
     #[serde(rename = "decimalTargetTypes")]
     pub decimal_target_types: Option<Vec<String>>,
     /// Custom encryption configuration (e.g., Cloud KMS keys)
@@ -2529,6 +2716,9 @@ pub struct JobConfigurationLoad {
     /// Optional. Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
     #[serde(rename = "nullMarker")]
     pub null_marker: Option<String>,
+    /// Optional. A list of strings represented as SQL NULL value in a CSV file. null_marker and null_markers can't be set at the same time. If null_marker is set, null_markers has to be not set. If null_markers is set, null_marker has to be not set. If both null_marker and null_markers are set at the same time, a user error would be thrown. Any strings listed in null_markers, including empty string would be interpreted as SQL NULL. This applies to all column types.
+    #[serde(rename = "nullMarkers")]
+    pub null_markers: Option<Vec<String>>,
     /// Optional. Additional properties to set if sourceFormat is set to PARQUET.
     #[serde(rename = "parquetOptions")]
     pub parquet_options: Option<ParquetOptions>,
@@ -2554,25 +2744,40 @@ pub struct JobConfigurationLoad {
     /// [Deprecated] The format of the schemaInline property.
     #[serde(rename = "schemaInlineFormat")]
     pub schema_inline_format: Option<String>,
-    /// Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: * ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. * ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+    /// Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in three cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE_DATA; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: * ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. * ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
     #[serde(rename = "schemaUpdateOptions")]
     pub schema_update_options: Option<Vec<String>>,
     /// Optional. The number of rows at the top of a CSV file that BigQuery will skip when loading the data. The default value is 0. This property is useful if you have header rows in the file that should be skipped. When autodetect is on, the behavior is the following: * skipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected, the row is read as data. Otherwise data is read starting from the second row. * skipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row. * skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected, row N is just skipped. Otherwise row N is used to extract column names for the detected schema.
     #[serde(rename = "skipLeadingRows")]
     pub skip_leading_rows: Option<i32>,
+    /// Optional. Controls the strategy used to match loaded columns to the schema. If not set, a sensible default is chosen based on how the schema is provided. If autodetect is used, then columns are matched by name. Otherwise, columns are matched by position. This is done to keep the behavior backward-compatible.
+    #[serde(rename = "sourceColumnMatch")]
+    pub source_column_match: Option<String>,
     /// Optional. The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro, specify "AVRO". For parquet, specify "PARQUET". For orc, specify "ORC". The default value is CSV.
     #[serde(rename = "sourceFormat")]
     pub source_format: Option<String>,
     /// [Required] The fully-qualified URIs that point to your data in Google Cloud. For Google Cloud Storage URIs: Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources. For Google Cloud Bigtable URIs: Exactly one URI can be specified and it has be a fully specified and valid HTTPS URL for a Google Cloud Bigtable table. For Google Cloud Datastore backups: Exactly one URI can be specified. Also, the '*' wildcard character is not allowed.
     #[serde(rename = "sourceUris")]
     pub source_uris: Option<Vec<String>>,
+    /// Optional. Date format used for parsing TIME values.
+    #[serde(rename = "timeFormat")]
+    pub time_format: Option<String>,
     /// Time-based partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
     #[serde(rename = "timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
+    /// Optional. Default time zone that will apply when parsing timestamp values that have no specific time zone.
+    #[serde(rename = "timeZone")]
+    pub time_zone: Option<String>,
+    /// Optional. Date format used for parsing TIMESTAMP values.
+    #[serde(rename = "timestampFormat")]
+    pub timestamp_format: Option<String>,
+    /// Precisions (maximum number of total digits in base 10) for seconds of TIMESTAMP types that are allowed to the destination table for autodetection mode. Available for the formats: CSV. For the CSV Format, Possible values include: Not Specified, [], or [6]: timestamp(6) for all auto detected TIMESTAMP columns [6, 12]: timestamp(6) for all auto detected TIMESTAMP columns that have less than 6 digits of subseconds. timestamp(12) for all auto detected TIMESTAMP columns that have more than 6 digits of subseconds. [12]: timestamp(12) for all auto detected TIMESTAMP columns. The order of the elements in this array is ignored. Inputs that have higher precision than the highest target precision in this array will be truncated.
+    #[serde(rename = "timestampTargetPrecision")]
+    pub timestamp_target_precision: Option<Vec<i32>>,
     /// Optional. If sourceFormat is set to "AVRO", indicates whether to interpret logical types as the corresponding BigQuery data type (for example, TIMESTAMP), instead of using the raw type (for example, INTEGER).
     #[serde(rename = "useAvroLogicalTypes")]
     pub use_avro_logical_types: Option<bool>,
-    /// Optional. Specifies the action that occurs if the destination table already exists. The following values are supported: * WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the data, removes the constraints and uses the schema from the load job. * WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. * WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_APPEND. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
+    /// Optional. Specifies the action that occurs if the destination table already exists. The following values are supported: * WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the data, removes the constraints and uses the schema from the load job. * WRITE_TRUNCATE_DATA: If the table already exists, BigQuery overwrites the data, but keeps the constraints and schema of the existing table. * WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. * WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_APPEND. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename = "writeDisposition")]
     pub write_disposition: Option<String>,
 }
@@ -2638,7 +2843,7 @@ pub struct JobConfigurationQuery {
     /// Range partitioning specification for the destination table. Only one of timePartitioning and rangePartitioning should be specified.
     #[serde(rename = "rangePartitioning")]
     pub range_partitioning: Option<RangePartitioning>,
-    /// Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: * ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. * ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+    /// Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in three cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE_DATA; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: * ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. * ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
     #[serde(rename = "schemaUpdateOptions")]
     pub schema_update_options: Option<Vec<String>>,
     /// Options controlling the execution of scripts.
@@ -2662,9 +2867,12 @@ pub struct JobConfigurationQuery {
     /// Describes user-defined function resources used in the query.
     #[serde(rename = "userDefinedFunctionResources")]
     pub user_defined_function_resources: Option<Vec<UserDefinedFunctionResource>>,
-    /// Optional. Specifies the action that occurs if the destination table already exists. The following values are supported: * WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the data, removes the constraints, and uses the schema from the query result. * WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. * WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
+    /// Optional. Specifies the action that occurs if the destination table already exists. The following values are supported: * WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the data, removes the constraints, and uses the schema from the query result. * WRITE_TRUNCATE_DATA: If the table already exists, BigQuery overwrites the data, but keeps the constraints and schema of the existing table. * WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. * WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename = "writeDisposition")]
     pub write_disposition: Option<String>,
+    /// Optional. This is only supported for a SELECT query using a temporary table. If set, the query is allowed to write results incrementally to the temporary result table. This may incur a performance penalty. This option cannot be used with Legacy SQL. This feature is not yet available.
+    #[serde(rename = "writeIncrementalResults")]
+    pub write_incremental_results: Option<bool>,
 }
 
 impl common::Part for JobConfigurationQuery {}
@@ -2705,7 +2913,7 @@ pub struct JobConfigurationTableCopy {
 
 impl common::Part for JobConfigurationTableCopy {}
 
-/// Reason about why a Job was created from a [`jobs.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query) method when used with `JOB_CREATION_OPTIONAL` Job creation mode. For [`jobs.insert`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/insert) method calls it will always be `REQUESTED`. This feature is not yet available. Jobs will always be created.
+/// Reason about why a Job was created from a [`jobs.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query) method when used with `JOB_CREATION_OPTIONAL` Job creation mode. For [`jobs.insert`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/insert) method calls it will always be `REQUESTED`.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -2786,6 +2994,8 @@ pub struct JobStatistics {
     /// Output only. Statistics for data-masking. Present only for query and extract jobs.
     #[serde(rename = "dataMaskingStatistics")]
     pub data_masking_statistics: Option<DataMaskingStatistics>,
+    /// Output only. Name of edition corresponding to the reservation for this job at the time of this update.
+    pub edition: Option<String>,
     /// Output only. End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
     #[serde(rename = "endTime")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -2810,6 +3020,9 @@ pub struct JobStatistics {
     /// Output only. Quotas which delayed this job's start time.
     #[serde(rename = "quotaDeferments")]
     pub quota_deferments: Option<Vec<String>>,
+    /// Output only. The reservation group path of the reservation assigned to this job. This field has a limit of 10 nested reservation groups. This is to maintain consistency between reservatins info schema and jobs info schema. The first reservation group is the root reservation group and the last is the leaf or lowest level reservation group.
+    #[serde(rename = "reservationGroupPath")]
+    pub reservation_group_path: Option<Vec<String>>,
     /// Output only. Job resource usage breakdown by reservation. This field reported misleading information and will no longer be populated.
     #[serde(rename = "reservationUsage")]
     pub reservation_usage: Option<Vec<JobStatisticsReservationUsage>>,
@@ -2904,6 +3117,9 @@ pub struct JobStatistics2 {
     /// Output only. Job cost breakdown as bigquery internal cost and external service costs.
     #[serde(rename = "externalServiceCosts")]
     pub external_service_costs: Option<Vec<ExternalServiceCost>>,
+    /// Output only. Statistics related to incremental query results, if enabled for the query. This feature is not yet available.
+    #[serde(rename = "incrementalResultStats")]
+    pub incremental_result_stats: Option<IncrementalResultStats>,
     /// Output only. Statistics for a LOAD query.
     #[serde(rename = "loadQueryStatistics")]
     pub load_query_statistics: Option<LoadQueryStatistics>,
@@ -2942,7 +3158,7 @@ pub struct JobStatistics2 {
     /// Output only. Referenced routines for the job.
     #[serde(rename = "referencedRoutines")]
     pub referenced_routines: Option<Vec<RoutineReference>>,
-    /// Output only. Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
+    /// Output only. Referenced tables for the job.
     #[serde(rename = "referencedTables")]
     pub referenced_tables: Option<Vec<TableReference>>,
     /// Output only. Job resource usage breakdown by reservation. This field reported misleading information and will no longer be populated.
@@ -2956,7 +3172,7 @@ pub struct JobStatistics2 {
     /// Output only. Statistics of a Spark procedure job.
     #[serde(rename = "sparkStatistics")]
     pub spark_statistics: Option<SparkStatistics>,
-    /// Output only. The type of query statement, if valid. Possible values: * `SELECT`: [`SELECT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#select_list) statement. * `ASSERT`: [`ASSERT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/debugging-statements#assert) statement. * `INSERT`: [`INSERT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#insert_statement) statement. * `UPDATE`: [`UPDATE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#update_statement) statement. * `DELETE`: [`DELETE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language) statement. * `MERGE`: [`MERGE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language) statement. * `CREATE_TABLE`: [`CREATE TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_statement) statement, without `AS SELECT`. * `CREATE_TABLE_AS_SELECT`: [`CREATE TABLE AS SELECT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#query_statement) statement. * `CREATE_VIEW`: [`CREATE VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_view_statement) statement. * `CREATE_MODEL`: [`CREATE MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-create#create_model_statement) statement. * `CREATE_MATERIALIZED_VIEW`: [`CREATE MATERIALIZED VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_materialized_view_statement) statement. * `CREATE_FUNCTION`: [`CREATE FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_function_statement) statement. * `CREATE_TABLE_FUNCTION`: [`CREATE TABLE FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_function_statement) statement. * `CREATE_PROCEDURE`: [`CREATE PROCEDURE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_procedure) statement. * `CREATE_ROW_ACCESS_POLICY`: [`CREATE ROW ACCESS POLICY`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_row_access_policy_statement) statement. * `CREATE_SCHEMA`: [`CREATE SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_schema_statement) statement. * `CREATE_SNAPSHOT_TABLE`: [`CREATE SNAPSHOT TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_snapshot_table_statement) statement. * `CREATE_SEARCH_INDEX`: [`CREATE SEARCH INDEX`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_search_index_statement) statement. * `DROP_TABLE`: [`DROP TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_table_statement) statement. * `DROP_EXTERNAL_TABLE`: [`DROP EXTERNAL TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_external_table_statement) statement. * `DROP_VIEW`: [`DROP VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_view_statement) statement. * `DROP_MODEL`: [`DROP MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-drop-model) statement. * `DROP_MATERIALIZED_VIEW`: [`DROP MATERIALIZED VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_materialized_view_statement) statement. * `DROP_FUNCTION` : [`DROP FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_function_statement) statement. * `DROP_TABLE_FUNCTION` : [`DROP TABLE FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_table_function) statement. * `DROP_PROCEDURE`: [`DROP PROCEDURE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_procedure_statement) statement. * `DROP_SEARCH_INDEX`: [`DROP SEARCH INDEX`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_search_index) statement. * `DROP_SCHEMA`: [`DROP SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_schema_statement) statement. * `DROP_SNAPSHOT_TABLE`: [`DROP SNAPSHOT TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_snapshot_table_statement) statement. * `DROP_ROW_ACCESS_POLICY`: [`DROP [ALL] ROW ACCESS POLICY|POLICIES`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_row_access_policy_statement) statement. * `ALTER_TABLE`: [`ALTER TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_table_set_options_statement) statement. * `ALTER_VIEW`: [`ALTER VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_view_set_options_statement) statement. * `ALTER_MATERIALIZED_VIEW`: [`ALTER MATERIALIZED VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_materialized_view_set_options_statement) statement. * `ALTER_SCHEMA`: [`ALTER SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#aalter_schema_set_options_statement) statement. * `SCRIPT`: [`SCRIPT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language). * `TRUNCATE_TABLE`: [`TRUNCATE TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#truncate_table_statement) statement. * `CREATE_EXTERNAL_TABLE`: [`CREATE EXTERNAL TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_external_table_statement) statement. * `EXPORT_DATA`: [`EXPORT DATA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/other-statements#export_data_statement) statement. * `EXPORT_MODEL`: [`EXPORT MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-export-model) statement. * `LOAD_DATA`: [`LOAD DATA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/other-statements#load_data_statement) statement. * `CALL`: [`CALL`](https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language#call) statement.
+    /// Output only. The type of query statement, if valid. Possible values: * `SELECT`: [`SELECT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#select_list) statement. * `ASSERT`: [`ASSERT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/debugging-statements#assert) statement. * `INSERT`: [`INSERT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#insert_statement) statement. * `UPDATE`: [`UPDATE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#update_statement) statement. * `DELETE`: [`DELETE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language) statement. * `MERGE`: [`MERGE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language) statement. * `CREATE_TABLE`: [`CREATE TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_statement) statement, without `AS SELECT`. * `CREATE_TABLE_AS_SELECT`: [`CREATE TABLE AS SELECT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_statement) statement. * `CREATE_VIEW`: [`CREATE VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_view_statement) statement. * `CREATE_MODEL`: [`CREATE MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-create#create_model_statement) statement. * `CREATE_MATERIALIZED_VIEW`: [`CREATE MATERIALIZED VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_materialized_view_statement) statement. * `CREATE_FUNCTION`: [`CREATE FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_function_statement) statement. * `CREATE_TABLE_FUNCTION`: [`CREATE TABLE FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_function_statement) statement. * `CREATE_PROCEDURE`: [`CREATE PROCEDURE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_procedure) statement. * `CREATE_ROW_ACCESS_POLICY`: [`CREATE ROW ACCESS POLICY`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_row_access_policy_statement) statement. * `CREATE_SCHEMA`: [`CREATE SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_schema_statement) statement. * `CREATE_SNAPSHOT_TABLE`: [`CREATE SNAPSHOT TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_snapshot_table_statement) statement. * `CREATE_SEARCH_INDEX`: [`CREATE SEARCH INDEX`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_search_index_statement) statement. * `DROP_TABLE`: [`DROP TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_table_statement) statement. * `DROP_EXTERNAL_TABLE`: [`DROP EXTERNAL TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_external_table_statement) statement. * `DROP_VIEW`: [`DROP VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_view_statement) statement. * `DROP_MODEL`: [`DROP MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-drop-model) statement. * `DROP_MATERIALIZED_VIEW`: [`DROP MATERIALIZED VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_materialized_view_statement) statement. * `DROP_FUNCTION` : [`DROP FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_function_statement) statement. * `DROP_TABLE_FUNCTION` : [`DROP TABLE FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_table_function) statement. * `DROP_PROCEDURE`: [`DROP PROCEDURE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_procedure_statement) statement. * `DROP_SEARCH_INDEX`: [`DROP SEARCH INDEX`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_search_index) statement. * `DROP_SCHEMA`: [`DROP SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_schema_statement) statement. * `DROP_SNAPSHOT_TABLE`: [`DROP SNAPSHOT TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_snapshot_table_statement) statement. * `DROP_ROW_ACCESS_POLICY`: [`DROP [ALL] ROW ACCESS POLICY|POLICIES`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_row_access_policy_statement) statement. * `ALTER_TABLE`: [`ALTER TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_table_set_options_statement) statement. * `ALTER_VIEW`: [`ALTER VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_view_set_options_statement) statement. * `ALTER_MATERIALIZED_VIEW`: [`ALTER MATERIALIZED VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_materialized_view_set_options_statement) statement. * `ALTER_SCHEMA`: [`ALTER SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_schema_set_options_statement) statement. * `SCRIPT`: [`SCRIPT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language). * `TRUNCATE_TABLE`: [`TRUNCATE TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#truncate_table_statement) statement. * `CREATE_EXTERNAL_TABLE`: [`CREATE EXTERNAL TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_external_table_statement) statement. * `EXPORT_DATA`: [`EXPORT DATA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/other-statements#export_data_statement) statement. * `EXPORT_MODEL`: [`EXPORT MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-export-model) statement. * `LOAD_DATA`: [`LOAD DATA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/other-statements#load_data_statement) statement. * `CALL`: [`CALL`](https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language#call) statement.
     #[serde(rename = "statementType")]
     pub statement_type: Option<String>,
     /// Output only. Describes a timeline of job execution.
@@ -2976,6 +3192,10 @@ pub struct JobStatistics2 {
     #[serde(rename = "totalPartitionsProcessed")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub total_partitions_processed: Option<i64>,
+    /// Output only. Total slot milliseconds for the job that ran on external services and billed on the services SKU. This field is only populated for jobs that have external service costs, and is the total of the usage for costs whose billing method is `"SERVICES_SKU"`.
+    #[serde(rename = "totalServicesSkuSlotMs")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_services_sku_slot_ms: Option<i64>,
     /// Output only. Slot-milliseconds for the job.
     #[serde(rename = "totalSlotMs")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -3313,7 +3533,7 @@ impl common::Part for MaterializedView {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct MaterializedViewDefinition {
-    /// Optional. This option declares the intention to construct a materialized view that isn't refreshed incrementally.
+    /// Optional. This option declares the intention to construct a materialized view that isn't refreshed incrementally. Non-incremental materialized views support an expanded range of SQL queries. The `allow_non_incremental_definition` option can't be changed after the materialized view is created.
     #[serde(rename = "allowNonIncrementalDefinition")]
     pub allow_non_incremental_definition: Option<bool>,
     /// Optional. Enable automatic refresh of the materialized view when the base table is updated. The default value is "true".
@@ -3370,7 +3590,7 @@ pub struct MaterializedViewStatus {
 
 impl common::Part for MaterializedViewStatus {}
 
-/// Statistics for metadata caching in BigLake tables.
+/// Statistics for metadata caching in queried tables.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -3778,6 +3998,47 @@ pub struct ProjectReference {
 
 impl common::Part for ProjectReference {}
 
+/// The column metadata index pruning statistics.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PruningStats {
+    /// The number of parallel inputs matched.
+    #[serde(rename = "postCmetaPruningParallelInputCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub post_cmeta_pruning_parallel_input_count: Option<i64>,
+    /// The number of partitions matched.
+    #[serde(rename = "postCmetaPruningPartitionCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub post_cmeta_pruning_partition_count: Option<i64>,
+    /// The number of parallel inputs scanned.
+    #[serde(rename = "preCmetaPruningParallelInputCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub pre_cmeta_pruning_parallel_input_count: Option<i64>,
+}
+
+impl common::Part for PruningStats {}
+
+/// Options for a user-defined Python function.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PythonOptions {
+    /// Required. The name of the function defined in Python code as the entry point when the Python UDF is invoked.
+    #[serde(rename = "entryPoint")]
+    pub entry_point: Option<String>,
+    /// Optional. A list of Python package names along with versions to be installed. Example: ["pandas>=2.1", "google-cloud-translate==3.11"]. For more information, see [Use third-party packages](https://cloud.google.com/bigquery/docs/user-defined-functions-python#third-party-packages).
+    pub packages: Option<Vec<String>>,
+}
+
+impl common::Part for PythonOptions {}
+
 /// Query optimization information for a QUERY job.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3830,6 +4091,10 @@ pub struct QueryParameterType {
     /// Optional. The types of the fields of this struct, in order, if this is a struct.
     #[serde(rename = "structTypes")]
     pub struct_types: Option<Vec<QueryParameterTypeStructTypes>>,
+    /// Optional. Precision (maximum number of total digits in base 10) for seconds of TIMESTAMP type. Possible values include: * 6 (Default, for TIMESTAMP type with microsecond precision) * 12 (For TIMESTAMP type with picosecond precision)
+    #[serde(rename = "timestampPrecision")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub timestamp_precision: Option<i64>,
     /// Required. The top level type of this field.
     #[serde(rename = "type")]
     pub type_: Option<String>,
@@ -3883,24 +4148,34 @@ pub struct QueryRequest {
     /// Optional. Specifies the default datasetId and projectId to assume for any unqualified table names in the query. If not set, all table names in the query string must be qualified in the format 'datasetId.tableId'.
     #[serde(rename = "defaultDataset")]
     pub default_dataset: Option<DatasetReference>,
+    /// Optional. Custom encryption configuration (e.g., Cloud KMS keys)
+    #[serde(rename = "destinationEncryptionConfiguration")]
+    pub destination_encryption_configuration: Option<EncryptionConfiguration>,
     /// Optional. If set to true, BigQuery doesn't run the job. Instead, if the query is valid, BigQuery returns statistics about the job such as how many bytes would be processed. If the query is invalid, an error returns. The default value is false.
     #[serde(rename = "dryRun")]
     pub dry_run: Option<bool>,
     /// Optional. Output format adjustments.
     #[serde(rename = "formatOptions")]
     pub format_options: Option<DataFormatOptions>,
-    /// Optional. If not set, jobs are always required. If set, the query request will follow the behavior described JobCreationMode. This feature is not yet available. Jobs will always be created.
+    /// Optional. If not set, jobs are always required. If set, the query request will follow the behavior described JobCreationMode.
     #[serde(rename = "jobCreationMode")]
     pub job_creation_mode: Option<String>,
+    /// Optional. Job timeout in milliseconds. If this time limit is exceeded, BigQuery will attempt to stop a longer job, but may not always succeed in canceling it before the job completes. For example, a job that takes more than 60 seconds to complete has a better chance of being stopped than a job that takes 10 seconds to complete. This timeout applies to the query even if a job does not need to be created.
+    #[serde(rename = "jobTimeoutMs")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub job_timeout_ms: Option<i64>,
     /// The resource type of the request.
     pub kind: Option<String>,
     /// Optional. The labels associated with this query. Labels can be used to organize and group query jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label keys must start with a letter and each label in the list must have a different key.
     pub labels: Option<HashMap<String, String>>,
-    /// The geographic location where the job should run. See details at https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+    /// The geographic location where the job should run. For more information, see how to [specify locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
     pub location: Option<String>,
     /// Optional. The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
     #[serde(rename = "maxResults")]
     pub max_results: Option<u32>,
+    /// Optional. A target limit on the rate of slot consumption by this query. If set to a value > 0, BigQuery will attempt to limit the rate of slot consumption by this query to keep it below the configured limit, even if the query is eligible for more slots based on fair scheduling. The unused slots will be available for other jobs and queries to use. Note: This feature is not yet generally available.
+    #[serde(rename = "maxSlots")]
+    pub max_slots: Option<i32>,
     /// Optional. Limits the bytes billed for this query. Queries with bytes billed above this limit will fail (without incurring a charge). If unspecified, the project default is used.
     #[serde(rename = "maximumBytesBilled")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -3919,6 +4194,8 @@ pub struct QueryRequest {
     /// Optional. A unique user provided identifier to ensure idempotent behavior for queries. Note that this is different from the job_id. It has the following properties: 1. It is case-sensitive, limited to up to 36 ASCII characters. A UUID is recommended. 2. Read only queries can ignore this token since they are nullipotent by definition. 3. For the purposes of idempotency ensured by the request_id, a request is considered duplicate of another only if they have the same request_id and are actually duplicates. When determining whether a request is a duplicate of another request, all parameters in the request that may affect the result are considered. For example, query, connection_properties, query_parameters, use_legacy_sql are parameters that affect the result and are considered when determining whether a request is a duplicate, but properties like timeout_ms don't affect the result and are thus not considered. Dry run query requests are never considered duplicate of another request. 4. When a duplicate mutating query request is detected, it returns: a. the results of the mutation if it completes successfully within the timeout. b. the running operation if it is still in progress at the end of the timeout. 5. Its lifetime is limited to 15 minutes. In other words, if two requests are sent with the same request_id, but more than 15 minutes apart, idempotency is not guaranteed.
     #[serde(rename = "requestId")]
     pub request_id: Option<String>,
+    /// Optional. The reservation that jobs.query request would use. User can specify a reservation to execute the job.query. The expected format is `projects/{project}/locations/{location}/reservations/{reservation}`.
+    pub reservation: Option<String>,
     /// Optional. Optional: Specifies the maximum amount of time, in milliseconds, that the client is willing to wait for the query to complete. By default, this limit is 10 seconds (10,000 milliseconds). If the query is complete, the jobComplete field in the response is true. If the query has not yet completed, jobComplete is false. You can request a longer timeout period in the timeoutMs field. However, the call is not guaranteed to wait for the specified timeout; it typically returns after around 200 seconds (200,000 milliseconds), even if the query is not complete. If jobComplete is false, you can continue to wait for the query to complete by calling the getQueryResults method until the jobComplete field in the getQueryResults response is true.
     #[serde(rename = "timeoutMs")]
     pub timeout_ms: Option<u32>,
@@ -3928,6 +4205,9 @@ pub struct QueryRequest {
     /// Optional. Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. The default value is true.
     #[serde(rename = "useQueryCache")]
     pub use_query_cache: Option<bool>,
+    /// Optional. This is only supported for SELECT query. If set, the query is allowed to write results incrementally to the temporary result table. This may incur a performance penalty. This option cannot be used with Legacy SQL. This feature is not yet available.
+    #[serde(rename = "writeIncrementalResults")]
+    pub write_incremental_results: Option<bool>,
 }
 
 impl common::RequestValue for QueryRequest {}
@@ -3947,22 +4227,32 @@ pub struct QueryResponse {
     /// Whether the query result was fetched from the query cache.
     #[serde(rename = "cacheHit")]
     pub cache_hit: Option<bool>,
+    /// Output only. Creation time of this query, in milliseconds since the epoch. This field will be present on all queries.
+    #[serde(rename = "creationTime")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub creation_time: Option<i64>,
     /// Output only. Detailed statistics for DML statements INSERT, UPDATE, DELETE, MERGE or TRUNCATE.
     #[serde(rename = "dmlStats")]
     pub dml_stats: Option<DmlStatistics>,
+    /// Output only. End time of this query, in milliseconds since the epoch. This field will be present whenever a query job is in the DONE state.
+    #[serde(rename = "endTime")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub end_time: Option<i64>,
     /// Output only. The first errors or warnings encountered during the running of the job. The final message includes the number of errors that caused the process to stop. Errors here do not necessarily mean that the job has completed or was unsuccessful. For more information about error messages, see [Error messages](https://cloud.google.com/bigquery/docs/error-messages).
     pub errors: Option<Vec<ErrorProto>>,
     /// Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available.
     #[serde(rename = "jobComplete")]
     pub job_complete: Option<bool>,
-    /// Optional. Only relevant when a job_reference is present in the response. If job_reference is not present it will always be unset. When job_reference is present, this field should be interpreted as follows: If set, it will provide the reason of why a Job was created. If not set, it should be treated as the default: REQUESTED. This feature is not yet available. Jobs will always be created.
+    /// Optional. The reason why a Job was created. Only relevant when a job_reference is present in the response. If job_reference is not present it will always be unset.
     #[serde(rename = "jobCreationReason")]
     pub job_creation_reason: Option<JobCreationReason>,
-    /// Reference to the Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
+    /// Reference to the Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults). If job_creation_mode was set to `JOB_CREATION_OPTIONAL` and the query completes without creating a job, this field will be empty.
     #[serde(rename = "jobReference")]
     pub job_reference: Option<JobReference>,
     /// The resource type.
     pub kind: Option<String>,
+    /// Output only. The geographic location of the query. For more information about BigQuery locations, see: https://cloud.google.com/bigquery/docs/locations
+    pub location: Option<String>,
     /// Output only. The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
     #[serde(rename = "numDmlAffectedRows")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -3970,7 +4260,7 @@ pub struct QueryResponse {
     /// A token used for paging results. A non-empty token indicates that additional results are available. To see additional results, query the [`jobs.getQueryResults`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/getQueryResults) method. For more information, see [Paging through table data](https://cloud.google.com/bigquery/docs/paging-results).
     #[serde(rename = "pageToken")]
     pub page_token: Option<String>,
-    /// Query ID for the completed query. This ID will be auto-generated. This field is not yet available and it is currently not guaranteed to be populated.
+    /// Auto-generated ID for the query.
     #[serde(rename = "queryId")]
     pub query_id: Option<String>,
     /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above.
@@ -3980,6 +4270,14 @@ pub struct QueryResponse {
     /// Output only. Information of the session if this job is part of one.
     #[serde(rename = "sessionInfo")]
     pub session_info: Option<SessionInfo>,
+    /// Output only. Start time of this query, in milliseconds since the epoch. This field will be present when the query job transitions from the PENDING state to either RUNNING or DONE.
+    #[serde(rename = "startTime")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub start_time: Option<i64>,
+    /// Output only. If the project is configured to use on-demand pricing, then this field contains the total bytes billed for the job. If the project is configured to use flat-rate pricing, then you are not billed for bytes and this field is informational only.
+    #[serde(rename = "totalBytesBilled")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_bytes_billed: Option<i64>,
     /// The total number of bytes processed for this query. If this query was a dry run, this is the number of bytes that would be processed if the query were run.
     #[serde(rename = "totalBytesProcessed")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -3988,6 +4286,10 @@ pub struct QueryResponse {
     #[serde(rename = "totalRows")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub total_rows: Option<u64>,
+    /// Output only. Number of slot ms the user is actually billed for.
+    #[serde(rename = "totalSlotMs")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub total_slot_ms: Option<i64>,
 }
 
 impl common::ResponseResult for QueryResponse {}
@@ -4020,6 +4322,9 @@ pub struct QueryTimelineSample {
     #[serde(rename = "pendingUnits")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub pending_units: Option<i64>,
+    /// Total shuffle usage ratio in shuffle RAM per reservation of this query. This will be provided for reservation customers only.
+    #[serde(rename = "shuffleRamUsageRatio")]
+    pub shuffle_ram_usage_ratio: Option<f64>,
     /// Cumulative slot-ms consumed by the query.
     #[serde(rename = "totalSlotMs")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -4188,6 +4493,7 @@ impl common::Part for RestrictionConfig {}
 /// * [insert routines](RoutineInsertCall) (request|response)
 /// * [list routines](RoutineListCall) (none)
 /// * [set iam policy routines](RoutineSetIamPolicyCall) (none)
+/// * [test iam permissions routines](RoutineTestIamPermissionCall) (none)
 /// * [update routines](RoutineUpdateCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
@@ -4202,7 +4508,7 @@ pub struct Routine {
     /// Optional. If set to `DATA_MASKING`, the function is validated and made available as a masking function. For more information, see [Create custom masking routines](https://cloud.google.com/bigquery/docs/user-defined-functions#custom-mask).
     #[serde(rename = "dataGovernanceType")]
     pub data_governance_type: Option<String>,
-    /// Required. The body of the routine. For functions, this is the expression in the AS clause. If language=SQL, it is the substring inside (but excluding) the parentheses. For example, for the function created with the following statement: `CREATE FUNCTION JoinLines(x string, y string) as (concat(x, "\n", y))` The definition_body is `concat(x, "\n", y)` (\n is not replaced with linebreak). If language=JAVASCRIPT, it is the evaluated string in the AS clause. For example, for the function created with the following statement: `CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS 'return "\n";\n'` The definition_body is `return "\n";\n` Note that both \n are replaced with linebreaks.
+    /// Required. The body of the routine. For functions, this is the expression in the AS clause. If `language = "SQL"`, it is the substring inside (but excluding) the parentheses. For example, for the function created with the following statement: `CREATE FUNCTION JoinLines(x string, y string) as (concat(x, "\n", y))` The definition_body is `concat(x, "\n", y)` (\n is not replaced with linebreak). If `language="JAVASCRIPT"`, it is the evaluated string in the AS clause. For example, for the function created with the following statement: `CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS 'return "\n";\n'` The definition_body is `return "\n";\n` Note that both \n are replaced with linebreaks. If `definition_body` references another routine, then that routine must be fully qualified with its project ID.
     #[serde(rename = "definitionBody")]
     pub definition_body: Option<String>,
     /// Optional. The description of the routine, if defined.
@@ -4212,6 +4518,9 @@ pub struct Routine {
     pub determinism_level: Option<String>,
     /// Output only. A hash of this resource.
     pub etag: Option<String>,
+    /// Optional. Options for the runtime of the external system executing the routine. This field is only applicable for Python UDFs. [Preview](https://cloud.google.com/products/#product-launch-stages)
+    #[serde(rename = "externalRuntimeOptions")]
+    pub external_runtime_options: Option<ExternalRuntimeOptions>,
     /// Optional. If language = "JAVASCRIPT", this field stores the path of the imported JAVASCRIPT libraries.
     #[serde(rename = "importedLibraries")]
     pub imported_libraries: Option<Vec<String>>,
@@ -4221,6 +4530,9 @@ pub struct Routine {
     #[serde(rename = "lastModifiedTime")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub last_modified_time: Option<i64>,
+    /// Optional. Options for the Python UDF. [Preview](https://cloud.google.com/products/#product-launch-stages)
+    #[serde(rename = "pythonOptions")]
+    pub python_options: Option<PythonOptions>,
     /// Optional. Remote function specific options.
     #[serde(rename = "remoteFunctionOptions")]
     pub remote_function_options: Option<RemoteFunctionOptions>,
@@ -4291,8 +4603,14 @@ impl common::Part for Row {}
 
 /// Represents access on a subset of rows on the specified table, defined by its filter predicate. Access to the subset of rows is controlled by its IAM policy.
 ///
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 ///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [get row access policies](RowAccessPolicyGetCall) (response)
+/// * [insert row access policies](RowAccessPolicyInsertCall) (request|response)
+/// * [update row access policies](RowAccessPolicyUpdateCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -4305,6 +4623,8 @@ pub struct RowAccessPolicy {
     /// Required. A SQL boolean expression that represents the rows defined by this row access policy, similar to the boolean expression in a WHERE clause of a SELECT query on a table. References to other tables, routines, and temporary functions are not supported. Examples: region="EU" date_field = CAST('2019-9-27' as DATE) nullable_field is not NULL numeric_field BETWEEN 1.0 AND 5.0
     #[serde(rename = "filterPredicate")]
     pub filter_predicate: Option<String>,
+    /// Optional. Input only. The optional list of iam_member users or groups that specifies the initial members that the row-level access policy should be created with. grantees types: - "user:alice@example.com": An email address that represents a specific Google account. - "serviceAccount:my-other-app@appspot.gserviceaccount.com": An email address that represents a service account. - "group:admins@example.com": An email address that represents a Google group. - "domain:example.com":The Google Workspace domain (primary) that represents all the users of that domain. - "allAuthenticatedUsers": A special identifier that represents all service accounts and all users on the internet who have authenticated with a Google Account. This identifier includes accounts that aren't connected to a Google Workspace or Cloud Identity domain, such as personal Gmail accounts. Users who aren't authenticated, such as anonymous visitors, aren't included. - "allUsers":A special identifier that represents anyone who is on the internet, including authenticated and unauthenticated users. Because BigQuery requires authentication before a user can access the service, allUsers includes only authenticated users.
+    pub grantees: Option<Vec<String>>,
     /// Output only. The time when this row access policy was last modified, in milliseconds since the epoch.
     #[serde(rename = "lastModifiedTime")]
     pub last_modified_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -4313,7 +4633,8 @@ pub struct RowAccessPolicy {
     pub row_access_policy_reference: Option<RowAccessPolicyReference>,
 }
 
-impl common::Part for RowAccessPolicy {}
+impl common::RequestValue for RowAccessPolicy {}
+impl common::ResponseResult for RowAccessPolicy {}
 
 /// Id path of a row access policy.
 ///
@@ -4432,6 +4753,9 @@ impl common::Part for ScriptStatistics {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SearchStatistics {
+    /// Search index pruning statistics, one for each base table that has a search index. If a base table does not have a search index or the index does not help with pruning on the base table, then there is no pruning statistics for that table.
+    #[serde(rename = "indexPruningStats")]
+    pub index_pruning_stats: Option<Vec<IndexPruningStats>>,
     /// When `indexUsageMode` is `UNUSED` or `PARTIALLY_USED`, this field explains why indexes were not used in all or part of the search query. If `indexUsageMode` is `FULLY_USED`, this field is not populated.
     #[serde(rename = "indexUnusedReasons")]
     pub index_unused_reasons: Option<Vec<IndexUnusedReason>>,
@@ -4669,7 +4993,7 @@ pub struct StagePerformanceStandaloneInsight {
 
 impl common::Part for StagePerformanceStandaloneInsight {}
 
-/// The data type of a variable such as a function argument. Examples include: * INT64: `{"typeKind": "INT64"}` * ARRAY: { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "STRING"} } * STRUCT>: { "typeKind": "STRUCT", "structType": { "fields": [ { "name": "x", "type": {"typeKind": "STRING"} }, { "name": "y", "type": { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "DATE"} } } ] } }
+/// The data type of a variable such as a function argument. Examples include: * INT64: `{"typeKind": "INT64"}` * ARRAY: { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "STRING"} } * STRUCT>: { "typeKind": "STRUCT", "structType": { "fields": [ { "name": "x", "type": {"typeKind": "STRING"} }, { "name": "y", "type": { "typeKind": "ARRAY", "arrayElementType": {"typeKind": "DATE"} } } ] } } * RANGE: { "typeKind": "RANGE", "rangeElementType": {"typeKind": "DATE"} }
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -4749,7 +5073,7 @@ pub struct StorageDescriptor {
     /// Optional. Specifies the fully qualified class name of the InputFormat (e.g. "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat"). The maximum length is 128 characters.
     #[serde(rename = "inputFormat")]
     pub input_format: Option<String>,
-    /// Optional. The physical location of the table (e.g. 'gs://spark-dataproc-data/pangea-data/case_sensitive/' or 'gs://spark-dataproc-data/pangea-data/*'). The maximum length is 2056 bytes.
+    /// Optional. The physical location of the table (e.g. `gs://spark-dataproc-data/pangea-data/case_sensitive/` or `gs://spark-dataproc-data/pangea-data/*`). The maximum length is 2056 bytes.
     #[serde(rename = "locationUri")]
     pub location_uri: Option<String>,
     /// Optional. Specifies the fully qualified class name of the OutputFormat (e.g. "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat"). The maximum length is 128 characters.
@@ -4761,6 +5085,46 @@ pub struct StorageDescriptor {
 }
 
 impl common::Part for StorageDescriptor {}
+
+/// If the stored column was not used, explain why.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StoredColumnsUnusedReason {
+    /// Specifies the high-level reason for the unused scenario, each reason must have a code associated.
+    pub code: Option<String>,
+    /// Specifies the detailed description for the scenario.
+    pub message: Option<String>,
+    /// Specifies which columns were not covered by the stored columns for the specified code up to 20 columns. This is populated when the code is STORED_COLUMNS_COVER_INSUFFICIENT and BASE_TABLE_HAS_CLS.
+    #[serde(rename = "uncoveredColumns")]
+    pub uncovered_columns: Option<Vec<String>>,
+}
+
+impl common::Part for StoredColumnsUnusedReason {}
+
+/// Indicates the stored columns usage in the query.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StoredColumnsUsage {
+    /// Specifies the base table.
+    #[serde(rename = "baseTable")]
+    pub base_table: Option<TableReference>,
+    /// Specifies whether the query was accelerated with stored columns.
+    #[serde(rename = "isQueryAccelerated")]
+    pub is_query_accelerated: Option<bool>,
+    /// If stored columns were not used, explain why.
+    #[serde(rename = "storedColumnsUnusedReasons")]
+    pub stored_columns_unused_reasons: Option<Vec<StoredColumnsUnusedReason>>,
+}
+
+impl common::Part for StoredColumnsUsage {}
 
 /// There is no detailed description.
 ///
@@ -4836,7 +5200,7 @@ impl common::Part for SystemVariables {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Table {
-    /// Optional. Specifies the configuration of a BigLake managed table.
+    /// Optional. Specifies the configuration of a BigQuery table for Apache Iceberg.
     #[serde(rename = "biglakeConfiguration")]
     pub biglake_configuration: Option<BigLakeConfiguration>,
     /// Output only. Contains information about the clone. This value is set via the clone operation.
@@ -4886,6 +5250,9 @@ pub struct Table {
     pub last_modified_time: Option<u64>,
     /// Output only. The geographic location where the table resides. This value is inherited from the dataset.
     pub location: Option<String>,
+    /// Optional. If set, overrides the default managed table type configured in the dataset.
+    #[serde(rename = "managedTableType")]
+    pub managed_table_type: Option<String>,
     /// Optional. The materialized view definition.
     #[serde(rename = "materializedView")]
     pub materialized_view: Option<MaterializedViewDefinition>,
@@ -5125,6 +5492,9 @@ pub struct TableFieldSchema {
     pub categories: Option<TableFieldSchemaCategories>,
     /// Optional. Field collation can be set only when the type of field is STRING. The following values are supported: * 'und:ci': undetermined locale, case insensitive. * '': empty string. Default to case-sensitive behavior.
     pub collation: Option<String>,
+    /// Optional. Data policies attached to this field, used for field-level access control.
+    #[serde(rename = "dataPolicies")]
+    pub data_policies: Option<Vec<DataPolicyOption>>,
     /// Optional. A SQL expression to specify the [default value] (https://cloud.google.com/bigquery/docs/default-values) for this field.
     #[serde(rename = "defaultValueExpression")]
     pub default_value_expression: Option<String>,
@@ -5158,7 +5528,11 @@ pub struct TableFieldSchema {
     /// Optional. See documentation for precision.
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub scale: Option<i64>,
-    /// Required. The field data type. Possible values include: * STRING * BYTES * INTEGER (or INT64) * FLOAT (or FLOAT64) * BOOLEAN (or BOOL) * TIMESTAMP * DATE * TIME * DATETIME * GEOGRAPHY * NUMERIC * BIGNUMERIC * JSON * RECORD (or STRUCT) * RANGE ([Preview](https://cloud.google.com/products/#product-launch-stages)) Use of RECORD/STRUCT indicates that the field contains a nested schema.
+    /// Optional. Precision (maximum number of total digits in base 10) for seconds of TIMESTAMP type. Possible values include: * 6 (Default, for TIMESTAMP type with microsecond precision) * 12 (For TIMESTAMP type with picosecond precision)
+    #[serde(rename = "timestampPrecision")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub timestamp_precision: Option<i64>,
+    /// Required. The field data type. Possible values include: * STRING * BYTES * INTEGER (or INT64) * FLOAT (or FLOAT64) * BOOLEAN (or BOOL) * TIMESTAMP * DATE * TIME * DATETIME * GEOGRAPHY * NUMERIC * BIGNUMERIC * JSON * RECORD (or STRUCT) * RANGE Use of RECORD/STRUCT indicates that the field contains a nested schema.
     #[serde(rename = "type")]
     pub type_: Option<String>,
 }
@@ -5203,6 +5577,12 @@ impl common::ResponseResult for TableList {}
 pub struct TableMetadataCacheUsage {
     /// Free form human-readable reason metadata caching was unused for the job.
     pub explanation: Option<String>,
+    /// The column metadata index pruning statistics.
+    #[serde(rename = "pruningStats")]
+    pub pruning_stats: Option<PruningStats>,
+    /// Duration since last refresh as of this job for managed tables (indicates metadata cache staleness as seen by this job).
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub staleness: Option<chrono::Duration>,
     /// Metadata caching eligible table referenced in the query.
     #[serde(rename = "tableReference")]
     pub table_reference: Option<TableReference>,
@@ -5304,6 +5684,7 @@ impl common::Part for TableSchema {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
+/// * [test iam permissions routines](RoutineTestIamPermissionCall) (request)
 /// * [test iam permissions row access policies](RowAccessPolicyTestIamPermissionCall) (request)
 /// * [test iam permissions tables](TableTestIamPermissionCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
@@ -5323,6 +5704,7 @@ impl common::RequestValue for TestIamPermissionsRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
+/// * [test iam permissions routines](RoutineTestIamPermissionCall) (response)
 /// * [test iam permissions row access policies](RowAccessPolicyTestIamPermissionCall) (response)
 /// * [test iam permissions tables](TableTestIamPermissionCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
@@ -5421,13 +5803,16 @@ pub struct TrainingOptions {
     /// Subsample ratio of columns when constructing each tree for boosted tree models.
     #[serde(rename = "colsampleBytree")]
     pub colsample_bytree: Option<f64>,
+    /// The contribution metric. Applies to contribution analysis models. Allowed formats supported are for summable and summable ratio contribution metrics. These include expressions such as `SUM(x)` or `SUM(x)/SUM(y)`, where x and y are column names from the base table.
+    #[serde(rename = "contributionMetric")]
+    pub contribution_metric: Option<String>,
     /// Type of normalization algorithm for boosted tree models using dart booster.
     #[serde(rename = "dartNormalizeType")]
     pub dart_normalize_type: Option<String>,
     /// The data frequency of a time series.
     #[serde(rename = "dataFrequency")]
     pub data_frequency: Option<String>,
-    /// The column to split data with. This column won't be used as a feature. 1. When data_split_method is CUSTOM, the corresponding column should be boolean. The rows with true value tag are eval data, and the false are training data. 2. When data_split_method is SEQ, the first DATA_SPLIT_EVAL_FRACTION rows (from smallest to largest) in the corresponding column are used as training data, and the rest are eval data. It respects the order in Orderable data types: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#data-type-properties
+    /// The column to split data with. This column won't be used as a feature. 1. When data_split_method is CUSTOM, the corresponding column should be boolean. The rows with true value tag are eval data, and the false are training data. 2. When data_split_method is SEQ, the first DATA_SPLIT_EVAL_FRACTION rows (from smallest to largest) in the corresponding column are used as training data, and the rest are eval data. It respects the order in Orderable data types: https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#data_type_properties
     #[serde(rename = "dataSplitColumn")]
     pub data_split_column: Option<String>,
     /// The fraction of evaluation data over the whole input data. The rest of data will be used as training data. The format should be double. Accurate to two decimal places. Default value is 0.2.
@@ -5439,6 +5824,9 @@ pub struct TrainingOptions {
     /// If true, perform decompose time series and save the results.
     #[serde(rename = "decomposeTimeSeries")]
     pub decompose_time_series: Option<bool>,
+    /// Optional. Names of the columns to slice on. Applies to contribution analysis models.
+    #[serde(rename = "dimensionIdColumns")]
+    pub dimension_id_columns: Option<Vec<String>>,
     /// Distance type for clustering models.
     #[serde(rename = "distanceType")]
     pub distance_type: Option<String>,
@@ -5450,12 +5838,22 @@ pub struct TrainingOptions {
     /// If true, enable global explanation during training.
     #[serde(rename = "enableGlobalExplain")]
     pub enable_global_explain: Option<bool>,
+    /// The idle TTL of the endpoint before the resources get destroyed. The default value is 6.5 hours.
+    #[serde(rename = "endpointIdleTtl")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub endpoint_idle_ttl: Option<chrono::Duration>,
     /// Feedback type that specifies which algorithm to run for matrix factorization.
     #[serde(rename = "feedbackType")]
     pub feedback_type: Option<String>,
     /// Whether the model should include intercept during model training.
     #[serde(rename = "fitIntercept")]
     pub fit_intercept: Option<bool>,
+    /// The forecast limit lower bound that was used during ARIMA model training with limits. To see more details of the algorithm: https://otexts.com/fpp2/limits.html
+    #[serde(rename = "forecastLimitLowerBound")]
+    pub forecast_limit_lower_bound: Option<f64>,
+    /// The forecast limit upper bound that was used during ARIMA model training with limits.
+    #[serde(rename = "forecastLimitUpperBound")]
+    pub forecast_limit_upper_bound: Option<f64>,
     /// Hidden units for dnn models.
     #[serde(rename = "hiddenUnits")]
     #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
@@ -5472,6 +5870,9 @@ pub struct TrainingOptions {
     /// The target evaluation metrics to optimize the hyperparameters for.
     #[serde(rename = "hparamTuningObjectives")]
     pub hparam_tuning_objectives: Option<Vec<String>>,
+    /// The id of a Hugging Face model. For example, `google/gemma-2-2b-it`.
+    #[serde(rename = "huggingFaceModelId")]
+    pub hugging_face_model_id: Option<String>,
     /// Include drift when fitting an ARIMA model.
     #[serde(rename = "includeDrift")]
     pub include_drift: Option<bool>,
@@ -5488,6 +5889,9 @@ pub struct TrainingOptions {
     #[serde(rename = "integratedGradientsNumSteps")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub integrated_gradients_num_steps: Option<i64>,
+    /// Name of the column used to determine the rows corresponding to control and test. Applies to contribution analysis models.
+    #[serde(rename = "isTestColumn")]
+    pub is_test_column: Option<String>,
     /// Item column specified for matrix factorization models.
     #[serde(rename = "itemColumn")]
     pub item_column: Option<String>,
@@ -5518,6 +5922,9 @@ pub struct TrainingOptions {
     /// Type of loss function used during training run.
     #[serde(rename = "lossType")]
     pub loss_type: Option<String>,
+    /// The type of the machine used to deploy and serve the model.
+    #[serde(rename = "machineType")]
+    pub machine_type: Option<String>,
     /// The maximum number of iterations in training. Used only for iterative training algorithms.
     #[serde(rename = "maxIterations")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -5526,6 +5933,10 @@ pub struct TrainingOptions {
     #[serde(rename = "maxParallelTrials")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub max_parallel_trials: Option<i64>,
+    /// The maximum number of machine replicas that will be deployed on an endpoint. The default value is equal to min_replica_count.
+    #[serde(rename = "maxReplicaCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub max_replica_count: Option<i64>,
     /// The maximum number of time points in a time series that can be used in modeling the trend component of the time series. Don't use this option with the `timeSeriesLengthFraction` or `minTimeSeriesLength` options.
     #[serde(rename = "maxTimeSeriesLength")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -5534,9 +5945,16 @@ pub struct TrainingOptions {
     #[serde(rename = "maxTreeDepth")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub max_tree_depth: Option<i64>,
+    /// The apriori support minimum. Applies to contribution analysis models.
+    #[serde(rename = "minAprioriSupport")]
+    pub min_apriori_support: Option<f64>,
     /// When early_stop is true, stops training when accuracy improvement is less than 'min_relative_progress'. Used only for iterative training algorithms.
     #[serde(rename = "minRelativeProgress")]
     pub min_relative_progress: Option<f64>,
+    /// The minimum number of machine replicas that will be always deployed on an endpoint. This value must be greater than or equal to 1. The default value is 1.
+    #[serde(rename = "minReplicaCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub min_replica_count: Option<i64>,
     /// Minimum split loss for boosted tree models.
     #[serde(rename = "minSplitLoss")]
     pub min_split_loss: Option<f64>,
@@ -5548,6 +5966,9 @@ pub struct TrainingOptions {
     #[serde(rename = "minTreeChildWeight")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub min_tree_child_weight: Option<i64>,
+    /// The name of a Vertex model garden publisher model. Format is `publishers/{publisher}/models/{model}@{optional_version_id}`.
+    #[serde(rename = "modelGardenModelName")]
+    pub model_garden_model_name: Option<String>,
     /// The model registry.
     #[serde(rename = "modelRegistry")]
     pub model_registry: Option<String>,
@@ -5588,6 +6009,15 @@ pub struct TrainingOptions {
     /// The solver for PCA.
     #[serde(rename = "pcaSolver")]
     pub pca_solver: Option<String>,
+    /// Corresponds to the label key of a reservation resource used by Vertex AI. To target a SPECIFIC_RESERVATION by name, use `compute.googleapis.com/reservation-name` as the key and specify the name of your reservation as its value.
+    #[serde(rename = "reservationAffinityKey")]
+    pub reservation_affinity_key: Option<String>,
+    /// Specifies the reservation affinity type used to configure a Vertex AI resource. The default value is `NO_RESERVATION`.
+    #[serde(rename = "reservationAffinityType")]
+    pub reservation_affinity_type: Option<String>,
+    /// Corresponds to the label values of a reservation resource used by Vertex AI. This must be the full resource name of the reservation or reservation block.
+    #[serde(rename = "reservationAffinityValues")]
+    pub reservation_affinity_values: Option<Vec<String>>,
     /// Number of paths for the sampled Shapley explain method.
     #[serde(rename = "sampledShapleyNumPaths")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -5772,6 +6202,9 @@ pub struct VectorSearchStatistics {
     /// Specifies the index usage mode for the query.
     #[serde(rename = "indexUsageMode")]
     pub index_usage_mode: Option<String>,
+    /// Specifies the usage of stored columns in the query when stored columns are used in the query.
+    #[serde(rename = "storedColumnsUsages")]
+    pub stored_columns_usages: Option<Vec<StoredColumnsUsage>>,
 }
 
 impl common::Part for VectorSearchStatistics {}
@@ -5787,7 +6220,7 @@ pub struct ViewDefinition {
     /// Optional. Foreign view representations.
     #[serde(rename = "foreignDefinitions")]
     pub foreign_definitions: Option<Vec<ForeignViewDefinition>>,
-    /// Optional. Specifices the privacy policy for the view.
+    /// Optional. Specifies the privacy policy for the view.
     #[serde(rename = "privacyPolicy")]
     pub privacy_policy: Option<PrivacyPolicy>,
     /// Required. A query that BigQuery executes when the view is referenced.
@@ -5854,6 +6287,8 @@ impl common::Part for BqmlTrainingRunTrainingOptions {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DatasetAccess {
+    /// Optional. condition for the binding. If CEL expression in this field is true, this access binding will be considered
+    pub condition: Option<Expr>,
     /// [Pick one] A grant authorizing all resources of a particular type in a particular dataset access to this dataset. Only views are supported for now. The role field is not required when this field is set. If that dataset is deleted and re-created, its access needs to be granted again via an update operation.
     pub dataset: Option<DatasetAccessEntry>,
     /// [Pick one] A domain to grant access to. Any users signed in with the domain specified will be granted the specified access. Example: "example.com". Maps to IAM policy member "domain:DOMAIN".
@@ -5864,11 +6299,11 @@ pub struct DatasetAccess {
     /// [Pick one] Some other type of member that appears in the IAM Policy but isn't a user, group, domain, or special group.
     #[serde(rename = "iamMember")]
     pub iam_member: Option<String>,
-    /// An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: OWNER <=> roles/bigquery.dataOwner WRITER <=> roles/bigquery.dataEditor READER <=> roles/bigquery.dataViewer This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to "roles/bigquery.dataOwner", it will be returned back as "OWNER".
+    /// An IAM role ID that should be granted to the user, group, or domain specified in this access entry. The following legacy mappings will be applied: * `OWNER`: `roles/bigquery.dataOwner` * `WRITER`: `roles/bigquery.dataEditor` * `READER`: `roles/bigquery.dataViewer` This field will accept any of the above formats, but will return only the legacy format. For example, if you set this field to "roles/bigquery.dataOwner", it will be returned back as "OWNER".
     pub role: Option<String>,
     /// [Pick one] A routine from a different dataset to grant access to. Queries executed against that routine will have read access to views/tables/routines in this dataset. Only UDF is supported for now. The role field is not required when this field is set. If that routine is updated by any user, access to the routine needs to be granted again via an update operation.
     pub routine: Option<RoutineReference>,
-    /// [Pick one] A special group to grant access to. Possible values include: projectOwners: Owners of the enclosing project. projectReaders: Readers of the enclosing project. projectWriters: Writers of the enclosing project. allAuthenticatedUsers: All authenticated BigQuery users. Maps to similarly-named IAM members.
+    /// [Pick one] A special group to grant access to. Possible values include: * projectOwners: Owners of the enclosing project. * projectReaders: Readers of the enclosing project. * projectWriters: Writers of the enclosing project. * allAuthenticatedUsers: All authenticated BigQuery users. Maps to similarly-named IAM members.
     #[serde(rename = "specialGroup")]
     pub special_group: Option<String>,
     /// [Pick one] An email address of a user to grant access to. For example: fred@example.com. Maps to IAM policy member "user:EMAIL" or "serviceAccount:EMAIL".
@@ -5911,6 +6346,9 @@ pub struct DatasetListDatasets {
     /// The dataset reference. Use this property to access specific parts of the dataset's ID, such as project ID or dataset ID.
     #[serde(rename = "datasetReference")]
     pub dataset_reference: Option<DatasetReference>,
+    /// Output only. Reference to a read-only external dataset defined in data catalogs outside of BigQuery. Filled out when the dataset type is EXTERNAL.
+    #[serde(rename = "externalDatasetReference")]
+    pub external_dataset_reference: Option<ExternalDatasetReference>,
     /// An alternate name for the dataset. The friendly name is purely decorative in nature.
     #[serde(rename = "friendlyName")]
     pub friendly_name: Option<String>,
@@ -6305,7 +6743,7 @@ impl common::Part for TableListTables {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct TableListTablesView {
-    /// Specifices the privacy policy for the view.
+    /// Specifies the privacy policy for the view.
     #[serde(rename = "privacyPolicy")]
     pub privacy_policy: Option<PrivacyPolicy>,
     /// True if view is defined in legacy SQL dialect, false if in GoogleSQL.
@@ -6336,9 +6774,20 @@ impl common::Part for TableListTablesView {}
 /// use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -6349,7 +6798,7 @@ impl common::Part for TableListTablesView {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Bigquery::new(client, auth);
@@ -6403,6 +6852,7 @@ impl<'a, C> DatasetMethods<'a, C> {
             _project_id: project_id.to_string(),
             _dataset_id: dataset_id.to_string(),
             _dataset_view: Default::default(),
+            _access_policy_version: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -6422,6 +6872,7 @@ impl<'a, C> DatasetMethods<'a, C> {
             hub: self.hub,
             _request: request,
             _project_id: project_id.to_string(),
+            _access_policy_version: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -6469,6 +6920,8 @@ impl<'a, C> DatasetMethods<'a, C> {
             _request: request,
             _project_id: project_id.to_string(),
             _dataset_id: dataset_id.to_string(),
+            _update_mode: Default::default(),
+            _access_policy_version: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -6521,6 +6974,8 @@ impl<'a, C> DatasetMethods<'a, C> {
             _request: request,
             _project_id: project_id.to_string(),
             _dataset_id: dataset_id.to_string(),
+            _update_mode: Default::default(),
+            _access_policy_version: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -6544,9 +6999,20 @@ impl<'a, C> DatasetMethods<'a, C> {
 /// use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -6557,7 +7023,7 @@ impl<'a, C> DatasetMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Bigquery::new(client, auth);
@@ -6660,6 +7126,7 @@ impl<'a, C> JobMethods<'a, C> {
             _max_results: Default::default(),
             _location: Default::default(),
             _format_options_use_int64_timestamp: Default::default(),
+            _format_options_timestamp_output_format: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -6746,9 +7213,20 @@ impl<'a, C> JobMethods<'a, C> {
 /// use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -6759,7 +7237,7 @@ impl<'a, C> JobMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Bigquery::new(client, auth);
@@ -6893,9 +7371,20 @@ impl<'a, C> ModelMethods<'a, C> {
 /// use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -6906,7 +7395,7 @@ impl<'a, C> ModelMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Bigquery::new(client, auth);
@@ -6974,9 +7463,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -6987,12 +7487,12 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Bigquery::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `set_iam_policy(...)` and `update(...)`
+/// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.routines();
 /// # }
@@ -7157,6 +7657,29 @@ impl<'a, C> RoutineMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    pub fn test_iam_permissions(
+        &self,
+        request: TestIamPermissionsRequest,
+        resource: &str,
+    ) -> RoutineTestIamPermissionCall<'a, C> {
+        RoutineTestIamPermissionCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates information in an existing routine. The update method replaces the entire Routine resource.
     ///
     /// # Arguments
@@ -7201,9 +7724,20 @@ impl<'a, C> RoutineMethods<'a, C> {
 /// use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -7214,12 +7748,12 @@ impl<'a, C> RoutineMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Bigquery::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_iam_policy(...)`, `list(...)` and `test_iam_permissions(...)`
+/// // like `batch_delete(...)`, `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.row_access_policies();
 /// # }
@@ -7234,6 +7768,94 @@ where
 impl<'a, C> common::MethodsBuilder for RowAccessPolicyMethods<'a, C> {}
 
 impl<'a, C> RowAccessPolicyMethods<'a, C> {
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes provided row access policies.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Required. Project ID of the table to delete the row access policies.
+    /// * `datasetId` - Required. Dataset ID of the table to delete the row access policies.
+    /// * `tableId` - Required. Table ID of the table to delete the row access policies.
+    pub fn batch_delete(
+        &self,
+        request: BatchDeleteRowAccessPoliciesRequest,
+        project_id: &str,
+        dataset_id: &str,
+        table_id: &str,
+    ) -> RowAccessPolicyBatchDeleteCall<'a, C> {
+        RowAccessPolicyBatchDeleteCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _table_id: table_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a row access policy.
+    ///
+    /// # Arguments
+    ///
+    /// * `projectId` - Required. Project ID of the table to delete the row access policy.
+    /// * `datasetId` - Required. Dataset ID of the table to delete the row access policy.
+    /// * `tableId` - Required. Table ID of the table to delete the row access policy.
+    /// * `policyId` - Required. Policy ID of the row access policy.
+    pub fn delete(
+        &self,
+        project_id: &str,
+        dataset_id: &str,
+        table_id: &str,
+        policy_id: &str,
+    ) -> RowAccessPolicyDeleteCall<'a, C> {
+        RowAccessPolicyDeleteCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _table_id: table_id.to_string(),
+            _policy_id: policy_id.to_string(),
+            _force: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the specified row access policy by policy ID.
+    ///
+    /// # Arguments
+    ///
+    /// * `projectId` - Required. Project ID of the table to get the row access policy.
+    /// * `datasetId` - Required. Dataset ID of the table to get the row access policy.
+    /// * `tableId` - Required. Table ID of the table to get the row access policy.
+    /// * `policyId` - Required. Policy ID of the row access policy.
+    pub fn get(
+        &self,
+        project_id: &str,
+        dataset_id: &str,
+        table_id: &str,
+        policy_id: &str,
+    ) -> RowAccessPolicyGetCall<'a, C> {
+        RowAccessPolicyGetCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _table_id: table_id.to_string(),
+            _policy_id: policy_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
@@ -7251,6 +7873,35 @@ impl<'a, C> RowAccessPolicyMethods<'a, C> {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a row access policy.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Required. Project ID of the table to get the row access policy.
+    /// * `datasetId` - Required. Dataset ID of the table to get the row access policy.
+    /// * `tableId` - Required. Table ID of the table to get the row access policy.
+    pub fn insert(
+        &self,
+        request: RowAccessPolicy,
+        project_id: &str,
+        dataset_id: &str,
+        table_id: &str,
+    ) -> RowAccessPolicyInsertCall<'a, C> {
+        RowAccessPolicyInsertCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _table_id: table_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -7307,6 +7958,38 @@ impl<'a, C> RowAccessPolicyMethods<'a, C> {
             _scopes: Default::default(),
         }
     }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a row access policy.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `projectId` - Required. Project ID of the table to get the row access policy.
+    /// * `datasetId` - Required. Dataset ID of the table to get the row access policy.
+    /// * `tableId` - Required. Table ID of the table to get the row access policy.
+    /// * `policyId` - Required. Policy ID of the row access policy.
+    pub fn update(
+        &self,
+        request: RowAccessPolicy,
+        project_id: &str,
+        dataset_id: &str,
+        table_id: &str,
+        policy_id: &str,
+    ) -> RowAccessPolicyUpdateCall<'a, C> {
+        RowAccessPolicyUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _project_id: project_id.to_string(),
+            _dataset_id: dataset_id.to_string(),
+            _table_id: table_id.to_string(),
+            _policy_id: policy_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
 }
 
 /// A builder providing access to all methods supported on *tabledata* resources.
@@ -7325,9 +8008,20 @@ impl<'a, C> RowAccessPolicyMethods<'a, C> {
 /// use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -7338,7 +8032,7 @@ impl<'a, C> RowAccessPolicyMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Bigquery::new(client, auth);
@@ -7412,6 +8106,7 @@ impl<'a, C> TabledataMethods<'a, C> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _format_options_use_int64_timestamp: Default::default(),
+            _format_options_timestamp_output_format: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -7435,9 +8130,20 @@ impl<'a, C> TabledataMethods<'a, C> {
 /// use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -7448,7 +8154,7 @@ impl<'a, C> TabledataMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Bigquery::new(client, auth);
@@ -7715,9 +8421,20 @@ impl<'a, C> TableMethods<'a, C> {
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7728,7 +8445,7 @@ impl<'a, C> TableMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -7792,7 +8509,8 @@ where
 
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -7955,7 +8673,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8009,9 +8727,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8022,7 +8751,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -8031,6 +8760,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().get("projectId", "datasetId")
 ///              .dataset_view("duo")
+///              .access_policy_version(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8042,6 +8772,7 @@ where
     _project_id: String,
     _dataset_id: String,
     _dataset_view: Option<String>,
+    _access_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -8068,18 +8799,29 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "projectId", "datasetId", "datasetView"].iter() {
+        for &field in [
+            "alt",
+            "projectId",
+            "datasetId",
+            "datasetView",
+            "accessPolicyVersion",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("projectId", self._project_id);
         params.push("datasetId", self._dataset_id);
         if let Some(value) = self._dataset_view.as_ref() {
             params.push("datasetView", value);
+        }
+        if let Some(value) = self._access_policy_version.as_ref() {
+            params.push("accessPolicyVersion", value.to_string());
         }
 
         params.extend(self._additional_params.iter());
@@ -8087,7 +8829,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8218,6 +8961,13 @@ where
         self._dataset_view = Some(new_value.to_string());
         self
     }
+    /// Optional. The version of the access policy schema to fetch. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for conditional access policy binding in datasets must specify version 3. Dataset with no conditional role bindings in access policy may specify any valid value or leave the field unset. This field will be mapped to [IAM Policy version] (https://cloud.google.com/iam/docs/policies#versions) and will be used to fetch policy from IAM. If unset or if 0 or 1 value is used for dataset with conditional bindings, access entry with condition will have role string appended by 'withcond' string followed by a hash value. For example : { "access": [ { "role": "roles/bigquery.dataViewer_with_conditionalbinding_7a34awqsda", "userByEmail": "user@example.com", } ] } Please refer https://cloud.google.com/iam/docs/troubleshooting-withcond for more details.
+    ///
+    /// Sets the *access policy version* query property to the given value.
+    pub fn access_policy_version(mut self, new_value: i32) -> DatasetGetCall<'a, C> {
+        self._access_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -8263,7 +9013,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8318,9 +9068,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8331,7 +9092,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -8344,6 +9105,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().insert(req, "projectId")
+///              .access_policy_version(-37)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8354,6 +9116,7 @@ where
     hub: &'a Bigquery<C>,
     _request: Dataset,
     _project_id: String,
+    _access_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -8380,22 +9143,26 @@ where
             http_method: hyper::Method::POST,
         });
 
-        for &field in ["alt", "projectId"].iter() {
+        for &field in ["alt", "projectId", "accessPolicyVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
         params.push("projectId", self._project_id);
+        if let Some(value) = self._access_policy_version.as_ref() {
+            params.push("accessPolicyVersion", value.to_string());
+        }
 
         params.extend(self._additional_params.iter());
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8537,6 +9304,13 @@ where
         self._project_id = new_value.to_string();
         self
     }
+    /// Optional. The version of the provided access policy schema. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. This version refers to the schema version of the access policy and not the version of access policy. This field's value can be equal or more than the access policy schema provided in the request. For example, * Requests with conditional access policy binding in datasets must specify version 3. * But dataset with no conditional role bindings in access policy may specify any valid value or leave the field unset. If unset or if 0 or 1 value is used for dataset with conditional bindings, request will be rejected. This field will be mapped to IAM Policy version (https://cloud.google.com/iam/docs/policies#versions) and will be used to set policy in IAM.
+    ///
+    /// Sets the *access policy version* query property to the given value.
+    pub fn access_policy_version(mut self, new_value: i32) -> DatasetInsertCall<'a, C> {
+        self._access_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -8582,7 +9356,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8636,9 +9410,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8649,7 +9434,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -8657,9 +9442,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().list("projectId")
-///              .page_token("ut")
-///              .max_results(89)
-///              .filter("rebum.")
+///              .page_token("rebum.")
+///              .max_results(44)
+///              .filter("ipsum")
 ///              .all(true)
 ///              .doit().await;
 /// # }
@@ -8736,7 +9521,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8862,7 +9648,7 @@ where
         self._max_results = Some(new_value);
         self
     }
-    /// An expression for filtering the results of the request by label. The syntax is "labels.<name>\[:<value>\]". Multiple filters can be ANDed together by connecting with a space. Example: "labels.department:receiving labels.active". See [Filtering datasets using labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels) for details.
+    /// An expression for filtering the results of the request by label. The syntax is `labels.[:]`. Multiple filters can be AND-ed together by connecting with a space. Example: `labels.department:receiving labels.active`. See [Filtering datasets using labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels) for details.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> DatasetListCall<'a, C> {
@@ -8921,7 +9707,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8976,9 +9762,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8989,7 +9786,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -9002,6 +9799,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().patch(req, "projectId", "datasetId")
+///              .update_mode("ea")
+///              .access_policy_version(-99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9013,6 +9812,8 @@ where
     _request: Dataset,
     _project_id: String,
     _dataset_id: String,
+    _update_mode: Option<String>,
+    _access_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -9039,23 +9840,38 @@ where
             http_method: hyper::Method::PATCH,
         });
 
-        for &field in ["alt", "projectId", "datasetId"].iter() {
+        for &field in [
+            "alt",
+            "projectId",
+            "datasetId",
+            "updateMode",
+            "accessPolicyVersion",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("projectId", self._project_id);
         params.push("datasetId", self._dataset_id);
+        if let Some(value) = self._update_mode.as_ref() {
+            params.push("updateMode", value);
+        }
+        if let Some(value) = self._access_policy_version.as_ref() {
+            params.push("accessPolicyVersion", value.to_string());
+        }
 
         params.extend(self._additional_params.iter());
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9209,6 +10025,20 @@ where
         self._dataset_id = new_value.to_string();
         self
     }
+    /// Optional. Specifies the fields of dataset that update/patch operation is targeting By default, both metadata and ACL fields are updated.
+    ///
+    /// Sets the *update mode* query property to the given value.
+    pub fn update_mode(mut self, new_value: &str) -> DatasetPatchCall<'a, C> {
+        self._update_mode = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The version of the provided access policy schema. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. This version refers to the schema version of the access policy and not the version of access policy. This field's value can be equal or more than the access policy schema provided in the request. For example, * Operations updating conditional access policy binding in datasets must specify version 3. Some of the operations are : - Adding a new access policy entry with condition. - Removing an access policy entry with condition. - Updating an access policy entry with condition. * But dataset with no conditional role bindings in access policy may specify any valid value or leave the field unset. If unset or if 0 or 1 value is used for dataset with conditional bindings, request will be rejected. This field will be mapped to IAM Policy version (https://cloud.google.com/iam/docs/policies#versions) and will be used to set policy in IAM.
+    ///
+    /// Sets the *access policy version* query property to the given value.
+    pub fn access_policy_version(mut self, new_value: i32) -> DatasetPatchCall<'a, C> {
+        self._access_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -9254,7 +10084,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9309,9 +10139,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9322,7 +10163,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -9389,7 +10230,8 @@ where
         let mut url =
             self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}:undelete";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9591,7 +10433,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9646,9 +10488,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9659,7 +10512,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -9672,6 +10525,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datasets().update(req, "projectId", "datasetId")
+///              .update_mode("duo")
+///              .access_policy_version(-80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9683,6 +10538,8 @@ where
     _request: Dataset,
     _project_id: String,
     _dataset_id: String,
+    _update_mode: Option<String>,
+    _access_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -9709,23 +10566,38 @@ where
             http_method: hyper::Method::PUT,
         });
 
-        for &field in ["alt", "projectId", "datasetId"].iter() {
+        for &field in [
+            "alt",
+            "projectId",
+            "datasetId",
+            "updateMode",
+            "accessPolicyVersion",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("projectId", self._project_id);
         params.push("datasetId", self._dataset_id);
+        if let Some(value) = self._update_mode.as_ref() {
+            params.push("updateMode", value);
+        }
+        if let Some(value) = self._access_policy_version.as_ref() {
+            params.push("accessPolicyVersion", value.to_string());
+        }
 
         params.extend(self._additional_params.iter());
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9879,6 +10751,20 @@ where
         self._dataset_id = new_value.to_string();
         self
     }
+    /// Optional. Specifies the fields of dataset that update/patch operation is targeting By default, both metadata and ACL fields are updated.
+    ///
+    /// Sets the *update mode* query property to the given value.
+    pub fn update_mode(mut self, new_value: &str) -> DatasetUpdateCall<'a, C> {
+        self._update_mode = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The version of the provided access policy schema. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. This version refers to the schema version of the access policy and not the version of access policy. This field's value can be equal or more than the access policy schema provided in the request. For example, * Operations updating conditional access policy binding in datasets must specify version 3. Some of the operations are : - Adding a new access policy entry with condition. - Removing an access policy entry with condition. - Updating an access policy entry with condition. * But dataset with no conditional role bindings in access policy may specify any valid value or leave the field unset. If unset or if 0 or 1 value is used for dataset with conditional bindings, request will be rejected. This field will be mapped to IAM Policy version (https://cloud.google.com/iam/docs/policies#versions) and will be used to set policy in IAM.
+    ///
+    /// Sets the *access policy version* query property to the given value.
+    pub fn access_policy_version(mut self, new_value: i32) -> DatasetUpdateCall<'a, C> {
+        self._access_policy_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -9924,7 +10810,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9978,9 +10864,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9991,7 +10888,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -9999,7 +10896,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().cancel("projectId", "jobId")
-///              .location("labore")
+///              .location("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10056,7 +10953,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/jobs/{+jobId}/cancel";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -10180,7 +11078,7 @@ where
         self._job_id = new_value.to_string();
         self
     }
-    /// The geographic location of the job. You must specify the location to run the job for the following scenarios: - If the location to run a job is not in the `us` or the `eu` multi-regional location - If the job's location is in a single region (for example, `us-central1`) For more information, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+    /// The geographic location of the job. You must [specify the location](https://cloud.google.com/bigquery/docs/locations#specify_locations) to run the job for the following scenarios: * If the location to run a job is not in the `us` or the `eu` multi-regional location * If the job's location is in a single region (for example, `us-central1`)
     ///
     /// Sets the *location* query property to the given value.
     pub fn location(mut self, new_value: &str) -> JobCancelCall<'a, C> {
@@ -10232,7 +11130,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10286,9 +11184,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10299,7 +11208,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -10307,7 +11216,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().delete("projectId", "jobId")
-///              .location("sed")
+///              .location("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10363,7 +11272,8 @@ where
 
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/jobs/{+jobId}/delete";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -10474,7 +11384,7 @@ where
         self._job_id = new_value.to_string();
         self
     }
-    /// The geographic location of the job. Required. See details at: https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+    /// The geographic location of the job. Required. For more information, see how to [specify locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
     ///
     /// Sets the *location* query property to the given value.
     pub fn location(mut self, new_value: &str) -> JobDeleteCall<'a, C> {
@@ -10526,7 +11436,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10580,9 +11490,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10593,7 +11514,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -10601,7 +11522,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get("projectId", "jobId")
-///              .location("kasd")
+///              .location("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10658,7 +11579,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/jobs/{+jobId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -10782,7 +11704,7 @@ where
         self._job_id = new_value.to_string();
         self
     }
-    /// The geographic location of the job. You must specify the location to run the job for the following scenarios: - If the location to run a job is not in the `us` or the `eu` multi-regional location - If the job's location is in a single region (for example, `us-central1`) For more information, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+    /// The geographic location of the job. You must specify the location to run the job for the following scenarios: * If the location to run a job is not in the `us` or the `eu` multi-regional location * If the job's location is in a single region (for example, `us-central1`) For more information, see how to [specify locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
     ///
     /// Sets the *location* query property to the given value.
     pub fn location(mut self, new_value: &str) -> JobGetCall<'a, C> {
@@ -10834,7 +11756,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10888,9 +11810,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10901,7 +11834,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -10909,12 +11842,13 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get_query_results("projectId", "jobId")
-///              .timeout_ms(77)
-///              .start_index(33)
-///              .page_token("vero")
-///              .max_results(70)
-///              .location("sed")
+///              .timeout_ms(67)
+///              .start_index(79)
+///              .page_token("voluptua.")
+///              .max_results(99)
+///              .location("consetetur")
 ///              .format_options_use_int64_timestamp(false)
+///              .format_options_timestamp_output_format("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10931,6 +11865,7 @@ where
     _max_results: Option<u32>,
     _location: Option<String>,
     _format_options_use_int64_timestamp: Option<bool>,
+    _format_options_timestamp_output_format: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -10967,6 +11902,7 @@ where
             "maxResults",
             "location",
             "formatOptions.useInt64Timestamp",
+            "formatOptions.timestampOutputFormat",
         ]
         .iter()
         {
@@ -10976,7 +11912,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
         params.push("projectId", self._project_id);
         params.push("jobId", self._job_id);
         if let Some(value) = self._timeout_ms.as_ref() {
@@ -10997,13 +11933,17 @@ where
         if let Some(value) = self._format_options_use_int64_timestamp.as_ref() {
             params.push("formatOptions.useInt64Timestamp", value.to_string());
         }
+        if let Some(value) = self._format_options_timestamp_output_format.as_ref() {
+            params.push("formatOptions.timestampOutputFormat", value);
+        }
 
         params.extend(self._additional_params.iter());
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/queries/{+jobId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -11155,7 +12095,7 @@ where
         self._max_results = Some(new_value);
         self
     }
-    /// The geographic location of the job. You must specify the location to run the job for the following scenarios: - If the location to run a job is not in the `us` or the `eu` multi-regional location - If the job's location is in a single region (for example, `us-central1`) For more information, see https://cloud.google.com/bigquery/docs/locations#specifying_your_location.
+    /// The geographic location of the job. You must specify the location to run the job for the following scenarios: * If the location to run a job is not in the `us` or the `eu` multi-regional location * If the job's location is in a single region (for example, `us-central1`) For more information, see how to [specify locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
     ///
     /// Sets the *location* query property to the given value.
     pub fn location(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C> {
@@ -11170,6 +12110,16 @@ where
         new_value: bool,
     ) -> JobGetQueryResultCall<'a, C> {
         self._format_options_use_int64_timestamp = Some(new_value);
+        self
+    }
+    /// Optional. The API output format for a timestamp. This offers more explicit control over the timestamp output format as compared to the existing `use_int64_timestamp` option.
+    ///
+    /// Sets the *format options.timestamp output format* query property to the given value.
+    pub fn format_options_timestamp_output_format(
+        mut self,
+        new_value: &str,
+    ) -> JobGetQueryResultCall<'a, C> {
+        self._format_options_timestamp_output_format = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -11220,7 +12170,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11276,9 +12226,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11289,7 +12250,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -11353,7 +12314,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/jobs";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -11528,7 +12490,8 @@ where
         };
         params.push("uploadType", upload_type);
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -11854,7 +12817,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11908,9 +12871,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11921,7 +12895,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -11929,14 +12903,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().list("projectId")
-///              .add_state_filter("et")
-///              .projection("et")
-///              .parent_job_id("sadipscing")
-///              .page_token("Stet")
-///              .min_creation_time(2)
-///              .max_results(81)
-///              .max_creation_time(25)
-///              .all_users(false)
+///              .add_state_filter("sadipscing")
+///              .projection("Stet")
+///              .parent_job_id("dolor")
+///              .page_token("duo")
+///              .min_creation_time(25)
+///              .max_results(25)
+///              .max_creation_time(13)
+///              .all_users(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12034,7 +13008,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/jobs";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -12248,7 +13223,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12303,9 +13278,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12316,7 +13302,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -12380,7 +13366,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/queries";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -12567,7 +13554,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12621,9 +13608,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12634,7 +13632,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -12696,7 +13694,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/models/{+modelId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -12866,7 +13865,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12920,9 +13919,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12933,7 +13943,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -12996,7 +14006,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/models/{+modelId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -13179,7 +14190,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13233,9 +14244,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13246,7 +14268,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -13254,8 +14276,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.models().list("projectId", "datasetId")
-///              .page_token("takimata")
-///              .max_results(55)
+///              .page_token("voluptua.")
+///              .max_results(29)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13317,7 +14339,8 @@ where
         let mut url =
             self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/models";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -13500,7 +14523,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13555,9 +14578,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13568,7 +14602,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -13637,7 +14671,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/models/{+modelId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -13850,7 +14885,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13904,9 +14939,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13917,7 +14963,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -13975,7 +15021,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects/{+projectId}/serviceAccount";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -14135,7 +15182,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14189,9 +15236,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14202,7 +15260,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -14210,8 +15268,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().list()
-///              .page_token("amet.")
-///              .max_results(71)
+///              .page_token("takimata")
+///              .max_results(82)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14268,7 +15326,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "projects";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         let url = params.parse_with_url(&url);
@@ -14420,7 +15479,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14474,9 +15533,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14487,7 +15557,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -14549,7 +15619,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/routines/{+routineId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -14719,7 +15790,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14773,9 +15844,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14786,7 +15868,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -14854,7 +15936,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/routines/{+routineId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -15044,7 +16127,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15099,9 +16182,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15112,7 +16206,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -15176,7 +16270,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{+resource}:getIamPolicy";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -15366,7 +16461,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15421,9 +16516,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15434,7 +16540,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -15501,7 +16607,8 @@ where
         let mut url =
             self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/routines";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -15700,7 +16807,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15754,9 +16861,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15767,7 +16885,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -15776,9 +16894,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.routines().list("projectId", "datasetId")
 ///              .read_mask(FieldMask::new::<&str>(&[]))
-///              .page_token("ea")
-///              .max_results(6)
-///              .filter("Lorem")
+///              .page_token("Lorem")
+///              .max_results(63)
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15858,7 +16976,8 @@ where
         let mut url =
             self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/routines";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -16055,7 +17174,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16110,9 +17229,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16123,7 +17253,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -16187,7 +17317,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{+resource}:setIamPolicy";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -16377,7 +17508,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16414,6 +17545,343 @@ where
     }
 }
 
+/// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+///
+/// A builder for the *testIamPermissions* method supported by a *routine* resource.
+/// It is not used directly, but through a [`RoutineMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_bigquery2 as bigquery2;
+/// use bigquery2::api::TestIamPermissionsRequest;
+/// # async fn dox() {
+/// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Bigquery::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TestIamPermissionsRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.routines().test_iam_permissions(req, "resource")
+///              .doit().await;
+/// # }
+/// ```
+pub struct RoutineTestIamPermissionCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Bigquery<C>,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for RoutineTestIamPermissionCall<'a, C> {}
+
+impl<'a, C> RoutineTestIamPermissionCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, TestIamPermissionsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "bigquery.routines.testIamPermissions",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("resource", self._resource);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "{+resource}:testIamPermissions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["resource"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: TestIamPermissionsRequest,
+    ) -> RoutineTestIamPermissionCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> RoutineTestIamPermissionCall<'a, C> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> RoutineTestIamPermissionCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> RoutineTestIamPermissionCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatformReadOnly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> RoutineTestIamPermissionCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RoutineTestIamPermissionCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RoutineTestIamPermissionCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Updates information in an existing routine. The update method replaces the entire Routine resource.
 ///
 /// A builder for the *update* method supported by a *routine* resource.
@@ -16432,9 +17900,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16445,7 +17924,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -16514,7 +17993,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/routines/{+routineId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -16727,7 +18207,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16764,6 +18244,1037 @@ where
     }
 }
 
+/// Deletes provided row access policies.
+///
+/// A builder for the *batchDelete* method supported by a *rowAccessPolicy* resource.
+/// It is not used directly, but through a [`RowAccessPolicyMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_bigquery2 as bigquery2;
+/// use bigquery2::api::BatchDeleteRowAccessPoliciesRequest;
+/// # async fn dox() {
+/// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Bigquery::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchDeleteRowAccessPoliciesRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.row_access_policies().batch_delete(req, "projectId", "datasetId", "tableId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct RowAccessPolicyBatchDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Bigquery<C>,
+    _request: BatchDeleteRowAccessPoliciesRequest,
+    _project_id: String,
+    _dataset_id: String,
+    _table_id: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for RowAccessPolicyBatchDeleteCall<'a, C> {}
+
+impl<'a, C> RowAccessPolicyBatchDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<common::Response> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "bigquery.rowAccessPolicies.batchDelete",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["projectId", "datasetId", "tableId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("projectId", self._project_id);
+        params.push("datasetId", self._dataset_id);
+        params.push("tableId", self._table_id);
+
+        params.extend(self._additional_params.iter());
+
+        let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}/rowAccessPolicies:batchDelete";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{+projectId}", "projectId"),
+            ("{+datasetId}", "datasetId"),
+            ("{+tableId}", "tableId"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["tableId", "datasetId", "projectId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = common::Response::from_parts(parts, body);
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: BatchDeleteRowAccessPoliciesRequest,
+    ) -> RowAccessPolicyBatchDeleteCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Project ID of the table to delete the row access policies.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RowAccessPolicyBatchDeleteCall<'a, C> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Required. Dataset ID of the table to delete the row access policies.
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RowAccessPolicyBatchDeleteCall<'a, C> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// Required. Table ID of the table to delete the row access policies.
+    ///
+    /// Sets the *table id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn table_id(mut self, new_value: &str) -> RowAccessPolicyBatchDeleteCall<'a, C> {
+        self._table_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> RowAccessPolicyBatchDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyBatchDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> RowAccessPolicyBatchDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RowAccessPolicyBatchDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RowAccessPolicyBatchDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes a row access policy.
+///
+/// A builder for the *delete* method supported by a *rowAccessPolicy* resource.
+/// It is not used directly, but through a [`RowAccessPolicyMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_bigquery2 as bigquery2;
+/// # async fn dox() {
+/// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Bigquery::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.row_access_policies().delete("projectId", "datasetId", "tableId", "policyId")
+///              .force(true)
+///              .doit().await;
+/// # }
+/// ```
+pub struct RowAccessPolicyDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Bigquery<C>,
+    _project_id: String,
+    _dataset_id: String,
+    _table_id: String,
+    _policy_id: String,
+    _force: Option<bool>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for RowAccessPolicyDeleteCall<'a, C> {}
+
+impl<'a, C> RowAccessPolicyDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<common::Response> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "bigquery.rowAccessPolicies.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["projectId", "datasetId", "tableId", "policyId", "force"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("projectId", self._project_id);
+        params.push("datasetId", self._dataset_id);
+        params.push("tableId", self._table_id);
+        params.push("policyId", self._policy_id);
+        if let Some(value) = self._force.as_ref() {
+            params.push("force", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}/rowAccessPolicies/{+policyId}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{+projectId}", "projectId"),
+            ("{+datasetId}", "datasetId"),
+            ("{+tableId}", "tableId"),
+            ("{+policyId}", "policyId"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["policyId", "tableId", "datasetId", "projectId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = common::Response::from_parts(parts, body);
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. Project ID of the table to delete the row access policy.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RowAccessPolicyDeleteCall<'a, C> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Required. Dataset ID of the table to delete the row access policy.
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RowAccessPolicyDeleteCall<'a, C> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// Required. Table ID of the table to delete the row access policy.
+    ///
+    /// Sets the *table id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn table_id(mut self, new_value: &str) -> RowAccessPolicyDeleteCall<'a, C> {
+        self._table_id = new_value.to_string();
+        self
+    }
+    /// Required. Policy ID of the row access policy.
+    ///
+    /// Sets the *policy id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn policy_id(mut self, new_value: &str) -> RowAccessPolicyDeleteCall<'a, C> {
+        self._policy_id = new_value.to_string();
+        self
+    }
+    /// If set to true, it deletes the row access policy even if it's the last row access policy on the table and the deletion will widen the access rather narrowing it.
+    ///
+    /// Sets the *force* query property to the given value.
+    pub fn force(mut self, new_value: bool) -> RowAccessPolicyDeleteCall<'a, C> {
+        self._force = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> RowAccessPolicyDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> RowAccessPolicyDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RowAccessPolicyDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RowAccessPolicyDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets the specified row access policy by policy ID.
+///
+/// A builder for the *get* method supported by a *rowAccessPolicy* resource.
+/// It is not used directly, but through a [`RowAccessPolicyMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_bigquery2 as bigquery2;
+/// # async fn dox() {
+/// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Bigquery::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.row_access_policies().get("projectId", "datasetId", "tableId", "policyId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct RowAccessPolicyGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Bigquery<C>,
+    _project_id: String,
+    _dataset_id: String,
+    _table_id: String,
+    _policy_id: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for RowAccessPolicyGetCall<'a, C> {}
+
+impl<'a, C> RowAccessPolicyGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, RowAccessPolicy)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "bigquery.rowAccessPolicies.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "projectId", "datasetId", "tableId", "policyId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("projectId", self._project_id);
+        params.push("datasetId", self._dataset_id);
+        params.push("tableId", self._table_id);
+        params.push("policyId", self._policy_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}/rowAccessPolicies/{+policyId}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{+projectId}", "projectId"),
+            ("{+datasetId}", "datasetId"),
+            ("{+tableId}", "tableId"),
+            ("{+policyId}", "policyId"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["policyId", "tableId", "datasetId", "projectId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. Project ID of the table to get the row access policy.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RowAccessPolicyGetCall<'a, C> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Required. Dataset ID of the table to get the row access policy.
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RowAccessPolicyGetCall<'a, C> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// Required. Table ID of the table to get the row access policy.
+    ///
+    /// Sets the *table id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn table_id(mut self, new_value: &str) -> RowAccessPolicyGetCall<'a, C> {
+        self._table_id = new_value.to_string();
+        self
+    }
+    /// Required. Policy ID of the row access policy.
+    ///
+    /// Sets the *policy id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn policy_id(mut self, new_value: &str) -> RowAccessPolicyGetCall<'a, C> {
+        self._policy_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> RowAccessPolicyGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatformReadOnly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> RowAccessPolicyGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RowAccessPolicyGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RowAccessPolicyGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
 ///
 /// A builder for the *getIamPolicy* method supported by a *rowAccessPolicy* resource.
@@ -16782,9 +19293,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16795,7 +19317,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -16859,7 +19381,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{+resource}:getIamPolicy";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17052,7 +19575,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17089,6 +19612,371 @@ where
     }
 }
 
+/// Creates a row access policy.
+///
+/// A builder for the *insert* method supported by a *rowAccessPolicy* resource.
+/// It is not used directly, but through a [`RowAccessPolicyMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_bigquery2 as bigquery2;
+/// use bigquery2::api::RowAccessPolicy;
+/// # async fn dox() {
+/// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Bigquery::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RowAccessPolicy::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.row_access_policies().insert(req, "projectId", "datasetId", "tableId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct RowAccessPolicyInsertCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Bigquery<C>,
+    _request: RowAccessPolicy,
+    _project_id: String,
+    _dataset_id: String,
+    _table_id: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for RowAccessPolicyInsertCall<'a, C> {}
+
+impl<'a, C> RowAccessPolicyInsertCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, RowAccessPolicy)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "bigquery.rowAccessPolicies.insert",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "projectId", "datasetId", "tableId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("projectId", self._project_id);
+        params.push("datasetId", self._dataset_id);
+        params.push("tableId", self._table_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone()
+            + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}/rowAccessPolicies";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{+projectId}", "projectId"),
+            ("{+datasetId}", "datasetId"),
+            ("{+tableId}", "tableId"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["tableId", "datasetId", "projectId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RowAccessPolicy) -> RowAccessPolicyInsertCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Project ID of the table to get the row access policy.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RowAccessPolicyInsertCall<'a, C> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Required. Dataset ID of the table to get the row access policy.
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RowAccessPolicyInsertCall<'a, C> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// Required. Table ID of the table to get the row access policy.
+    ///
+    /// Sets the *table id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn table_id(mut self, new_value: &str) -> RowAccessPolicyInsertCall<'a, C> {
+        self._table_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> RowAccessPolicyInsertCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyInsertCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> RowAccessPolicyInsertCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RowAccessPolicyInsertCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RowAccessPolicyInsertCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Lists all row access policies on the specified table.
 ///
 /// A builder for the *list* method supported by a *rowAccessPolicy* resource.
@@ -17106,9 +19994,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17119,7 +20018,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -17127,8 +20026,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.row_access_policies().list("projectId", "datasetId", "tableId")
-///              .page_token("aliquyam")
-///              .page_size(-5)
+///              .page_token("dolores")
+///              .page_size(-95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17203,7 +20102,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}/rowAccessPolicies";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17403,7 +20303,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17458,9 +20358,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17471,7 +20382,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -17535,7 +20446,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{+resource}:testIamPermissions";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17728,7 +20640,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17765,6 +20677,383 @@ where
     }
 }
 
+/// Updates a row access policy.
+///
+/// A builder for the *update* method supported by a *rowAccessPolicy* resource.
+/// It is not used directly, but through a [`RowAccessPolicyMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_bigquery2 as bigquery2;
+/// use bigquery2::api::RowAccessPolicy;
+/// # async fn dox() {
+/// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Bigquery::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RowAccessPolicy::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.row_access_policies().update(req, "projectId", "datasetId", "tableId", "policyId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct RowAccessPolicyUpdateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Bigquery<C>,
+    _request: RowAccessPolicy,
+    _project_id: String,
+    _dataset_id: String,
+    _table_id: String,
+    _policy_id: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for RowAccessPolicyUpdateCall<'a, C> {}
+
+impl<'a, C> RowAccessPolicyUpdateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, RowAccessPolicy)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "bigquery.rowAccessPolicies.update",
+            http_method: hyper::Method::PUT,
+        });
+
+        for &field in ["alt", "projectId", "datasetId", "tableId", "policyId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("projectId", self._project_id);
+        params.push("datasetId", self._dataset_id);
+        params.push("tableId", self._table_id);
+        params.push("policyId", self._policy_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}/rowAccessPolicies/{+policyId}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{+projectId}", "projectId"),
+            ("{+datasetId}", "datasetId"),
+            ("{+tableId}", "tableId"),
+            ("{+policyId}", "policyId"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["policyId", "tableId", "datasetId", "projectId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PUT)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RowAccessPolicy) -> RowAccessPolicyUpdateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Project ID of the table to get the row access policy.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> RowAccessPolicyUpdateCall<'a, C> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// Required. Dataset ID of the table to get the row access policy.
+    ///
+    /// Sets the *dataset id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dataset_id(mut self, new_value: &str) -> RowAccessPolicyUpdateCall<'a, C> {
+        self._dataset_id = new_value.to_string();
+        self
+    }
+    /// Required. Table ID of the table to get the row access policy.
+    ///
+    /// Sets the *table id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn table_id(mut self, new_value: &str) -> RowAccessPolicyUpdateCall<'a, C> {
+        self._table_id = new_value.to_string();
+        self
+    }
+    /// Required. Policy ID of the row access policy.
+    ///
+    /// Sets the *policy id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn policy_id(mut self, new_value: &str) -> RowAccessPolicyUpdateCall<'a, C> {
+        self._policy_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> RowAccessPolicyUpdateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> RowAccessPolicyUpdateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> RowAccessPolicyUpdateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RowAccessPolicyUpdateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RowAccessPolicyUpdateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Streams data into BigQuery one record at a time without needing to run a load job.
 ///
 /// A builder for the *insertAll* method supported by a *tabledata* resource.
@@ -17783,9 +21072,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17796,7 +21096,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -17865,7 +21165,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}/insertAll";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -18084,7 +21385,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18138,9 +21439,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18151,7 +21463,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -18159,11 +21471,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tabledata().list("projectId", "datasetId", "tableId")
-///              .start_index(32)
-///              .selected_fields("et")
-///              .page_token("sed")
-///              .max_results(90)
-///              .format_options_use_int64_timestamp(false)
+///              .start_index(7)
+///              .selected_fields("duo")
+///              .page_token("diam")
+///              .max_results(44)
+///              .format_options_use_int64_timestamp(true)
+///              .format_options_timestamp_output_format("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18180,6 +21493,7 @@ where
     _page_token: Option<String>,
     _max_results: Option<u32>,
     _format_options_use_int64_timestamp: Option<bool>,
+    _format_options_timestamp_output_format: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -18216,6 +21530,7 @@ where
             "pageToken",
             "maxResults",
             "formatOptions.useInt64Timestamp",
+            "formatOptions.timestampOutputFormat",
         ]
         .iter()
         {
@@ -18225,7 +21540,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
         params.push("projectId", self._project_id);
         params.push("datasetId", self._dataset_id);
         params.push("tableId", self._table_id);
@@ -18244,6 +21559,9 @@ where
         if let Some(value) = self._format_options_use_int64_timestamp.as_ref() {
             params.push("formatOptions.useInt64Timestamp", value.to_string());
         }
+        if let Some(value) = self._format_options_timestamp_output_format.as_ref() {
+            params.push("formatOptions.timestampOutputFormat", value);
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -18251,7 +21569,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}/data";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -18427,6 +21746,16 @@ where
         self._format_options_use_int64_timestamp = Some(new_value);
         self
     }
+    /// Optional. The API output format for a timestamp. This offers more explicit control over the timestamp output format as compared to the existing `use_int64_timestamp` option.
+    ///
+    /// Sets the *format options.timestamp output format* query property to the given value.
+    pub fn format_options_timestamp_output_format(
+        mut self,
+        new_value: &str,
+    ) -> TabledataListCall<'a, C> {
+        self._format_options_timestamp_output_format = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -18472,7 +21801,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18526,9 +21855,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18539,7 +21879,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -18601,7 +21941,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -18771,7 +22112,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18825,9 +22166,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18838,7 +22190,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -18846,8 +22198,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().get("projectId", "datasetId", "tableId")
-///              .view("aliquyam")
-///              .selected_fields("dolores")
+///              .view("et")
+///              .selected_fields("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18920,7 +22272,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -19117,7 +22470,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19172,9 +22525,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19185,7 +22549,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -19249,7 +22613,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{+resource}:getIamPolicy";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -19439,7 +22804,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19494,9 +22859,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19507,7 +22883,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -19574,7 +22950,8 @@ where
         let mut url =
             self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/tables";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -19773,7 +23150,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19827,9 +23204,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19840,7 +23228,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -19848,8 +23236,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().list("projectId", "datasetId")
-///              .page_token("et")
-///              .max_results(91)
+///              .page_token("accusam")
+///              .max_results(54)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19911,7 +23299,8 @@ where
         let mut url =
             self.hub._base_url.clone() + "projects/{+projectId}/datasets/{+datasetId}/tables";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -20094,7 +23483,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20149,9 +23538,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20162,7 +23562,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -20244,7 +23644,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -20464,7 +23865,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20519,9 +23920,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20532,7 +23944,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -20596,7 +24008,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{+resource}:setIamPolicy";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -20786,7 +24199,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20841,9 +24254,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20854,7 +24278,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -20918,7 +24342,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{+resource}:testIamPermissions";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -21111,7 +24536,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21166,9 +24591,20 @@ where
 /// # use bigquery2::{Bigquery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21179,7 +24615,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Bigquery::new(client, auth);
@@ -21192,7 +24628,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().update(req, "projectId", "datasetId", "tableId")
-///              .autodetect_schema(false)
+///              .autodetect_schema(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21261,7 +24697,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "projects/{+projectId}/datasets/{+datasetId}/tables/{+tableId}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -21481,7 +24918,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::CloudPlatform`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

@@ -58,9 +58,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -71,7 +82,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = SecurityCommandCenter::new(client, auth);
@@ -126,7 +137,7 @@ impl<'a, C> SecurityCommandCenter<C> {
         SecurityCommandCenter {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://securitycenter.googleapis.com/".to_string(),
             _root_url: "https://securitycenter.googleapis.com/".to_string(),
         }
@@ -143,7 +154,7 @@ impl<'a, C> SecurityCommandCenter<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -255,6 +266,67 @@ pub struct AdaptiveProtection {
 
 impl common::Part for AdaptiveProtection {}
 
+/// Details about resources affected by this finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AffectedResources {
+    /// The count of resources affected by the finding.
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub count: Option<i64>,
+}
+
+impl common::Part for AffectedResources {}
+
+/// Contains information about the AI model associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AiModel {
+    /// The platform on which the model is deployed.
+    #[serde(rename = "deploymentPlatform")]
+    pub deployment_platform: Option<String>,
+    /// The user defined display name of model. Ex. baseline-classification-model
+    #[serde(rename = "displayName")]
+    pub display_name: Option<String>,
+    /// The domain of the model, for example, “image-classification”.
+    pub domain: Option<String>,
+    /// The name of the model library, for example, “transformers”.
+    pub library: Option<String>,
+    /// The region in which the model is used, for example, “us-central1”.
+    pub location: Option<String>,
+    /// The name of the AI model, for example, "gemini:1.0.0".
+    pub name: Option<String>,
+    /// The publisher of the model, for example, “google” or “nvidia”.
+    pub publisher: Option<String>,
+    /// The purpose of the model, for example, "Inteference" or "Training".
+    #[serde(rename = "usageCategory")]
+    pub usage_category: Option<String>,
+}
+
+impl common::Part for AiModel {}
+
+/// Allowed IP rule.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Allowed {
+    /// Optional. Optional list of allowed IP rules.
+    #[serde(rename = "ipRules")]
+    pub ip_rules: Option<Vec<IpRule>>,
+}
+
+impl common::Part for Allowed {}
+
 /// Represents an application associated with a finding.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -339,12 +411,20 @@ impl common::Part for AssetDiscoveryConfig {}
 pub struct Attack {
     /// Type of attack, for example, 'SYN-flood', 'NTP-udp', or 'CHARGEN-udp'.
     pub classification: Option<String>,
-    /// Total BPS (bytes per second) volume of attack.
+    /// Total BPS (bytes per second) volume of attack. Deprecated - refer to volume_bps_long instead.
     #[serde(rename = "volumeBps")]
     pub volume_bps: Option<i32>,
-    /// Total PPS (packets per second) volume of attack.
+    /// Total BPS (bytes per second) volume of attack.
+    #[serde(rename = "volumeBpsLong")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub volume_bps_long: Option<i64>,
+    /// Total PPS (packets per second) volume of attack. Deprecated - refer to volume_pps_long instead.
     #[serde(rename = "volumePps")]
     pub volume_pps: Option<i32>,
+    /// Total PPS (packets per second) volume of attack.
+    #[serde(rename = "volumePpsLong")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub volume_pps_long: Option<i64>,
 }
 
 impl common::Part for Attack {}
@@ -357,7 +437,7 @@ impl common::Part for Attack {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AttackExposure {
-    /// The resource name of the attack path simulation result that contains the details regarding this attack exposure score. Example: organizations/123/simulations/456/attackExposureResults/789
+    /// The resource name of the attack path simulation result that contains the details regarding this attack exposure score. Example: `organizations/123/simulations/456/attackExposureResults/789`
     #[serde(rename = "attackExposureResult")]
     pub attack_exposure_result: Option<String>,
     /// The number of high value resources that are exposed as a result of this finding.
@@ -432,9 +512,9 @@ pub struct AttackPathNode {
     /// Human-readable name of this resource.
     #[serde(rename = "displayName")]
     pub display_name: Option<String>,
-    /// The name of the resource at this point in the attack path. The format of the name follows the Cloud Asset Inventory [resource name format]("https://cloud.google.com/asset-inventory/docs/resource-name-format")
+    /// The name of the resource at this point in the attack path. The format of the name follows the Cloud Asset Inventory [resource name format](https://cloud.google.com/asset-inventory/docs/resource-name-format)
     pub resource: Option<String>,
-    /// The [supported resource type](https://cloud.google.com/asset-inventory/docs/supported-asset-types")
+    /// The [supported resource type](https://cloud.google.com/asset-inventory/docs/supported-asset-types)
     #[serde(rename = "resourceType")]
     pub resource_type: Option<String>,
     /// Unique id of the attack path node.
@@ -578,7 +658,7 @@ pub struct AzureManagementGroup {
     /// The display name of the Azure management group.
     #[serde(rename = "displayName")]
     pub display_name: Option<String>,
-    /// The UUID of the Azure management group, for example, "20000000-0001-0000-0000-000000000000".
+    /// The UUID of the Azure management group, for example, `20000000-0001-0000-0000-000000000000`.
     pub id: Option<String>,
 }
 
@@ -600,6 +680,8 @@ pub struct AzureMetadata {
     pub resource_group: Option<AzureResourceGroup>,
     /// The Azure subscription associated with the resource.
     pub subscription: Option<AzureSubscription>,
+    /// The Azure Entra tenant associated with the resource.
+    pub tenant: Option<AzureTenant>,
 }
 
 impl common::Part for AzureMetadata {}
@@ -612,6 +694,8 @@ impl common::Part for AzureMetadata {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AzureResourceGroup {
+    /// The ID of the Azure resource group.
+    pub id: Option<String>,
     /// The name of the Azure resource group. This is not a UUID.
     pub name: Option<String>,
 }
@@ -629,11 +713,28 @@ pub struct AzureSubscription {
     /// The display name of the Azure subscription.
     #[serde(rename = "displayName")]
     pub display_name: Option<String>,
-    /// The UUID of the Azure subscription, for example, "291bba3f-e0a5-47bc-a099-3bdcb2a50a05".
+    /// The UUID of the Azure subscription, for example, `291bba3f-e0a5-47bc-a099-3bdcb2a50a05`.
     pub id: Option<String>,
 }
 
 impl common::Part for AzureSubscription {}
+
+/// Represents a Microsoft Entra tenant.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AzureTenant {
+    /// The display name of the Azure tenant.
+    #[serde(rename = "displayName")]
+    pub display_name: Option<String>,
+    /// The ID of the Microsoft Entra tenant, for example, "a11aaa11-aa11-1aa1-11aa-1aaa11a".
+    pub id: Option<String>,
+}
+
+impl common::Part for AzureTenant {}
 
 /// Information related to Google Cloud Backup and DR Service findings.
 ///
@@ -746,9 +847,27 @@ pub struct BulkMuteFindingsRequest {
     /// This can be a mute configuration name or any identifier for mute/unmute of findings based on the filter.
     #[serde(rename = "muteAnnotation")]
     pub mute_annotation: Option<String>,
+    /// Optional. All findings matching the given filter will have their mute state set to this value. The default value is `MUTED`. Setting this to `UNDEFINED` will clear the mute state on all matching findings.
+    #[serde(rename = "muteState")]
+    pub mute_state: Option<String>,
 }
 
 impl common::RequestValue for BulkMuteFindingsRequest {}
+
+/// Contains details about a chokepoint, which is a resource or resource group where high-risk attack paths converge, based on [attack path simulations] (https://cloud.google.com/security-command-center/docs/attack-exposure-learn#attack_path_simulations).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Chokepoint {
+    /// List of resource names of findings associated with this chokepoint. For example, organizations/123/sources/456/findings/789. This list will have at most 100 findings.
+    #[serde(rename = "relatedFindings")]
+    pub related_findings: Option<Vec<String>>,
+}
+
+impl common::Part for Chokepoint {}
 
 /// Fields related to Google Cloud Armor findings.
 ///
@@ -778,6 +897,29 @@ pub struct CloudArmor {
 
 impl common::Part for CloudArmor {}
 
+/// CloudControl associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct CloudControl {
+    /// Name of the CloudControl associated with the finding.
+    #[serde(rename = "cloudControlName")]
+    pub cloud_control_name: Option<String>,
+    /// Policy type of the CloudControl
+    #[serde(rename = "policyType")]
+    pub policy_type: Option<String>,
+    /// Type of cloud control.
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+    /// Version of the Cloud Control
+    pub version: Option<i32>,
+}
+
+impl common::Part for CloudControl {}
+
 /// The [data profile](https://cloud.google.com/dlp/docs/data-profiles) associated with the finding.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -789,6 +931,9 @@ pub struct CloudDlpDataProfile {
     /// Name of the data profile, for example, `projects/123/locations/europe/tableProfiles/8383929`.
     #[serde(rename = "dataProfile")]
     pub data_profile: Option<String>,
+    /// Type of information detected by SDP. Info type includes name, version and sensitivity of the detected information type.
+    #[serde(rename = "infoTypes")]
+    pub info_types: Option<Vec<InfoType>>,
     /// The resource hierarchy level at which the data profile was generated.
     #[serde(rename = "parentType")]
     pub parent_type: Option<String>,
@@ -861,6 +1006,26 @@ pub struct Compliance {
 }
 
 impl common::Part for Compliance {}
+
+/// Compliance Details associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ComplianceDetails {
+    /// CloudControl associated with the finding
+    #[serde(rename = "cloudControl")]
+    pub cloud_control: Option<CloudControl>,
+    /// Cloud Control Deployments associated with the finding. For example, organizations/123/locations/global/cloudControlDeployments/deploymentIdentifier
+    #[serde(rename = "cloudControlDeploymentNames")]
+    pub cloud_control_deployment_names: Option<Vec<String>>,
+    /// Details of Frameworks associated with the finding
+    pub frameworks: Option<Vec<Framework>>,
+}
+
+impl common::Part for ComplianceDetails {}
 
 /// Contains information about the IP connection associated with the finding.
 ///
@@ -940,6 +1105,24 @@ pub struct Container {
 
 impl common::Part for Container {}
 
+/// Compliance control associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Control {
+    /// Name of the Control
+    #[serde(rename = "controlName")]
+    pub control_name: Option<String>,
+    /// Display name of the control. For example, AU-02.
+    #[serde(rename = "displayName")]
+    pub display_name: Option<String>,
+}
+
+impl common::Part for Control {}
+
 /// Request message to create single resource value config
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -967,7 +1150,7 @@ impl common::Part for CreateResourceValueConfigRequest {}
 pub struct CustomModuleValidationError {
     /// A description of the error, suitable for human consumption. Required.
     pub description: Option<String>,
-    /// The end position of the error in the uploaded text version of the module. This field may be omitted if no specific position applies, or if one could not be computed..
+    /// The end position of the error in the uploaded text version of the module. This field may be omitted if no specific position applies, or if one could not be computed.
     pub end: Option<Position>,
     /// The path, in RFC 8901 JSON Pointer format, to the field that failed validation. This may be left empty if no specific field is affected.
     #[serde(rename = "fieldPath")]
@@ -986,7 +1169,7 @@ impl common::Part for CustomModuleValidationError {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CustomModuleValidationErrors {
-    /// no description provided
+    /// The list of errors.
     pub errors: Option<Vec<CustomModuleValidationError>>,
 }
 
@@ -1002,9 +1185,15 @@ impl common::Part for CustomModuleValidationErrors {}
 pub struct Cve {
     /// Describe Common Vulnerability Scoring System specified at https://www.first.org/cvss/v3.1/specification-document
     pub cvssv3: Option<Cvssv3>,
+    /// Date the first publicly available exploit or PoC was released.
+    #[serde(rename = "exploitReleaseDate")]
+    pub exploit_release_date: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// The exploitation activity of the vulnerability in the wild.
     #[serde(rename = "exploitationActivity")]
     pub exploitation_activity: Option<String>,
+    /// Date of the earliest known exploitation.
+    #[serde(rename = "firstExploitationDate")]
+    pub first_exploitation_date: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// The unique identifier for the vulnerability. e.g. CVE-2021-34527
     pub id: Option<String>,
     /// The potential impact of the vulnerability if it was to be exploited.
@@ -1062,6 +1251,97 @@ pub struct Cvssv3 {
 
 impl common::Part for Cvssv3 {}
 
+/// CWE stands for Common Weakness Enumeration. Information about this weakness, as described by [CWE](https://cwe.mitre.org/).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Cwe {
+    /// The CWE identifier, e.g. CWE-94
+    pub id: Option<String>,
+    /// Any reference to the details on the CWE, for example, https://cwe.mitre.org/data/definitions/94.html
+    pub references: Option<Vec<Reference>>,
+}
+
+impl common::Part for Cwe {}
+
+/// Details about a data access attempt made by a principal not authorized under applicable data security policy.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DataAccessEvent {
+    /// Unique identifier for data access event.
+    #[serde(rename = "eventId")]
+    pub event_id: Option<String>,
+    /// Timestamp of data access event.
+    #[serde(rename = "eventTime")]
+    pub event_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The operation performed by the principal to access the data.
+    pub operation: Option<String>,
+    /// The email address of the principal that accessed the data. The principal could be a user account, service account, Google group, or other.
+    #[serde(rename = "principalEmail")]
+    pub principal_email: Option<String>,
+}
+
+impl common::Part for DataAccessEvent {}
+
+/// Details about a data flow event, in which either the data is moved to or is accessed from a non-compliant geo-location, as defined in the applicable data security policy.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DataFlowEvent {
+    /// Unique identifier for data flow event.
+    #[serde(rename = "eventId")]
+    pub event_id: Option<String>,
+    /// Timestamp of data flow event.
+    #[serde(rename = "eventTime")]
+    pub event_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The operation performed by the principal for the data flow event.
+    pub operation: Option<String>,
+    /// The email address of the principal that initiated the data flow event. The principal could be a user account, service account, Google group, or other.
+    #[serde(rename = "principalEmail")]
+    pub principal_email: Option<String>,
+    /// Non-compliant location of the principal or the data destination.
+    #[serde(rename = "violatedLocation")]
+    pub violated_location: Option<String>,
+}
+
+impl common::Part for DataFlowEvent {}
+
+/// Details about data retention deletion violations, in which the data is non-compliant based on their retention or deletion time, as defined in the applicable data security policy. The Data Retention Deletion (DRD) control is a control of the DSPM (Data Security Posture Management) suite that enables organizations to manage data retention and deletion policies in compliance with regulations, such as GDPR and CRPA. DRD supports two primary policy types: maximum storage length (max TTL) and minimum storage length (min TTL). Both are aimed at helping organizations meet regulatory and data management commitments.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DataRetentionDeletionEvent {
+    /// Number of objects that violated the policy for this resource. If the number is less than 1,000, then the value of this field is the exact number. If the number of objects that violated the policy is greater than or equal to 1,000, then the value of this field is 1000.
+    #[serde(rename = "dataObjectCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub data_object_count: Option<i64>,
+    /// Timestamp indicating when the event was detected.
+    #[serde(rename = "eventDetectionTime")]
+    pub event_detection_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Type of the DRD event.
+    #[serde(rename = "eventType")]
+    pub event_type: Option<String>,
+    /// Maximum duration of retention allowed from the DRD control. This comes from the DRD control where users set a max TTL for their data. For example, suppose that a user sets the max TTL for a Cloud Storage bucket to 90 days. However, an object in that bucket is 100 days old. In this case, a DataRetentionDeletionEvent will be generated for that Cloud Storage bucket, and the max_retention_allowed is 90 days.
+    #[serde(rename = "maxRetentionAllowed")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub max_retention_allowed: Option<chrono::Duration>,
+}
+
+impl common::Part for DataRetentionDeletionEvent {}
+
 /// Represents database access information, such as queries. A database may be a sub-resource of an instance (as in the case of Cloud SQL instances or Cloud Spanner instances), or the database instance itself. Some database resources might not have the [full resource name](https://google.aip.dev/122#full-resource-names) populated because these resource types, such as Cloud SQL databases, are not yet supported by Cloud Asset Inventory. In these cases only the display name is provided.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1088,6 +1368,40 @@ pub struct Database {
 
 impl common::Part for Database {}
 
+/// Vertex AI dataset associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Dataset {
+    /// The user defined display name of dataset, e.g. plants-dataset
+    #[serde(rename = "displayName")]
+    pub display_name: Option<String>,
+    /// Resource name of the dataset, e.g. projects/{project}/locations/{location}/datasets/2094040236064505856
+    pub name: Option<String>,
+    /// Data source, such as BigQuery source URI, e.g. bq://scc-nexus-test.AIPPtest.gsod
+    pub source: Option<String>,
+}
+
+impl common::Part for Dataset {}
+
+/// Denied IP rule.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Denied {
+    /// Optional. Optional list of denied IP rules.
+    #[serde(rename = "ipRules")]
+    pub ip_rules: Option<Vec<IpRule>>,
+}
+
+impl common::Part for Denied {}
+
 /// Memory hash detection contributing to the binary family match.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1104,6 +1418,20 @@ pub struct Detection {
 }
 
 impl common::Part for Detection {}
+
+/// Contains information about the disk associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Disk {
+    /// The name of the disk, for example, "https://www.googleapis.com/compute/v1/projects/{project-id}/zones/{zone-id}/disks/{disk-id}".
+    pub name: Option<String>,
+}
+
+impl common::Part for Disk {}
 
 /// Path of the file in terms of underlying disk/partition identifiers.
 ///
@@ -1123,6 +1451,24 @@ pub struct DiskPath {
 
 impl common::Part for DiskPath {}
 
+/// The record of a dynamic mute rule that matches the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DynamicMuteRecord {
+    /// When the dynamic mute rule first matched the finding.
+    #[serde(rename = "matchTime")]
+    pub match_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The relative resource name of the mute rule, represented by a mute config, that created this record, for example `organizations/123/muteConfigs/mymuteconfig` or `organizations/123/locations/global/muteConfigs/mymuteconfig`.
+    #[serde(rename = "muteConfig")]
+    pub mute_config: Option<String>,
+}
+
+impl common::Part for DynamicMuteRecord {}
+
 /// An EffectiveEventThreatDetectionCustomModule is the representation of an Event Threat Detection custom module at a specified level of the resource hierarchy: organization, folder, or project. If a custom module is inherited from a parent organization or folder, the value of the `enablement_state` property in EffectiveEventThreatDetectionCustomModule is set to the value that is effective in the parent, instead of `INHERITED`. For example, if the module is enabled in a parent organization or folder, the effective `enablement_state` for the module in all child folders or projects is also `enabled`. EffectiveEventThreatDetectionCustomModule is read-only.
 ///
 /// # Activities
@@ -1137,6 +1483,9 @@ impl common::Part for DiskPath {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct EffectiveEventThreatDetectionCustomModule {
+    /// The cloud provider of the custom module.
+    #[serde(rename = "cloudProvider")]
+    pub cloud_provider: Option<String>,
     /// Output only. Config for the effective module.
     pub config: Option<HashMap<String, serde_json::Value>>,
     /// Output only. The description for the module.
@@ -1147,7 +1496,7 @@ pub struct EffectiveEventThreatDetectionCustomModule {
     /// Output only. The effective state of enablement for the module at the given level of the hierarchy.
     #[serde(rename = "enablementState")]
     pub enablement_state: Option<String>,
-    /// Output only. The resource name of the effective ETD custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}".
+    /// Output only. The resource name of the effective ETD custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`.
     pub name: Option<String>,
     /// Output only. Type for the module. e.g. CONFIGURABLE_BAD_IP.
     #[serde(rename = "type")]
@@ -1232,6 +1581,9 @@ pub struct EventThreatDetectionCustomModule {
     /// Output only. The closest ancestor module that this module inherits the enablement state from. The format is the same as the EventThreatDetectionCustomModule resource name.
     #[serde(rename = "ancestorModule")]
     pub ancestor_module: Option<String>,
+    /// The cloud provider of the custom module.
+    #[serde(rename = "cloudProvider")]
+    pub cloud_provider: Option<String>,
     /// Config for the module. For the resident module, its config value is defined at this level. For the inherited module, its config value is inherited from the ancestor module.
     pub config: Option<HashMap<String, serde_json::Value>>,
     /// The description for the module.
@@ -1245,7 +1597,7 @@ pub struct EventThreatDetectionCustomModule {
     /// Output only. The editor the module was last updated by.
     #[serde(rename = "lastEditor")]
     pub last_editor: Option<String>,
-    /// Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub name: Option<String>,
     /// Type for the module. e.g. CONFIGURABLE_BAD_IP.
     #[serde(rename = "type")]
@@ -1331,6 +1683,8 @@ pub struct File {
     #[serde(rename = "hashedSize")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub hashed_size: Option<i64>,
+    /// Operation(s) performed on a file.
+    pub operations: Option<Vec<FileOperation>>,
     /// True when the hash covers only a prefix of the file.
     #[serde(rename = "partiallyHashed")]
     pub partially_hashed: Option<bool>,
@@ -1344,6 +1698,21 @@ pub struct File {
 }
 
 impl common::Part for File {}
+
+/// Operation(s) performed on a file.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct FileOperation {
+    /// The type of the operation
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+}
+
+impl common::Part for FileOperation {}
 
 /// Security Command Center finding. A finding is a record of assessment data like security, risk, health, or privacy, that is ingested into Security Command Center for presentation, notification, analysis, policy testing, and enforcement. For example, a cross-site scripting (XSS) vulnerability in an App Engine application is a finding.
 ///
@@ -1368,6 +1737,12 @@ impl common::Part for File {}
 pub struct Finding {
     /// Access details associated with the finding, such as more information on the caller, which method was accessed, and from where.
     pub access: Option<Access>,
+    /// AffectedResources associated with the finding.
+    #[serde(rename = "affectedResources")]
+    pub affected_resources: Option<AffectedResources>,
+    /// The AI model associated with the finding.
+    #[serde(rename = "aiModel")]
+    pub ai_model: Option<AiModel>,
     /// Represents an application associated with the finding.
     pub application: Option<Application>,
     /// The results of an attack path simulation relevant to this finding.
@@ -1381,6 +1756,8 @@ pub struct Finding {
     pub canonical_name: Option<String>,
     /// The additional taxonomy group within findings from a given source. This field is immutable after creation time. Example: "XSS_FLASH_INJECTION"
     pub category: Option<String>,
+    /// Contains details about a chokepoint, which is a resource or resource group where high-risk attack paths converge, based on [attack path simulations] (https://cloud.google.com/security-command-center/docs/attack-exposure-learn#attack_path_simulations). This field cannot be updated. Its value is ignored in all update requests.
+    pub chokepoint: Option<Chokepoint>,
     /// Fields related to Cloud Armor findings.
     #[serde(rename = "cloudArmor")]
     pub cloud_armor: Option<CloudArmor>,
@@ -1390,6 +1767,9 @@ pub struct Finding {
     /// Cloud Data Loss Prevention (Cloud DLP) inspection results that are associated with the finding.
     #[serde(rename = "cloudDlpInspection")]
     pub cloud_dlp_inspection: Option<CloudDlpInspection>,
+    /// Details about the compliance implications of the finding.
+    #[serde(rename = "complianceDetails")]
+    pub compliance_details: Option<ComplianceDetails>,
     /// Contains compliance information for security standards associated to the finding.
     pub compliances: Option<Vec<Compliance>>,
     /// Contains information about the IP connection associated with the finding.
@@ -1401,10 +1781,21 @@ pub struct Finding {
     /// The time at which the finding was created in Security Command Center.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Data access events associated with the finding.
+    #[serde(rename = "dataAccessEvents")]
+    pub data_access_events: Option<Vec<DataAccessEvent>>,
+    /// Data flow events associated with the finding.
+    #[serde(rename = "dataFlowEvents")]
+    pub data_flow_events: Option<Vec<DataFlowEvent>>,
+    /// Data retention deletion events associated with the finding.
+    #[serde(rename = "dataRetentionDeletionEvents")]
+    pub data_retention_deletion_events: Option<Vec<DataRetentionDeletionEvent>>,
     /// Database associated with the finding.
     pub database: Option<Database>,
     /// Contains more details about the finding.
     pub description: Option<String>,
+    /// Disk associated with the finding.
+    pub disk: Option<Disk>,
     /// The time the finding was first detected. If an existing finding is updated, then this is the time the update occurred. For example, if the finding represents an open firewall, this property captures the time the detector believes the firewall became open. The accuracy is determined by the detector. If the finding is later resolved, then this time reflects when the finding was resolved. This must not be set to a value greater than the current timestamp.
     #[serde(rename = "eventTime")]
     pub event_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -1429,6 +1820,11 @@ pub struct Finding {
     pub iam_bindings: Option<Vec<IamBinding>>,
     /// Represents what's commonly known as an *indicator of compromise* (IoC) in computer forensics. This is an artifact observed on a network or in an operating system that, with high confidence, indicates a computer intrusion. For more information, see [Indicator of compromise](https://en.wikipedia.org/wiki/Indicator_of_compromise).
     pub indicator: Option<Indicator>,
+    /// IP rules associated with the finding.
+    #[serde(rename = "ipRules")]
+    pub ip_rules: Option<IpRules>,
+    /// Job associated with the finding.
+    pub job: Option<Job>,
     /// Signature of the kernel rootkit.
     #[serde(rename = "kernelRootkit")]
     pub kernel_rootkit: Option<KernelRootkit>,
@@ -1448,6 +1844,9 @@ pub struct Finding {
     pub module_name: Option<String>,
     /// Indicates the mute state of a finding (either muted, unmuted or undefined). Unlike other attributes of a finding, a finding provider shouldn't set the value of mute.
     pub mute: Option<String>,
+    /// Output only. The mute information regarding this finding.
+    #[serde(rename = "muteInfo")]
+    pub mute_info: Option<MuteInfo>,
     /// Records additional information about the mute operation, for example, the [mute configuration](https://cloud.google.com/security-command-center/docs/how-to-mute-findings) that muted the finding and the user who muted the finding.
     #[serde(rename = "muteInitiator")]
     pub mute_initiator: Option<String>,
@@ -1456,6 +1855,8 @@ pub struct Finding {
     pub mute_update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
     pub name: Option<String>,
+    /// Represents the VPC networks that the resource is attached to.
+    pub networks: Option<Vec<Network>>,
     /// Steps to address the finding.
     #[serde(rename = "nextSteps")]
     pub next_steps: Option<String>,
@@ -1490,6 +1891,9 @@ pub struct Finding {
     /// Contains details about a group of security issues that, when the issues occur together, represent a greater risk than when the issues occur independently. A group of such issues is referred to as a toxic combination. This field cannot be updated. Its value is ignored in all update requests.
     #[serde(rename = "toxicCombination")]
     pub toxic_combination: Option<ToxicCombination>,
+    /// VertexAi associated with the finding.
+    #[serde(rename = "vertexAi")]
+    pub vertex_ai: Option<VertexAi>,
     /// Represents vulnerability-specific fields like CVE and CVSS scores. CVE stands for Common Vulnerabilities and Exposures (https://cve.mitre.org/about/)
     pub vulnerability: Option<Vulnerability>,
 }
@@ -1522,10 +1926,8 @@ impl common::ResponseResult for Finding {}
 /// * [event threat detection settings effective custom modules list folders](FolderEventThreatDetectionSettingEffectiveCustomModuleListCall) (none)
 /// * [event threat detection settings validate custom module folders](FolderEventThreatDetectionSettingValidateCustomModuleCall) (none)
 /// * [findings bulk mute folders](FolderFindingBulkMuteCall) (none)
-/// * [locations mute configs create folders](FolderLocationMuteConfigCreateCall) (none)
 /// * [locations mute configs delete folders](FolderLocationMuteConfigDeleteCall) (none)
 /// * [locations mute configs get folders](FolderLocationMuteConfigGetCall) (none)
-/// * [locations mute configs list folders](FolderLocationMuteConfigListCall) (none)
 /// * [locations mute configs patch folders](FolderLocationMuteConfigPatchCall) (none)
 /// * [mute configs create folders](FolderMuteConfigCreateCall) (none)
 /// * [mute configs delete folders](FolderMuteConfigDeleteCall) (none)
@@ -1567,6 +1969,30 @@ pub struct Folder {
 }
 
 impl common::Resource for Folder {}
+
+/// Compliance framework associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Framework {
+    /// Category of the framework associated with the finding. E.g. Security Benchmark, or Assured Workloads
+    pub category: Option<Vec<String>>,
+    /// The controls associated with the framework.
+    pub controls: Option<Vec<Control>>,
+    /// Display name of the framework. For a standard framework, this will look like e.g. PCI DSS 3.2.1, whereas for a custom framework it can be a user defined string like MyFramework
+    #[serde(rename = "displayName")]
+    pub display_name: Option<String>,
+    /// Name of the framework associated with the finding
+    pub name: Option<String>,
+    /// Type of the framework associated with the finding, to specify whether the framework is built-in (pre-defined and immutable) or a custom framework defined by the customer (equivalent to security posture)
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+}
+
+impl common::Part for Framework {}
 
 /// Represents a geographical location for a given access.
 ///
@@ -1734,6 +2160,9 @@ impl common::Part for GoogleCloudSecuritycenterV1CustomOutputSpec {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudSecuritycenterV1EffectiveSecurityHealthAnalyticsCustomModule {
+    /// The cloud provider of the custom module.
+    #[serde(rename = "cloudProvider")]
+    pub cloud_provider: Option<String>,
     /// Output only. The user-specified configuration for the module.
     #[serde(rename = "customConfig")]
     pub custom_config: Option<GoogleCloudSecuritycenterV1CustomConfig>,
@@ -1808,19 +2237,16 @@ impl common::ResponseResult for GoogleCloudSecuritycenterV1ExternalSystem {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
-/// * [locations mute configs create folders](FolderLocationMuteConfigCreateCall) (request|response)
 /// * [locations mute configs get folders](FolderLocationMuteConfigGetCall) (response)
 /// * [locations mute configs patch folders](FolderLocationMuteConfigPatchCall) (request|response)
 /// * [mute configs create folders](FolderMuteConfigCreateCall) (request|response)
 /// * [mute configs get folders](FolderMuteConfigGetCall) (response)
 /// * [mute configs patch folders](FolderMuteConfigPatchCall) (request|response)
-/// * [locations mute configs create organizations](OrganizationLocationMuteConfigCreateCall) (request|response)
 /// * [locations mute configs get organizations](OrganizationLocationMuteConfigGetCall) (response)
 /// * [locations mute configs patch organizations](OrganizationLocationMuteConfigPatchCall) (request|response)
 /// * [mute configs create organizations](OrganizationMuteConfigCreateCall) (request|response)
 /// * [mute configs get organizations](OrganizationMuteConfigGetCall) (response)
 /// * [mute configs patch organizations](OrganizationMuteConfigPatchCall) (request|response)
-/// * [locations mute configs create projects](ProjectLocationMuteConfigCreateCall) (request|response)
 /// * [locations mute configs get projects](ProjectLocationMuteConfigGetCall) (response)
 /// * [locations mute configs patch projects](ProjectLocationMuteConfigPatchCall) (request|response)
 /// * [mute configs create projects](ProjectMuteConfigCreateCall) (request|response)
@@ -1838,13 +2264,19 @@ pub struct GoogleCloudSecuritycenterV1MuteConfig {
     /// The human readable name to be displayed for the mute config.
     #[serde(rename = "displayName")]
     pub display_name: Option<String>,
+    /// Optional. The expiry of the mute config. Only applicable for dynamic configs. If the expiry is set, when the config expires, it is removed from all findings.
+    #[serde(rename = "expiryTime")]
+    pub expiry_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Required. An expression that defines the filter to apply across create/update events of findings. While creating a filter string, be mindful of the scope in which the mute configuration is being created. E.g., If a filter contains project = X but is created under the project = Y scope, it might not match any findings. The following field and operator combinations are supported: * severity: `=`, `:` * category: `=`, `:` * resource.name: `=`, `:` * resource.project_name: `=`, `:` * resource.project_display_name: `=`, `:` * resource.folders.resource_folder: `=`, `:` * resource.parent_name: `=`, `:` * resource.parent_display_name: `=`, `:` * resource.type: `=`, `:` * finding_class: `=`, `:` * indicator.ip_addresses: `=`, `:` * indicator.domains: `=`, `:`
     pub filter: Option<String>,
     /// Output only. Email address of the user who last edited the mute config. This field is set by the server and will be ignored if provided on config creation or update.
     #[serde(rename = "mostRecentEditor")]
     pub most_recent_editor: Option<String>,
-    /// This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     pub name: Option<String>,
+    /// Optional. The type of the mute config, which determines what type of mute state the config affects. The static mute state takes precedence over the dynamic mute state. Immutable after creation. STATIC by default if not set during creation.
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
     /// Output only. The most recent time at which the mute config was updated. This field is set by the server and will be ignored if provided on config creation or update.
     #[serde(rename = "updateTime")]
     pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -1869,6 +2301,94 @@ pub struct GoogleCloudSecuritycenterV1Property {
 }
 
 impl common::Part for GoogleCloudSecuritycenterV1Property {}
+
+/// The App Hub Application associated with the finding's resource.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudSecuritycenterV1ResourceApplication {
+    /// Consumer provided attributes for the application
+    pub attributes: Option<GoogleCloudSecuritycenterV1ResourceApplicationAttributes>,
+    /// The resource name of an Application. Format: `projects/{host-project-id}/locations/{location}/applications/{application-id}`
+    pub name: Option<String>,
+}
+
+impl common::Part for GoogleCloudSecuritycenterV1ResourceApplication {}
+
+/// Consumer provided attributes for the application
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudSecuritycenterV1ResourceApplicationAttributes {
+    /// Business team that ensures user needs are met and value is delivered
+    #[serde(rename = "businessOwners")]
+    pub business_owners:
+        Option<Vec<GoogleCloudSecuritycenterV1ResourceApplicationAttributesContactInfo>>,
+    /// User-defined criticality information.
+    pub criticality: Option<GoogleCloudSecuritycenterV1ResourceApplicationAttributesCriticality>,
+    /// Developer team that owns development and coding.
+    #[serde(rename = "developerOwners")]
+    pub developer_owners:
+        Option<Vec<GoogleCloudSecuritycenterV1ResourceApplicationAttributesContactInfo>>,
+    /// User-defined environment information.
+    pub environment: Option<GoogleCloudSecuritycenterV1ResourceApplicationAttributesEnvironment>,
+    /// Operator team that ensures runtime and operations.
+    #[serde(rename = "operatorOwners")]
+    pub operator_owners:
+        Option<Vec<GoogleCloudSecuritycenterV1ResourceApplicationAttributesContactInfo>>,
+}
+
+impl common::Part for GoogleCloudSecuritycenterV1ResourceApplicationAttributes {}
+
+/// Contact information of stakeholders.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudSecuritycenterV1ResourceApplicationAttributesContactInfo {
+    /// Email address of the contacts.
+    pub email: Option<String>,
+}
+
+impl common::Part for GoogleCloudSecuritycenterV1ResourceApplicationAttributesContactInfo {}
+
+/// Criticality of the Application, Service, or Workload
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudSecuritycenterV1ResourceApplicationAttributesCriticality {
+    /// Criticality Type.
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+}
+
+impl common::Part for GoogleCloudSecuritycenterV1ResourceApplicationAttributesCriticality {}
+
+/// Environment of the Application, Service, or Workload
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudSecuritycenterV1ResourceApplicationAttributesEnvironment {
+    /// Environment Type.
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+}
+
+impl common::Part for GoogleCloudSecuritycenterV1ResourceApplicationAttributesEnvironment {}
 
 /// Resource for selecting resource type.
 ///
@@ -1908,22 +2428,22 @@ pub struct GoogleCloudSecuritycenterV1ResourceValueConfig {
     pub description: Option<String>,
     /// Name for the resource value configuration
     pub name: Option<String>,
-    /// List of resource labels to search for, evaluated with AND. For example, "resource_labels_selector": {"key": "value", "env": "prod"} will match resources with labels "key": "value" AND "env": "prod" https://cloud.google.com/resource-manager/docs/creating-managing-labels
+    /// List of resource labels to search for, evaluated with `AND`. For example, `"resource_labels_selector": {"key": "value", "env": "prod"}` will match resources with labels "key": "value" `AND` "env": "prod" https://cloud.google.com/resource-manager/docs/creating-managing-labels
     #[serde(rename = "resourceLabelsSelector")]
     pub resource_labels_selector: Option<HashMap<String, String>>,
-    /// Apply resource_value only to resources that match resource_type. resource_type will be checked with AND of other resources. For example, "storage.googleapis.com/Bucket" with resource_value "HIGH" will apply "HIGH" value only to "storage.googleapis.com/Bucket" resources.
+    /// Apply resource_value only to resources that match resource_type. resource_type will be checked with `AND` of other resources. For example, "storage.googleapis.com/Bucket" with resource_value "HIGH" will apply "HIGH" value only to "storage.googleapis.com/Bucket" resources.
     #[serde(rename = "resourceType")]
     pub resource_type: Option<String>,
     /// Required. Resource value level this expression represents
     #[serde(rename = "resourceValue")]
     pub resource_value: Option<String>,
-    /// Project or folder to scope this configuration to. For example, "project/456" would apply this configuration only to resources in "project/456" scope will be checked with AND of other resources.
+    /// Project or folder to scope this configuration to. For example, "project/456" would apply this configuration only to resources in "project/456" scope will be checked with `AND` of other resources.
     pub scope: Option<String>,
     /// A mapping of the sensitivity on Sensitive Data Protection finding to resource values. This mapping can only be used in combination with a resource_type that is related to BigQuery, e.g. "bigquery.googleapis.com/Dataset".
     #[serde(rename = "sensitiveDataProtectionMapping")]
     pub sensitive_data_protection_mapping:
         Option<GoogleCloudSecuritycenterV1SensitiveDataProtectionMapping>,
-    /// Required. Tag values combined with AND to check against. Values in the form "tagValues/123" Example: [ "tagValues/123", "tagValues/456", "tagValues/789" ] https://cloud.google.com/resource-manager/docs/tags/tags-creating-and-managing
+    /// Required. Tag values combined with `AND` to check against. For Google Cloud resources, they are tag value IDs in the form of "tagValues/123". Example: `[ "tagValues/123", "tagValues/456", "tagValues/789" ]` https://cloud.google.com/resource-manager/docs/tags/tags-creating-and-managing
     #[serde(rename = "tagValues")]
     pub tag_values: Option<Vec<String>>,
     /// Output only. Timestamp this resource value configuration was last updated.
@@ -1957,6 +2477,9 @@ pub struct GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule {
     /// Output only. If empty, indicates that the custom module was created in the organization, folder, or project in which you are viewing the custom module. Otherwise, `ancestor_module` specifies the organization or folder from which the custom module is inherited.
     #[serde(rename = "ancestorModule")]
     pub ancestor_module: Option<String>,
+    /// The cloud provider of the custom module.
+    #[serde(rename = "cloudProvider")]
+    pub cloud_provider: Option<String>,
     /// The user specified custom configuration for the module.
     #[serde(rename = "customConfig")]
     pub custom_config: Option<GoogleCloudSecuritycenterV1CustomConfig>,
@@ -2218,6 +2741,90 @@ pub struct Indicator {
 
 impl common::Part for Indicator {}
 
+/// Type of information detected by the API.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct InfoType {
+    /// Name of the information type. Either a name of your choosing when creating a CustomInfoType, or one of the names listed at https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference when specifying a built-in type. When sending Cloud DLP results to Data Catalog, infoType names should conform to the pattern `[A-Za-z0-9$_-]{1,64}`.
+    pub name: Option<String>,
+    /// Optional custom sensitivity for this InfoType. This only applies to data profiling.
+    #[serde(rename = "sensitivityScore")]
+    pub sensitivity_score: Option<SensitivityScore>,
+    /// Optional version name for this InfoType.
+    pub version: Option<String>,
+}
+
+impl common::Part for InfoType {}
+
+/// IP rule information.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct IpRule {
+    /// Optional. An optional list of ports to which this rule applies. This field is only applicable for the UDP or (S)TCP protocols. Each entry must be either an integer or a range including a min and max port number.
+    #[serde(rename = "portRanges")]
+    pub port_ranges: Option<Vec<PortRange>>,
+    /// The IP protocol this rule applies to. This value can either be one of the following well known protocol strings (TCP, UDP, ICMP, ESP, AH, IPIP, SCTP) or a string representation of the integer value.
+    pub protocol: Option<String>,
+}
+
+impl common::Part for IpRule {}
+
+/// IP rules associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct IpRules {
+    /// Tuple with allowed rules.
+    pub allowed: Option<Allowed>,
+    /// Tuple with denied rules.
+    pub denied: Option<Denied>,
+    /// If destination IP ranges are specified, the firewall rule applies only to traffic that has a destination IP address in these ranges. These ranges must be expressed in CIDR format. Only supports IPv4.
+    #[serde(rename = "destinationIpRanges")]
+    pub destination_ip_ranges: Option<Vec<String>>,
+    /// The direction that the rule is applicable to, one of ingress or egress.
+    pub direction: Option<String>,
+    /// Name of the network protocol service, such as FTP, that is exposed by the open port. Follows the naming convention available at: https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml.
+    #[serde(rename = "exposedServices")]
+    pub exposed_services: Option<Vec<String>>,
+    /// If source IP ranges are specified, the firewall rule applies only to traffic that has a source IP address in these ranges. These ranges must be expressed in CIDR format. Only supports IPv4.
+    #[serde(rename = "sourceIpRanges")]
+    pub source_ip_ranges: Option<Vec<String>>,
+}
+
+impl common::Part for IpRules {}
+
+/// Describes a job
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Job {
+    /// Optional. If the job did not complete successfully, this field describes why.
+    #[serde(rename = "errorCode")]
+    pub error_code: Option<i32>,
+    /// Optional. Gives the location where the job ran, such as `US` or `europe-west1`
+    pub location: Option<String>,
+    /// The fully-qualified name for a job. e.g. `projects//jobs/`
+    pub name: Option<String>,
+    /// Output only. State of the job, such as `RUNNING` or `PENDING`.
+    pub state: Option<String>,
+}
+
+impl common::Part for Job {}
+
 /// Kernel mode rootkit signatures.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2354,6 +2961,7 @@ impl common::Part for ListAssetsResult {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
+/// * [attack paths list organizations](OrganizationAttackPathListCall) (response)
 /// * [simulations attack exposure results attack paths list organizations](OrganizationSimulationAttackExposureResultAttackPathListCall) (response)
 /// * [simulations attack paths list organizations](OrganizationSimulationAttackPathListCall) (response)
 /// * [simulations valued resources attack paths list organizations](OrganizationSimulationValuedResourceAttackPathListCall) (response)
@@ -2574,11 +3182,8 @@ impl common::Part for ListFindingsResult {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
-/// * [locations mute configs list folders](FolderLocationMuteConfigListCall) (response)
 /// * [mute configs list folders](FolderMuteConfigListCall) (response)
-/// * [locations mute configs list organizations](OrganizationLocationMuteConfigListCall) (response)
 /// * [mute configs list organizations](OrganizationMuteConfigListCall) (response)
-/// * [locations mute configs list projects](ProjectLocationMuteConfigListCall) (response)
 /// * [mute configs list projects](ProjectMuteConfigListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
@@ -2635,6 +3240,8 @@ pub struct ListOperationsResponse {
     pub next_page_token: Option<String>,
     /// A list of operations that matches the specified filter in the request.
     pub operations: Option<Vec<Operation>>,
+    /// Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListOperationsResponse {}
@@ -2718,6 +3325,7 @@ impl common::ResponseResult for ListSourcesResponse {}
 ///
 /// * [simulations attack exposure results valued resources list organizations](OrganizationSimulationAttackExposureResultValuedResourceListCall) (response)
 /// * [simulations valued resources list organizations](OrganizationSimulationValuedResourceListCall) (response)
+/// * [valued resources list organizations](OrganizationValuedResourceListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -2806,6 +3414,38 @@ pub struct MitreAttack {
 }
 
 impl common::Part for MitreAttack {}
+
+/// Mute information about the finding, including whether the finding has a static mute or any matching dynamic mute rules.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MuteInfo {
+    /// The list of dynamic mute rules that currently match the finding.
+    #[serde(rename = "dynamicMuteRecords")]
+    pub dynamic_mute_records: Option<Vec<DynamicMuteRecord>>,
+    /// If set, the static mute applied to this finding. Static mutes override dynamic mutes. If unset, there is no static mute.
+    #[serde(rename = "staticMute")]
+    pub static_mute: Option<StaticMute>,
+}
+
+impl common::Part for MuteInfo {}
+
+/// Contains information about a VPC network associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Network {
+    /// The name of the VPC network resource, for example, `//compute.googleapis.com/projects/my-project/global/networks/my-network`.
+    pub name: Option<String>,
+}
+
+impl common::Part for Network {}
 
 /// Kubernetes nodes associated with the finding.
 ///
@@ -3021,7 +3661,7 @@ impl common::Part for Package {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct PathNodeAssociatedFinding {
-    /// Canonical name of the associated findings. Example: organizations/123/sources/456/findings/789
+    /// Canonical name of the associated findings. Example: `organizations/123/sources/456/findings/789`
     #[serde(rename = "canonicalFinding")]
     pub canonical_finding: Option<String>,
     /// The additional taxonomy group within findings from a given source.
@@ -3032,6 +3672,23 @@ pub struct PathNodeAssociatedFinding {
 }
 
 impl common::Part for PathNodeAssociatedFinding {}
+
+/// Vertex AI training pipeline associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Pipeline {
+    /// The user defined display name of pipeline, e.g. plants-classification
+    #[serde(rename = "displayName")]
+    pub display_name: Option<String>,
+    /// Resource name of the pipeline, e.g. projects/{project}/locations/{location}/trainingPipelines/5253428229225578496
+    pub name: Option<String>,
+}
+
+impl common::Part for Pipeline {}
 
 /// A Kubernetes Pod.
 ///
@@ -3100,6 +3757,24 @@ pub struct PolicyDriftDetails {
 
 impl common::Part for PolicyDriftDetails {}
 
+/// A port range which is inclusive of the min and max values. Values are between 0 and 2^16-1. The max can be equal / must be not smaller than the min value. If min and max are equal this indicates that it is a single port.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PortRange {
+    /// Maximum port value.
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub max: Option<i64>,
+    /// Minimum port value.
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub min: Option<i64>,
+}
+
+impl common::Part for PortRange {}
+
 /// A position in the uploaded text version of a module.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3108,10 +3783,10 @@ impl common::Part for PolicyDriftDetails {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Position {
-    /// no description provided
+    /// The column number.
     #[serde(rename = "columnNumber")]
     pub column_number: Option<i32>,
-    /// no description provided
+    /// The line number.
     #[serde(rename = "lineNumber")]
     pub line_number: Option<i32>,
 }
@@ -3152,6 +3827,10 @@ pub struct Process {
     pub pid: Option<i64>,
     /// When the process represents the invocation of a script, `binary` provides information about the interpreter, while `script` provides information about the script file provided to the interpreter.
     pub script: Option<File>,
+    /// The ID of the user that executed the process. E.g. If this is the root user this will always be 0.
+    #[serde(rename = "userId")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub user_id: Option<i64>,
 }
 
 impl common::Part for Process {}
@@ -3224,6 +3903,8 @@ impl common::Part for Requests {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Resource {
+    /// The App Hub application this resource belongs to.
+    pub application: Option<GoogleCloudSecuritycenterV1ResourceApplication>,
     /// The AWS metadata associated with the finding.
     #[serde(rename = "awsMetadata")]
     pub aws_metadata: Option<AwsMetadata>,
@@ -3259,7 +3940,7 @@ pub struct Resource {
     /// Provides the path to the resource within the resource hierarchy.
     #[serde(rename = "resourcePath")]
     pub resource_path: Option<ResourcePath>,
-    /// A string representation of the resource path. For Google Cloud, it has the format of org/{organization_id}/folder/{folder_id}/folder/{folder_id}/project/{project_id} where there can be any number of folders. For AWS, it has the format of org/{organization_id}/ou/{organizational_unit_id}/ou/{organizational_unit_id}/account/{account_id} where there can be any number of organizational units. For Azure, it has the format of mg/{management_group_id}/mg/{management_group_id}/subscription/{subscription_id}/rg/{resource_group_name} where there can be any number of management groups.
+    /// A string representation of the resource path. For Google Cloud, it has the format of `org/{organization_id}/folder/{folder_id}/folder/{folder_id}/project/{project_id}` where there can be any number of folders. For AWS, it has the format of `org/{organization_id}/ou/{organizational_unit_id}/ou/{organizational_unit_id}/account/{account_id}` where there can be any number of organizational units. For Azure, it has the format of `mg/{management_group_id}/mg/{management_group_id}/subscription/{subscription_id}/rg/{resource_group_name}` where there can be any number of management groups.
     #[serde(rename = "resourcePathString")]
     pub resource_path_string: Option<String>,
     /// The service or resource provider associated with the resource.
@@ -3495,6 +4176,20 @@ pub struct SecurityPosture {
 
 impl common::Part for SecurityPosture {}
 
+/// Score is calculated from of all elements in the data profile. A higher level means the data is more sensitive.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SensitivityScore {
+    /// The sensitivity score applied to the resource.
+    pub score: Option<String>,
+}
+
+impl common::Part for SensitivityScore {}
+
 /// Identity delegation history of an authenticated service account.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3527,7 +4222,7 @@ impl common::Part for ServiceAccountDelegationInfo {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SetFindingStateRequest {
-    /// Required. The time at which the updated state takes effect.
+    /// Optional. The time at which the updated state takes effect. If unset, defaults to the request time.
     #[serde(rename = "startTime")]
     pub start_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Required. The desired State of the finding.
@@ -3678,7 +4373,7 @@ pub struct Simulation {
     /// Output only. Time simulation was created
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
-    /// Full resource name of the Simulation: organizations/123/simulations/456
+    /// Full resource name of the Simulation: `organizations/123/simulations/456`
     pub name: Option<String>,
     /// Resource value configurations' metadata used in this simulation. Maximum of 100.
     #[serde(rename = "resourceValueConfigsMetadata")]
@@ -3715,6 +4410,23 @@ pub struct Source {
 
 impl common::RequestValue for Source {}
 impl common::ResponseResult for Source {}
+
+/// Information about the static mute state. A static mute state overrides any dynamic mute rules that apply to this finding. The static mute state can be set by a static mute rule or by muting the finding directly.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StaticMute {
+    /// When the static mute was applied.
+    #[serde(rename = "applyTime")]
+    pub apply_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The static mute state. If the value is `MUTED` or `UNMUTED`, then the finding's overall mute state will have the same value.
+    pub state: Option<String>,
+}
+
+impl common::Part for StaticMute {}
 
 /// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
 ///
@@ -3838,7 +4550,7 @@ pub struct ToxicCombination {
     /// The [Attack exposure score](https://cloud.google.com/security-command-center/docs/attack-exposure-learn#attack_exposure_scores) of this toxic combination. The score is a measure of how much this toxic combination exposes one or more high-value resources to potential attack.
     #[serde(rename = "attackExposureScore")]
     pub attack_exposure_score: Option<f64>,
-    /// List of resource names of findings associated with this toxic combination. For example, organizations/123/sources/456/findings/789.
+    /// List of resource names of findings associated with this toxic combination. For example, `organizations/123/sources/456/findings/789`.
     #[serde(rename = "relatedFindings")]
     pub related_findings: Option<Vec<String>>,
 }
@@ -3924,6 +4636,22 @@ pub struct ValuedResource {
 
 impl common::ResponseResult for ValuedResource {}
 
+/// Vertex AI-related information associated with the finding.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct VertexAi {
+    /// Datasets associated with the finding.
+    pub datasets: Option<Vec<Dataset>>,
+    /// Pipelines associated with the finding.
+    pub pipelines: Option<Vec<Pipeline>>,
+}
+
+impl common::Part for VertexAi {}
+
 /// Refers to common vulnerability fields e.g. cve, cvss, cwe etc.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3934,12 +4662,20 @@ impl common::ResponseResult for ValuedResource {}
 pub struct Vulnerability {
     /// CVE stands for Common Vulnerabilities and Exposures (https://cve.mitre.org/about/)
     pub cve: Option<Cve>,
+    /// Represents one or more Common Weakness Enumeration (CWE) information on this vulnerability.
+    pub cwes: Option<Vec<Cwe>>,
     /// The fixed package is relevant to the finding.
     #[serde(rename = "fixedPackage")]
     pub fixed_package: Option<Package>,
     /// The offending package is relevant to the finding.
     #[serde(rename = "offendingPackage")]
     pub offending_package: Option<Package>,
+    /// Provider provided risk_score based on multiple factors. The higher the risk score, the more risky the vulnerability is.
+    #[serde(rename = "providerRiskScore")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub provider_risk_score: Option<i64>,
+    /// Represents whether the vulnerability is reachable (detected via static analysis)
+    pub reachable: Option<bool>,
     /// The security bulletin is relevant to this finding.
     #[serde(rename = "securityBulletin")]
     pub security_bulletin: Option<SecurityBulletin>,
@@ -3982,9 +4718,20 @@ impl common::Part for YaraRuleSignature {}
 /// use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3995,12 +4742,12 @@ impl common::Part for YaraRuleSignature {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = SecurityCommandCenter::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `assets_group(...)`, `assets_list(...)`, `assets_update_security_marks(...)`, `big_query_exports_create(...)`, `big_query_exports_delete(...)`, `big_query_exports_get(...)`, `big_query_exports_list(...)`, `big_query_exports_patch(...)`, `event_threat_detection_settings_custom_modules_create(...)`, `event_threat_detection_settings_custom_modules_delete(...)`, `event_threat_detection_settings_custom_modules_get(...)`, `event_threat_detection_settings_custom_modules_list(...)`, `event_threat_detection_settings_custom_modules_list_descendant(...)`, `event_threat_detection_settings_custom_modules_patch(...)`, `event_threat_detection_settings_effective_custom_modules_get(...)`, `event_threat_detection_settings_effective_custom_modules_list(...)`, `event_threat_detection_settings_validate_custom_module(...)`, `findings_bulk_mute(...)`, `locations_mute_configs_create(...)`, `locations_mute_configs_delete(...)`, `locations_mute_configs_get(...)`, `locations_mute_configs_list(...)`, `locations_mute_configs_patch(...)`, `mute_configs_create(...)`, `mute_configs_delete(...)`, `mute_configs_get(...)`, `mute_configs_list(...)`, `mute_configs_patch(...)`, `notification_configs_create(...)`, `notification_configs_delete(...)`, `notification_configs_get(...)`, `notification_configs_list(...)`, `notification_configs_patch(...)`, `security_health_analytics_settings_custom_modules_create(...)`, `security_health_analytics_settings_custom_modules_delete(...)`, `security_health_analytics_settings_custom_modules_get(...)`, `security_health_analytics_settings_custom_modules_list(...)`, `security_health_analytics_settings_custom_modules_list_descendant(...)`, `security_health_analytics_settings_custom_modules_patch(...)`, `security_health_analytics_settings_custom_modules_simulate(...)`, `security_health_analytics_settings_effective_custom_modules_get(...)`, `security_health_analytics_settings_effective_custom_modules_list(...)`, `sources_findings_external_systems_patch(...)`, `sources_findings_group(...)`, `sources_findings_list(...)`, `sources_findings_patch(...)`, `sources_findings_set_mute(...)`, `sources_findings_set_state(...)`, `sources_findings_update_security_marks(...)` and `sources_list(...)`
+/// // like `assets_group(...)`, `assets_list(...)`, `assets_update_security_marks(...)`, `big_query_exports_create(...)`, `big_query_exports_delete(...)`, `big_query_exports_get(...)`, `big_query_exports_list(...)`, `big_query_exports_patch(...)`, `event_threat_detection_settings_custom_modules_create(...)`, `event_threat_detection_settings_custom_modules_delete(...)`, `event_threat_detection_settings_custom_modules_get(...)`, `event_threat_detection_settings_custom_modules_list(...)`, `event_threat_detection_settings_custom_modules_list_descendant(...)`, `event_threat_detection_settings_custom_modules_patch(...)`, `event_threat_detection_settings_effective_custom_modules_get(...)`, `event_threat_detection_settings_effective_custom_modules_list(...)`, `event_threat_detection_settings_validate_custom_module(...)`, `findings_bulk_mute(...)`, `locations_mute_configs_delete(...)`, `locations_mute_configs_get(...)`, `locations_mute_configs_patch(...)`, `mute_configs_create(...)`, `mute_configs_delete(...)`, `mute_configs_get(...)`, `mute_configs_list(...)`, `mute_configs_patch(...)`, `notification_configs_create(...)`, `notification_configs_delete(...)`, `notification_configs_get(...)`, `notification_configs_list(...)`, `notification_configs_patch(...)`, `security_health_analytics_settings_custom_modules_create(...)`, `security_health_analytics_settings_custom_modules_delete(...)`, `security_health_analytics_settings_custom_modules_get(...)`, `security_health_analytics_settings_custom_modules_list(...)`, `security_health_analytics_settings_custom_modules_list_descendant(...)`, `security_health_analytics_settings_custom_modules_patch(...)`, `security_health_analytics_settings_custom_modules_simulate(...)`, `security_health_analytics_settings_effective_custom_modules_get(...)`, `security_health_analytics_settings_effective_custom_modules_list(...)`, `sources_findings_external_systems_patch(...)`, `sources_findings_group(...)`, `sources_findings_list(...)`, `sources_findings_patch(...)`, `sources_findings_set_mute(...)`, `sources_findings_set_state(...)`, `sources_findings_update_security_marks(...)` and `sources_list(...)`
 /// // to build up your call.
 /// let rb = hub.folders();
 /// # }
@@ -4022,7 +4769,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. The name of the parent to group the assets by. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn assets_group(
         &self,
         request: GroupAssetsRequest,
@@ -4044,7 +4791,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn assets_list(&self, parent: &str) -> FolderAssetListCall<'a, C> {
         FolderAssetListCall {
             hub: self.hub,
@@ -4094,7 +4841,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. The name of the parent resource of the new BigQuery export. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn big_query_exports_create(
         &self,
         request: GoogleCloudSecuritycenterV1BigQueryExport,
@@ -4117,7 +4864,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// * `name` - Required. The name of the BigQuery export to delete. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     pub fn big_query_exports_delete(&self, name: &str) -> FolderBigQueryExportDeleteCall<'a, C> {
         FolderBigQueryExportDeleteCall {
             hub: self.hub,
@@ -4134,7 +4881,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// * `name` - Required. Name of the BigQuery export to retrieve. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     pub fn big_query_exports_get(&self, name: &str) -> FolderBigQueryExportGetCall<'a, C> {
         FolderBigQueryExportGetCall {
             hub: self.hub,
@@ -4151,7 +4898,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns the collection of BigQuery exports. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// * `parent` - Required. The parent, which owns the collection of BigQuery exports. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     pub fn big_query_exports_list(&self, parent: &str) -> FolderBigQueryExportListCall<'a, C> {
         FolderBigQueryExportListCall {
             hub: self.hub,
@@ -4195,7 +4942,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. The new custom module's parent. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_custom_modules_create(
         &self,
         request: EventThreatDetectionCustomModule,
@@ -4217,7 +4964,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// * `name` - Required. Name of the custom module to delete. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub fn event_threat_detection_settings_custom_modules_delete(
         &self,
         name: &str,
@@ -4237,7 +4984,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// * `name` - Required. Name of the custom module to get. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub fn event_threat_detection_settings_custom_modules_get(
         &self,
         name: &str,
@@ -4257,7 +5004,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_custom_modules_list(
         &self,
         parent: &str,
@@ -4279,7 +5026,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_custom_modules_list_descendant(
         &self,
         parent: &str,
@@ -4302,7 +5049,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// * `name` - Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub fn event_threat_detection_settings_custom_modules_patch(
         &self,
         request: EventThreatDetectionCustomModule,
@@ -4325,7 +5072,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}".
+    /// * `name` - Required. The resource name of the effective Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`.
     pub fn event_threat_detection_settings_effective_custom_modules_get(
         &self,
         name: &str,
@@ -4345,7 +5092,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Name of the parent to list custom modules for. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_effective_custom_modules_list(
         &self,
         parent: &str,
@@ -4368,7 +5115,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Resource name of the parent to validate the Custom Module under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_validate_custom_module(
         &self,
         request: ValidateEventThreatDetectionCustomModuleRequest,
@@ -4391,7 +5138,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// * `parent` - Required. The parent, at which bulk action needs to be applied. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     pub fn findings_bulk_mute(
         &self,
         request: BulkMuteFindingsRequest,
@@ -4409,35 +5156,11 @@ impl<'a, C> FolderMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a mute config.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
-    pub fn locations_mute_configs_create(
-        &self,
-        request: GoogleCloudSecuritycenterV1MuteConfig,
-        parent: &str,
-    ) -> FolderLocationMuteConfigCreateCall<'a, C> {
-        FolderLocationMuteConfigCreateCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _mute_config_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Deletes an existing mute config.
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn locations_mute_configs_delete(
         &self,
         name: &str,
@@ -4457,33 +5180,11 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn locations_mute_configs_get(&self, name: &str) -> FolderLocationMuteConfigGetCall<'a, C> {
         FolderLocationMuteConfigGetCall {
             hub: self.hub,
             _name: name.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists mute configs.
-    ///
-    /// # Arguments
-    ///
-    /// * `parent` - Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
-    pub fn locations_mute_configs_list(
-        &self,
-        parent: &str,
-    ) -> FolderLocationMuteConfigListCall<'a, C> {
-        FolderLocationMuteConfigListCall {
-            hub: self.hub,
-            _parent: parent.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -4497,7 +5198,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// * `name` - This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     pub fn locations_mute_configs_patch(
         &self,
         request: GoogleCloudSecuritycenterV1MuteConfig,
@@ -4521,7 +5222,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. Resource name of the new mute configs's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn mute_configs_create(
         &self,
         request: GoogleCloudSecuritycenterV1MuteConfig,
@@ -4544,7 +5245,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn mute_configs_delete(&self, name: &str) -> FolderMuteConfigDeleteCall<'a, C> {
         FolderMuteConfigDeleteCall {
             hub: self.hub,
@@ -4561,7 +5262,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn mute_configs_get(&self, name: &str) -> FolderMuteConfigGetCall<'a, C> {
         FolderMuteConfigGetCall {
             hub: self.hub,
@@ -4578,7 +5279,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// * `parent` - Required. The parent, which owns the collection of mute configs. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     pub fn mute_configs_list(&self, parent: &str) -> FolderMuteConfigListCall<'a, C> {
         FolderMuteConfigListCall {
             hub: self.hub,
@@ -4598,7 +5299,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// * `name` - This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     pub fn mute_configs_patch(
         &self,
         request: GoogleCloudSecuritycenterV1MuteConfig,
@@ -4622,7 +5323,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. Resource name of the new notification config's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn notification_configs_create(
         &self,
         request: NotificationConfig,
@@ -4645,7 +5346,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// * `name` - Required. Name of the notification config to delete. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     pub fn notification_configs_delete(
         &self,
         name: &str,
@@ -4665,7 +5366,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// * `name` - Required. Name of the notification config to get. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     pub fn notification_configs_get(&self, name: &str) -> FolderNotificationConfigGetCall<'a, C> {
         FolderNotificationConfigGetCall {
             hub: self.hub,
@@ -4729,7 +5430,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Resource name of the new custom module's parent. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_custom_modules_create(
         &self,
         request: GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule,
@@ -4751,7 +5452,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// * `name` - Required. Name of the custom module to delete. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     pub fn security_health_analytics_settings_custom_modules_delete(
         &self,
         name: &str,
@@ -4771,7 +5472,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// * `name` - Required. Name of the custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     pub fn security_health_analytics_settings_custom_modules_get(
         &self,
         name: &str,
@@ -4791,7 +5492,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Name of parent to list custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_custom_modules_list(
         &self,
         parent: &str,
@@ -4813,7 +5514,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Name of parent to list descendant custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_custom_modules_list_descendant(
         &self,
         parent: &str,
@@ -4882,7 +5583,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}"
+    /// * `name` - Required. Name of the effective custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`
     pub fn security_health_analytics_settings_effective_custom_modules_get(
         &self,
         name: &str,
@@ -4902,7 +5603,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Name of parent to list effective custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_effective_custom_modules_list(
         &self,
         parent: &str,
@@ -4949,7 +5650,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Name of the source to groupBy. Its format is "organizations/[organization_id]/sources/[source_id]", folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]. To groupBy across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-, or projects/{project_id}/sources/-
+    /// * `parent` - Required. Name of the source to groupBy. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To groupBy across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-`, or `projects/{project_id}/sources/-`
     pub fn sources_findings_group(
         &self,
         request: GroupFindingsRequest,
@@ -4971,7 +5672,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the source the findings belong to. Its format is "organizations/[organization_id]/sources/[source_id], folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]". To list across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/- or projects/{projects_id}/sources/-
+    /// * `parent` - Required. Name of the source the findings belong to. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To list across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-`, `folders/{folder_id}/sources/-` or `projects/{projects_id}/sources/-`
     pub fn sources_findings_list(&self, parent: &str) -> FolderSourceFindingListCall<'a, C> {
         FolderSourceFindingListCall {
             hub: self.hub,
@@ -5020,7 +5721,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     pub fn sources_findings_set_mute(
         &self,
         request: SetMuteRequest,
@@ -5043,7 +5744,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     pub fn sources_findings_set_state(
         &self,
         request: SetFindingStateRequest,
@@ -5090,7 +5791,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. Resource name of the parent of sources to list. Its format should be `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn sources_list(&self, parent: &str) -> FolderSourceListCall<'a, C> {
         FolderSourceListCall {
             hub: self.hub,
@@ -5120,9 +5821,20 @@ impl<'a, C> FolderMethods<'a, C> {
 /// use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -5133,12 +5845,12 @@ impl<'a, C> FolderMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = SecurityCommandCenter::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `assets_group(...)`, `assets_list(...)`, `assets_run_discovery(...)`, `assets_update_security_marks(...)`, `big_query_exports_create(...)`, `big_query_exports_delete(...)`, `big_query_exports_get(...)`, `big_query_exports_list(...)`, `big_query_exports_patch(...)`, `event_threat_detection_settings_custom_modules_create(...)`, `event_threat_detection_settings_custom_modules_delete(...)`, `event_threat_detection_settings_custom_modules_get(...)`, `event_threat_detection_settings_custom_modules_list(...)`, `event_threat_detection_settings_custom_modules_list_descendant(...)`, `event_threat_detection_settings_custom_modules_patch(...)`, `event_threat_detection_settings_effective_custom_modules_get(...)`, `event_threat_detection_settings_effective_custom_modules_list(...)`, `event_threat_detection_settings_validate_custom_module(...)`, `findings_bulk_mute(...)`, `get_organization_settings(...)`, `locations_mute_configs_create(...)`, `locations_mute_configs_delete(...)`, `locations_mute_configs_get(...)`, `locations_mute_configs_list(...)`, `locations_mute_configs_patch(...)`, `mute_configs_create(...)`, `mute_configs_delete(...)`, `mute_configs_get(...)`, `mute_configs_list(...)`, `mute_configs_patch(...)`, `notification_configs_create(...)`, `notification_configs_delete(...)`, `notification_configs_get(...)`, `notification_configs_list(...)`, `notification_configs_patch(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)`, `resource_value_configs_batch_create(...)`, `resource_value_configs_delete(...)`, `resource_value_configs_get(...)`, `resource_value_configs_list(...)`, `resource_value_configs_patch(...)`, `security_health_analytics_settings_custom_modules_create(...)`, `security_health_analytics_settings_custom_modules_delete(...)`, `security_health_analytics_settings_custom_modules_get(...)`, `security_health_analytics_settings_custom_modules_list(...)`, `security_health_analytics_settings_custom_modules_list_descendant(...)`, `security_health_analytics_settings_custom_modules_patch(...)`, `security_health_analytics_settings_custom_modules_simulate(...)`, `security_health_analytics_settings_effective_custom_modules_get(...)`, `security_health_analytics_settings_effective_custom_modules_list(...)`, `simulations_attack_exposure_results_attack_paths_list(...)`, `simulations_attack_exposure_results_valued_resources_list(...)`, `simulations_attack_paths_list(...)`, `simulations_get(...)`, `simulations_valued_resources_attack_paths_list(...)`, `simulations_valued_resources_get(...)`, `simulations_valued_resources_list(...)`, `sources_create(...)`, `sources_findings_create(...)`, `sources_findings_external_systems_patch(...)`, `sources_findings_group(...)`, `sources_findings_list(...)`, `sources_findings_patch(...)`, `sources_findings_set_mute(...)`, `sources_findings_set_state(...)`, `sources_findings_update_security_marks(...)`, `sources_get(...)`, `sources_get_iam_policy(...)`, `sources_list(...)`, `sources_patch(...)`, `sources_set_iam_policy(...)`, `sources_test_iam_permissions(...)` and `update_organization_settings(...)`
+/// // like `assets_group(...)`, `assets_list(...)`, `assets_run_discovery(...)`, `assets_update_security_marks(...)`, `attack_paths_list(...)`, `big_query_exports_create(...)`, `big_query_exports_delete(...)`, `big_query_exports_get(...)`, `big_query_exports_list(...)`, `big_query_exports_patch(...)`, `event_threat_detection_settings_custom_modules_create(...)`, `event_threat_detection_settings_custom_modules_delete(...)`, `event_threat_detection_settings_custom_modules_get(...)`, `event_threat_detection_settings_custom_modules_list(...)`, `event_threat_detection_settings_custom_modules_list_descendant(...)`, `event_threat_detection_settings_custom_modules_patch(...)`, `event_threat_detection_settings_effective_custom_modules_get(...)`, `event_threat_detection_settings_effective_custom_modules_list(...)`, `event_threat_detection_settings_validate_custom_module(...)`, `findings_bulk_mute(...)`, `get_organization_settings(...)`, `locations_mute_configs_delete(...)`, `locations_mute_configs_get(...)`, `locations_mute_configs_patch(...)`, `mute_configs_create(...)`, `mute_configs_delete(...)`, `mute_configs_get(...)`, `mute_configs_list(...)`, `mute_configs_patch(...)`, `notification_configs_create(...)`, `notification_configs_delete(...)`, `notification_configs_get(...)`, `notification_configs_list(...)`, `notification_configs_patch(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)`, `resource_value_configs_batch_create(...)`, `resource_value_configs_delete(...)`, `resource_value_configs_get(...)`, `resource_value_configs_list(...)`, `resource_value_configs_patch(...)`, `security_health_analytics_settings_custom_modules_create(...)`, `security_health_analytics_settings_custom_modules_delete(...)`, `security_health_analytics_settings_custom_modules_get(...)`, `security_health_analytics_settings_custom_modules_list(...)`, `security_health_analytics_settings_custom_modules_list_descendant(...)`, `security_health_analytics_settings_custom_modules_patch(...)`, `security_health_analytics_settings_custom_modules_simulate(...)`, `security_health_analytics_settings_effective_custom_modules_get(...)`, `security_health_analytics_settings_effective_custom_modules_list(...)`, `simulations_attack_exposure_results_attack_paths_list(...)`, `simulations_attack_exposure_results_valued_resources_list(...)`, `simulations_attack_paths_list(...)`, `simulations_get(...)`, `simulations_valued_resources_attack_paths_list(...)`, `simulations_valued_resources_get(...)`, `simulations_valued_resources_list(...)`, `sources_create(...)`, `sources_findings_create(...)`, `sources_findings_external_systems_patch(...)`, `sources_findings_group(...)`, `sources_findings_list(...)`, `sources_findings_patch(...)`, `sources_findings_set_mute(...)`, `sources_findings_set_state(...)`, `sources_findings_update_security_marks(...)`, `sources_get(...)`, `sources_get_iam_policy(...)`, `sources_list(...)`, `sources_patch(...)`, `sources_set_iam_policy(...)`, `sources_test_iam_permissions(...)`, `update_organization_settings(...)` and `valued_resources_list(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
@@ -5160,7 +5872,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. The name of the parent to group the assets by. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn assets_group(
         &self,
         request: GroupAssetsRequest,
@@ -5182,7 +5894,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn assets_list(&self, parent: &str) -> OrganizationAssetListCall<'a, C> {
         OrganizationAssetListCall {
             hub: self.hub,
@@ -5207,7 +5919,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Name of the organization to run asset discovery for. Its format is "organizations/[organization_id]".
+    /// * `parent` - Required. Name of the organization to run asset discovery for. Its format is `organizations/[organization_id]`.
     pub fn assets_run_discovery(
         &self,
         request: RunAssetDiscoveryRequest,
@@ -5250,12 +5962,32 @@ impl<'a, C> OrganizationMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists the attack paths for a set of simulation results or valued resources and filter.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
+    pub fn attack_paths_list(&self, parent: &str) -> OrganizationAttackPathListCall<'a, C> {
+        OrganizationAttackPathListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a BigQuery export.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. The name of the parent resource of the new BigQuery export. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn big_query_exports_create(
         &self,
         request: GoogleCloudSecuritycenterV1BigQueryExport,
@@ -5278,7 +6010,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// * `name` - Required. The name of the BigQuery export to delete. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     pub fn big_query_exports_delete(
         &self,
         name: &str,
@@ -5298,7 +6030,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// * `name` - Required. Name of the BigQuery export to retrieve. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     pub fn big_query_exports_get(&self, name: &str) -> OrganizationBigQueryExportGetCall<'a, C> {
         OrganizationBigQueryExportGetCall {
             hub: self.hub,
@@ -5315,7 +6047,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns the collection of BigQuery exports. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// * `parent` - Required. The parent, which owns the collection of BigQuery exports. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     pub fn big_query_exports_list(
         &self,
         parent: &str,
@@ -5362,7 +6094,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. The new custom module's parent. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_custom_modules_create(
         &self,
         request: EventThreatDetectionCustomModule,
@@ -5384,7 +6116,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// * `name` - Required. Name of the custom module to delete. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub fn event_threat_detection_settings_custom_modules_delete(
         &self,
         name: &str,
@@ -5404,7 +6136,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// * `name` - Required. Name of the custom module to get. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub fn event_threat_detection_settings_custom_modules_get(
         &self,
         name: &str,
@@ -5424,7 +6156,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_custom_modules_list(
         &self,
         parent: &str,
@@ -5446,7 +6178,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_custom_modules_list_descendant(
         &self,
         parent: &str,
@@ -5469,7 +6201,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// * `name` - Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub fn event_threat_detection_settings_custom_modules_patch(
         &self,
         request: EventThreatDetectionCustomModule,
@@ -5492,7 +6224,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}".
+    /// * `name` - Required. The resource name of the effective Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`.
     pub fn event_threat_detection_settings_effective_custom_modules_get(
         &self,
         name: &str,
@@ -5512,7 +6244,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Name of the parent to list custom modules for. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_effective_custom_modules_list(
         &self,
         parent: &str,
@@ -5535,7 +6267,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Resource name of the parent to validate the Custom Module under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_validate_custom_module(
         &self,
         request: ValidateEventThreatDetectionCustomModuleRequest,
@@ -5558,7 +6290,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// * `parent` - Required. The parent, at which bulk action needs to be applied. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     pub fn findings_bulk_mute(
         &self,
         request: BulkMuteFindingsRequest,
@@ -5576,35 +6308,11 @@ impl<'a, C> OrganizationMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a mute config.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
-    pub fn locations_mute_configs_create(
-        &self,
-        request: GoogleCloudSecuritycenterV1MuteConfig,
-        parent: &str,
-    ) -> OrganizationLocationMuteConfigCreateCall<'a, C> {
-        OrganizationLocationMuteConfigCreateCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _mute_config_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Deletes an existing mute config.
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn locations_mute_configs_delete(
         &self,
         name: &str,
@@ -5624,7 +6332,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn locations_mute_configs_get(
         &self,
         name: &str,
@@ -5640,34 +6348,12 @@ impl<'a, C> OrganizationMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists mute configs.
-    ///
-    /// # Arguments
-    ///
-    /// * `parent` - Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
-    pub fn locations_mute_configs_list(
-        &self,
-        parent: &str,
-    ) -> OrganizationLocationMuteConfigListCall<'a, C> {
-        OrganizationLocationMuteConfigListCall {
-            hub: self.hub,
-            _parent: parent.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Updates a mute config.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// * `name` - This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     pub fn locations_mute_configs_patch(
         &self,
         request: GoogleCloudSecuritycenterV1MuteConfig,
@@ -5691,7 +6377,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. Resource name of the new mute configs's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn mute_configs_create(
         &self,
         request: GoogleCloudSecuritycenterV1MuteConfig,
@@ -5714,7 +6400,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn mute_configs_delete(&self, name: &str) -> OrganizationMuteConfigDeleteCall<'a, C> {
         OrganizationMuteConfigDeleteCall {
             hub: self.hub,
@@ -5731,7 +6417,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn mute_configs_get(&self, name: &str) -> OrganizationMuteConfigGetCall<'a, C> {
         OrganizationMuteConfigGetCall {
             hub: self.hub,
@@ -5748,7 +6434,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// * `parent` - Required. The parent, which owns the collection of mute configs. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     pub fn mute_configs_list(&self, parent: &str) -> OrganizationMuteConfigListCall<'a, C> {
         OrganizationMuteConfigListCall {
             hub: self.hub,
@@ -5768,7 +6454,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// * `name` - This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     pub fn mute_configs_patch(
         &self,
         request: GoogleCloudSecuritycenterV1MuteConfig,
@@ -5792,7 +6478,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. Resource name of the new notification config's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn notification_configs_create(
         &self,
         request: NotificationConfig,
@@ -5815,7 +6501,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// * `name` - Required. Name of the notification config to delete. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     pub fn notification_configs_delete(
         &self,
         name: &str,
@@ -5835,7 +6521,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// * `name` - Required. Name of the notification config to get. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     pub fn notification_configs_get(
         &self,
         name: &str,
@@ -5897,7 +6583,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
     ///
     /// # Arguments
     ///
@@ -5957,6 +6643,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
         OrganizationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
@@ -6015,7 +6702,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the resource value config to retrieve. Its format is organizations/{organization}/resourceValueConfigs/{config_id}.
+    /// * `name` - Required. Name of the resource value config to retrieve. Its format is `organizations/{organization}/resourceValueConfigs/{config_id}`.
     pub fn resource_value_configs_get(
         &self,
         name: &str,
@@ -6035,7 +6722,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns the collection of resource value configs. Its format is "organizations/[organization_id]"
+    /// * `parent` - Required. The parent, which owns the collection of resource value configs. Its format is `organizations/[organization_id]`
     pub fn resource_value_configs_list(
         &self,
         parent: &str,
@@ -6082,7 +6769,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Resource name of the new custom module's parent. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_custom_modules_create(
         &self,
         request: GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule,
@@ -6104,7 +6791,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// * `name` - Required. Name of the custom module to delete. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     pub fn security_health_analytics_settings_custom_modules_delete(
         &self,
         name: &str,
@@ -6124,7 +6811,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// * `name` - Required. Name of the custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     pub fn security_health_analytics_settings_custom_modules_get(
         &self,
         name: &str,
@@ -6144,7 +6831,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Name of parent to list custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_custom_modules_list(
         &self,
         parent: &str,
@@ -6166,7 +6853,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Name of parent to list descendant custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_custom_modules_list_descendant(
         &self,
         parent: &str,
@@ -6235,7 +6922,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}"
+    /// * `name` - Required. Name of the effective custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`
     pub fn security_health_analytics_settings_effective_custom_modules_get(
         &self,
         name: &str,
@@ -6255,7 +6942,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Name of parent to list effective custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_effective_custom_modules_list(
         &self,
         parent: &str,
@@ -6277,7 +6964,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}"
+    /// * `parent` - Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
     pub fn simulations_attack_exposure_results_attack_paths_list(
         &self,
         parent: &str,
@@ -6300,7 +6987,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list valued resources. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}"
+    /// * `parent` - Required. Name of parent to list valued resources. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}`
     pub fn simulations_attack_exposure_results_valued_resources_list(
         &self,
         parent: &str,
@@ -6324,7 +7011,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}"
+    /// * `parent` - Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
     pub fn simulations_attack_paths_list(
         &self,
         parent: &str,
@@ -6347,7 +7034,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}"
+    /// * `parent` - Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
     pub fn simulations_valued_resources_attack_paths_list(
         &self,
         parent: &str,
@@ -6370,7 +7057,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The name of this valued resource Valid format: "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}"
+    /// * `name` - Required. The name of this valued resource Valid format: `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
     pub fn simulations_valued_resources_get(
         &self,
         name: &str,
@@ -6390,7 +7077,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list valued resources. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}"
+    /// * `parent` - Required. Name of parent to list valued resources. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}`
     pub fn simulations_valued_resources_list(
         &self,
         parent: &str,
@@ -6414,7 +7101,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The organization name or simulation name of this simulation Valid format: "organizations/{organization}/simulations/latest" "organizations/{organization}/simulations/{simulation}"
+    /// * `name` - Required. The organization name or simulation name of this simulation Valid format: `organizations/{organization}/simulations/latest` `organizations/{organization}/simulations/{simulation}`
     pub fn simulations_get(&self, name: &str) -> OrganizationSimulationGetCall<'a, C> {
         OrganizationSimulationGetCall {
             hub: self.hub,
@@ -6456,7 +7143,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new finding's parent. Its format should be "organizations/[organization_id]/sources/[source_id]".
+    /// * `parent` - Required. Resource name of the new finding's parent. Its format should be `organizations/[organization_id]/sources/[source_id]`.
     pub fn sources_findings_create(
         &self,
         request: Finding,
@@ -6480,7 +7167,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Name of the source to groupBy. Its format is "organizations/[organization_id]/sources/[source_id]", folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]. To groupBy across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-, or projects/{project_id}/sources/-
+    /// * `parent` - Required. Name of the source to groupBy. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To groupBy across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-`, or `projects/{project_id}/sources/-`
     pub fn sources_findings_group(
         &self,
         request: GroupFindingsRequest,
@@ -6502,7 +7189,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the source the findings belong to. Its format is "organizations/[organization_id]/sources/[source_id], folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]". To list across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/- or projects/{projects_id}/sources/-
+    /// * `parent` - Required. Name of the source the findings belong to. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To list across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-`, `folders/{folder_id}/sources/-` or `projects/{projects_id}/sources/-`
     pub fn sources_findings_list(&self, parent: &str) -> OrganizationSourceFindingListCall<'a, C> {
         OrganizationSourceFindingListCall {
             hub: self.hub,
@@ -6551,7 +7238,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     pub fn sources_findings_set_mute(
         &self,
         request: SetMuteRequest,
@@ -6574,7 +7261,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     pub fn sources_findings_set_state(
         &self,
         request: SetFindingStateRequest,
@@ -6622,7 +7309,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new source's parent. Its format should be "organizations/[organization_id]".
+    /// * `parent` - Required. Resource name of the new source's parent. Its format should be `organizations/[organization_id]`.
     pub fn sources_create(
         &self,
         request: Source,
@@ -6644,7 +7331,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Relative resource name of the source. Its format is "organizations/[organization_id]/source/[source_id]".
+    /// * `name` - Required. Relative resource name of the source. Its format is `organizations/[organization_id]/source/[source_id]`.
     pub fn sources_get(&self, name: &str) -> OrganizationSourceGetCall<'a, C> {
         OrganizationSourceGetCall {
             hub: self.hub,
@@ -6684,7 +7371,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. Resource name of the parent of sources to list. Its format should be `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn sources_list(&self, parent: &str) -> OrganizationSourceListCall<'a, C> {
         OrganizationSourceListCall {
             hub: self.hub,
@@ -6765,11 +7452,32 @@ impl<'a, C> OrganizationMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists the valued resources for a set of simulation results and filter.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. Name of parent to list valued resources. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}`
+    pub fn valued_resources_list(&self, parent: &str) -> OrganizationValuedResourceListCall<'a, C> {
+        OrganizationValuedResourceListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets the settings for an organization.
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the organization to get organization settings for. Its format is "organizations/[organization_id]/organizationSettings".
+    /// * `name` - Required. Name of the organization to get organization settings for. Its format is `organizations/[organization_id]/organizationSettings`.
     pub fn get_organization_settings(
         &self,
         name: &str,
@@ -6824,9 +7532,20 @@ impl<'a, C> OrganizationMethods<'a, C> {
 /// use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -6837,12 +7556,12 @@ impl<'a, C> OrganizationMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = SecurityCommandCenter::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `assets_group(...)`, `assets_list(...)`, `assets_update_security_marks(...)`, `big_query_exports_create(...)`, `big_query_exports_delete(...)`, `big_query_exports_get(...)`, `big_query_exports_list(...)`, `big_query_exports_patch(...)`, `event_threat_detection_settings_custom_modules_create(...)`, `event_threat_detection_settings_custom_modules_delete(...)`, `event_threat_detection_settings_custom_modules_get(...)`, `event_threat_detection_settings_custom_modules_list(...)`, `event_threat_detection_settings_custom_modules_list_descendant(...)`, `event_threat_detection_settings_custom_modules_patch(...)`, `event_threat_detection_settings_effective_custom_modules_get(...)`, `event_threat_detection_settings_effective_custom_modules_list(...)`, `event_threat_detection_settings_validate_custom_module(...)`, `findings_bulk_mute(...)`, `locations_mute_configs_create(...)`, `locations_mute_configs_delete(...)`, `locations_mute_configs_get(...)`, `locations_mute_configs_list(...)`, `locations_mute_configs_patch(...)`, `mute_configs_create(...)`, `mute_configs_delete(...)`, `mute_configs_get(...)`, `mute_configs_list(...)`, `mute_configs_patch(...)`, `notification_configs_create(...)`, `notification_configs_delete(...)`, `notification_configs_get(...)`, `notification_configs_list(...)`, `notification_configs_patch(...)`, `security_health_analytics_settings_custom_modules_create(...)`, `security_health_analytics_settings_custom_modules_delete(...)`, `security_health_analytics_settings_custom_modules_get(...)`, `security_health_analytics_settings_custom_modules_list(...)`, `security_health_analytics_settings_custom_modules_list_descendant(...)`, `security_health_analytics_settings_custom_modules_patch(...)`, `security_health_analytics_settings_custom_modules_simulate(...)`, `security_health_analytics_settings_effective_custom_modules_get(...)`, `security_health_analytics_settings_effective_custom_modules_list(...)`, `sources_findings_external_systems_patch(...)`, `sources_findings_group(...)`, `sources_findings_list(...)`, `sources_findings_patch(...)`, `sources_findings_set_mute(...)`, `sources_findings_set_state(...)`, `sources_findings_update_security_marks(...)` and `sources_list(...)`
+/// // like `assets_group(...)`, `assets_list(...)`, `assets_update_security_marks(...)`, `big_query_exports_create(...)`, `big_query_exports_delete(...)`, `big_query_exports_get(...)`, `big_query_exports_list(...)`, `big_query_exports_patch(...)`, `event_threat_detection_settings_custom_modules_create(...)`, `event_threat_detection_settings_custom_modules_delete(...)`, `event_threat_detection_settings_custom_modules_get(...)`, `event_threat_detection_settings_custom_modules_list(...)`, `event_threat_detection_settings_custom_modules_list_descendant(...)`, `event_threat_detection_settings_custom_modules_patch(...)`, `event_threat_detection_settings_effective_custom_modules_get(...)`, `event_threat_detection_settings_effective_custom_modules_list(...)`, `event_threat_detection_settings_validate_custom_module(...)`, `findings_bulk_mute(...)`, `locations_mute_configs_delete(...)`, `locations_mute_configs_get(...)`, `locations_mute_configs_patch(...)`, `mute_configs_create(...)`, `mute_configs_delete(...)`, `mute_configs_get(...)`, `mute_configs_list(...)`, `mute_configs_patch(...)`, `notification_configs_create(...)`, `notification_configs_delete(...)`, `notification_configs_get(...)`, `notification_configs_list(...)`, `notification_configs_patch(...)`, `security_health_analytics_settings_custom_modules_create(...)`, `security_health_analytics_settings_custom_modules_delete(...)`, `security_health_analytics_settings_custom_modules_get(...)`, `security_health_analytics_settings_custom_modules_list(...)`, `security_health_analytics_settings_custom_modules_list_descendant(...)`, `security_health_analytics_settings_custom_modules_patch(...)`, `security_health_analytics_settings_custom_modules_simulate(...)`, `security_health_analytics_settings_effective_custom_modules_get(...)`, `security_health_analytics_settings_effective_custom_modules_list(...)`, `sources_findings_external_systems_patch(...)`, `sources_findings_group(...)`, `sources_findings_list(...)`, `sources_findings_patch(...)`, `sources_findings_set_mute(...)`, `sources_findings_set_state(...)`, `sources_findings_update_security_marks(...)` and `sources_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -6864,7 +7583,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. The name of the parent to group the assets by. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn assets_group(
         &self,
         request: GroupAssetsRequest,
@@ -6886,7 +7605,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn assets_list(&self, parent: &str) -> ProjectAssetListCall<'a, C> {
         ProjectAssetListCall {
             hub: self.hub,
@@ -6936,7 +7655,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. The name of the parent resource of the new BigQuery export. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn big_query_exports_create(
         &self,
         request: GoogleCloudSecuritycenterV1BigQueryExport,
@@ -6959,7 +7678,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// * `name` - Required. The name of the BigQuery export to delete. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     pub fn big_query_exports_delete(&self, name: &str) -> ProjectBigQueryExportDeleteCall<'a, C> {
         ProjectBigQueryExportDeleteCall {
             hub: self.hub,
@@ -6976,7 +7695,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// * `name` - Required. Name of the BigQuery export to retrieve. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     pub fn big_query_exports_get(&self, name: &str) -> ProjectBigQueryExportGetCall<'a, C> {
         ProjectBigQueryExportGetCall {
             hub: self.hub,
@@ -6993,7 +7712,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns the collection of BigQuery exports. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// * `parent` - Required. The parent, which owns the collection of BigQuery exports. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     pub fn big_query_exports_list(&self, parent: &str) -> ProjectBigQueryExportListCall<'a, C> {
         ProjectBigQueryExportListCall {
             hub: self.hub,
@@ -7037,7 +7756,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. The new custom module's parent. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_custom_modules_create(
         &self,
         request: EventThreatDetectionCustomModule,
@@ -7059,7 +7778,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// * `name` - Required. Name of the custom module to delete. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub fn event_threat_detection_settings_custom_modules_delete(
         &self,
         name: &str,
@@ -7079,7 +7798,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// * `name` - Required. Name of the custom module to get. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub fn event_threat_detection_settings_custom_modules_get(
         &self,
         name: &str,
@@ -7099,7 +7818,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_custom_modules_list(
         &self,
         parent: &str,
@@ -7121,7 +7840,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_custom_modules_list_descendant(
         &self,
         parent: &str,
@@ -7144,7 +7863,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// * `name` - Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     pub fn event_threat_detection_settings_custom_modules_patch(
         &self,
         request: EventThreatDetectionCustomModule,
@@ -7167,7 +7886,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}".
+    /// * `name` - Required. The resource name of the effective Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`.
     pub fn event_threat_detection_settings_effective_custom_modules_get(
         &self,
         name: &str,
@@ -7187,7 +7906,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Name of the parent to list custom modules for. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_effective_custom_modules_list(
         &self,
         parent: &str,
@@ -7210,7 +7929,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// * `parent` - Required. Resource name of the parent to validate the Custom Module under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     pub fn event_threat_detection_settings_validate_custom_module(
         &self,
         request: ValidateEventThreatDetectionCustomModuleRequest,
@@ -7233,7 +7952,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// * `parent` - Required. The parent, at which bulk action needs to be applied. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     pub fn findings_bulk_mute(
         &self,
         request: BulkMuteFindingsRequest,
@@ -7251,35 +7970,11 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a mute config.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
-    pub fn locations_mute_configs_create(
-        &self,
-        request: GoogleCloudSecuritycenterV1MuteConfig,
-        parent: &str,
-    ) -> ProjectLocationMuteConfigCreateCall<'a, C> {
-        ProjectLocationMuteConfigCreateCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _mute_config_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Deletes an existing mute config.
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn locations_mute_configs_delete(
         &self,
         name: &str,
@@ -7299,7 +7994,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn locations_mute_configs_get(
         &self,
         name: &str,
@@ -7315,34 +8010,12 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists mute configs.
-    ///
-    /// # Arguments
-    ///
-    /// * `parent` - Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
-    pub fn locations_mute_configs_list(
-        &self,
-        parent: &str,
-    ) -> ProjectLocationMuteConfigListCall<'a, C> {
-        ProjectLocationMuteConfigListCall {
-            hub: self.hub,
-            _parent: parent.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Updates a mute config.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// * `name` - This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     pub fn locations_mute_configs_patch(
         &self,
         request: GoogleCloudSecuritycenterV1MuteConfig,
@@ -7366,7 +8039,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. Resource name of the new mute configs's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn mute_configs_create(
         &self,
         request: GoogleCloudSecuritycenterV1MuteConfig,
@@ -7389,7 +8062,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn mute_configs_delete(&self, name: &str) -> ProjectMuteConfigDeleteCall<'a, C> {
         ProjectMuteConfigDeleteCall {
             hub: self.hub,
@@ -7406,7 +8079,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// * `name` - Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     pub fn mute_configs_get(&self, name: &str) -> ProjectMuteConfigGetCall<'a, C> {
         ProjectMuteConfigGetCall {
             hub: self.hub,
@@ -7423,7 +8096,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// * `parent` - Required. The parent, which owns the collection of mute configs. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     pub fn mute_configs_list(&self, parent: &str) -> ProjectMuteConfigListCall<'a, C> {
         ProjectMuteConfigListCall {
             hub: self.hub,
@@ -7443,7 +8116,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// * `name` - This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     pub fn mute_configs_patch(
         &self,
         request: GoogleCloudSecuritycenterV1MuteConfig,
@@ -7467,7 +8140,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. Resource name of the new notification config's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn notification_configs_create(
         &self,
         request: NotificationConfig,
@@ -7490,7 +8163,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// * `name` - Required. Name of the notification config to delete. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     pub fn notification_configs_delete(
         &self,
         name: &str,
@@ -7510,7 +8183,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// * `name` - Required. Name of the notification config to get. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     pub fn notification_configs_get(&self, name: &str) -> ProjectNotificationConfigGetCall<'a, C> {
         ProjectNotificationConfigGetCall {
             hub: self.hub,
@@ -7574,7 +8247,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Resource name of the new custom module's parent. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_custom_modules_create(
         &self,
         request: GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule,
@@ -7596,7 +8269,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// * `name` - Required. Name of the custom module to delete. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     pub fn security_health_analytics_settings_custom_modules_delete(
         &self,
         name: &str,
@@ -7616,7 +8289,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// * `name` - Required. Name of the custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     pub fn security_health_analytics_settings_custom_modules_get(
         &self,
         name: &str,
@@ -7636,7 +8309,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Name of parent to list custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_custom_modules_list(
         &self,
         parent: &str,
@@ -7658,7 +8331,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Name of parent to list descendant custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_custom_modules_list_descendant(
         &self,
         parent: &str,
@@ -7727,7 +8400,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}"
+    /// * `name` - Required. Name of the effective custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`
     pub fn security_health_analytics_settings_effective_custom_modules_get(
         &self,
         name: &str,
@@ -7747,7 +8420,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// * `parent` - Required. Name of parent to list effective custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     pub fn security_health_analytics_settings_effective_custom_modules_list(
         &self,
         parent: &str,
@@ -7794,7 +8467,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. Name of the source to groupBy. Its format is "organizations/[organization_id]/sources/[source_id]", folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]. To groupBy across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-, or projects/{project_id}/sources/-
+    /// * `parent` - Required. Name of the source to groupBy. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To groupBy across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-`, or `projects/{project_id}/sources/-`
     pub fn sources_findings_group(
         &self,
         request: GroupFindingsRequest,
@@ -7816,7 +8489,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Name of the source the findings belong to. Its format is "organizations/[organization_id]/sources/[source_id], folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]". To list across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/- or projects/{projects_id}/sources/-
+    /// * `parent` - Required. Name of the source the findings belong to. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To list across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-`, `folders/{folder_id}/sources/-` or `projects/{projects_id}/sources/-`
     pub fn sources_findings_list(&self, parent: &str) -> ProjectSourceFindingListCall<'a, C> {
         ProjectSourceFindingListCall {
             hub: self.hub,
@@ -7865,7 +8538,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     pub fn sources_findings_set_mute(
         &self,
         request: SetMuteRequest,
@@ -7888,7 +8561,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// * `name` - Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     pub fn sources_findings_set_state(
         &self,
         request: SetFindingStateRequest,
@@ -7935,7 +8608,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// * `parent` - Required. Resource name of the parent of sources to list. Its format should be `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     pub fn sources_list(&self, parent: &str) -> ProjectSourceListCall<'a, C> {
         ProjectSourceListCall {
             hub: self.hub,
@@ -7971,9 +8644,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7984,7 +8668,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -8181,7 +8865,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. The name of the parent to group the assets by. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8293,9 +8977,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8306,7 +9001,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -8517,7 +9212,7 @@ where
         }
     }
 
-    /// Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8682,9 +9377,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8695,7 +9401,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -9035,9 +9741,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9048,7 +9765,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -9255,7 +9972,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. The name of the parent resource of the new BigQuery export. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -9374,9 +10091,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9387,7 +10115,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -9548,7 +10276,7 @@ where
         }
     }
 
-    /// Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// Required. The name of the BigQuery export to delete. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9660,9 +10388,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9673,7 +10412,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -9836,7 +10575,7 @@ where
         }
     }
 
-    /// Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// Required. Name of the BigQuery export to retrieve. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9948,9 +10687,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9961,7 +10711,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -10132,7 +10882,7 @@ where
         }
     }
 
-    /// Required. The parent, which owns the collection of BigQuery exports. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// Required. The parent, which owns the collection of BigQuery exports. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10259,9 +11009,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10272,7 +11033,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -10602,9 +11363,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10615,7 +11387,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -10817,7 +11589,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. The new custom module's parent. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10944,9 +11716,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10957,7 +11740,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -11118,7 +11901,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Required. Name of the custom module to delete. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -11245,9 +12028,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11258,7 +12052,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -11421,7 +12215,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Required. Name of the custom module to get. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -11546,9 +12340,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11559,7 +12364,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -11735,7 +12540,7 @@ where
         }
     }
 
-    /// Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -11880,9 +12685,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11893,7 +12709,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -12072,7 +12888,7 @@ where
         }
     }
 
-    /// Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -12220,9 +13036,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12233,7 +13060,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -12440,7 +13267,7 @@ where
         self._request = new_value;
         self
     }
-    /// Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12575,9 +13402,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12588,7 +13426,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -12754,7 +13592,7 @@ where
         }
     }
 
-    /// Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}".
+    /// Required. The resource name of the effective Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12881,9 +13719,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12894,7 +13743,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -13073,7 +13922,7 @@ where
         }
     }
 
-    /// Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Name of the parent to list custom modules for. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13221,9 +14070,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13234,7 +14094,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -13442,7 +14302,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Resource name of the parent to validate the Custom Module under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13570,9 +14430,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13583,7 +14454,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -13783,7 +14654,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// Required. The parent, at which bulk action needs to be applied. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13878,346 +14749,6 @@ where
     }
 }
 
-/// Creates a mute config.
-///
-/// A builder for the *locations.muteConfigs.create* method supported by a *folder* resource.
-/// It is not used directly, but through a [`FolderMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_securitycenter1 as securitycenter1;
-/// use securitycenter1::api::GoogleCloudSecuritycenterV1MuteConfig;
-/// # async fn dox() {
-/// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = SecurityCommandCenter::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleCloudSecuritycenterV1MuteConfig::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.folders().locations_mute_configs_create(req, "parent")
-///              .mute_config_id("amet.")
-///              .doit().await;
-/// # }
-/// ```
-pub struct FolderLocationMuteConfigCreateCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a SecurityCommandCenter<C>,
-    _request: GoogleCloudSecuritycenterV1MuteConfig,
-    _parent: String,
-    _mute_config_id: Option<String>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for FolderLocationMuteConfigCreateCall<'a, C> {}
-
-impl<'a, C> FolderLocationMuteConfigCreateCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(
-        mut self,
-    ) -> common::Result<(common::Response, GoogleCloudSecuritycenterV1MuteConfig)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "securitycenter.folders.locations.muteConfigs.create",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "parent", "muteConfigId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        if let Some(value) = self._mute_config_id.as_ref() {
-            params.push("muteConfigId", value);
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/muteConfigs";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["parent"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: GoogleCloudSecuritycenterV1MuteConfig,
-    ) -> FolderLocationMuteConfigCreateCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderLocationMuteConfigCreateCall<'a, C> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// Required. Unique identifier provided by the client within the parent scope. It must consist of only lowercase letters, numbers, and hyphens, must start with a letter, must end with either a letter or a number, and must be 63 characters or less.
-    ///
-    /// Sets the *mute config id* query property to the given value.
-    pub fn mute_config_id(mut self, new_value: &str) -> FolderLocationMuteConfigCreateCall<'a, C> {
-        self._mute_config_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> FolderLocationMuteConfigCreateCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationMuteConfigCreateCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderLocationMuteConfigCreateCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderLocationMuteConfigCreateCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> FolderLocationMuteConfigCreateCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Deletes an existing mute config.
 ///
 /// A builder for the *locations.muteConfigs.delete* method supported by a *folder* resource.
@@ -14235,9 +14766,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14248,7 +14790,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -14409,7 +14951,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -14521,9 +15063,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14534,7 +15087,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -14697,7 +15250,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -14792,316 +15345,6 @@ where
     }
 }
 
-/// Lists mute configs.
-///
-/// A builder for the *locations.muteConfigs.list* method supported by a *folder* resource.
-/// It is not used directly, but through a [`FolderMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_securitycenter1 as securitycenter1;
-/// # async fn dox() {
-/// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = SecurityCommandCenter::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.folders().locations_mute_configs_list("parent")
-///              .page_token("et")
-///              .page_size(-22)
-///              .doit().await;
-/// # }
-/// ```
-pub struct FolderLocationMuteConfigListCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a SecurityCommandCenter<C>,
-    _parent: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for FolderLocationMuteConfigListCall<'a, C> {}
-
-impl<'a, C> FolderLocationMuteConfigListCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, ListMuteConfigsResponse)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "securitycenter.folders.locations.muteConfigs.list",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        if let Some(value) = self._page_token.as_ref() {
-            params.push("pageToken", value);
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push("pageSize", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["parent"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderLocationMuteConfigListCall<'a, C> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// A page token, received from a previous `ListMuteConfigs` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListMuteConfigs` must match the call that provided the page token.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderLocationMuteConfigListCall<'a, C> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of configs to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderLocationMuteConfigListCall<'a, C> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> FolderLocationMuteConfigListCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationMuteConfigListCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderLocationMuteConfigListCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderLocationMuteConfigListCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> FolderLocationMuteConfigListCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Updates a mute config.
 ///
 /// A builder for the *locations.muteConfigs.patch* method supported by a *folder* resource.
@@ -15120,9 +15363,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15133,7 +15387,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -15340,7 +15594,7 @@ where
         self._request = new_value;
         self
     }
-    /// This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -15463,9 +15717,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15476,7 +15741,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -15683,7 +15948,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. Resource name of the new mute configs's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -15802,9 +16067,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15815,7 +16091,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -15976,7 +16252,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -16088,9 +16364,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16101,7 +16388,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -16264,7 +16551,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -16376,9 +16663,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16389,7 +16687,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -16397,8 +16695,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().mute_configs_list("parent")
-///              .page_token("invidunt")
-///              .page_size(-65)
+///              .page_token("Stet")
+///              .page_size(-99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16560,7 +16858,7 @@ where
         }
     }
 
-    /// Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// Required. The parent, which owns the collection of mute configs. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -16687,9 +16985,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16700,7 +17009,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -16907,7 +17216,7 @@ where
         self._request = new_value;
         self
     }
-    /// This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -17027,9 +17336,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17040,7 +17360,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -17053,7 +17373,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().notification_configs_create(req, "parent")
-///              .config_id("Lorem")
+///              .config_id("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17245,7 +17565,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. Resource name of the new notification config's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -17364,9 +17684,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17377,7 +17708,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -17538,7 +17869,7 @@ where
         }
     }
 
-    /// Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// Required. Name of the notification config to delete. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -17650,9 +17981,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17663,7 +18005,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -17824,7 +18166,7 @@ where
         }
     }
 
-    /// Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// Required. Name of the notification config to get. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -17936,9 +18278,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17949,7 +18302,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -17957,8 +18310,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().notification_configs_list("parent")
-///              .page_token("accusam")
-///              .page_size(-59)
+///              .page_token("elitr")
+///              .page_size(-6)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18249,9 +18602,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18262,7 +18626,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -18590,9 +18954,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18603,7 +18978,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -18811,7 +19186,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Resource name of the new custom module's parent. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -18938,9 +19313,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18951,7 +19337,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -19115,7 +19501,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// Required. Name of the custom module to delete. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -19242,9 +19628,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19255,7 +19652,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -19421,7 +19818,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// Required. Name of the custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -19548,9 +19945,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19561,7 +19969,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -19569,8 +19977,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().security_health_analytics_settings_custom_modules_list("parent")
-///              .page_token("amet.")
-///              .page_size(-30)
+///              .page_token("consetetur")
+///              .page_size(-28)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19740,7 +20148,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Name of parent to list custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -19887,9 +20295,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19900,7 +20319,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -19908,8 +20327,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().security_health_analytics_settings_custom_modules_list_descendant("parent")
-///              .page_token("dolores")
-///              .page_size(-62)
+///              .page_token("erat")
+///              .page_size(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20077,7 +20496,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Name of parent to list descendant custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -20225,9 +20644,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20238,7 +20668,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -20589,9 +21019,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20602,7 +21043,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -20937,9 +21378,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20950,7 +21402,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -21119,7 +21571,7 @@ where
         }
     }
 
-    /// Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}"
+    /// Required. Name of the effective custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -21246,9 +21698,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21259,7 +21722,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -21267,8 +21730,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().security_health_analytics_settings_effective_custom_modules_list("parent")
-///              .page_token("dolore")
-///              .page_size(-34)
+///              .page_token("gubergren")
+///              .page_size(-74)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21436,7 +21899,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Name of parent to list effective custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -21584,9 +22047,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21597,7 +22071,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -21934,9 +22408,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21947,7 +22432,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -22147,7 +22632,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the source to groupBy. Its format is "organizations/[organization_id]/sources/[source_id]", folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]. To groupBy across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-, or projects/{project_id}/sources/-
+    /// Required. Name of the source to groupBy. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To groupBy across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-`, or `projects/{project_id}/sources/-`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -22259,9 +22744,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22272,7 +22768,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -22281,12 +22777,12 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().sources_findings_list("parent")
 ///              .read_time(chrono::Utc::now())
-///              .page_token("sadipscing")
-///              .page_size(-6)
-///              .order_by("invidunt")
-///              .filter("no")
+///              .page_token("dolore")
+///              .page_size(-34)
+///              .order_by("voluptua.")
+///              .filter("amet.")
 ///              .field_mask(FieldMask::new::<&str>(&[]))
-///              .compare_duration(chrono::Duration::seconds(9793868))
+///              .compare_duration(chrono::Duration::seconds(846145))
 ///              .doit().await;
 /// # }
 /// ```
@@ -22483,7 +22979,7 @@ where
         }
     }
 
-    /// Required. Name of the source the findings belong to. Its format is "organizations/[organization_id]/sources/[source_id], folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]". To list across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/- or projects/{projects_id}/sources/-
+    /// Required. Name of the source the findings belong to. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To list across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-`, `folders/{folder_id}/sources/-` or `projects/{projects_id}/sources/-`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -22654,9 +23150,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22667,7 +23174,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -22992,9 +23499,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23005,7 +23523,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -23202,7 +23720,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -23315,9 +23833,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23328,7 +23857,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -23528,7 +24057,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -23641,9 +24170,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23654,7 +24194,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -23999,9 +24539,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24012,7 +24563,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -24020,8 +24571,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().sources_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-18)
+///              .page_token("sed")
+///              .page_size(-98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24183,7 +24734,7 @@ where
         }
     }
 
-    /// Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. Resource name of the parent of sources to list. Its format should be `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -24310,9 +24861,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24323,7 +24885,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -24520,7 +25082,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. The name of the parent to group the assets by. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -24632,9 +25194,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24645,7 +25218,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -24654,12 +25227,12 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().assets_list("parent")
 ///              .read_time(chrono::Utc::now())
-///              .page_token("est")
-///              .page_size(-30)
-///              .order_by("diam")
-///              .filter("dolores")
+///              .page_token("aliquyam")
+///              .page_size(-5)
+///              .order_by("et")
+///              .filter("sanctus")
 ///              .field_mask(FieldMask::new::<&str>(&[]))
-///              .compare_duration(chrono::Duration::seconds(4316570))
+///              .compare_duration(chrono::Duration::seconds(5915796))
 ///              .doit().await;
 /// # }
 /// ```
@@ -24856,7 +25429,7 @@ where
         }
     }
 
-    /// Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -25024,9 +25597,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25037,7 +25621,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -25237,7 +25821,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the organization to run asset discovery for. Its format is "organizations/[organization_id]".
+    /// Required. Name of the organization to run asset discovery for. Its format is `organizations/[organization_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -25350,9 +25934,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25363,7 +25958,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -25688,6 +26283,339 @@ where
     }
 }
 
+/// Lists the attack paths for a set of simulation results or valued resources and filter.
+///
+/// A builder for the *attackPaths.list* method supported by a *organization* resource.
+/// It is not used directly, but through a [`OrganizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_securitycenter1 as securitycenter1;
+/// # async fn dox() {
+/// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = SecurityCommandCenter::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().attack_paths_list("parent")
+///              .page_token("dolores")
+///              .page_size(-69)
+///              .filter("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct OrganizationAttackPathListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a SecurityCommandCenter<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for OrganizationAttackPathListCall<'a, C> {}
+
+impl<'a, C> OrganizationAttackPathListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListAttackPathsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "securitycenter.organizations.attackPaths.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/attackPaths";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> OrganizationAttackPathListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The value returned by the last `ListAttackPathsResponse`; indicates that this is a continuation of a prior `ListAttackPaths` call, and that the system should return the next page of data.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> OrganizationAttackPathListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of results to return in a single response. Default is 10, minimum is 1, maximum is 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> OrganizationAttackPathListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The filter expression that filters the attack path in the response. Supported fields: * `valued_resources` supports =
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> OrganizationAttackPathListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationAttackPathListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationAttackPathListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationAttackPathListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationAttackPathListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> OrganizationAttackPathListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Creates a BigQuery export.
 ///
 /// A builder for the *bigQueryExports.create* method supported by a *organization* resource.
@@ -25706,9 +26634,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25719,7 +26658,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -25732,7 +26671,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().big_query_exports_create(req, "parent")
-///              .big_query_export_id("et")
+///              .big_query_export_id("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25926,7 +26865,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. The name of the parent resource of the new BigQuery export. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -26048,9 +26987,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26061,7 +27011,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -26222,7 +27172,7 @@ where
         }
     }
 
-    /// Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// Required. The name of the BigQuery export to delete. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -26334,9 +27284,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26347,7 +27308,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -26510,7 +27471,7 @@ where
         }
     }
 
-    /// Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// Required. Name of the BigQuery export to retrieve. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -26622,9 +27583,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26635,7 +27607,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -26643,8 +27615,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().big_query_exports_list("parent")
-///              .page_token("nonumy")
-///              .page_size(-77)
+///              .page_token("no")
+///              .page_size(-91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26806,7 +27778,7 @@ where
         }
     }
 
-    /// Required. The parent, which owns the collection of BigQuery exports. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// Required. The parent, which owns the collection of BigQuery exports. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -26933,9 +27905,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26946,7 +27929,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -27276,9 +28259,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27289,7 +28283,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -27494,7 +28488,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. The new custom module's parent. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -27621,9 +28615,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27634,7 +28639,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -27798,7 +28803,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Required. Name of the custom module to delete. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -27925,9 +28930,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27938,7 +28954,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -28104,7 +29120,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Required. Name of the custom module to get. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -28231,9 +29247,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28244,7 +29271,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -28252,8 +29279,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().event_threat_detection_settings_custom_modules_list("parent")
-///              .page_token("aliquyam")
-///              .page_size(-47)
+///              .page_token("erat")
+///              .page_size(-82)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28423,7 +29450,7 @@ where
         }
     }
 
-    /// Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -28570,9 +29597,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28583,7 +29621,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -28591,8 +29629,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().event_threat_detection_settings_custom_modules_list_descendant("parent")
-///              .page_token("et")
-///              .page_size(-10)
+///              .page_token("est")
+///              .page_size(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28760,7 +29798,7 @@ where
         }
     }
 
-    /// Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -28908,9 +29946,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28921,7 +29970,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -29131,7 +30180,7 @@ where
         self._request = new_value;
         self
     }
-    /// Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -29268,9 +30317,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29281,7 +30341,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -29445,7 +30505,7 @@ where
         }
     }
 
-    /// Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}".
+    /// Required. The resource name of the effective Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -29572,9 +30632,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29585,7 +30656,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -29593,8 +30664,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().event_threat_detection_settings_effective_custom_modules_list("parent")
-///              .page_token("est")
-///              .page_size(-82)
+///              .page_token("Stet")
+///              .page_size(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29762,7 +30833,7 @@ where
         }
     }
 
-    /// Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Name of the parent to list custom modules for. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -29910,9 +30981,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29923,7 +31005,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -30131,7 +31213,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Resource name of the parent to validate the Custom Module under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -30259,9 +31341,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30272,7 +31365,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -30472,7 +31565,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// Required. The parent, at which bulk action needs to be applied. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -30567,349 +31660,6 @@ where
     }
 }
 
-/// Creates a mute config.
-///
-/// A builder for the *locations.muteConfigs.create* method supported by a *organization* resource.
-/// It is not used directly, but through a [`OrganizationMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_securitycenter1 as securitycenter1;
-/// use securitycenter1::api::GoogleCloudSecuritycenterV1MuteConfig;
-/// # async fn dox() {
-/// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = SecurityCommandCenter::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleCloudSecuritycenterV1MuteConfig::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.organizations().locations_mute_configs_create(req, "parent")
-///              .mute_config_id("est")
-///              .doit().await;
-/// # }
-/// ```
-pub struct OrganizationLocationMuteConfigCreateCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a SecurityCommandCenter<C>,
-    _request: GoogleCloudSecuritycenterV1MuteConfig,
-    _parent: String,
-    _mute_config_id: Option<String>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for OrganizationLocationMuteConfigCreateCall<'a, C> {}
-
-impl<'a, C> OrganizationLocationMuteConfigCreateCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(
-        mut self,
-    ) -> common::Result<(common::Response, GoogleCloudSecuritycenterV1MuteConfig)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "securitycenter.organizations.locations.muteConfigs.create",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "parent", "muteConfigId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        if let Some(value) = self._mute_config_id.as_ref() {
-            params.push("muteConfigId", value);
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/muteConfigs";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["parent"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: GoogleCloudSecuritycenterV1MuteConfig,
-    ) -> OrganizationLocationMuteConfigCreateCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationLocationMuteConfigCreateCall<'a, C> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// Required. Unique identifier provided by the client within the parent scope. It must consist of only lowercase letters, numbers, and hyphens, must start with a letter, must end with either a letter or a number, and must be 63 characters or less.
-    ///
-    /// Sets the *mute config id* query property to the given value.
-    pub fn mute_config_id(
-        mut self,
-        new_value: &str,
-    ) -> OrganizationLocationMuteConfigCreateCall<'a, C> {
-        self._mute_config_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> OrganizationLocationMuteConfigCreateCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationMuteConfigCreateCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationLocationMuteConfigCreateCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationLocationMuteConfigCreateCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationLocationMuteConfigCreateCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Deletes an existing mute config.
 ///
 /// A builder for the *locations.muteConfigs.delete* method supported by a *organization* resource.
@@ -30927,9 +31677,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30940,7 +31701,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -31101,7 +31862,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -31213,9 +31974,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31226,7 +31998,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -31389,7 +32161,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -31484,316 +32256,6 @@ where
     }
 }
 
-/// Lists mute configs.
-///
-/// A builder for the *locations.muteConfigs.list* method supported by a *organization* resource.
-/// It is not used directly, but through a [`OrganizationMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_securitycenter1 as securitycenter1;
-/// # async fn dox() {
-/// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = SecurityCommandCenter::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.organizations().locations_mute_configs_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-17)
-///              .doit().await;
-/// # }
-/// ```
-pub struct OrganizationLocationMuteConfigListCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a SecurityCommandCenter<C>,
-    _parent: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for OrganizationLocationMuteConfigListCall<'a, C> {}
-
-impl<'a, C> OrganizationLocationMuteConfigListCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, ListMuteConfigsResponse)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "securitycenter.organizations.locations.muteConfigs.list",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        if let Some(value) = self._page_token.as_ref() {
-            params.push("pageToken", value);
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push("pageSize", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["parent"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationLocationMuteConfigListCall<'a, C> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// A page token, received from a previous `ListMuteConfigs` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListMuteConfigs` must match the call that provided the page token.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationMuteConfigListCall<'a, C> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of configs to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationMuteConfigListCall<'a, C> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> OrganizationLocationMuteConfigListCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationMuteConfigListCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationLocationMuteConfigListCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationLocationMuteConfigListCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationLocationMuteConfigListCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Updates a mute config.
 ///
 /// A builder for the *locations.muteConfigs.patch* method supported by a *organization* resource.
@@ -31812,9 +32274,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31825,7 +32298,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -32032,7 +32505,7 @@ where
         self._request = new_value;
         self
     }
-    /// This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -32155,9 +32628,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32168,7 +32652,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -32181,7 +32665,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().mute_configs_create(req, "parent")
-///              .mute_config_id("eos")
+///              .mute_config_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -32375,7 +32859,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. Resource name of the new mute configs's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -32494,9 +32978,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32507,7 +33002,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -32668,7 +33163,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -32780,9 +33275,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32793,7 +33299,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -32956,7 +33462,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -33068,9 +33574,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33081,7 +33598,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -33089,8 +33606,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().mute_configs_list("parent")
-///              .page_token("At")
-///              .page_size(-84)
+///              .page_token("Stet")
+///              .page_size(-19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33252,7 +33769,7 @@ where
         }
     }
 
-    /// Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// Required. The parent, which owns the collection of mute configs. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -33379,9 +33896,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33392,7 +33920,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -33599,7 +34127,7 @@ where
         self._request = new_value;
         self
     }
-    /// This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -33722,9 +34250,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33735,7 +34274,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -33748,7 +34287,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().notification_configs_create(req, "parent")
-///              .config_id("accusam")
+///              .config_id("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -33940,7 +34479,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. Resource name of the new notification config's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -34059,9 +34598,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34072,7 +34622,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -34233,7 +34783,7 @@ where
         }
     }
 
-    /// Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// Required. Name of the notification config to delete. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -34345,9 +34895,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34358,7 +34919,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -34519,7 +35080,7 @@ where
         }
     }
 
-    /// Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// Required. Name of the notification config to get. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -34631,9 +35192,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34644,7 +35216,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -34652,8 +35224,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().notification_configs_list("parent")
-///              .page_token("erat")
-///              .page_size(-73)
+///              .page_token("eirmod")
+///              .page_size(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34944,9 +35516,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34957,7 +35540,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -35267,7 +35850,7 @@ where
     }
 }
 
-/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
 ///
 /// A builder for the *operations.cancel* method supported by a *organization* resource.
 /// It is not used directly, but through a [`OrganizationMethods`] instance.
@@ -35284,9 +35867,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -35297,7 +35891,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -35570,9 +36164,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -35583,7 +36188,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -35856,9 +36461,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -35869,7 +36485,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -36142,9 +36758,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -36155,7 +36782,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -36163,9 +36790,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().operations_list("name")
-///              .page_token("dolor")
-///              .page_size(-22)
-///              .filter("sit")
+///              .return_partial_success(false)
+///              .page_token("sea")
+///              .page_size(-59)
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -36175,6 +36803,7 @@ where
 {
     hub: &'a SecurityCommandCenter<C>,
     _name: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -36204,15 +36833,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -36341,6 +36982,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `"projects/example/locations/-"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> OrganizationOperationListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -36465,9 +37116,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -36478,7 +37140,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -36805,9 +37467,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -36818,7 +37491,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -37094,9 +37767,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -37107,7 +37791,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -37273,7 +37957,7 @@ where
         }
     }
 
-    /// Required. Name of the resource value config to retrieve. Its format is organizations/{organization}/resourceValueConfigs/{config_id}.
+    /// Required. Name of the resource value config to retrieve. Its format is `organizations/{organization}/resourceValueConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -37385,9 +38069,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -37398,7 +38093,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -37406,8 +38101,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().resource_value_configs_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-21)
+///              .page_token("sit")
+///              .page_size(-81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -37571,7 +38266,7 @@ where
         }
     }
 
-    /// Required. The parent, which owns the collection of resource value configs. Its format is "organizations/[organization_id]"
+    /// Required. The parent, which owns the collection of resource value configs. Its format is `organizations/[organization_id]`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -37698,9 +38393,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -37711,7 +38417,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -38044,9 +38750,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -38057,7 +38774,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -38265,7 +38982,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Resource name of the new custom module's parent. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -38392,9 +39109,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -38405,7 +39133,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -38569,7 +39297,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// Required. Name of the custom module to delete. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -38696,9 +39424,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -38709,7 +39448,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -38878,7 +39617,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// Required. Name of the custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -39005,9 +39744,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -39018,7 +39768,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -39026,8 +39776,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().security_health_analytics_settings_custom_modules_list("parent")
-///              .page_token("At")
-///              .page_size(-19)
+///              .page_token("sea")
+///              .page_size(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39197,7 +39947,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Name of parent to list custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -39344,9 +40094,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -39357,7 +40118,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -39365,8 +40126,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().security_health_analytics_settings_custom_modules_list_descendant("parent")
-///              .page_token("gubergren")
-///              .page_size(-4)
+///              .page_token("aliquyam")
+///              .page_size(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39534,7 +40295,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Name of parent to list descendant custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -39682,9 +40443,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -39695,7 +40467,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -40046,9 +40818,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -40059,7 +40842,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -40392,9 +41175,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -40405,7 +41199,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -40572,7 +41366,7 @@ where
         }
     }
 
-    /// Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}"
+    /// Required. Name of the effective custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -40699,9 +41493,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -40712,7 +41517,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -40720,8 +41525,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().security_health_analytics_settings_effective_custom_modules_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-73)
+///              .page_token("dolor")
+///              .page_size(-32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -40889,7 +41694,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Name of parent to list effective custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -41036,9 +41841,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -41049,7 +41865,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -41057,9 +41873,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().simulations_attack_exposure_results_attack_paths_list("parent")
-///              .page_token("sadipscing")
-///              .page_size(-27)
-///              .filter("sit")
+///              .page_token("amet.")
+///              .page_size(-50)
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -41228,7 +42044,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}"
+    /// Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -41385,9 +42201,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -41398,7 +42225,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -41406,10 +42233,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().simulations_attack_exposure_results_valued_resources_list("parent")
-///              .page_token("sit")
-///              .page_size(-83)
-///              .order_by("et")
-///              .filter("rebum.")
+///              .page_token("gubergren")
+///              .page_size(-45)
+///              .order_by("At")
+///              .filter("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -41589,7 +42416,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list valued resources. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}"
+    /// Required. Name of parent to list valued resources. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -41622,7 +42449,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. The fields by which to order the valued resources response. Supported fields: * `exposed_score` * `resource_value` * `resource_type` * `resource` * `display_name` Values should be a comma separated list of fields. For example: `exposed_score,resource_value`. The default sorting order is descending. To specify ascending or descending order for a field, append a " ASC" or a " DESC" suffix, respectively; for example: `exposed_score DESC`.
+    /// Optional. The fields by which to order the valued resources response. Supported fields: * `exposed_score` * `resource_value` * `resource_type` * `resource` * `display_name` Values should be a comma separated list of fields. For example: `exposed_score,resource_value`. The default sorting order is descending. To specify ascending or descending order for a field, append a ` ASC` or a ` DESC` suffix, respectively; for example: `exposed_score DESC`.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(
@@ -41756,9 +42583,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -41769,7 +42607,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -41777,9 +42615,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().simulations_attack_paths_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-71)
-///              .filter("amet.")
+///              .page_token("sit")
+///              .page_size(-83)
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -41945,7 +42783,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}"
+    /// Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -42081,9 +42919,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -42094,7 +42943,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -42102,9 +42951,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().simulations_valued_resources_attack_paths_list("parent")
-///              .page_token("nonumy")
-///              .page_size(-43)
-///              .filter("kasd")
+///              .page_token("dolor")
+///              .page_size(-6)
+///              .filter("justo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -42270,7 +43119,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}"
+    /// Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -42425,9 +43274,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -42438,7 +43298,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -42599,7 +43459,7 @@ where
         }
     }
 
-    /// Required. The name of this valued resource Valid format: "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}"
+    /// Required. The name of this valued resource Valid format: `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -42718,9 +43578,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -42731,7 +43602,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -42740,9 +43611,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().simulations_valued_resources_list("parent")
 ///              .page_token("nonumy")
-///              .page_size(-66)
-///              .order_by("tempor")
-///              .filter("dolore")
+///              .page_size(-43)
+///              .order_by("kasd")
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -42921,7 +43792,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list valued resources. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}"
+    /// Required. Name of parent to list valued resources. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -42954,7 +43825,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. The fields by which to order the valued resources response. Supported fields: * `exposed_score` * `resource_value` * `resource_type` * `resource` * `display_name` Values should be a comma separated list of fields. For example: `exposed_score,resource_value`. The default sorting order is descending. To specify ascending or descending order for a field, append a " ASC" or a " DESC" suffix, respectively; for example: `exposed_score DESC`.
+    /// Optional. The fields by which to order the valued resources response. Supported fields: * `exposed_score` * `resource_value` * `resource_type` * `resource` * `display_name` Values should be a comma separated list of fields. For example: `exposed_score,resource_value`. The default sorting order is descending. To specify ascending or descending order for a field, append a ` ASC` or a ` DESC` suffix, respectively; for example: `exposed_score DESC`.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(
@@ -43083,9 +43954,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -43096,7 +43978,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -43257,7 +44139,7 @@ where
         }
     }
 
-    /// Required. The organization name or simulation name of this simulation Valid format: "organizations/{organization}/simulations/latest" "organizations/{organization}/simulations/{simulation}"
+    /// Required. The organization name or simulation name of this simulation Valid format: `organizations/{organization}/simulations/latest` `organizations/{organization}/simulations/{simulation}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -43370,9 +44252,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -43383,7 +44276,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -43726,9 +44619,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -43739,7 +44643,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -43752,7 +44656,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().sources_findings_create(req, "parent")
-///              .finding_id("amet")
+///              .finding_id("tempor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -43941,7 +44845,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new finding's parent. Its format should be "organizations/[organization_id]/sources/[source_id]".
+    /// Required. Resource name of the new finding's parent. Its format should be `organizations/[organization_id]/sources/[source_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -44061,9 +44965,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -44074,7 +44989,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -44274,7 +45189,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the source to groupBy. Its format is "organizations/[organization_id]/sources/[source_id]", folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]. To groupBy across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-, or projects/{project_id}/sources/-
+    /// Required. Name of the source to groupBy. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To groupBy across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-`, or `projects/{project_id}/sources/-`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -44386,9 +45301,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -44399,7 +45325,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -44408,12 +45334,12 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().sources_findings_list("parent")
 ///              .read_time(chrono::Utc::now())
-///              .page_token("sit")
-///              .page_size(-76)
-///              .order_by("duo")
-///              .filter("sadipscing")
+///              .page_token("amet.")
+///              .page_size(-84)
+///              .order_by("amet")
+///              .filter("ut")
 ///              .field_mask(FieldMask::new::<&str>(&[]))
-///              .compare_duration(chrono::Duration::seconds(1907299))
+///              .compare_duration(chrono::Duration::seconds(9750243))
 ///              .doit().await;
 /// # }
 /// ```
@@ -44610,7 +45536,7 @@ where
         }
     }
 
-    /// Required. Name of the source the findings belong to. Its format is "organizations/[organization_id]/sources/[source_id], folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]". To list across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/- or projects/{projects_id}/sources/-
+    /// Required. Name of the source the findings belong to. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To list across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-`, `folders/{folder_id}/sources/-` or `projects/{projects_id}/sources/-`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -44781,9 +45707,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -44794,7 +45731,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -45119,9 +46056,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -45132,7 +46080,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -45332,7 +46280,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -45445,9 +46393,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -45458,7 +46417,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -45658,7 +46617,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -45771,9 +46730,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -45784,7 +46754,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -46140,9 +47110,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -46153,7 +47134,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -46350,7 +47331,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new source's parent. Its format should be "organizations/[organization_id]".
+    /// Required. Resource name of the new source's parent. Its format should be `organizations/[organization_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -46462,9 +47443,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -46475,7 +47467,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -46636,7 +47628,7 @@ where
         }
     }
 
-    /// Required. Relative resource name of the source. Its format is "organizations/[organization_id]/source/[source_id]".
+    /// Required. Relative resource name of the source. Its format is `organizations/[organization_id]/source/[source_id]`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -46749,9 +47741,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -46762,7 +47765,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -47074,9 +48077,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -47087,7 +48101,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -47095,8 +48109,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().sources_list("parent")
-///              .page_token("magna")
-///              .page_size(-59)
+///              .page_token("sadipscing")
+///              .page_size(-39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -47258,7 +48272,7 @@ where
         }
     }
 
-    /// Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. Resource name of the parent of sources to list. Its format should be `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -47385,9 +48399,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -47398,7 +48423,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -47723,9 +48748,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -47736,7 +48772,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -48049,9 +49085,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -48062,7 +49109,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -48357,6 +49404,360 @@ where
     }
 }
 
+/// Lists the valued resources for a set of simulation results and filter.
+///
+/// A builder for the *valuedResources.list* method supported by a *organization* resource.
+/// It is not used directly, but through a [`OrganizationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_securitycenter1 as securitycenter1;
+/// # async fn dox() {
+/// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = SecurityCommandCenter::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().valued_resources_list("parent")
+///              .page_token("takimata")
+///              .page_size(-66)
+///              .order_by("At")
+///              .filter("invidunt")
+///              .doit().await;
+/// # }
+/// ```
+pub struct OrganizationValuedResourceListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a SecurityCommandCenter<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for OrganizationValuedResourceListCall<'a, C> {}
+
+impl<'a, C> OrganizationValuedResourceListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListValuedResourcesResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "securitycenter.organizations.valuedResources.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "orderBy",
+            "filter",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/valuedResources";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. Name of parent to list valued resources. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> OrganizationValuedResourceListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The value returned by the last `ListValuedResourcesResponse`; indicates that this is a continuation of a prior `ListValuedResources` call, and that the system should return the next page of data.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> OrganizationValuedResourceListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of results to return in a single response. Default is 10, minimum is 1, maximum is 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> OrganizationValuedResourceListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. The fields by which to order the valued resources response. Supported fields: * `exposed_score` * `resource_value` * `resource_type` * `resource` * `display_name` Values should be a comma separated list of fields. For example: `exposed_score,resource_value`. The default sorting order is descending. To specify ascending or descending order for a field, append a ` ASC` or a ` DESC` suffix, respectively; for example: `exposed_score DESC`.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> OrganizationValuedResourceListCall<'a, C> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// The filter expression that filters the valued resources in the response. Supported fields: * `resource_value` supports = * `resource_type` supports =
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> OrganizationValuedResourceListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationValuedResourceListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationValuedResourceListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationValuedResourceListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationValuedResourceListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> OrganizationValuedResourceListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets the settings for an organization.
 ///
 /// A builder for the *getOrganizationSettings* method supported by a *organization* resource.
@@ -48374,9 +49775,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -48387,7 +49799,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -48548,7 +49960,7 @@ where
         }
     }
 
-    /// Required. Name of the organization to get organization settings for. Its format is "organizations/[organization_id]/organizationSettings".
+    /// Required. Name of the organization to get organization settings for. Its format is `organizations/[organization_id]/organizationSettings`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -48661,9 +50073,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -48674,7 +50097,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -49005,9 +50428,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -49018,7 +50452,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -49215,7 +50649,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. The name of the parent to group the assets by. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -49327,9 +50761,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -49340,7 +50785,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -49551,7 +50996,7 @@ where
         }
     }
 
-    /// Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -49716,9 +51161,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -49729,7 +51185,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -50072,9 +51528,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -50085,7 +51552,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -50292,7 +51759,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. The name of the parent resource of the new BigQuery export. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -50414,9 +51881,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -50427,7 +51905,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -50588,7 +52066,7 @@ where
         }
     }
 
-    /// Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// Required. The name of the BigQuery export to delete. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -50700,9 +52178,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -50713,7 +52202,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -50876,7 +52365,7 @@ where
         }
     }
 
-    /// Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}
+    /// Required. Name of the BigQuery export to retrieve. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -50988,9 +52477,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -51001,7 +52501,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -51172,7 +52672,7 @@ where
         }
     }
 
-    /// Required. The parent, which owns the collection of BigQuery exports. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// Required. The parent, which owns the collection of BigQuery exports. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -51299,9 +52799,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -51312,7 +52823,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -51642,9 +53153,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -51655,7 +53177,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -51860,7 +53382,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. The new custom module's parent. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -51987,9 +53509,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -52000,7 +53533,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -52164,7 +53697,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Required. Name of the custom module to delete. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -52291,9 +53824,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -52304,7 +53848,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -52467,7 +54011,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Required. Name of the custom module to get. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -52592,9 +54136,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -52605,7 +54160,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -52781,7 +54336,7 @@ where
         }
     }
 
-    /// Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -52926,9 +54481,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -52939,7 +54505,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -53118,7 +54684,7 @@ where
         }
     }
 
-    /// Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -53266,9 +54832,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -53279,7 +54856,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -53486,7 +55063,7 @@ where
         self._request = new_value;
         self
     }
-    /// Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}".
+    /// Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -53623,9 +55200,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -53636,7 +55224,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -53802,7 +55390,7 @@ where
         }
     }
 
-    /// Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}".
+    /// Required. The resource name of the effective Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -53929,9 +55517,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -53942,7 +55541,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -54121,7 +55720,7 @@ where
         }
     }
 
-    /// Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Name of the parent to list custom modules for. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -54269,9 +55868,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -54282,7 +55892,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -54490,7 +56100,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings".
+    /// Required. Resource name of the parent to validate the Custom Module under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -54618,9 +56228,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -54631,7 +56252,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -54831,7 +56452,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// Required. The parent, at which bulk action needs to be applied. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -54926,346 +56547,6 @@ where
     }
 }
 
-/// Creates a mute config.
-///
-/// A builder for the *locations.muteConfigs.create* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_securitycenter1 as securitycenter1;
-/// use securitycenter1::api::GoogleCloudSecuritycenterV1MuteConfig;
-/// # async fn dox() {
-/// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = SecurityCommandCenter::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleCloudSecuritycenterV1MuteConfig::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_mute_configs_create(req, "parent")
-///              .mute_config_id("justo")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationMuteConfigCreateCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a SecurityCommandCenter<C>,
-    _request: GoogleCloudSecuritycenterV1MuteConfig,
-    _parent: String,
-    _mute_config_id: Option<String>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationMuteConfigCreateCall<'a, C> {}
-
-impl<'a, C> ProjectLocationMuteConfigCreateCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(
-        mut self,
-    ) -> common::Result<(common::Response, GoogleCloudSecuritycenterV1MuteConfig)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "securitycenter.projects.locations.muteConfigs.create",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "parent", "muteConfigId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        if let Some(value) = self._mute_config_id.as_ref() {
-            params.push("muteConfigId", value);
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/muteConfigs";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["parent"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: GoogleCloudSecuritycenterV1MuteConfig,
-    ) -> ProjectLocationMuteConfigCreateCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationMuteConfigCreateCall<'a, C> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// Required. Unique identifier provided by the client within the parent scope. It must consist of only lowercase letters, numbers, and hyphens, must start with a letter, must end with either a letter or a number, and must be 63 characters or less.
-    ///
-    /// Sets the *mute config id* query property to the given value.
-    pub fn mute_config_id(mut self, new_value: &str) -> ProjectLocationMuteConfigCreateCall<'a, C> {
-        self._mute_config_id = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationMuteConfigCreateCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationMuteConfigCreateCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationMuteConfigCreateCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationMuteConfigCreateCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationMuteConfigCreateCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Deletes an existing mute config.
 ///
 /// A builder for the *locations.muteConfigs.delete* method supported by a *project* resource.
@@ -55283,9 +56564,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -55296,7 +56588,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -55457,7 +56749,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -55569,9 +56861,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -55582,7 +56885,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -55745,7 +57048,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -55840,316 +57143,6 @@ where
     }
 }
 
-/// Lists mute configs.
-///
-/// A builder for the *locations.muteConfigs.list* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_securitycenter1 as securitycenter1;
-/// # async fn dox() {
-/// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = SecurityCommandCenter::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_mute_configs_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-15)
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationMuteConfigListCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a SecurityCommandCenter<C>,
-    _parent: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationMuteConfigListCall<'a, C> {}
-
-impl<'a, C> ProjectLocationMuteConfigListCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, ListMuteConfigsResponse)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "securitycenter.projects.locations.muteConfigs.list",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push("parent", self._parent);
-        if let Some(value) = self._page_token.as_ref() {
-            params.push("pageToken", value);
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push("pageSize", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["parent"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationMuteConfigListCall<'a, C> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// A page token, received from a previous `ListMuteConfigs` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListMuteConfigs` must match the call that provided the page token.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationMuteConfigListCall<'a, C> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// The maximum number of configs to return. The service may return fewer than this value. If unspecified, at most 10 configs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationMuteConfigListCall<'a, C> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationMuteConfigListCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationMuteConfigListCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationMuteConfigListCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationMuteConfigListCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationMuteConfigListCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Updates a mute config.
 ///
 /// A builder for the *locations.muteConfigs.patch* method supported by a *project* resource.
@@ -56168,9 +57161,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -56181,7 +57185,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -56388,7 +57392,7 @@ where
         self._request = new_value;
         self
     }
-    /// This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -56511,9 +57515,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -56524,7 +57539,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -56537,7 +57552,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().mute_configs_create(req, "parent")
-///              .mute_config_id("no")
+///              .mute_config_id("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -56731,7 +57746,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. Resource name of the new mute configs's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -56850,9 +57865,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -56863,7 +57889,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -57024,7 +58050,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -57136,9 +58162,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -57149,7 +58186,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -57312,7 +58349,7 @@ where
         }
     }
 
-    /// Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}.
+    /// Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -57424,9 +58461,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -57437,7 +58485,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -57445,8 +58493,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().mute_configs_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-21)
+///              .page_token("ipsum")
+///              .page_size(-61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -57608,7 +58656,7 @@ where
         }
     }
 
-    /// Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]".
+    /// Required. The parent, which owns the collection of mute configs. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -57735,9 +58783,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -57748,7 +58807,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -57955,7 +59014,7 @@ where
         self._request = new_value;
         self
     }
-    /// This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}"
+    /// This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -58078,9 +59137,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -58091,7 +59161,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -58104,7 +59174,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().notification_configs_create(req, "parent")
-///              .config_id("nonumy")
+///              .config_id("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -58296,7 +59366,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. Resource name of the new notification config's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -58415,9 +59485,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -58428,7 +59509,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -58589,7 +59670,7 @@ where
         }
     }
 
-    /// Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// Required. Name of the notification config to delete. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -58701,9 +59782,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -58714,7 +59806,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -58875,7 +59967,7 @@ where
         }
     }
 
-    /// Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]".
+    /// Required. Name of the notification config to get. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -58987,9 +60079,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -59000,7 +60103,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -59008,8 +60111,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().notification_configs_list("parent")
-///              .page_token("justo")
-///              .page_size(-17)
+///              .page_token("sed")
+///              .page_size(-91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -59300,9 +60403,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -59313,7 +60427,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -59641,9 +60755,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -59654,7 +60779,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -59862,7 +60987,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Resource name of the new custom module's parent. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -59989,9 +61114,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -60002,7 +61138,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -60166,7 +61302,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// Required. Name of the custom module to delete. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -60293,9 +61429,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -60306,7 +61453,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -60475,7 +61622,7 @@ where
         }
     }
 
-    /// Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}"
+    /// Required. Name of the custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -60602,9 +61749,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -60615,7 +61773,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -60623,7 +61781,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().security_health_analytics_settings_custom_modules_list("parent")
-///              .page_token("nonumy")
+///              .page_token("At")
 ///              .page_size(-81)
 ///              .doit().await;
 /// # }
@@ -60794,7 +61952,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Name of parent to list custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -60941,9 +62099,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -60954,7 +62123,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -60962,8 +62131,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().security_health_analytics_settings_custom_modules_list_descendant("parent")
-///              .page_token("dolores")
-///              .page_size(-50)
+///              .page_token("vero")
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -61131,7 +62300,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Name of parent to list descendant custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -61279,9 +62448,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -61292,7 +62472,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -61643,9 +62823,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -61656,7 +62847,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -61991,9 +63182,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -62004,7 +63206,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -62171,7 +63373,7 @@ where
         }
     }
 
-    /// Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}"
+    /// Required. Name of the effective custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -62298,9 +63500,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -62311,7 +63524,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -62319,8 +63532,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().security_health_analytics_settings_effective_custom_modules_list("parent")
-///              .page_token("consetetur")
-///              .page_size(-72)
+///              .page_token("ipsum")
+///              .page_size(-28)
 ///              .doit().await;
 /// # }
 /// ```
@@ -62488,7 +63701,7 @@ where
         }
     }
 
-    /// Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings"
+    /// Required. Name of parent to list effective custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -62636,9 +63849,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -62649,7 +63873,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -62986,9 +64210,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -62999,7 +64234,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -63199,7 +64434,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the source to groupBy. Its format is "organizations/[organization_id]/sources/[source_id]", folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]. To groupBy across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-, or projects/{project_id}/sources/-
+    /// Required. Name of the source to groupBy. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To groupBy across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-`, or `projects/{project_id}/sources/-`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -63311,9 +64546,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -63324,7 +64570,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -63333,12 +64579,12 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sources_findings_list("parent")
 ///              .read_time(chrono::Utc::now())
-///              .page_token("erat")
-///              .page_size(-42)
-///              .order_by("nonumy")
-///              .filter("Lorem")
+///              .page_token("consetetur")
+///              .page_size(-72)
+///              .order_by("clita")
+///              .filter("sit")
 ///              .field_mask(FieldMask::new::<&str>(&[]))
-///              .compare_duration(chrono::Duration::seconds(3257709))
+///              .compare_duration(chrono::Duration::seconds(5507939))
 ///              .doit().await;
 /// # }
 /// ```
@@ -63535,7 +64781,7 @@ where
         }
     }
 
-    /// Required. Name of the source the findings belong to. Its format is "organizations/[organization_id]/sources/[source_id], folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]". To list across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/- or projects/{projects_id}/sources/-
+    /// Required. Name of the source the findings belong to. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To list across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-`, `folders/{folder_id}/sources/-` or `projects/{projects_id}/sources/-`
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -63706,9 +64952,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -63719,7 +64976,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -64044,9 +65301,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -64057,7 +65325,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -64254,7 +65522,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -64367,9 +65635,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -64380,7 +65659,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -64580,7 +65859,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}".
+    /// Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -64693,9 +65972,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -64706,7 +65996,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -65055,9 +66345,20 @@ where
 /// # use securitycenter1::{SecurityCommandCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -65068,7 +66369,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = SecurityCommandCenter::new(client, auth);
@@ -65076,8 +66377,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().sources_list("parent")
-///              .page_token("dolore")
-///              .page_size(-55)
+///              .page_token("diam")
+///              .page_size(-92)
 ///              .doit().await;
 /// # }
 /// ```
@@ -65239,7 +66540,7 @@ where
         }
     }
 
-    /// Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]".
+    /// Required. Resource name of the parent of sources to list. Its format should be `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`.
     ///
     /// Sets the *parent* path property to the given value.
     ///

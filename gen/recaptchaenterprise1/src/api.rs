@@ -59,9 +59,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -72,7 +83,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -126,7 +137,7 @@ impl<'a, C> RecaptchaEnterprise<C> {
         RecaptchaEnterprise {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://recaptchaenterprise.googleapis.com/".to_string(),
             _root_url: "https://recaptchaenterprise.googleapis.com/".to_string(),
         }
@@ -137,7 +148,7 @@ impl<'a, C> RecaptchaEnterprise<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -200,6 +211,42 @@ pub struct GoogleCloudRecaptchaenterpriseV1AccountVerificationInfo {
 
 impl common::Part for GoogleCloudRecaptchaenterpriseV1AccountVerificationInfo {}
 
+/// The AddIpOverride request message.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [keys add ip override projects](ProjectKeyAddIpOverrideCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest {
+    /// Required. IP override added to the key.
+    #[serde(rename = "ipOverrideData")]
+    pub ip_override_data: Option<GoogleCloudRecaptchaenterpriseV1IpOverrideData>,
+}
+
+impl common::RequestValue for GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest {}
+
+/// Response for AddIpOverride.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [keys add ip override projects](ProjectKeyAddIpOverrideCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1AddIpOverrideResponse {
+    _never_set: Option<bool>,
+}
+
+impl common::ResponseResult for GoogleCloudRecaptchaenterpriseV1AddIpOverrideResponse {}
+
 /// Settings specific to keys that can be used by Android apps.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -211,7 +258,7 @@ pub struct GoogleCloudRecaptchaenterpriseV1AndroidKeySettings {
     /// Optional. If set to true, allowed_package_names are not enforced.
     #[serde(rename = "allowAllPackageNames")]
     pub allow_all_package_names: Option<bool>,
-    /// Optional. Android package names of apps allowed to use the key. Example: 'com.companyname.appname'
+    /// Optional. Android package names of apps allowed to use the key. Example: 'com.companyname.appname' Each key supports a maximum of 250 package names. To use a key on more apps, set `allow_all_package_names` to true. When this is set, you are responsible for validating the package name by checking the `token_properties.android_package_name` field in each assessment response against your list of allowed package names.
     #[serde(rename = "allowedPackageNames")]
     pub allowed_package_names: Option<Vec<String>>,
     /// Optional. Set to true for keys that are used in an Android application that is available for download in app stores in addition to the Google Play Store.
@@ -236,12 +283,16 @@ pub struct GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest {
     /// Optional. A stable account identifier to apply to the assessment. This is an alternative to setting `account_id` in `CreateAssessment`, for example when a stable account identifier is not yet known in the initial request.
     #[serde(rename = "accountId")]
     pub account_id: Option<String>,
-    /// Optional. The annotation that will be assigned to the Event. This field can be left empty to provide reasons that apply to an event without concluding whether the event is legitimate or fraudulent.
+    /// Optional. The annotation that is assigned to the Event. This field can be left empty to provide reasons that apply to an event without concluding whether the event is legitimate or fraudulent.
     pub annotation: Option<String>,
     /// Optional. A stable hashed account identifier to apply to the assessment. This is an alternative to setting `hashed_account_id` in `CreateAssessment`, for example when a stable account identifier is not yet known in the initial request.
     #[serde(rename = "hashedAccountId")]
     #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub hashed_account_id: Option<Vec<u8>>,
+    /// Optional. If using an external multi-factor authentication provider, provide phone authentication details for fraud detection purposes.
+    #[serde(rename = "phoneAuthenticationEvent")]
+    pub phone_authentication_event:
+        Option<GoogleCloudRecaptchaenterpriseV1PhoneAuthenticationEvent>,
     /// Optional. Reasons for the annotation that are assigned to the event.
     pub reasons: Option<Vec<String>>,
     /// Optional. If the assessment is part of a payment transaction, provide details on payment lifecycle events that occur in the transaction.
@@ -308,6 +359,9 @@ pub struct GoogleCloudRecaptchaenterpriseV1Assessment {
     /// Optional. Account verification information for identity verification. The assessment event must include a token and site key to use this feature.
     #[serde(rename = "accountVerification")]
     pub account_verification: Option<GoogleCloudRecaptchaenterpriseV1AccountVerificationInfo>,
+    /// Optional. The environment creating the assessment. This describes your environment (the system invoking CreateAssessment), NOT the environment of your user.
+    #[serde(rename = "assessmentEnvironment")]
+    pub assessment_environment: Option<GoogleCloudRecaptchaenterpriseV1AssessmentEnvironment>,
     /// Optional. The event being assessed.
     pub event: Option<GoogleCloudRecaptchaenterpriseV1Event>,
     /// Output only. Assessment returned when firewall policies belonging to the project are evaluated using the field firewall_policy_evaluation.
@@ -340,6 +394,39 @@ pub struct GoogleCloudRecaptchaenterpriseV1Assessment {
 
 impl common::RequestValue for GoogleCloudRecaptchaenterpriseV1Assessment {}
 impl common::ResponseResult for GoogleCloudRecaptchaenterpriseV1Assessment {}
+
+/// The environment creating the assessment. This describes your environment (the system invoking CreateAssessment), NOT the environment of your user.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1AssessmentEnvironment {
+    /// Optional. Identifies the client module initiating the CreateAssessment request. This can be the link to the client module's project. Examples include: - "github.com/GoogleCloudPlatform/recaptcha-enterprise-google-tag-manager" - "wordpress.org/plugins/recaptcha-something"
+    pub client: Option<String>,
+    /// Optional. The version of the client module. For example, "1.0.0".
+    pub version: Option<String>,
+}
+
+impl common::Part for GoogleCloudRecaptchaenterpriseV1AssessmentEnvironment {}
+
+/// Bot information and metadata.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1Bot {
+    /// Optional. Enumerated field representing the type of bot.
+    #[serde(rename = "botType")]
+    pub bot_type: Option<String>,
+    /// Optional. Enumerated string value that indicates the identity of the bot, formatted in kebab-case.
+    pub name: Option<String>,
+}
+
+impl common::Part for GoogleCloudRecaptchaenterpriseV1Bot {}
 
 /// Metrics related to challenges.
 ///
@@ -404,9 +491,9 @@ pub struct GoogleCloudRecaptchaenterpriseV1Event {
     /// Optional. The expected action for this type of event. This should be the same action provided at token generation time on client-side platforms already integrated with recaptcha enterprise.
     #[serde(rename = "expectedAction")]
     pub expected_action: Option<String>,
-    /// Optional. Flag for a reCAPTCHA express request for an assessment without a token. If enabled, `site_key` must reference a SCORE key with WAF feature set to EXPRESS.
+    /// Optional. Flag for a reCAPTCHA express request for an assessment without a token. If enabled, `site_key` must reference an Express site key.
     pub express: Option<bool>,
-    /// Optional. Flag for enabling firewall policy config assessment. If this flag is enabled, the firewall policy will be evaluated and a suggested firewall action will be returned in the response.
+    /// Optional. Flag for enabling firewall policy config assessment. If this flag is enabled, the firewall policy is evaluated and a suggested firewall action is returned in the response.
     #[serde(rename = "firewallPolicyEvaluation")]
     pub firewall_policy_evaluation: Option<bool>,
     /// Optional. The Fraud Prevention setting for this assessment.
@@ -418,8 +505,10 @@ pub struct GoogleCloudRecaptchaenterpriseV1Event {
     pub hashed_account_id: Option<Vec<u8>>,
     /// Optional. HTTP header information about the request.
     pub headers: Option<Vec<String>>,
-    /// Optional. JA3 fingerprint for SSL clients.
+    /// Optional. JA3 fingerprint for SSL clients. To learn how to compute this fingerprint, please refer to https://github.com/salesforce/ja3.
     pub ja3: Option<String>,
+    /// Optional. JA4 fingerprint for SSL clients. To learn how to compute this fingerprint, please refer to https://github.com/FoxIO-LLC/ja4.
+    pub ja4: Option<String>,
     /// Optional. The URI resource the user requested that triggered an assessment.
     #[serde(rename = "requestedUri")]
     pub requested_uri: Option<String>,
@@ -440,12 +529,25 @@ pub struct GoogleCloudRecaptchaenterpriseV1Event {
     /// Optional. The IP address in the request from the user's device related to this event.
     #[serde(rename = "userIpAddress")]
     pub user_ip_address: Option<String>,
-    /// Optional. Flag for running WAF token assessment. If enabled, the token must be specified, and have been created by a WAF-enabled key.
+    /// Optional. Flag for running Web Application Firewall (WAF) token assessment. If enabled, the token must be specified, and have been created by a WAF-enabled key.
     #[serde(rename = "wafTokenAssessment")]
     pub waf_token_assessment: Option<bool>,
 }
 
 impl common::Part for GoogleCloudRecaptchaenterpriseV1Event {}
+
+/// Settings specific to keys that can be used for reCAPTCHA Express.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1ExpressKeySettings {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for GoogleCloudRecaptchaenterpriseV1ExpressKeySettings {}
 
 /// An individual action. Each action represents what to do if a policy matches.
 ///
@@ -457,18 +559,18 @@ impl common::Part for GoogleCloudRecaptchaenterpriseV1Event {}
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallAction {
     /// The user request did not match any policy and should be allowed access to the requested resource.
     pub allow: Option<GoogleCloudRecaptchaenterpriseV1FirewallActionAllowAction>,
-    /// This action will deny access to a given page. The user will get an HTTP error code.
+    /// This action denies access to a given page. The user gets an HTTP error code.
     pub block: Option<GoogleCloudRecaptchaenterpriseV1FirewallActionBlockAction>,
-    /// This action will inject reCAPTCHA JavaScript code into the HTML page returned by the site backend.
+    /// This action injects reCAPTCHA JavaScript code into the HTML page returned by the site backend.
     #[serde(rename = "includeRecaptchaScript")]
     pub include_recaptcha_script:
         Option<GoogleCloudRecaptchaenterpriseV1FirewallActionIncludeRecaptchaScriptAction>,
-    /// This action will redirect the request to a ReCaptcha interstitial to attach a token.
+    /// This action redirects the request to a reCAPTCHA interstitial to attach a token.
     pub redirect: Option<GoogleCloudRecaptchaenterpriseV1FirewallActionRedirectAction>,
-    /// This action will set a custom header but allow the request to continue to the customer backend.
+    /// This action sets a custom header but allow the request to continue to the customer backend.
     #[serde(rename = "setHeader")]
     pub set_header: Option<GoogleCloudRecaptchaenterpriseV1FirewallActionSetHeaderAction>,
-    /// This action will transparently serve a different page to an offending user.
+    /// This action transparently serves a different page to an offending user.
     pub substitute: Option<GoogleCloudRecaptchaenterpriseV1FirewallActionSubstituteAction>,
 }
 
@@ -513,7 +615,7 @@ pub struct GoogleCloudRecaptchaenterpriseV1FirewallActionIncludeRecaptchaScriptA
 
 impl common::Part for GoogleCloudRecaptchaenterpriseV1FirewallActionIncludeRecaptchaScriptAction {}
 
-/// A redirect action returns a 307 (temporary redirect) response, pointing the user to a ReCaptcha interstitial page to attach a token.
+/// A redirect action returns a 307 (temporary redirect) response, pointing the user to a reCAPTCHA interstitial page to attach a token.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -593,9 +695,9 @@ impl common::ResponseResult for GoogleCloudRecaptchaenterpriseV1FirewallPolicy {
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallPolicyAssessment {
-    /// Output only. If the processing of a policy config fails, an error will be populated and the firewall_policy will be left empty.
+    /// Output only. If the processing of a policy config fails, an error is populated and the firewall_policy is left empty.
     pub error: Option<GoogleRpcStatus>,
-    /// Output only. The policy that matched the request. If more than one policy may match, this is the first match. If no policy matches the incoming request, the policy field will be left empty.
+    /// Output only. The policy that matched the request. If more than one policy may match, this is the first match. If no policy matches the incoming request, the policy field is left empty.
     #[serde(rename = "firewallPolicy")]
     pub firewall_policy: Option<GoogleCloudRecaptchaenterpriseV1FirewallPolicy>,
 }
@@ -618,6 +720,10 @@ pub struct GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessment {
     #[serde(rename = "cardTestingVerdict")]
     pub card_testing_verdict:
         Option<GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentCardTestingVerdict>,
+    /// Output only. Reasons why the transaction is probably fraudulent and received a high transaction risk score.
+    #[serde(rename = "riskReasons")]
+    pub risk_reasons:
+        Option<Vec<GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentRiskReason>>,
     /// Output only. Assessment of this transaction for risk of a stolen instrument.
     #[serde(rename = "stolenInstrumentVerdict")]
     pub stolen_instrument_verdict:
@@ -659,6 +765,20 @@ pub struct GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentCardTestingV
 }
 
 impl common::Part for GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentCardTestingVerdict {}
+
+/// Risk reasons applicable to the Fraud Prevention assessment.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentRiskReason {
+    /// Output only. Risk reasons applicable to the Fraud Prevention assessment.
+    pub reason: Option<String>,
+}
+
+impl common::Part for GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentRiskReason {}
 
 /// Information about stolen instrument fraud, where the user is not the legitimate owner of the instrument being used for the purchase.
 ///
@@ -739,15 +859,32 @@ pub struct GoogleCloudRecaptchaenterpriseV1IOSKeySettings {
     /// Optional. If set to true, allowed_bundle_ids are not enforced.
     #[serde(rename = "allowAllBundleIds")]
     pub allow_all_bundle_ids: Option<bool>,
-    /// Optional. iOS bundle ids of apps allowed to use the key. Example: 'com.companyname.productname.appname'
+    /// Optional. iOS bundle IDs of apps allowed to use the key. Example: 'com.companyname.productname.appname' Each key supports a maximum of 250 bundle IDs. To use a key on more apps, set `allow_all_bundle_ids` to true. When this is set, you are responsible for validating the bundle id by checking the `token_properties.ios_bundle_id` field in each assessment response against your list of allowed bundle IDs.
     #[serde(rename = "allowedBundleIds")]
     pub allowed_bundle_ids: Option<Vec<String>>,
-    /// Optional. Apple Developer account details for the app that is protected by the reCAPTCHA Key. reCAPTCHA Enterprise leverages platform-specific checks like Apple App Attest and Apple DeviceCheck to protect your app from abuse. Providing these fields allows reCAPTCHA Enterprise to get a better assessment of the integrity of your app.
+    /// Optional. Apple Developer account details for the app that is protected by the reCAPTCHA Key. reCAPTCHA leverages platform-specific checks like Apple App Attest and Apple DeviceCheck to protect your app from abuse. Providing these fields allows reCAPTCHA to get a better assessment of the integrity of your app.
     #[serde(rename = "appleDeveloperId")]
     pub apple_developer_id: Option<GoogleCloudRecaptchaenterpriseV1AppleDeveloperId>,
 }
 
 impl common::Part for GoogleCloudRecaptchaenterpriseV1IOSKeySettings {}
+
+/// Information about the IP or IP range override.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1IpOverrideData {
+    /// Required. The IP address to override (can be IPv4, IPv6 or CIDR). The IP override must be a valid IPv4 or IPv6 address, or a CIDR range. The IP override must be a public IP address. Example of IPv4: 168.192.5.6 Example of IPv6: 2001:0000:130F:0000:0000:09C0:876A:130B Example of IPv4 with CIDR: 168.192.5.0/24 Example of IPv6 with CIDR: 2001:0DB8:1234::/48
+    pub ip: Option<String>,
+    /// Required. Describes the type of IP override.
+    #[serde(rename = "overrideType")]
+    pub override_type: Option<String>,
+}
+
+impl common::Part for GoogleCloudRecaptchaenterpriseV1IpOverrideData {}
 
 /// A key used to identify and configure applications (web and/or mobile) that use reCAPTCHA Enterprise.
 ///
@@ -773,17 +910,20 @@ pub struct GoogleCloudRecaptchaenterpriseV1Key {
     /// Required. Human-readable display name of this key. Modifiable by user.
     #[serde(rename = "displayName")]
     pub display_name: Option<String>,
+    /// Settings for keys that can be used by reCAPTCHA Express.
+    #[serde(rename = "expressSettings")]
+    pub express_settings: Option<GoogleCloudRecaptchaenterpriseV1ExpressKeySettings>,
     /// Settings for keys that can be used by iOS apps.
     #[serde(rename = "iosSettings")]
     pub ios_settings: Option<GoogleCloudRecaptchaenterpriseV1IOSKeySettings>,
-    /// Optional. See [Creating and managing labels] (https://cloud.google.com/recaptcha-enterprise/docs/labels).
+    /// Optional. See [Creating and managing labels] (https://cloud.google.com/recaptcha/docs/labels).
     pub labels: Option<HashMap<String, String>>,
     /// Identifier. The resource name for the Key in the format `projects/{project}/keys/{key}`.
     pub name: Option<String>,
     /// Optional. Options for user acceptance testing.
     #[serde(rename = "testingOptions")]
     pub testing_options: Option<GoogleCloudRecaptchaenterpriseV1TestingOptions>,
-    /// Optional. Settings for WAF
+    /// Optional. Settings for Web Application Firewall (WAF).
     #[serde(rename = "wafSettings")]
     pub waf_settings: Option<GoogleCloudRecaptchaenterpriseV1WafSettings>,
     /// Settings for keys that can be used by websites.
@@ -815,6 +955,28 @@ pub struct GoogleCloudRecaptchaenterpriseV1ListFirewallPoliciesResponse {
 }
 
 impl common::ResponseResult for GoogleCloudRecaptchaenterpriseV1ListFirewallPoliciesResponse {}
+
+/// Response for ListIpOverrides.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [keys list ip overrides projects](ProjectKeyListIpOverrideCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1ListIpOverridesResponse {
+    /// IP Overrides details.
+    #[serde(rename = "ipOverrides")]
+    pub ip_overrides: Option<Vec<GoogleCloudRecaptchaenterpriseV1IpOverrideData>>,
+    /// Token to retrieve the next page of results. If this field is empty, no keys remain in the results.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+}
+
+impl common::ResponseResult for GoogleCloudRecaptchaenterpriseV1ListIpOverridesResponse {}
 
 /// Response to request to list keys in a project.
 ///
@@ -897,15 +1059,15 @@ impl common::ResponseResult for GoogleCloudRecaptchaenterpriseV1ListRelatedAccou
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1Metrics {
-    /// Metrics will be continuous and in order by dates, and in the granularity of day. Only challenge-based keys (CHECKBOX, INVISIBLE), will have challenge-based data.
+    /// Metrics are continuous and in order by dates, and in the granularity of day. Only challenge-based keys (CHECKBOX, INVISIBLE) have challenge-based data.
     #[serde(rename = "challengeMetrics")]
     pub challenge_metrics: Option<Vec<GoogleCloudRecaptchaenterpriseV1ChallengeMetrics>>,
     /// Output only. Identifier. The name of the metrics, in the format `projects/{project}/keys/{key}/metrics`.
     pub name: Option<String>,
-    /// Metrics will be continuous and in order by dates, and in the granularity of day. All Key types should have score-based data.
+    /// Metrics are continuous and in order by dates, and in the granularity of day. All Key types should have score-based data.
     #[serde(rename = "scoreMetrics")]
     pub score_metrics: Option<Vec<GoogleCloudRecaptchaenterpriseV1ScoreMetrics>>,
-    /// Inclusive start time aligned to a day (UTC).
+    /// Inclusive start time aligned to a day in the America/Los_Angeles (Pacific) timezone.
     #[serde(rename = "startTime")]
     pub start_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
@@ -924,12 +1086,30 @@ impl common::ResponseResult for GoogleCloudRecaptchaenterpriseV1Metrics {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest {
-    /// Optional. If true, skips the billing check. A reCAPTCHA Enterprise key or migrated key behaves differently than a reCAPTCHA (non-Enterprise version) key when you reach a quota limit (see https://cloud.google.com/recaptcha-enterprise/quotas#quota_limit). To avoid any disruption of your usage, we check that a billing account is present. If your usage of reCAPTCHA is under the free quota, you can safely skip the billing check and proceed with the migration. See https://cloud.google.com/recaptcha-enterprise/docs/billing-information.
+    /// Optional. If true, skips the billing check. A reCAPTCHA Enterprise key or migrated key behaves differently than a reCAPTCHA (non-Enterprise version) key when you reach a quota limit (see https://docs.cloud.google.com/recaptcha/quotas#quota_limit). To avoid any disruption of your usage, we check that a billing account is present. If your usage of reCAPTCHA is under the free quota, you can safely skip the billing check and proceed with the migration. See https://cloud.google.com/recaptcha/docs/billing-information.
     #[serde(rename = "skipBillingCheck")]
     pub skip_billing_check: Option<bool>,
 }
 
 impl common::RequestValue for GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest {}
+
+/// Details on a phone authentication event
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1PhoneAuthenticationEvent {
+    /// Optional. The time at which the multi-factor authentication event (challenge or verification) occurred.
+    #[serde(rename = "eventTime")]
+    pub event_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Required. Phone number in E.164 format for which a multi-factor authentication challenge was initiated, succeeded, or failed.
+    #[serde(rename = "phoneNumber")]
+    pub phone_number: Option<String>,
+}
+
+impl common::Part for GoogleCloudRecaptchaenterpriseV1PhoneAuthenticationEvent {}
 
 /// Assessment for Phone Fraud
 ///
@@ -1009,6 +1189,42 @@ pub struct GoogleCloudRecaptchaenterpriseV1RelatedAccountGroupMembership {
 
 impl common::Part for GoogleCloudRecaptchaenterpriseV1RelatedAccountGroupMembership {}
 
+/// The RemoveIpOverride request message.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [keys remove ip override projects](ProjectKeyRemoveIpOverrideCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest {
+    /// Required. IP override to be removed from the key.
+    #[serde(rename = "ipOverrideData")]
+    pub ip_override_data: Option<GoogleCloudRecaptchaenterpriseV1IpOverrideData>,
+}
+
+impl common::RequestValue for GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest {}
+
+/// Response for RemoveIpOverride.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [keys remove ip override projects](ProjectKeyRemoveIpOverrideCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideResponse {
+    _never_set: Option<bool>,
+}
+
+impl common::ResponseResult for GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideResponse {}
+
 /// The reorder firewall policies request message.
 ///
 /// # Activities
@@ -1071,6 +1287,8 @@ impl common::ResponseResult for GoogleCloudRecaptchaenterpriseV1RetrieveLegacySe
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1RiskAnalysis {
+    /// Output only. Challenge information for POLICY_BASED_CHALLENGE and INVISIBLE keys.
+    pub challenge: Option<String>,
     /// Output only. Extended verdict reasons to be used for experimentation only. The set of possible reasons is subject to change.
     #[serde(rename = "extendedVerdictReasons")]
     pub extended_verdict_reasons: Option<Vec<String>>,
@@ -1078,6 +1296,9 @@ pub struct GoogleCloudRecaptchaenterpriseV1RiskAnalysis {
     pub reasons: Option<Vec<String>>,
     /// Output only. Legitimate event score from 0.0 to 1.0. (1.0 means very likely legitimate traffic while 0.0 means very likely non-legitimate traffic).
     pub score: Option<f32>,
+    /// Output only. Bots with identities that have been verified by reCAPTCHA and detected in the event.
+    #[serde(rename = "verifiedBots")]
+    pub verified_bots: Option<Vec<GoogleCloudRecaptchaenterpriseV1Bot>>,
 }
 
 impl common::Part for GoogleCloudRecaptchaenterpriseV1RiskAnalysis {}
@@ -1198,10 +1419,10 @@ impl common::Part for GoogleCloudRecaptchaenterpriseV1SmsTollFraudVerdict {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1TestingOptions {
-    /// Optional. For challenge-based keys only (CHECKBOX, INVISIBLE), all challenge requests for this site will return nocaptcha if NOCAPTCHA, or an unsolvable challenge if CHALLENGE.
+    /// Optional. For challenge-based keys only (CHECKBOX, INVISIBLE), all challenge requests for this site return nocaptcha if NOCAPTCHA, or an unsolvable challenge if CHALLENGE.
     #[serde(rename = "testingChallenge")]
     pub testing_challenge: Option<String>,
-    /// Optional. All assessments for this Key will return this score. Must be between 0 (likely not legitimate) and 1 (likely legitimate) inclusive.
+    /// Optional. All assessments for this Key return this score. Must be between 0 (likely not legitimate) and 1 (likely legitimate) inclusive.
     #[serde(rename = "testingScore")]
     pub testing_score: Option<f32>,
 }
@@ -1457,10 +1678,10 @@ impl common::Part for GoogleCloudRecaptchaenterpriseV1UserInfo {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1WafSettings {
-    /// Required. The WAF feature for which this key is enabled.
+    /// Required. The Web Application Firewall (WAF) feature for which this key is enabled.
     #[serde(rename = "wafFeature")]
     pub waf_feature: Option<String>,
-    /// Required. The WAF service that uses this key.
+    /// Required. The Web Application Firewall (WAF) service that uses this key.
     #[serde(rename = "wafService")]
     pub waf_service: Option<String>,
 }
@@ -1475,24 +1696,61 @@ impl common::Part for GoogleCloudRecaptchaenterpriseV1WafSettings {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1WebKeySettings {
-    /// Optional. If set to true, it means allowed_domains will not be enforced.
+    /// Optional. If set to true, it means allowed_domains are not enforced.
     #[serde(rename = "allowAllDomains")]
     pub allow_all_domains: Option<bool>,
     /// Optional. If set to true, the key can be used on AMP (Accelerated Mobile Pages) websites. This is supported only for the SCORE integration type.
     #[serde(rename = "allowAmpTraffic")]
     pub allow_amp_traffic: Option<bool>,
-    /// Optional. Domains or subdomains of websites allowed to use the key. All subdomains of an allowed domain are automatically allowed. A valid domain requires a host and must not include any path, port, query or fragment. Examples: 'example.com' or 'subdomain.example.com'
+    /// Optional. Domains or subdomains of websites allowed to use the key. All subdomains of an allowed domain are automatically allowed. A valid domain requires a host and must not include any path, port, query or fragment. Examples: 'example.com' or 'subdomain.example.com' Each key supports a maximum of 250 domains. To use a key on more domains, set `allow_all_domains` to true. When this is set, you are responsible for validating the hostname by checking the `token_properties.hostname` field in each assessment response against your list of allowed domains.
     #[serde(rename = "allowedDomains")]
     pub allowed_domains: Option<Vec<String>>,
-    /// Optional. Settings for the frequency and difficulty at which this key triggers captcha challenges. This should only be specified for IntegrationTypes CHECKBOX and INVISIBLE.
+    /// Optional. Settings for the frequency and difficulty at which this key triggers captcha challenges. This should only be specified for `IntegrationType` CHECKBOX, INVISIBLE or POLICY_BASED_CHALLENGE.
     #[serde(rename = "challengeSecurityPreference")]
     pub challenge_security_preference: Option<String>,
+    /// Optional. Challenge settings.
+    #[serde(rename = "challengeSettings")]
+    pub challenge_settings: Option<GoogleCloudRecaptchaenterpriseV1WebKeySettingsChallengeSettings>,
     /// Required. Describes how this key is integrated with the website.
     #[serde(rename = "integrationType")]
     pub integration_type: Option<String>,
 }
 
 impl common::Part for GoogleCloudRecaptchaenterpriseV1WebKeySettings {}
+
+/// Per-action challenge settings.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1WebKeySettingsActionSettings {
+    /// Required. A challenge is triggered if the end-user score is below that threshold. Value must be between 0 and 1 (inclusive).
+    #[serde(rename = "scoreThreshold")]
+    pub score_threshold: Option<f32>,
+}
+
+impl common::Part for GoogleCloudRecaptchaenterpriseV1WebKeySettingsActionSettings {}
+
+/// Settings for POLICY_BASED_CHALLENGE keys to control when a challenge is triggered.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1WebKeySettingsChallengeSettings {
+    /// Optional. The action to score threshold map. The action name should be the same as the action name passed in the `data-action` attribute (see https://cloud.google.com/recaptcha/docs/actions-website). Action names are case-insensitive. There is a maximum of 100 action settings. An action name has a maximum length of 100.
+    #[serde(rename = "actionSettings")]
+    pub action_settings:
+        Option<HashMap<String, GoogleCloudRecaptchaenterpriseV1WebKeySettingsActionSettings>>,
+    /// Required. Defines when a challenge is triggered (unless the default threshold is overridden for the given action, see `action_settings`).
+    #[serde(rename = "defaultSettings")]
+    pub default_settings: Option<GoogleCloudRecaptchaenterpriseV1WebKeySettingsActionSettings>,
+}
+
+impl common::Part for GoogleCloudRecaptchaenterpriseV1WebKeySettingsChallengeSettings {}
 
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
 ///
@@ -1550,9 +1808,20 @@ impl common::Part for GoogleRpcStatus {}
 /// use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -1563,12 +1832,12 @@ impl common::Part for GoogleRpcStatus {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = RecaptchaEnterprise::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `assessments_annotate(...)`, `assessments_create(...)`, `firewallpolicies_create(...)`, `firewallpolicies_delete(...)`, `firewallpolicies_get(...)`, `firewallpolicies_list(...)`, `firewallpolicies_patch(...)`, `firewallpolicies_reorder(...)`, `keys_create(...)`, `keys_delete(...)`, `keys_get(...)`, `keys_get_metrics(...)`, `keys_list(...)`, `keys_migrate(...)`, `keys_patch(...)`, `keys_retrieve_legacy_secret_key(...)`, `relatedaccountgroupmemberships_search(...)`, `relatedaccountgroups_list(...)` and `relatedaccountgroups_memberships_list(...)`
+/// // like `assessments_annotate(...)`, `assessments_create(...)`, `firewallpolicies_create(...)`, `firewallpolicies_delete(...)`, `firewallpolicies_get(...)`, `firewallpolicies_list(...)`, `firewallpolicies_patch(...)`, `firewallpolicies_reorder(...)`, `keys_add_ip_override(...)`, `keys_create(...)`, `keys_delete(...)`, `keys_get(...)`, `keys_get_metrics(...)`, `keys_list(...)`, `keys_list_ip_overrides(...)`, `keys_migrate(...)`, `keys_patch(...)`, `keys_remove_ip_override(...)`, `keys_retrieve_legacy_secret_key(...)`, `relatedaccountgroupmemberships_search(...)`, `relatedaccountgroups_list(...)` and `relatedaccountgroups_memberships_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1613,7 +1882,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the project in which the assessment will be created, in the format `projects/{project}`.
+    /// * `parent` - Required. The name of the project in which the assessment is created, in the format `projects/{project}`.
     pub fn assessments_create(
         &self,
         request: GoogleCloudRecaptchaenterpriseV1Assessment,
@@ -1636,7 +1905,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the project this policy will apply to, in the format `projects/{project}`.
+    /// * `parent` - Required. The name of the project this policy applies to, in the format `projects/{project}`.
     pub fn firewallpolicies_create(
         &self,
         request: GoogleCloudRecaptchaenterpriseV1FirewallPolicy,
@@ -1754,12 +2023,35 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Adds an IP override to a key. The following restrictions hold: * The maximum number of IP overrides per key is 1000. * For any conflict (such as IP already exists or IP part of an existing IP range), an error is returned.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the key to which the IP override is added, in the format `projects/{project}/keys/{key}`.
+    pub fn keys_add_ip_override(
+        &self,
+        request: GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest,
+        name: &str,
+    ) -> ProjectKeyAddIpOverrideCall<'a, C> {
+        ProjectKeyAddIpOverrideCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a new reCAPTCHA Enterprise key.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the project in which the key will be created, in the format `projects/{project}`.
+    /// * `parent` - Required. The name of the project in which the key is created, in the format `projects/{project}`.
     pub fn keys_create(
         &self,
         request: GoogleCloudRecaptchaenterpriseV1Key,
@@ -1832,9 +2124,28 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The name of the project that contains the keys that will be listed, in the format `projects/{project}`.
+    /// * `parent` - Required. The name of the project that contains the keys that is listed, in the format `projects/{project}`.
     pub fn keys_list(&self, parent: &str) -> ProjectKeyListCall<'a, C> {
         ProjectKeyListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all IP overrides for a key.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent key for which the IP overrides are listed, in the format `projects/{project}/keys/{key}`.
+    pub fn keys_list_ip_overrides(&self, parent: &str) -> ProjectKeyListIpOverrideCall<'a, C> {
+        ProjectKeyListIpOverrideCall {
             hub: self.hub,
             _parent: parent.to_string(),
             _page_token: Default::default(),
@@ -1886,6 +2197,29 @@ impl<'a, C> ProjectMethods<'a, C> {
             _request: request,
             _name: name.to_string(),
             _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Removes an IP override from a key. The following restrictions hold: * If the IP isn't found in an existing IP override, a `NOT_FOUND` error is returned. * If the IP is found in an existing IP override, but the override type does not match, a `NOT_FOUND` error is returned.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the key from which the IP override is removed, in the format `projects/{project}/keys/{key}`.
+    pub fn keys_remove_ip_override(
+        &self,
+        request: GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest,
+        name: &str,
+    ) -> ProjectKeyRemoveIpOverrideCall<'a, C> {
+        ProjectKeyRemoveIpOverrideCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2002,9 +2336,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2015,7 +2360,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -2333,9 +2678,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2346,7 +2702,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -2548,7 +2904,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the project in which the assessment will be created, in the format `projects/{project}`.
+    /// Required. The name of the project in which the assessment is created, in the format `projects/{project}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2661,9 +3017,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2674,7 +3041,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -2879,7 +3246,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the project this policy will apply to, in the format `projects/{project}`.
+    /// Required. The name of the project this policy applies to, in the format `projects/{project}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2991,9 +3358,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3004,7 +3382,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -3277,9 +3655,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3290,7 +3679,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -3568,9 +3957,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3581,7 +3981,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -3884,9 +4284,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3897,7 +4308,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -4117,7 +4528,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. The mask to control which fields of the policy get updated. If the mask is not present, all fields will be updated.
+    /// Optional. The mask to control which fields of the policy get updated. If the mask is not present, all fields are updated.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(
@@ -4230,9 +4641,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4243,7 +4665,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -4543,6 +4965,348 @@ where
     }
 }
 
+/// Adds an IP override to a key. The following restrictions hold: * The maximum number of IP overrides per key is 1000. * For any conflict (such as IP already exists or IP part of an existing IP range), an error is returned.
+///
+/// A builder for the *keys.addIpOverride* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_recaptchaenterprise1 as recaptchaenterprise1;
+/// use recaptchaenterprise1::api::GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest;
+/// # async fn dox() {
+/// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = RecaptchaEnterprise::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().keys_add_ip_override(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectKeyAddIpOverrideCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a RecaptchaEnterprise<C>,
+    _request: GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectKeyAddIpOverrideCall<'a, C> {}
+
+impl<'a, C> ProjectKeyAddIpOverrideCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudRecaptchaenterpriseV1AddIpOverrideResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "recaptchaenterprise.projects.keys.addIpOverride",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:addIpOverride";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudRecaptchaenterpriseV1AddIpOverrideRequest,
+    ) -> ProjectKeyAddIpOverrideCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the key to which the IP override is added, in the format `projects/{project}/keys/{key}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectKeyAddIpOverrideCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectKeyAddIpOverrideCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyAddIpOverrideCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectKeyAddIpOverrideCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectKeyAddIpOverrideCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectKeyAddIpOverrideCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Creates a new reCAPTCHA Enterprise key.
 ///
 /// A builder for the *keys.create* method supported by a *project* resource.
@@ -4561,9 +5325,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4574,7 +5349,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -4776,7 +5551,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the project in which the key will be created, in the format `projects/{project}`.
+    /// Required. The name of the project in which the key is created, in the format `projects/{project}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4888,9 +5663,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4901,7 +5687,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -5174,9 +5960,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5187,7 +5984,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -5459,9 +6256,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5472,7 +6280,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -5747,9 +6555,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5760,7 +6579,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -5768,8 +6587,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().keys_list("parent")
-///              .page_token("ea")
-///              .page_size(-55)
+///              .page_token("ipsum")
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5936,7 +6755,7 @@ where
         }
     }
 
-    /// Required. The name of the project that contains the keys that will be listed, in the format `projects/{project}`.
+    /// Required. The name of the project that contains the keys that is listed, in the format `projects/{project}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -6045,6 +6864,332 @@ where
     }
 }
 
+/// Lists all IP overrides for a key.
+///
+/// A builder for the *keys.listIpOverrides* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_recaptchaenterprise1 as recaptchaenterprise1;
+/// # async fn dox() {
+/// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = RecaptchaEnterprise::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().keys_list_ip_overrides("parent")
+///              .page_token("duo")
+///              .page_size(-50)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectKeyListIpOverrideCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a RecaptchaEnterprise<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectKeyListIpOverrideCall<'a, C> {}
+
+impl<'a, C> ProjectKeyListIpOverrideCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudRecaptchaenterpriseV1ListIpOverridesResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "recaptchaenterprise.projects.keys.listIpOverrides",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}:listIpOverrides";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The parent key for which the IP overrides are listed, in the format `projects/{project}/keys/{key}`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectKeyListIpOverrideCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The next_page_token value returned from a previous ListIpOverridesRequest, if any.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectKeyListIpOverrideCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of overrides to return. Default is 10. Max limit is 100. If the number of overrides is less than the page_size, all overrides are returned. If the page size is more than 100, it is coerced to 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectKeyListIpOverrideCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectKeyListIpOverrideCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyListIpOverrideCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectKeyListIpOverrideCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectKeyListIpOverrideCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectKeyListIpOverrideCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Migrates an existing key from reCAPTCHA to reCAPTCHA Enterprise. Once a key is migrated, it can be used from either product. SiteVerify requests are billed as CreateAssessment calls. You must be authenticated as one of the current owners of the reCAPTCHA Key, and your user must have the reCAPTCHA Enterprise Admin IAM role in the destination project.
 ///
 /// A builder for the *keys.migrate* method supported by a *project* resource.
@@ -6063,9 +7208,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6076,7 +7232,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -6391,9 +7547,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6404,7 +7571,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -6621,7 +7788,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. The mask to control which fields of the key get updated. If the mask is not present, all fields will be updated.
+    /// Optional. The mask to control which fields of the key get updated. If the mask is not present, all fields are updated.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: common::FieldMask) -> ProjectKeyPatchCall<'a, C> {
@@ -6713,6 +7880,348 @@ where
     }
 }
 
+/// Removes an IP override from a key. The following restrictions hold: * If the IP isn't found in an existing IP override, a `NOT_FOUND` error is returned. * If the IP is found in an existing IP override, but the override type does not match, a `NOT_FOUND` error is returned.
+///
+/// A builder for the *keys.removeIpOverride* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_recaptchaenterprise1 as recaptchaenterprise1;
+/// use recaptchaenterprise1::api::GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest;
+/// # async fn dox() {
+/// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = RecaptchaEnterprise::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().keys_remove_ip_override(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectKeyRemoveIpOverrideCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a RecaptchaEnterprise<C>,
+    _request: GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectKeyRemoveIpOverrideCall<'a, C> {}
+
+impl<'a, C> ProjectKeyRemoveIpOverrideCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "recaptchaenterprise.projects.keys.removeIpOverride",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:removeIpOverride";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudRecaptchaenterpriseV1RemoveIpOverrideRequest,
+    ) -> ProjectKeyRemoveIpOverrideCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the key from which the IP override is removed, in the format `projects/{project}/keys/{key}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectKeyRemoveIpOverrideCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectKeyRemoveIpOverrideCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectKeyRemoveIpOverrideCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectKeyRemoveIpOverrideCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectKeyRemoveIpOverrideCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectKeyRemoveIpOverrideCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Returns the secret key related to the specified public key. You must use the legacy secret key only in a 3rd party integration with legacy reCAPTCHA.
 ///
 /// A builder for the *keys.retrieveLegacySecretKey* method supported by a *project* resource.
@@ -6730,9 +8239,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6743,7 +8263,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -7021,9 +8541,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7034,7 +8565,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -7365,9 +8896,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7378,7 +8920,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -7386,8 +8928,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().relatedaccountgroups_memberships_list("parent")
-///              .page_token("ut")
-///              .page_size(-12)
+///              .page_token("ipsum")
+///              .page_size(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7696,9 +9238,20 @@ where
 /// # use recaptchaenterprise1::{RecaptchaEnterprise, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7709,7 +9262,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = RecaptchaEnterprise::new(client, auth);
@@ -7717,8 +9270,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().relatedaccountgroups_list("parent")
-///              .page_token("est")
-///              .page_size(-50)
+///              .page_token("ea")
+///              .page_size(-99)
 ///              .doit().await;
 /// # }
 /// ```

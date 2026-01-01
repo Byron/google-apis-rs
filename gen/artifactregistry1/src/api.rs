@@ -52,7 +52,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_artifactregistry1 as artifactregistry1;
-/// use artifactregistry1::api::Repository;
+/// use artifactregistry1::api::Attachment;
 /// use artifactregistry1::{Result, Error};
 /// # async fn dox() {
 /// use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -65,9 +65,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -78,20 +89,20 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = ArtifactRegistry::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Repository::default();
+/// let mut req = Attachment::default();
 ///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_repositories_create(req, "parent")
-///              .repository_id("At")
+/// let result = hub.projects().locations_repositories_attachments_create(req, "parent")
+///              .attachment_id("At")
 ///              .doit().await;
 ///
 /// match result {
@@ -132,7 +143,7 @@ impl<'a, C> ArtifactRegistry<C> {
         ArtifactRegistry {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://artifactregistry.googleapis.com/".to_string(),
             _root_url: "https://artifactregistry.googleapis.com/".to_string(),
         }
@@ -143,7 +154,7 @@ impl<'a, C> ArtifactRegistry<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -190,6 +201,47 @@ pub struct AptRepository {
 
 impl common::Part for AptRepository {}
 
+/// An Attachment refers to additional metadata that can be attached to artifacts in Artifact Registry. An attachment consists of one or more files.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations repositories attachments create projects](ProjectLocationRepositoryAttachmentCreateCall) (request)
+/// * [locations repositories attachments get projects](ProjectLocationRepositoryAttachmentGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Attachment {
+    /// Optional. User annotations. These attributes can only be set and used by the user, and not by Artifact Registry. See https://google.aip.dev/128#annotations for more details such as format and size limitations.
+    pub annotations: Option<HashMap<String, String>>,
+    /// The namespace this attachment belongs to. E.g. If an attachment is created by artifact analysis, namespace is set to `artifactanalysis.googleapis.com`.
+    #[serde(rename = "attachmentNamespace")]
+    pub attachment_namespace: Option<String>,
+    /// Output only. The time when the attachment was created.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Required. The files that belong to this attachment. If the file ID part contains slashes, they are escaped. E.g. `projects/p1/locations/us-central1/repositories/repo1/files/sha:`.
+    pub files: Option<Vec<String>>,
+    /// The name of the attachment. E.g. `projects/p1/locations/us/repositories/repo/attachments/sbom`.
+    pub name: Option<String>,
+    /// Output only. The name of the OCI version that this attachment created. Only populated for Docker attachments. E.g. `projects/p1/locations/us-central1/repositories/repo1/packages/p1/versions/v1`.
+    #[serde(rename = "ociVersionName")]
+    pub oci_version_name: Option<String>,
+    /// Required. The target the attachment is for, can be a Version, Package or Repository. E.g. `projects/p1/locations/us-central1/repositories/repo1/packages/p1/versions/v1`.
+    pub target: Option<String>,
+    /// Type of attachment. E.g. `application/vnd.spdx+json`
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+    /// Output only. The time when the attachment was last updated.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::RequestValue for Attachment {}
+impl common::ResponseResult for Attachment {}
+
 /// The request to delete multiple versions across a repository.
 ///
 /// # Activities
@@ -202,7 +254,7 @@ impl common::Part for AptRepository {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BatchDeleteVersionsRequest {
-    /// Required. The names of the versions to delete. A maximum of 10000 versions can be deleted in a batch.
+    /// Required. The names of the versions to delete. The maximum number of versions deleted per batch is determined by the service and is dependent on the available resources in the region.
     pub names: Option<Vec<String>>,
     /// If true, the request is performed without deleting data, following AIP-163.
     #[serde(rename = "validateOnly")]
@@ -300,6 +352,20 @@ pub struct CleanupPolicyMostRecentVersions {
 
 impl common::Part for CleanupPolicyMostRecentVersions {}
 
+/// Common remote repository settings type.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct CommonRemoteRepository {
+    /// Required. A common public repository base for remote repository.
+    pub uri: Option<String>,
+}
+
+impl common::Part for CommonRemoteRepository {}
+
 /// DockerImage represents a docker artifact. The following fields are returned as untyped metadata in the Version resource, using camelcase keys (i.e. metadata.imageSizeBytes): * imageSizeBytes * mediaType * buildTime
 ///
 /// # Activities
@@ -312,9 +378,15 @@ impl common::Part for CleanupPolicyMostRecentVersions {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DockerImage {
+    /// ArtifactType of this image, e.g. "application/vnd.example+type". If the `subject_digest` is set and no `artifact_type` is given, the `media_type` will be considered as the `artifact_type`. This field is returned as the `metadata.artifactType` field in the Version resource.
+    #[serde(rename = "artifactType")]
+    pub artifact_type: Option<String>,
     /// The time this image was built. This field is returned as the 'metadata.buildTime' field in the Version resource. The build time is returned to the client as an RFC 3339 string, which can be easily used with the JavaScript Date constructor.
     #[serde(rename = "buildTime")]
     pub build_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Optional. For multi-arch images (manifest lists), this field contains the list of image manifests.
+    #[serde(rename = "imageManifests")]
+    pub image_manifests: Option<Vec<ImageManifest>>,
     /// Calculated size of the image. This field is returned as the 'metadata.imageSizeBytes' field in the Version resource.
     #[serde(rename = "imageSizeBytes")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -322,7 +394,7 @@ pub struct DockerImage {
     /// Media type of this image, e.g. "application/vnd.docker.distribution.manifest.v2+json". This field is returned as the 'metadata.mediaType' field in the Version resource.
     #[serde(rename = "mediaType")]
     pub media_type: Option<String>,
-    /// Required. registry_location, project_id, repository_name and image id forms a unique image name:`projects//locations//repository//dockerImages/`. For example, "projects/test-project/locations/us-west4/repositories/test-repo/dockerImages/ nginx@sha256:e9954c1fc875017be1c3e36eca16be2d9e9bccc4bf072163515467d6a823c7cf", where "us-west4" is the registry_location, "test-project" is the project_id, "test-repo" is the repository_name and "nginx@sha256:e9954c1fc875017be1c3e36eca16be2d9e9bccc4bf072163515467d6a823c7cf" is the image's digest.
+    /// Required. registry_location, project_id, repository_name and image id forms a unique image name:`projects//locations//repositories//dockerImages/`. For example, "projects/test-project/locations/us-west4/repositories/test-repo/dockerImages/ nginx@sha256:e9954c1fc875017be1c3e36eca16be2d9e9bccc4bf072163515467d6a823c7cf", where "us-west4" is the registry_location, "test-project" is the project_id, "test-repo" is the repository_name and "nginx@sha256:e9954c1fc875017be1c3e36eca16be2d9e9bccc4bf072163515467d6a823c7cf" is the image's digest.
     pub name: Option<String>,
     /// Tags attached to this image.
     pub tags: Option<Vec<String>>,
@@ -398,6 +470,7 @@ impl common::ResponseResult for DownloadFileResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
 /// * [locations repositories packages tags delete projects](ProjectLocationRepositoryPackageTagDeleteCall) (response)
+/// * [locations repositories rules delete projects](ProjectLocationRepositoryRuleDeleteCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -406,6 +479,31 @@ pub struct Empty {
 }
 
 impl common::ResponseResult for Empty {}
+
+/// The request for exporting an artifact to a destination.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations repositories export artifact projects](ProjectLocationRepositoryExportArtifactCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExportArtifactRequest {
+    /// The Cloud Storage path to export the artifact to. Should start with the bucket name, and optionally have a directory path. Examples: `dst_bucket`, `dst_bucket/sub_dir`. Existing objects with the same path will be overwritten.
+    #[serde(rename = "gcsPath")]
+    pub gcs_path: Option<String>,
+    /// The artifact tag to export. Format:projects/{project}/locations/{location}/repositories/{repository}/packages/{package}/tags/{tag}
+    #[serde(rename = "sourceTag")]
+    pub source_tag: Option<String>,
+    /// The artifact version to export. Format: projects/{project}/locations/{location}/repositories/{repository}/packages/{package}/versions/{version}
+    #[serde(rename = "sourceVersion")]
+    pub source_version: Option<String>,
+}
+
+impl common::RequestValue for ExportArtifactRequest {}
 
 /// Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec. Example (Comparison): title: "Summary size limit" description: "Determines if a summary is less than 100 chars" expression: "document.summary.size() < 100" Example (Equality): title: "Requestor is owner" description: "Determines if requestor is the document owner" expression: "document.owner == request.auth.claims.email" Example (Logic): title: "Public documents" description: "Determine whether the document should be publicly visible" expression: "document.type != 'private' && document.type != 'internal'" Example (Data Manipulation): title: "Notification string" description: "Create a notification string with a timestamp." expression: "'New message received at ' + string(document.create_time)" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information.
 ///
@@ -435,10 +533,13 @@ impl common::Part for Expr {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
 /// * [locations repositories files get projects](ProjectLocationRepositoryFileGetCall) (response)
+/// * [locations repositories files patch projects](ProjectLocationRepositoryFilePatchCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleDevtoolsArtifactregistryV1File {
+    /// Optional. Client specified annotations.
+    pub annotations: Option<HashMap<String, String>>,
     /// Output only. The time when the File was created.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -460,6 +561,7 @@ pub struct GoogleDevtoolsArtifactregistryV1File {
     pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
 
+impl common::RequestValue for GoogleDevtoolsArtifactregistryV1File {}
 impl common::ResponseResult for GoogleDevtoolsArtifactregistryV1File {}
 
 /// Customer-specified publicly available remote repository.
@@ -606,6 +708,36 @@ impl common::Part
 {
 }
 
+/// A rule defines the deny or allow action of the operation it applies to and the conditions required for the rule to apply. You can set one rule for an entire repository and one rule for each package within.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations repositories rules create projects](ProjectLocationRepositoryRuleCreateCall) (request|response)
+/// * [locations repositories rules get projects](ProjectLocationRepositoryRuleGetCall) (response)
+/// * [locations repositories rules patch projects](ProjectLocationRepositoryRulePatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleDevtoolsArtifactregistryV1Rule {
+    /// The action this rule takes.
+    pub action: Option<String>,
+    /// Optional. A CEL expression for conditions that must be met in order for the rule to apply. If not provided, the rule matches all objects.
+    pub condition: Option<Expr>,
+    /// The name of the rule, for example: `projects/p1/locations/us-central1/repositories/repo1/rules/rule1`.
+    pub name: Option<String>,
+    /// no description provided
+    pub operation: Option<String>,
+    /// The package ID the rule applies to. If empty, this rule applies to all packages inside the repository.
+    #[serde(rename = "packageId")]
+    pub package_id: Option<String>,
+}
+
+impl common::RequestValue for GoogleDevtoolsArtifactregistryV1Rule {}
+impl common::ResponseResult for GoogleDevtoolsArtifactregistryV1Rule {}
+
 /// A hash of file content.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -623,6 +755,35 @@ pub struct Hash {
 }
 
 impl common::Part for Hash {}
+
+/// Details of a single image manifest within a multi-arch image.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ImageManifest {
+    /// Optional. The CPU architecture of the image. Values are provided by the Docker client and are not validated by Artifact Registry. Example values include "amd64", "arm64", "ppc64le", "s390x", "riscv64", "mips64le", etc.
+    pub architecture: Option<String>,
+    /// Optional. The manifest digest, in the format "sha256:".
+    pub digest: Option<String>,
+    /// Optional. The media type of the manifest, e.g., "application/vnd.docker.distribution.manifest.v2+json"
+    #[serde(rename = "mediaType")]
+    pub media_type: Option<String>,
+    /// Optional. The operating system of the image. Values are provided by the Docker client and are not validated by Artifact Registry. Example values include "linux", "windows", "darwin", "aix", etc.
+    pub os: Option<String>,
+    /// Optional. The required OS features for the image, for example on Windows `win32k`.
+    #[serde(rename = "osFeatures")]
+    pub os_features: Option<Vec<String>>,
+    /// Optional. The OS version of the image, for example on Windows `10.0.14393.1066`.
+    #[serde(rename = "osVersion")]
+    pub os_version: Option<String>,
+    /// Optional. The variant of the CPU in the image, for example `v7` to specify ARMv7 when architecture is `arm`.
+    pub variant: Option<String>,
+}
+
+impl common::Part for ImageManifest {}
 
 /// Google Cloud Storage location where the artifacts currently reside.
 ///
@@ -731,6 +892,27 @@ pub struct ImportYumArtifactsRequest {
 }
 
 impl common::RequestValue for ImportYumArtifactsRequest {}
+
+/// The response from listing attachments.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations repositories attachments list projects](ProjectLocationRepositoryAttachmentListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListAttachmentsResponse {
+    /// The attachments returned.
+    pub attachments: Option<Vec<Attachment>>,
+    /// The token to retrieve the next page of attachments, or empty if there are no more attachments to return.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+}
+
+impl common::ResponseResult for ListAttachmentsResponse {}
 
 /// The response from listing docker images.
 ///
@@ -903,6 +1085,27 @@ pub struct ListRepositoriesResponse {
 }
 
 impl common::ResponseResult for ListRepositoriesResponse {}
+
+/// The response from listing rules.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations repositories rules list projects](ProjectLocationRepositoryRuleListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListRulesResponse {
+    /// The token to retrieve the next page of rules, or empty if there are no more rules to return.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The rules returned.
+    pub rules: Option<Vec<GoogleDevtoolsArtifactregistryV1Rule>>,
+}
+
+impl common::ResponseResult for ListRulesResponse {}
 
 /// The response from listing tags.
 ///
@@ -1106,6 +1309,8 @@ impl common::Part for NpmRepository {}
 ///
 /// * [locations operations get projects](ProjectLocationOperationGetCall) (response)
 /// * [locations repositories apt artifacts import projects](ProjectLocationRepositoryAptArtifactImportCall) (response)
+/// * [locations repositories attachments create projects](ProjectLocationRepositoryAttachmentCreateCall) (response)
+/// * [locations repositories attachments delete projects](ProjectLocationRepositoryAttachmentDeleteCall) (response)
 /// * [locations repositories files delete projects](ProjectLocationRepositoryFileDeleteCall) (response)
 /// * [locations repositories googet artifacts import projects](ProjectLocationRepositoryGoogetArtifactImportCall) (response)
 /// * [locations repositories packages versions batch delete projects](ProjectLocationRepositoryPackageVersionBatchDeleteCall) (response)
@@ -1114,6 +1319,7 @@ impl common::Part for NpmRepository {}
 /// * [locations repositories yum artifacts import projects](ProjectLocationRepositoryYumArtifactImportCall) (response)
 /// * [locations repositories create projects](ProjectLocationRepositoryCreateCall) (response)
 /// * [locations repositories delete projects](ProjectLocationRepositoryDeleteCall) (response)
+/// * [locations repositories export artifact projects](ProjectLocationRepositoryExportArtifactCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1205,6 +1411,9 @@ pub struct ProjectSettings {
     pub legacy_redirection_state: Option<String>,
     /// The name of the project's settings. Always of the form: projects/{project-id}/projectSettings In update request: never set In response: always set
     pub name: Option<String>,
+    /// The percentage of pull traffic to redirect from GCR to AR when using partial redirection.
+    #[serde(rename = "pullPercent")]
+    pub pull_percent: Option<i32>,
 }
 
 impl common::RequestValue for ProjectSettings {}
@@ -1272,6 +1481,9 @@ pub struct RemoteRepositoryConfig {
     /// Specific settings for an Apt remote repository.
     #[serde(rename = "aptRepository")]
     pub apt_repository: Option<AptRepository>,
+    /// Common remote repository settings. Used as the remote repository upstream URL.
+    #[serde(rename = "commonRepository")]
+    pub common_repository: Option<CommonRemoteRepository>,
     /// The description of the remote source.
     pub description: Option<String>,
     /// Input only. A create/update remote repo option to avoid making a HEAD/GET request to validate a remote repo and any supplied upstream credentials.
@@ -1344,13 +1556,16 @@ pub struct Repository {
     pub mode: Option<String>,
     /// The name of the repository, for example: `projects/p1/locations/us-central1/repositories/repo1`. For each location in a project, repository names must be unique.
     pub name: Option<String>,
+    /// Output only. The repository endpoint, for example: `us-docker.pkg.dev/my-proj/my-repo`.
+    #[serde(rename = "registryUri")]
+    pub registry_uri: Option<String>,
     /// Configuration specific for a Remote Repository.
     #[serde(rename = "remoteRepositoryConfig")]
     pub remote_repository_config: Option<RemoteRepositoryConfig>,
-    /// Output only. If set, the repository satisfies physical zone isolation.
+    /// Output only. Whether or not this repository satisfies PZI.
     #[serde(rename = "satisfiesPzi")]
     pub satisfies_pzi: Option<bool>,
-    /// Output only. If set, the repository satisfies physical zone separation.
+    /// Output only. Whether or not this repository satisfies PZS.
     #[serde(rename = "satisfiesPzs")]
     pub satisfies_pzs: Option<bool>,
     /// Output only. The size, in bytes, of all artifact storage in this repository. Repositories that are generally available or in public preview use this to calculate storage costs.
@@ -1363,6 +1578,9 @@ pub struct Repository {
     /// Configuration specific for a Virtual Repository.
     #[serde(rename = "virtualRepositoryConfig")]
     pub virtual_repository_config: Option<VirtualRepositoryConfig>,
+    /// Optional. Config and state for vulnerability scanning of resources within this Repository.
+    #[serde(rename = "vulnerabilityScanningConfig")]
+    pub vulnerability_scanning_config: Option<VulnerabilityScanningConfig>,
 }
 
 impl common::RequestValue for Repository {}
@@ -1420,7 +1638,7 @@ impl common::Part for Status {}
 pub struct Tag {
     /// The name of the tag, for example: "projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/tags/tag1". If the package part contains slashes, the slashes are escaped. The tag part can only have characters in [a-zA-Z0-9\-._~:@], anything else must be URL encoded.
     pub name: Option<String>,
-    /// The name of the version the tag refers to, for example: "projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/sha256:5243811" If the package or version ID parts contain slashes, the slashes are escaped.
+    /// The name of the version the tag refers to, for example: `projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/sha256:5243811` If the package or version ID parts contain slashes, the slashes are escaped.
     pub version: Option<String>,
 }
 
@@ -1505,6 +1723,43 @@ impl common::RequestValue for UploadAptArtifactRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
+/// * [locations repositories files upload projects](ProjectLocationRepositoryFileUploadCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct UploadFileMediaResponse {
+    /// Operation that will be returned to the user.
+    pub operation: Option<Operation>,
+}
+
+impl common::ResponseResult for UploadFileMediaResponse {}
+
+/// The request to upload a file.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations repositories files upload projects](ProjectLocationRepositoryFileUploadCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct UploadFileRequest {
+    /// Optional. The ID of the file. If left empty will default to sha256 digest of the content uploaded.
+    #[serde(rename = "fileId")]
+    pub file_id: Option<String>,
+}
+
+impl common::RequestValue for UploadFileRequest {}
+
+/// The response to upload a generic artifact.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
 /// * [locations repositories generic artifacts upload projects](ProjectLocationRepositoryGenericArtifactUploadCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
@@ -1530,10 +1785,10 @@ impl common::ResponseResult for UploadGenericArtifactMediaResponse {}
 pub struct UploadGenericArtifactRequest {
     /// The name of the file of the generic artifact to be uploaded. E.g. `example-file.zip` The filename is limited to letters, numbers, and url safe characters, i.e. [a-zA-Z0-9-_.~@].
     pub filename: Option<String>,
-    /// The ID of the package of the generic artifact. If the package does not exist, a new package will be created. The `package_id` must start with a letter, end with a letter or number, only contain letters, numbers, hyphens and periods i.e. [a-z0-9-.], and cannot exceed 256 characters.
+    /// The ID of the package of the generic artifact. If the package does not exist, a new package will be created. The `package_id` should start and end with a letter or number, only contain letters, numbers, hyphens, underscores, and periods, and not exceed 256 characters.
     #[serde(rename = "packageId")]
     pub package_id: Option<String>,
-    /// The ID of the version of the generic artifact. If the version does not exist, a new version will be created. The version_id must start and end with a letter or number, can only contain lowercase letters, numbers, hyphens and periods, i.e. [a-z0-9-.] and cannot exceed a total of 128 characters. Creating a version called `latest` is not allowed.
+    /// The ID of the version of the generic artifact. If the version does not exist, a new version will be created. The version_id must start and end with a letter or number, can only contain lowercase letters, numbers, the following characters [-.+~:], i.e.[a-z0-9-.+~:] and cannot exceed a total of 128 characters. Creating a version called `latest` is not allowed.
     #[serde(rename = "versionId")]
     pub version_id: Option<String>,
 }
@@ -1764,10 +2019,13 @@ impl common::ResponseResult for VPCSCConfig {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
 /// * [locations repositories packages versions get projects](ProjectLocationRepositoryPackageVersionGetCall) (response)
+/// * [locations repositories packages versions patch projects](ProjectLocationRepositoryPackageVersionPatchCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Version {
+    /// Optional. Client specified annotations.
+    pub annotations: Option<HashMap<String, String>>,
     /// The time when the version was created.
     #[serde(rename = "createTime")]
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -1775,7 +2033,7 @@ pub struct Version {
     pub description: Option<String>,
     /// Output only. Repository-specific Metadata stored against this version. The fields returned are defined by the underlying repository-specific resource. Currently, the resources could be: DockerImage MavenArtifact
     pub metadata: Option<HashMap<String, serde_json::Value>>,
-    /// The name of the version, for example: "projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/art1". If the package or version ID parts contain slashes, the slashes are escaped.
+    /// The name of the version, for example: `projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/art1`. If the package or version ID parts contain slashes, the slashes are escaped.
     pub name: Option<String>,
     /// Output only. A list of related tags. Will contain up to 100 tags that reference this version.
     #[serde(rename = "relatedTags")]
@@ -1785,6 +2043,7 @@ pub struct Version {
     pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
 
+impl common::RequestValue for Version {}
 impl common::ResponseResult for Version {}
 
 /// Virtual repository configuration.
@@ -1801,6 +2060,30 @@ pub struct VirtualRepositoryConfig {
 }
 
 impl common::Part for VirtualRepositoryConfig {}
+
+/// Config on whether to perform vulnerability scanning for resources in this repository, as well as output fields describing current state.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct VulnerabilityScanningConfig {
+    /// Optional. Config for whether this repository has vulnerability scanning disabled.
+    #[serde(rename = "enablementConfig")]
+    pub enablement_config: Option<String>,
+    /// Output only. State of feature enablement, combining repository enablement config and API enablement state.
+    #[serde(rename = "enablementState")]
+    pub enablement_state: Option<String>,
+    /// Output only. Reason for the repository state.
+    #[serde(rename = "enablementStateReason")]
+    pub enablement_state_reason: Option<String>,
+    /// Output only. The last time this repository config was enabled.
+    #[serde(rename = "lastEnableTime")]
+    pub last_enable_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::Part for VulnerabilityScanningConfig {}
 
 /// Configuration for a Yum remote repository.
 ///
@@ -1842,9 +2125,20 @@ impl common::Part for YumRepository {}
 /// use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -1855,12 +2149,12 @@ impl common::Part for YumRepository {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = ArtifactRegistry::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_project_settings(...)`, `locations_get(...)`, `locations_get_vpcsc_config(...)`, `locations_list(...)`, `locations_operations_get(...)`, `locations_repositories_apt_artifacts_import(...)`, `locations_repositories_apt_artifacts_upload(...)`, `locations_repositories_create(...)`, `locations_repositories_delete(...)`, `locations_repositories_docker_images_get(...)`, `locations_repositories_docker_images_list(...)`, `locations_repositories_files_delete(...)`, `locations_repositories_files_download(...)`, `locations_repositories_files_get(...)`, `locations_repositories_files_list(...)`, `locations_repositories_generic_artifacts_upload(...)`, `locations_repositories_get(...)`, `locations_repositories_get_iam_policy(...)`, `locations_repositories_go_modules_upload(...)`, `locations_repositories_googet_artifacts_import(...)`, `locations_repositories_googet_artifacts_upload(...)`, `locations_repositories_kfp_artifacts_upload(...)`, `locations_repositories_list(...)`, `locations_repositories_maven_artifacts_get(...)`, `locations_repositories_maven_artifacts_list(...)`, `locations_repositories_npm_packages_get(...)`, `locations_repositories_npm_packages_list(...)`, `locations_repositories_packages_delete(...)`, `locations_repositories_packages_get(...)`, `locations_repositories_packages_list(...)`, `locations_repositories_packages_patch(...)`, `locations_repositories_packages_tags_create(...)`, `locations_repositories_packages_tags_delete(...)`, `locations_repositories_packages_tags_get(...)`, `locations_repositories_packages_tags_list(...)`, `locations_repositories_packages_tags_patch(...)`, `locations_repositories_packages_versions_batch_delete(...)`, `locations_repositories_packages_versions_delete(...)`, `locations_repositories_packages_versions_get(...)`, `locations_repositories_packages_versions_list(...)`, `locations_repositories_patch(...)`, `locations_repositories_python_packages_get(...)`, `locations_repositories_python_packages_list(...)`, `locations_repositories_set_iam_policy(...)`, `locations_repositories_test_iam_permissions(...)`, `locations_repositories_yum_artifacts_import(...)`, `locations_repositories_yum_artifacts_upload(...)`, `locations_update_vpcsc_config(...)` and `update_project_settings(...)`
+/// // like `get_project_settings(...)`, `locations_get(...)`, `locations_get_vpcsc_config(...)`, `locations_list(...)`, `locations_operations_get(...)`, `locations_repositories_apt_artifacts_import(...)`, `locations_repositories_apt_artifacts_upload(...)`, `locations_repositories_attachments_create(...)`, `locations_repositories_attachments_delete(...)`, `locations_repositories_attachments_get(...)`, `locations_repositories_attachments_list(...)`, `locations_repositories_create(...)`, `locations_repositories_delete(...)`, `locations_repositories_docker_images_get(...)`, `locations_repositories_docker_images_list(...)`, `locations_repositories_export_artifact(...)`, `locations_repositories_files_delete(...)`, `locations_repositories_files_download(...)`, `locations_repositories_files_get(...)`, `locations_repositories_files_list(...)`, `locations_repositories_files_patch(...)`, `locations_repositories_files_upload(...)`, `locations_repositories_generic_artifacts_upload(...)`, `locations_repositories_get(...)`, `locations_repositories_get_iam_policy(...)`, `locations_repositories_go_modules_upload(...)`, `locations_repositories_googet_artifacts_import(...)`, `locations_repositories_googet_artifacts_upload(...)`, `locations_repositories_kfp_artifacts_upload(...)`, `locations_repositories_list(...)`, `locations_repositories_maven_artifacts_get(...)`, `locations_repositories_maven_artifacts_list(...)`, `locations_repositories_npm_packages_get(...)`, `locations_repositories_npm_packages_list(...)`, `locations_repositories_packages_delete(...)`, `locations_repositories_packages_get(...)`, `locations_repositories_packages_list(...)`, `locations_repositories_packages_patch(...)`, `locations_repositories_packages_tags_create(...)`, `locations_repositories_packages_tags_delete(...)`, `locations_repositories_packages_tags_get(...)`, `locations_repositories_packages_tags_list(...)`, `locations_repositories_packages_tags_patch(...)`, `locations_repositories_packages_versions_batch_delete(...)`, `locations_repositories_packages_versions_delete(...)`, `locations_repositories_packages_versions_get(...)`, `locations_repositories_packages_versions_list(...)`, `locations_repositories_packages_versions_patch(...)`, `locations_repositories_patch(...)`, `locations_repositories_python_packages_get(...)`, `locations_repositories_python_packages_list(...)`, `locations_repositories_rules_create(...)`, `locations_repositories_rules_delete(...)`, `locations_repositories_rules_get(...)`, `locations_repositories_rules_list(...)`, `locations_repositories_rules_patch(...)`, `locations_repositories_set_iam_policy(...)`, `locations_repositories_test_iam_permissions(...)`, `locations_repositories_yum_artifacts_import(...)`, `locations_repositories_yum_artifacts_upload(...)`, `locations_update_vpcsc_config(...)` and `update_project_settings(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1932,6 +2226,93 @@ impl<'a, C> ProjectMethods<'a, C> {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates an attachment. The returned Operation will finish once the attachment has been created. Its response will be the created attachment.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the parent resource where the attachment will be created.
+    pub fn locations_repositories_attachments_create(
+        &self,
+        request: Attachment,
+        parent: &str,
+    ) -> ProjectLocationRepositoryAttachmentCreateCall<'a, C> {
+        ProjectLocationRepositoryAttachmentCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _attachment_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an attachment. The returned Operation will finish once the attachments has been deleted. It will not have any Operation metadata and will return a `google.protobuf.Empty` response.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the attachment to delete.
+    pub fn locations_repositories_attachments_delete(
+        &self,
+        name: &str,
+    ) -> ProjectLocationRepositoryAttachmentDeleteCall<'a, C> {
+        ProjectLocationRepositoryAttachmentDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets an attachment.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the attachment to retrieve.
+    pub fn locations_repositories_attachments_get(
+        &self,
+        name: &str,
+    ) -> ProjectLocationRepositoryAttachmentGetCall<'a, C> {
+        ProjectLocationRepositoryAttachmentGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists attachments.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The name of the parent resource whose attachments will be listed.
+    pub fn locations_repositories_attachments_list(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationRepositoryAttachmentListCall<'a, C> {
+        ProjectLocationRepositoryAttachmentListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2059,6 +2440,53 @@ impl<'a, C> ProjectMethods<'a, C> {
             _page_size: Default::default(),
             _order_by: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a file.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of the file, for example: `projects/p1/locations/us-central1/repositories/repo1/files/a%2Fb%2Fc.txt`. If the file ID part contains slashes, they are escaped.
+    pub fn locations_repositories_files_patch(
+        &self,
+        request: GoogleDevtoolsArtifactregistryV1File,
+        name: &str,
+    ) -> ProjectLocationRepositoryFilePatchCall<'a, C> {
+        ProjectLocationRepositoryFilePatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Directly uploads a file to a repository. The returned Operation will complete once the resources are uploaded.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The resource name of the repository where the file will be uploaded.
+    pub fn locations_repositories_files_upload(
+        &self,
+        request: UploadFileRequest,
+        parent: &str,
+    ) -> ProjectLocationRepositoryFileUploadCall<'a, C> {
+        ProjectLocationRepositoryFileUploadCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2458,6 +2886,31 @@ impl<'a, C> ProjectMethods<'a, C> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a version.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of the version, for example: `projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/art1`. If the package or version ID parts contain slashes, the slashes are escaped.
+    pub fn locations_repositories_packages_versions_patch(
+        &self,
+        request: Version,
+        name: &str,
+    ) -> ProjectLocationRepositoryPackageVersionPatchCall<'a, C> {
+        ProjectLocationRepositoryPackageVersionPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2520,6 +2973,8 @@ impl<'a, C> ProjectMethods<'a, C> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2586,6 +3041,116 @@ impl<'a, C> ProjectMethods<'a, C> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a rule.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the parent resource where the rule will be created.
+    pub fn locations_repositories_rules_create(
+        &self,
+        request: GoogleDevtoolsArtifactregistryV1Rule,
+        parent: &str,
+    ) -> ProjectLocationRepositoryRuleCreateCall<'a, C> {
+        ProjectLocationRepositoryRuleCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _rule_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a rule.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the rule to delete.
+    pub fn locations_repositories_rules_delete(
+        &self,
+        name: &str,
+    ) -> ProjectLocationRepositoryRuleDeleteCall<'a, C> {
+        ProjectLocationRepositoryRuleDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a rule.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the rule to retrieve.
+    pub fn locations_repositories_rules_get(
+        &self,
+        name: &str,
+    ) -> ProjectLocationRepositoryRuleGetCall<'a, C> {
+        ProjectLocationRepositoryRuleGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists rules.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The name of the parent repository whose rules will be listed. For example: `projects/p1/locations/us-central1/repositories/repo1`.
+    pub fn locations_repositories_rules_list(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationRepositoryRuleListCall<'a, C> {
+        ProjectLocationRepositoryRuleListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a rule.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of the rule, for example: `projects/p1/locations/us-central1/repositories/repo1/rules/rule1`.
+    pub fn locations_repositories_rules_patch(
+        &self,
+        request: GoogleDevtoolsArtifactregistryV1Rule,
+        name: &str,
+    ) -> ProjectLocationRepositoryRulePatchCall<'a, C> {
+        ProjectLocationRepositoryRulePatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2684,6 +3249,29 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Exports an artifact to a Cloud Storage bucket.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `repository` - Required. The repository of the artifact to export. Format: projects/{project}/locations/{location}/repositories/{repository}
+    pub fn locations_repositories_export_artifact(
+        &self,
+        request: ExportArtifactRequest,
+        repository: &str,
+    ) -> ProjectLocationRepositoryExportArtifactCall<'a, C> {
+        ProjectLocationRepositoryExportArtifactCall {
+            hub: self.hub,
+            _request: request,
+            _repository: repository.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets a repository.
     ///
     /// # Arguments
@@ -2739,6 +3327,8 @@ impl<'a, C> ProjectMethods<'a, C> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2866,6 +3456,7 @@ impl<'a, C> ProjectMethods<'a, C> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _extra_location_types: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2959,9 +3550,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2972,7 +3574,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -3031,7 +3633,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -3191,7 +3793,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3246,9 +3848,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3259,7 +3872,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -3586,9 +4199,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3599,7 +4223,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -3964,6 +4588,1328 @@ where
     }
 }
 
+/// Creates an attachment. The returned Operation will finish once the attachment has been created. Its response will be the created attachment.
+///
+/// A builder for the *locations.repositories.attachments.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::Attachment;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Attachment::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_attachments_create(req, "parent")
+///              .attachment_id("amet.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryAttachmentCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _request: Attachment,
+    _parent: String,
+    _attachment_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryAttachmentCreateCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryAttachmentCreateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.attachments.create",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent", "attachmentId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._attachment_id.as_ref() {
+            params.push("attachmentId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/attachments";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: Attachment,
+    ) -> ProjectLocationRepositoryAttachmentCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the parent resource where the attachment will be created.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationRepositoryAttachmentCreateCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. The attachment id to use for this attachment.
+    ///
+    /// Sets the *attachment id* query property to the given value.
+    pub fn attachment_id(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationRepositoryAttachmentCreateCall<'a, C> {
+        self._attachment_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryAttachmentCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationRepositoryAttachmentCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationRepositoryAttachmentCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationRepositoryAttachmentCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryAttachmentCreateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes an attachment. The returned Operation will finish once the attachments has been deleted. It will not have any Operation metadata and will return a `google.protobuf.Empty` response.
+///
+/// A builder for the *locations.repositories.attachments.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_attachments_delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryAttachmentDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryAttachmentDeleteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryAttachmentDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.attachments.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the attachment to delete.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRepositoryAttachmentDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryAttachmentDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationRepositoryAttachmentDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationRepositoryAttachmentDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationRepositoryAttachmentDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryAttachmentDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets an attachment.
+///
+/// A builder for the *locations.repositories.attachments.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_attachments_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryAttachmentGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryAttachmentGetCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryAttachmentGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Attachment)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.attachments.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the attachment to retrieve.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRepositoryAttachmentGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryAttachmentGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationRepositoryAttachmentGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatformReadOnly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryAttachmentGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationRepositoryAttachmentGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryAttachmentGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Lists attachments.
+///
+/// A builder for the *locations.repositories.attachments.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_attachments_list("parent")
+///              .page_token("Lorem")
+///              .page_size(-12)
+///              .filter("eos")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryAttachmentListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryAttachmentListCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryAttachmentListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListAttachmentsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.attachments.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/attachments";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the parent resource whose attachments will be listed.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRepositoryAttachmentListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The next_page_token value returned from a previous list request, if any.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationRepositoryAttachmentListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of attachments to return. Maximum page size is 1,000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> ProjectLocationRepositoryAttachmentListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. An expression for filtering the results of the request. Filter rules are case insensitive. The fields eligible for filtering are: * `target` * `type` * `attachment_namespace`
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationRepositoryAttachmentListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryAttachmentListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationRepositoryAttachmentListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatformReadOnly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryAttachmentListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationRepositoryAttachmentListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryAttachmentListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets a docker image.
 ///
 /// A builder for the *locations.repositories.dockerImages.get* method supported by a *project* resource.
@@ -3981,9 +5927,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3994,7 +5951,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -4053,7 +6010,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -4217,7 +6174,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4274,9 +6231,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4287,7 +6255,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -4295,9 +6263,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_docker_images_list("parent")
-///              .page_token("duo")
-///              .page_size(-55)
-///              .order_by("gubergren")
+///              .page_token("ipsum")
+///              .page_size(-88)
+///              .order_by("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4361,7 +6329,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/dockerImages";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -4558,7 +6526,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4615,9 +6583,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4628,7 +6607,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -4906,9 +6885,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4919,7 +6909,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -4987,7 +6977,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}:download";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -5152,7 +7142,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5209,9 +7199,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5222,7 +7223,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -5283,7 +7284,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -5443,7 +7444,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5497,9 +7498,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5510,7 +7522,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -5518,10 +7530,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_files_list("parent")
-///              .page_token("ea")
-///              .page_size(-55)
-///              .order_by("invidunt")
-///              .filter("amet")
+///              .page_token("gubergren")
+///              .page_size(-16)
+///              .order_by("est")
+///              .filter("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5598,7 +7610,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/files";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -5731,7 +7743,7 @@ where
         self._order_by = Some(new_value.to_string());
         self
     }
-    /// An expression for filtering the results of the request. Filter rules are case insensitive. The fields eligible for filtering are: * `name` * `owner` An example of using a filter: * `name="projects/p1/locations/us-central1/repositories/repo1/files/a/b/*"` --> Files with an ID starting with "a/b/". * `owner="projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/1.0"` --> Files owned by the version `1.0` in package `pkg1`.
+    /// An expression for filtering the results of the request. Filter rules are case insensitive. The fields eligible for filtering are: * `name` * `owner` * `annotations` Examples of using a filter: To filter the results of your request to files with the name `my_file.txt` in project `my-project` in the `us-central` region, in repository `my-repo`, append the following filter expression to your request: * `name="projects/my-project/locations/us-central1/repositories/my-repo/files/my-file.txt"` You can also use wildcards to match any number of characters before or after the value: * `name="projects/my-project/locations/us-central1/repositories/my-repo/files/my-*"` * `name="projects/my-project/locations/us-central1/repositories/my-repo/files/*file.txt"` * `name="projects/my-project/locations/us-central1/repositories/my-repo/files/*file*"` To filter the results of your request to files owned by the version `1.0` in package `pkg1`, append the following filter expression to your request: * `owner="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/versions/1.0"` To filter the results of your request to files with the annotation key-value pair [`external_link`: `external_link_value`], append the following filter expression to your request: * `"annotations.external_link:external_link_value"` To filter just for a specific annotation key `external_link`, append the following filter expression to your request: * `"annotations.external_link"` If the annotation key or value contains special characters, you can escape them by surrounding the value with backticks. For example, to filter the results of your request to files with the annotation key-value pair [`external.link`:`https://example.com/my-file`], append the following filter expression to your request: * `` "annotations.`external.link`:`https://example.com/my-file`" `` You can also filter with annotations with a wildcard to match any number of characters before or after the value: * `` "annotations.*_link:`*example.com*`" ``
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationRepositoryFileListCall<'a, C> {
@@ -5786,7 +7798,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5823,6 +7835,858 @@ where
     }
 }
 
+/// Updates a file.
+///
+/// A builder for the *locations.repositories.files.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::GoogleDevtoolsArtifactregistryV1File;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleDevtoolsArtifactregistryV1File::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_files_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryFilePatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _request: GoogleDevtoolsArtifactregistryV1File,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryFilePatchCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryFilePatchCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleDevtoolsArtifactregistryV1File)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.files.patch",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleDevtoolsArtifactregistryV1File,
+    ) -> ProjectLocationRepositoryFilePatchCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the file, for example: `projects/p1/locations/us-central1/repositories/repo1/files/a%2Fb%2Fc.txt`. If the file ID part contains slashes, they are escaped.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRepositoryFilePatchCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationRepositoryFilePatchCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryFilePatchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryFilePatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryFilePatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryFilePatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryFilePatchCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Directly uploads a file to a repository. The returned Operation will complete once the resources are uploaded.
+///
+/// A builder for the *locations.repositories.files.upload* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::UploadFileRequest;
+/// use std::fs;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UploadFileRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `upload_resumable(...)`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_files_upload(req, "parent")
+///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryFileUploadCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _request: UploadFileRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryFileUploadCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryFileUploadCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    async fn doit<RS>(
+        mut self,
+        mut reader: RS,
+        reader_mime_type: mime::Mime,
+        protocol: common::UploadProtocol,
+    ) -> common::Result<(common::Response, UploadFileMediaResponse)>
+    where
+        RS: common::ReadSeek,
+    {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.files.upload",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let (mut url, upload_type) = if protocol == common::UploadProtocol::Resumable {
+            (
+                self.hub._root_url.clone() + "resumable/upload/v1/{+parent}/files:upload",
+                "resumable",
+            )
+        } else if protocol == common::UploadProtocol::Simple {
+            (
+                self.hub._root_url.clone() + "upload/v1/{+parent}/files:upload",
+                "multipart",
+            )
+        } else {
+            unreachable!()
+        };
+        params.push("uploadType", upload_type);
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        let mut upload_url_from_server;
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let mut mp_reader: common::MultiPartReader = Default::default();
+                let (mut body_reader, content_type) = match protocol {
+                    common::UploadProtocol::Simple => {
+                        mp_reader.reserve_exact(2);
+                        let size = reader.seek(std::io::SeekFrom::End(0)).unwrap();
+                        reader.seek(std::io::SeekFrom::Start(0)).unwrap();
+
+                        mp_reader
+                            .add_part(
+                                &mut request_value_reader,
+                                request_size,
+                                json_mime_type.clone(),
+                            )
+                            .add_part(&mut reader, size, reader_mime_type.clone());
+                        (
+                            &mut mp_reader as &mut (dyn std::io::Read + Send),
+                            common::MultiPartReader::mime_type(),
+                        )
+                    }
+                    _ => (
+                        &mut request_value_reader as &mut (dyn std::io::Read + Send),
+                        json_mime_type.clone(),
+                    ),
+                };
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                upload_url_from_server = true;
+                if protocol == common::UploadProtocol::Resumable {
+                    req_builder = req_builder
+                        .header("X-Upload-Content-Type", format!("{}", reader_mime_type));
+                }
+
+                let mut body_reader_bytes = vec![];
+                body_reader.read_to_end(&mut body_reader_bytes).unwrap();
+                let request = req_builder
+                    .header(CONTENT_TYPE, content_type.to_string())
+                    .body(common::to_body(body_reader_bytes.into()));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    if protocol == common::UploadProtocol::Resumable {
+                        let size = reader.seek(std::io::SeekFrom::End(0)).unwrap();
+                        reader.seek(std::io::SeekFrom::Start(0)).unwrap();
+
+                        let upload_result = {
+                            let url_str = &parts
+                                .headers
+                                .get("Location")
+                                .expect("LOCATION header is part of protocol")
+                                .to_str()
+                                .unwrap();
+                            if upload_url_from_server {
+                                dlg.store_upload_url(Some(url_str));
+                            }
+
+                            common::ResumableUploadHelper {
+                                client: &self.hub.client,
+                                delegate: dlg,
+                                start_at: if upload_url_from_server {
+                                    Some(0)
+                                } else {
+                                    None
+                                },
+                                auth: &self.hub.auth,
+                                user_agent: &self.hub._user_agent,
+                                // TODO: Check this assumption
+                                auth_header: format!(
+                                    "Bearer {}",
+                                    token
+                                        .ok_or_else(|| common::Error::MissingToken(
+                                            "resumable upload requires token".into()
+                                        ))?
+                                        .as_str()
+                                ),
+                                url: url_str,
+                                reader: &mut reader,
+                                media_type: reader_mime_type.clone(),
+                                content_length: size,
+                            }
+                            .upload()
+                            .await
+                        };
+                        match upload_result {
+                            None => {
+                                dlg.finished(false);
+                                return Err(common::Error::Cancelled);
+                            }
+                            Some(Err(err)) => {
+                                dlg.finished(false);
+                                return Err(common::Error::HttpError(err));
+                            }
+                            Some(Ok(response)) => {
+                                (parts, body) = response.into_parts();
+                                if !parts.status.is_success() {
+                                    dlg.store_upload_url(None);
+                                    dlg.finished(false);
+                                    return Err(common::Error::Failure(
+                                        common::Response::from_parts(parts, body),
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Upload media in a resumable fashion.
+    /// Even if the upload fails or is interrupted, it can be resumed for a
+    /// certain amount of time as the server maintains state temporarily.
+    ///
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
+    /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
+    /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
+    /// `cancel_chunk_upload(...)`.
+    ///
+    /// * *multipart*: yes
+    /// * *max size*: 0kb
+    /// * *valid mime types*: '*/*'
+    pub async fn upload_resumable<RS>(
+        self,
+        resumeable_stream: RS,
+        mime_type: mime::Mime,
+    ) -> common::Result<(common::Response, UploadFileMediaResponse)>
+    where
+        RS: common::ReadSeek,
+    {
+        self.doit(
+            resumeable_stream,
+            mime_type,
+            common::UploadProtocol::Resumable,
+        )
+        .await
+    }
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *multipart*: yes
+    /// * *max size*: 0kb
+    /// * *valid mime types*: '*/*'
+    pub async fn upload<RS>(
+        self,
+        stream: RS,
+        mime_type: mime::Mime,
+    ) -> common::Result<(common::Response, UploadFileMediaResponse)>
+    where
+        RS: common::ReadSeek,
+    {
+        self.doit(stream, mime_type, common::UploadProtocol::Simple)
+            .await
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: UploadFileRequest,
+    ) -> ProjectLocationRepositoryFileUploadCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The resource name of the repository where the file will be uploaded.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRepositoryFileUploadCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryFileUploadCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryFileUploadCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryFileUploadCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryFileUploadCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryFileUploadCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Directly uploads a Generic artifact. The returned operation will complete once the resources are uploaded. Package, version, and file resources are created based on the uploaded artifact. Uploaded artifacts that conflict with existing resources will raise an `ALREADY_EXISTS` error.
 ///
 /// A builder for the *locations.repositories.genericArtifacts.upload* method supported by a *project* resource.
@@ -5842,9 +8706,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5855,7 +8730,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -6343,9 +9218,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6356,7 +9242,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -6733,9 +9619,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6746,7 +9643,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -7073,9 +9970,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7086,7 +9994,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -7470,9 +10378,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7483,7 +10402,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -7865,9 +10784,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7878,7 +10808,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -7937,7 +10867,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8101,7 +11031,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8161,9 +11091,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8174,7 +11115,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -8182,8 +11123,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_maven_artifacts_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-50)
+///              .page_token("duo")
+///              .page_size(-80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8243,7 +11184,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/mavenArtifacts";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8430,7 +11371,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8490,9 +11431,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8503,7 +11455,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -8562,7 +11514,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8726,7 +11678,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8783,9 +11735,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8796,7 +11759,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -8804,8 +11767,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_npm_packages_list("parent")
-///              .page_token("ea")
-///              .page_size(-99)
+///              .page_token("kasd")
+///              .page_size(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8865,7 +11828,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/npmPackages";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9049,7 +12012,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9107,9 +12070,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9120,7 +12094,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -9133,7 +12107,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_tags_create(req, "parent")
-///              .tag_id("eos")
+///              .tag_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9460,9 +12434,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9473,7 +12458,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -9756,9 +12741,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9769,7 +12765,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -9828,7 +12824,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9992,7 +12988,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10049,9 +13045,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10062,7 +13069,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -10071,8 +13078,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_tags_list("parent")
 ///              .page_token("sed")
-///              .page_size(-61)
-///              .filter("Stet")
+///              .page_size(-20)
+///              .filter("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10136,7 +13143,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/tags";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -10268,7 +13275,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// An expression for filtering the results of the request. Filter rules are case insensitive. The fields eligible for filtering are: * `version` An example of using a filter: * `version="projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/1.0"` --> Tags that are applied to the version `1.0` in package `pkg1`. * `name="projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/tags/a%2Fb%2F*"` --> tags with an ID starting with "a/b/". * `name="projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/tags/*%2Fb%2Fc"` --> tags with an ID ending with "/b/c". * `name="projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/tags/*%2Fb%2F*"` --> tags with an ID containing "/b/".
+    /// An expression for filtering the results of the request. Filter rules are case insensitive. The fields eligible for filtering are: * `name` * `version` Examples of using a filter: To filter the results of your request to tags with the name `my-tag` in package `my-package` in repository `my-repo` in project "`y-project` in the us-central region, append the following filter expression to your request: * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/tags/my-tag"` You can also use wildcards to match any number of characters before or after the value: * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/tags/my*"` * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/tags/*tag"` * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/tags/*tag*"` To filter the results of your request to tags applied to the version `1.0` in package `my-package`, append the following filter expression to your request: * `version="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/versions/1.0"`
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationRepositoryPackageTagListCall<'a, C> {
@@ -10327,7 +13334,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10385,9 +13392,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10398,7 +13416,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -10733,9 +13751,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10746,7 +13775,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -11071,9 +14100,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11084,7 +14124,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -11092,7 +14132,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_versions_delete("name")
-///              .force(true)
+///              .force(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11385,9 +14425,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11398,7 +14449,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -11406,7 +14457,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_versions_get("name")
-///              .view("erat")
+///              .view("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11462,7 +14513,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -11639,7 +14690,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11699,9 +14750,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11712,7 +14774,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -11720,10 +14782,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_versions_list("parent")
-///              .view("duo")
-///              .page_token("dolore")
-///              .page_size(-22)
-///              .order_by("voluptua.")
+///              .view("et")
+///              .page_token("sadipscing")
+///              .page_size(-15)
+///              .order_by("dolor")
+///              .filter("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11737,6 +14800,7 @@ where
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -11763,14 +14827,24 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "view", "pageToken", "pageSize", "orderBy"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "view",
+            "pageToken",
+            "pageSize",
+            "orderBy",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
         params.push("parent", self._parent);
         if let Some(value) = self._view.as_ref() {
             params.push("view", value);
@@ -11784,6 +14858,9 @@ where
         if let Some(value) = self._order_by.as_ref() {
             params.push("orderBy", value);
         }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -11791,7 +14868,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/versions";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -11946,6 +15023,16 @@ where
         self._order_by = Some(new_value.to_string());
         self
     }
+    /// Optional. An expression for filtering the results of the request. Filter rules are case insensitive. The fields eligible for filtering are: * `name` * `annotations` Examples of using a filter: To filter the results of your request to versions with the name `my-version` in project `my-project` in the `us-central` region, in repository `my-repo`, append the following filter expression to your request: * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/versions/my-version"` You can also use wildcards to match any number of characters before or after the value: * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/versions/*version"` * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/versions/my*"` * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package/versions/*version*"` To filter the results of your request to versions with the annotation key-value pair [`external_link`: `external_link_value`], append the following filter expression to your request: * `"annotations.external_link:external_link_value"` To filter just for a specific annotation key `external_link`, append the following filter expression to your request: * `"annotations.external_link"` If the annotation key or value contains special characters, you can escape them by surrounding the value with backticks. For example, to filter the results of your request to versions with the annotation key-value pair [`external.link`:`https://example.com/my-version`], append the following filter expression to your request: * `` "annotations.`external.link`:`https://example.com/my-version`" `` You can also filter with annotations with a wildcard to match any number of characters before or after the value: * `` "annotations.*_link:`*example.com*`" ``
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationRepositoryPackageVersionListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -11998,7 +15085,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12041,6 +15128,371 @@ where
     }
 }
 
+/// Updates a version.
+///
+/// A builder for the *locations.repositories.packages.versions.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::Version;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Version::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_packages_versions_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryPackageVersionPatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _request: Version,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryPackageVersionPatchCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryPackageVersionPatchCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Version)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.packages.versions.patch",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: Version,
+    ) -> ProjectLocationRepositoryPackageVersionPatchCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the version, for example: `projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/versions/art1`. If the package or version ID parts contain slashes, the slashes are escaped.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationRepositoryPackageVersionPatchCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationRepositoryPackageVersionPatchCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryPackageVersionPatchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationRepositoryPackageVersionPatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationRepositoryPackageVersionPatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationRepositoryPackageVersionPatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryPackageVersionPatchCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Deletes a package and all of its versions and tags. The returned operation will complete once the package has been deleted.
 ///
 /// A builder for the *locations.repositories.packages.delete* method supported by a *project* resource.
@@ -12058,9 +15510,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12071,7 +15534,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -12351,9 +15814,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12364,7 +15838,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -12423,7 +15897,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -12583,7 +16057,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12637,9 +16111,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12650,7 +16135,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -12658,8 +16143,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_list("parent")
-///              .page_token("dolor")
-///              .page_size(-18)
+///              .page_token("vero")
+///              .page_size(-44)
+///              .order_by("Lorem")
+///              .filter("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12671,6 +16158,8 @@ where
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -12697,20 +16186,35 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "orderBy",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("parent", self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
         if let Some(value) = self._page_size.as_ref() {
             params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
         }
 
         params.extend(self._additional_params.iter());
@@ -12719,7 +16223,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/packages";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -12848,6 +16352,20 @@ where
         self._page_size = Some(new_value);
         self
     }
+    /// Optional. The field to order the results by.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRepositoryPackageListCall<'a, C> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. An expression for filtering the results of the request. Filter rules are case insensitive. The fields eligible for filtering are: * `name` * `annotations` Examples of using a filter: To filter the results of your request to packages with the name `my-package` in project `my-project` in the `us-central` region, in repository `my-repo`, append the following filter expression to your request: * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-package"` You can also use wildcards to match any number of characters before or after the value: * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/my-*"` * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/*package"` * `name="projects/my-project/locations/us-central1/repositories/my-repo/packages/*pack*"` To filter the results of your request to packages with the annotation key-value pair [`external_link`: `external_link_value`], append the following filter expression to your request": * `"annotations.external_link:external_link_value"` To filter the results just for a specific annotation key `external_link`, append the following filter expression to your request: * `"annotations.external_link"` If the annotation key or value contains special characters, you can escape them by surrounding the value with backticks. For example, to filter the results of your request to packages with the annotation key-value pair [`external.link`:`https://example.com/my-package`], append the following filter expression to your request: * `` "annotations.`external.link`:`https://example.com/my-package`" `` You can also filter with annotations with a wildcard to match any number of characters before or after the value: * `` "annotations.*_link:`*example.com*`" ``
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationRepositoryPackageListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -12896,7 +16414,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12951,9 +16469,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12964,7 +16493,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -13294,9 +16823,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13307,7 +16847,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -13366,7 +16906,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -13530,7 +17070,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13590,9 +17130,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13603,7 +17154,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -13611,8 +17162,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_python_packages_list("parent")
-///              .page_token("dolor")
-///              .page_size(-20)
+///              .page_token("takimata")
+///              .page_size(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13672,7 +17223,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/pythonPackages";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -13859,7 +17410,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13902,6 +17453,1628 @@ where
     }
 }
 
+/// Creates a rule.
+///
+/// A builder for the *locations.repositories.rules.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::GoogleDevtoolsArtifactregistryV1Rule;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleDevtoolsArtifactregistryV1Rule::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_rules_create(req, "parent")
+///              .rule_id("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryRuleCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _request: GoogleDevtoolsArtifactregistryV1Rule,
+    _parent: String,
+    _rule_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryRuleCreateCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryRuleCreateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleDevtoolsArtifactregistryV1Rule)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.rules.create",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent", "ruleId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._rule_id.as_ref() {
+            params.push("ruleId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/rules";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleDevtoolsArtifactregistryV1Rule,
+    ) -> ProjectLocationRepositoryRuleCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the parent resource where the rule will be created.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRepositoryRuleCreateCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The rule id to use for this repository.
+    ///
+    /// Sets the *rule id* query property to the given value.
+    pub fn rule_id(mut self, new_value: &str) -> ProjectLocationRepositoryRuleCreateCall<'a, C> {
+        self._rule_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryRuleCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryRuleCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryRuleCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryRuleCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryRuleCreateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes a rule.
+///
+/// A builder for the *locations.repositories.rules.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_rules_delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryRuleDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryRuleDeleteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryRuleDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Empty)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.rules.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the rule to delete.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRepositoryRuleDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryRuleDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryRuleDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryRuleDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryRuleDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryRuleDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets a rule.
+///
+/// A builder for the *locations.repositories.rules.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_rules_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryRuleGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryRuleGetCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryRuleGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleDevtoolsArtifactregistryV1Rule)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.rules.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the rule to retrieve.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRepositoryRuleGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryRuleGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryRuleGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatformReadOnly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryRuleGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryRuleGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryRuleGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Lists rules.
+///
+/// A builder for the *locations.repositories.rules.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_rules_list("parent")
+///              .page_token("sed")
+///              .page_size(-9)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryRuleListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryRuleListCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryRuleListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListRulesResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.rules.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/rules";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the parent repository whose rules will be listed. For example: `projects/p1/locations/us-central1/repositories/repo1`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRepositoryRuleListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The next_page_token value returned from a previous list request, if any.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRepositoryRuleListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of rules to return. Maximum page size is 1,000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRepositoryRuleListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryRuleListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryRuleListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatformReadOnly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryRuleListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryRuleListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryRuleListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Updates a rule.
+///
+/// A builder for the *locations.repositories.rules.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::GoogleDevtoolsArtifactregistryV1Rule;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleDevtoolsArtifactregistryV1Rule::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_rules_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryRulePatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _request: GoogleDevtoolsArtifactregistryV1Rule,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryRulePatchCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryRulePatchCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleDevtoolsArtifactregistryV1Rule)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.rules.patch",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: GoogleDevtoolsArtifactregistryV1Rule,
+    ) -> ProjectLocationRepositoryRulePatchCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the rule, for example: `projects/p1/locations/us-central1/repositories/repo1/rules/rule1`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRepositoryRulePatchCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationRepositoryRulePatchCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryRulePatchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryRulePatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryRulePatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryRulePatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryRulePatchCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Imports Yum (RPM) artifacts. The returned Operation will complete once the resources are imported. Package, Version, and File resources are created based on the imported artifacts. Imported artifacts that conflict with existing resources are ignored.
 ///
 /// A builder for the *locations.repositories.yumArtifacts.import* method supported by a *project* resource.
@@ -13920,9 +19093,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13933,7 +19117,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -14260,9 +19444,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14273,7 +19468,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -14656,9 +19851,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14669,7 +19875,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -14682,7 +19888,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_create(req, "parent")
-///              .repository_id("Stet")
+///              .repository_id("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14990,9 +20196,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15003,7 +20220,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -15259,6 +20476,353 @@ where
     }
 }
 
+/// Exports an artifact to a Cloud Storage bucket.
+///
+/// A builder for the *locations.repositories.exportArtifact* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::ExportArtifactRequest;
+/// # async fn dox() {
+/// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = ArtifactRegistry::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ExportArtifactRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_export_artifact(req, "repository")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryExportArtifactCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a ArtifactRegistry<C>,
+    _request: ExportArtifactRequest,
+    _repository: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationRepositoryExportArtifactCall<'a, C> {}
+
+impl<'a, C> ProjectLocationRepositoryExportArtifactCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "artifactregistry.projects.locations.repositories.exportArtifact",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "repository"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("repository", self._repository);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+repository}:exportArtifact";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+repository}", "repository")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["repository"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: ExportArtifactRequest,
+    ) -> ProjectLocationRepositoryExportArtifactCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The repository of the artifact to export. Format: projects/{project}/locations/{location}/repositories/{repository}
+    ///
+    /// Sets the *repository* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn repository(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationRepositoryExportArtifactCall<'a, C> {
+        self._repository = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationRepositoryExportArtifactCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationRepositoryExportArtifactCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryExportArtifactCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationRepositoryExportArtifactCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryExportArtifactCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets a repository.
 ///
 /// A builder for the *locations.repositories.get* method supported by a *project* resource.
@@ -15276,9 +20840,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15289,7 +20864,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -15348,7 +20923,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -15508,7 +21083,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15562,9 +21137,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15575,7 +21161,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -15583,7 +21169,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_get_iam_policy("resource")
-///              .options_requested_policy_version(-29)
+///              .options_requested_policy_version(-2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15639,7 +21225,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -15809,7 +21395,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15866,9 +21452,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15879,7 +21476,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -15887,8 +21484,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-23)
+///              .page_token("sadipscing")
+///              .page_size(-6)
+///              .order_by("invidunt")
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15900,6 +21499,8 @@ where
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -15926,20 +21527,35 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "orderBy",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("parent", self._parent);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
         if let Some(value) = self._page_size.as_ref() {
             params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
         }
 
         params.extend(self._additional_params.iter());
@@ -15948,7 +21564,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/repositories";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -16074,6 +21690,20 @@ where
         self._page_size = Some(new_value);
         self
     }
+    /// Optional. The field to order the results by.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRepositoryListCall<'a, C> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. An expression for filtering the results of the request. Filter rules are case insensitive. The fields eligible for filtering are: * `name` Examples of using a filter: To filter the results of your request to repositories with the name `my-repo` in project `my-project` in the `us-central` region, append the following filter expression to your request: * `name="projects/my-project/locations/us-central1/repositories/my-repo"` You can also use wildcards to match any number of characters before or after the value: * `name="projects/my-project/locations/us-central1/repositories/my-*"` * `name="projects/my-project/locations/us-central1/repositories/*repo"` * `name="projects/my-project/locations/us-central1/repositories/*repo*"`
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationRepositoryListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -16122,7 +21752,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16177,9 +21807,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16190,7 +21831,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -16515,9 +22156,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16528,7 +22180,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -16844,9 +22496,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16857,7 +22520,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -16922,7 +22585,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17122,7 +22785,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17182,9 +22845,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17195,7 +22869,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -17254,7 +22928,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17414,7 +23088,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17468,9 +23142,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17481,7 +23166,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -17540,7 +23225,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17700,7 +23385,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17754,9 +23439,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17767,7 +23463,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -17775,9 +23471,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("amet.")
-///              .page_size(-30)
-///              .filter("takimata")
+///              .page_token("aliquyam")
+///              .page_size(-5)
+///              .filter("et")
+///              .add_extra_location_types("sanctus")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17790,6 +23487,7 @@ where
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
+    _extra_location_types: Vec<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -17816,14 +23514,23 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "pageToken",
+            "pageSize",
+            "filter",
+            "extraLocationTypes",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
@@ -17834,6 +23541,11 @@ where
         if let Some(value) = self._filter.as_ref() {
             params.push("filter", value);
         }
+        if !self._extra_location_types.is_empty() {
+            for f in self._extra_location_types.iter() {
+                params.push("extraLocationTypes", f);
+            }
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -17841,7 +23553,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}/locations";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17974,6 +23686,14 @@ where
         self._filter = Some(new_value.to_string());
         self
     }
+    /// Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.
+    ///
+    /// Append the given value to the *extra location types* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_extra_location_types(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+        self._extra_location_types.push(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -18022,7 +23742,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18077,9 +23797,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18090,7 +23821,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -18417,9 +24148,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18430,7 +24172,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);
@@ -18489,7 +24231,7 @@ where
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::CloudPlatformReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -18649,7 +24391,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::CloudPlatformReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18704,9 +24446,20 @@ where
 /// # use artifactregistry1::{ArtifactRegistry, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18717,7 +24470,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = ArtifactRegistry::new(client, auth);

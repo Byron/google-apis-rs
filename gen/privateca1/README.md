@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-privateca1` library allows access to all features of the *Google Certificate Authority Service* service.
 
-This documentation was generated from *Certificate Authority Service* crate version *6.0.0+20240605*, where *20240605* is the exact revision of the *privateca:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+This documentation was generated from *Certificate Authority Service* crate version *7.0.0+20251022*, where *20251022* is the exact revision of the *privateca:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 
 Everything else about the *Certificate Authority Service* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/CertificateAuthorityService) ...
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/CertificateAuthorityService) ...
 
 * projects
- * [*locations ca pools certificate authorities activate*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityActivateCall), [*locations ca pools certificate authorities certificate revocation lists get*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListGetCall), [*locations ca pools certificate authorities certificate revocation lists get iam policy*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListGetIamPolicyCall), [*locations ca pools certificate authorities certificate revocation lists list*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListListCall), [*locations ca pools certificate authorities certificate revocation lists patch*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListPatchCall), [*locations ca pools certificate authorities certificate revocation lists set iam policy*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListSetIamPolicyCall), [*locations ca pools certificate authorities certificate revocation lists test iam permissions*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListTestIamPermissionCall), [*locations ca pools certificate authorities create*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCreateCall), [*locations ca pools certificate authorities delete*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityDeleteCall), [*locations ca pools certificate authorities disable*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityDisableCall), [*locations ca pools certificate authorities enable*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityEnableCall), [*locations ca pools certificate authorities fetch*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityFetchCall), [*locations ca pools certificate authorities get*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityGetCall), [*locations ca pools certificate authorities list*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityListCall), [*locations ca pools certificate authorities patch*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityPatchCall), [*locations ca pools certificate authorities undelete*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityUndeleteCall), [*locations ca pools certificates create*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateCreateCall), [*locations ca pools certificates get*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateGetCall), [*locations ca pools certificates list*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateListCall), [*locations ca pools certificates patch*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificatePatchCall), [*locations ca pools certificates revoke*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCertificateRevokeCall), [*locations ca pools create*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolCreateCall), [*locations ca pools delete*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolDeleteCall), [*locations ca pools fetch ca certs*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolFetchCaCertCall), [*locations ca pools get*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolGetCall), [*locations ca pools get iam policy*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolGetIamPolicyCall), [*locations ca pools list*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolListCall), [*locations ca pools patch*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolPatchCall), [*locations ca pools set iam policy*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolSetIamPolicyCall), [*locations ca pools test iam permissions*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCaPoolTestIamPermissionCall), [*locations certificate templates create*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCertificateTemplateCreateCall), [*locations certificate templates delete*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCertificateTemplateDeleteCall), [*locations certificate templates get*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCertificateTemplateGetCall), [*locations certificate templates get iam policy*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCertificateTemplateGetIamPolicyCall), [*locations certificate templates list*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCertificateTemplateListCall), [*locations certificate templates patch*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCertificateTemplatePatchCall), [*locations certificate templates set iam policy*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCertificateTemplateSetIamPolicyCall), [*locations certificate templates test iam permissions*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationCertificateTemplateTestIamPermissionCall), [*locations get*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationOperationGetCall) and [*locations operations list*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/api::ProjectLocationOperationListCall)
+ * [*locations ca pools certificate authorities activate*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityActivateCall), [*locations ca pools certificate authorities certificate revocation lists get*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListGetCall), [*locations ca pools certificate authorities certificate revocation lists get iam policy*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListGetIamPolicyCall), [*locations ca pools certificate authorities certificate revocation lists list*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListListCall), [*locations ca pools certificate authorities certificate revocation lists patch*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListPatchCall), [*locations ca pools certificate authorities certificate revocation lists set iam policy*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListSetIamPolicyCall), [*locations ca pools certificate authorities certificate revocation lists test iam permissions*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCertificateRevocationListTestIamPermissionCall), [*locations ca pools certificate authorities create*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityCreateCall), [*locations ca pools certificate authorities delete*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityDeleteCall), [*locations ca pools certificate authorities disable*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityDisableCall), [*locations ca pools certificate authorities enable*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityEnableCall), [*locations ca pools certificate authorities fetch*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityFetchCall), [*locations ca pools certificate authorities get*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityGetCall), [*locations ca pools certificate authorities list*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityListCall), [*locations ca pools certificate authorities patch*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityPatchCall), [*locations ca pools certificate authorities undelete*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateAuthorityUndeleteCall), [*locations ca pools certificates create*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateCreateCall), [*locations ca pools certificates get*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateGetCall), [*locations ca pools certificates list*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateListCall), [*locations ca pools certificates patch*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificatePatchCall), [*locations ca pools certificates revoke*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCertificateRevokeCall), [*locations ca pools create*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolCreateCall), [*locations ca pools delete*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolDeleteCall), [*locations ca pools fetch ca certs*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolFetchCaCertCall), [*locations ca pools get*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolGetCall), [*locations ca pools get iam policy*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolGetIamPolicyCall), [*locations ca pools list*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolListCall), [*locations ca pools patch*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolPatchCall), [*locations ca pools set iam policy*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolSetIamPolicyCall), [*locations ca pools test iam permissions*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCaPoolTestIamPermissionCall), [*locations certificate templates create*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCertificateTemplateCreateCall), [*locations certificate templates delete*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCertificateTemplateDeleteCall), [*locations certificate templates get*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCertificateTemplateGetCall), [*locations certificate templates get iam policy*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCertificateTemplateGetIamPolicyCall), [*locations certificate templates list*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCertificateTemplateListCall), [*locations certificate templates patch*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCertificateTemplatePatchCall), [*locations certificate templates set iam policy*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCertificateTemplateSetIamPolicyCall), [*locations certificate templates test iam permissions*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationCertificateTemplateTestIamPermissionCall), [*locations get*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationOperationGetCall) and [*locations operations list*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/api::ProjectLocationOperationListCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/CertificateAuthorityService)**
+* **[Hub](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/CertificateAuthorityService)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::CallBuilder)
-* **[Resources](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::CallBuilder)
+* **[Resources](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::Part)**
+    * **[Parts](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::CallBuilder)**
+* **[Activities](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -99,9 +99,20 @@ let secret: yup_oauth2::ApplicationSecret = Default::default();
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+let connector = hyper_rustls::HttpsConnectorBuilder::new()
+    .with_native_roots()
+    .unwrap()
+    .https_only()
+    .enable_http2()
+    .build();
+
+let executor = hyper_util::rt::TokioExecutor::new();
+let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
     secret,
     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    yup_oauth2::client::CustomHyperClientBuilder::from(
+        hyper_util::client::legacy::Client::builder(executor).build(connector),
+    ),
 ).build().await.unwrap();
 
 let client = hyper_util::client::legacy::Client::builder(
@@ -112,7 +123,7 @@ let client = hyper_util::client::legacy::Client::builder(
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build()
 );
 let mut hub = CertificateAuthorityService::new(client, auth);
@@ -147,17 +158,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the
-[Hub Delegate](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -167,29 +178,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::Delegate) to the
-[Method Builder](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::CallBuilder) before making the final `doit()` call.
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::Delegate) to the
+[Method Builder](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::CallBuilder) before making the final `doit()` call.
 Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::RequestValue) and
-[decodable](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
+All structures provided by this library are made to be [encodable](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::RequestValue) and
+[decodable](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::Part) which are identifiable by name, which will be sent to
+Most optionals are are considered [Parts](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-privateca1/6.0.0+20240605/google_privateca1/common::RequestValue) are moved
+* [request values](https://docs.rs/google-privateca1/7.0.0+20251022/google_privateca1/common::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

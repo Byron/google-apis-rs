@@ -46,7 +46,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::LbRouteExtension;
+/// use networkservices1::api::AuthzExtension;
 /// use networkservices1::{Result, Error};
 /// # async fn dox() {
 /// use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -59,9 +59,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -72,21 +83,21 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = NetworkServices::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = LbRouteExtension::default();
+/// let mut req = AuthzExtension::default();
 ///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_lb_route_extensions_create(req, "parent")
+/// let result = hub.projects().locations_authz_extensions_create(req, "parent")
 ///              .request_id("sed")
-///              .lb_route_extension_id("amet.")
+///              .authz_extension_id("amet.")
 ///              .doit().await;
 ///
 /// match result {
@@ -127,7 +138,7 @@ impl<'a, C> NetworkServices<C> {
         NetworkServices {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://networkservices.googleapis.com/".to_string(),
             _root_url: "https://networkservices.googleapis.com/".to_string(),
         }
@@ -138,7 +149,7 @@ impl<'a, C> NetworkServices<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -199,6 +210,58 @@ pub struct AuditLogConfig {
 }
 
 impl common::Part for AuditLogConfig {}
+
+/// `AuthzExtension` is a resource that allows traffic forwarding to a callout backend service to make an authorization decision.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations authz extensions create projects](ProjectLocationAuthzExtensionCreateCall) (request)
+/// * [locations authz extensions get projects](ProjectLocationAuthzExtensionGetCall) (response)
+/// * [locations authz extensions patch projects](ProjectLocationAuthzExtensionPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AuthzExtension {
+    /// Required. The `:authority` header in the gRPC request sent from Envoy to the extension service.
+    pub authority: Option<String>,
+    /// Output only. The timestamp when the resource was created.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Optional. A human-readable description of the resource.
+    pub description: Option<String>,
+    /// Optional. Determines how the proxy behaves if the call to the extension fails or times out. When set to `TRUE`, request or response processing continues without error. Any subsequent extensions in the extension chain are also executed. When set to `FALSE` or the default setting of `FALSE` is used, one of the following happens: * If response headers have not been delivered to the downstream client, a generic 500 error is returned to the client. The error response can be tailored by configuring a custom error response in the load balancer. * If response headers have been delivered, then the HTTP stream to the downstream client is reset.
+    #[serde(rename = "failOpen")]
+    pub fail_open: Option<bool>,
+    /// Optional. List of the HTTP headers to forward to the extension (from the client). If omitted, all headers are sent. Each element is a string indicating the header name.
+    #[serde(rename = "forwardHeaders")]
+    pub forward_headers: Option<Vec<String>>,
+    /// Optional. Set of labels associated with the `AuthzExtension` resource. The format must comply with [the requirements for labels](https://cloud.google.com/compute/docs/labeling-resources#requirements) for Google Cloud resources.
+    pub labels: Option<HashMap<String, String>>,
+    /// Required. All backend services and forwarding rules referenced by this extension must share the same load balancing scheme. Supported values: `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. For more information, refer to [Backend services overview](https://cloud.google.com/load-balancing/docs/backend-service).
+    #[serde(rename = "loadBalancingScheme")]
+    pub load_balancing_scheme: Option<String>,
+    /// Optional. The metadata provided here is included as part of the `metadata_context` (of type `google.protobuf.Struct`) in the `ProcessingRequest` message sent to the extension server. The metadata is available under the namespace `com.google.authz_extension.`. The following variables are supported in the metadata Struct: `{forwarding_rule_id}` - substituted with the forwarding rule's fully qualified resource name.
+    pub metadata: Option<HashMap<String, serde_json::Value>>,
+    /// Required. Identifier. Name of the `AuthzExtension` resource in the following format: `projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+    pub name: Option<String>,
+    /// Required. The reference to the service that runs the extension. To configure a callout extension, `service` must be a fully-qualified reference to a [backend service](https://cloud.google.com/compute/docs/reference/rest/v1/backendServices) in the format: `https://www.googleapis.com/compute/v1/projects/{project}/regions/{region}/backendServices/{backendService}` or `https://www.googleapis.com/compute/v1/projects/{project}/global/backendServices/{backendService}`.
+    pub service: Option<String>,
+    /// Required. Specifies the timeout for each individual message on the stream. The timeout must be between 10-10000 milliseconds.
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub timeout: Option<chrono::Duration>,
+    /// Output only. The timestamp when the resource was updated.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Optional. The format of communication supported by the callout extension. This field is supported only for regional `AuthzExtension` resources. If not specified, the default value `EXT_PROC_GRPC` is used. Global `AuthzExtension` resources use the `EXT_PROC_GRPC` wire format.
+    #[serde(rename = "wireFormat")]
+    pub wire_format: Option<String>,
+}
+
+impl common::RequestValue for AuthzExtension {}
+impl common::ResponseResult for AuthzExtension {}
 
 /// Associates `members`, or principals, with a `role`.
 ///
@@ -334,7 +397,7 @@ pub struct EndpointPolicy {
     pub endpoint_matcher: Option<EndpointMatcher>,
     /// Optional. Set of label tags associated with the EndpointPolicy resource.
     pub labels: Option<HashMap<String, String>>,
-    /// Required. Name of the EndpointPolicy resource. It matches pattern `projects/{project}/locations/global/endpointPolicies/{endpoint_policy}`.
+    /// Identifier. Name of the EndpointPolicy resource. It matches pattern `projects/{project}/locations/*/endpointPolicies/{endpoint_policy}`.
     pub name: Option<String>,
     /// Optional. A URL referring to ServerTlsPolicy resource. ServerTlsPolicy is used to determine the authentication policy to be applied to terminate the inbound traffic at the identified backends. If this field is not set, authentication is disabled(open) for this endpoint.
     #[serde(rename = "serverTlsPolicy")]
@@ -381,7 +444,7 @@ impl common::Part for Expr {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionChain {
-    /// Required. A set of extensions to execute for the matching request. At least one extension is required. Up to 3 extensions can be defined for each extension chain for `LbTrafficExtension` resource. `LbRouteExtension` chains are limited to 1 extension per extension chain.
+    /// Required. A set of extensions to execute for the matching request. At least one extension is required. Up to 3 extensions can be defined for each extension chain for `LbTrafficExtension` resource. `LbRouteExtension` and `LbEdgeExtension` chains are limited to 1 extension per extension chain.
     pub extensions: Option<Vec<ExtensionChainExtension>>,
     /// Required. Conditions under which this chain is invoked for a request.
     #[serde(rename = "matchCondition")]
@@ -400,7 +463,7 @@ impl common::Part for ExtensionChain {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExtensionChainExtension {
-    /// Optional. The `:authority` header in the gRPC request sent from Envoy to the extension service. Required for Callout extensions.
+    /// Optional. The `:authority` header in the gRPC request sent from Envoy to the extension service. Required for Callout extensions. This field is not supported for plugin extensions. Setting it results in a validation error.
     pub authority: Option<String>,
     /// Optional. Determines how the proxy behaves if the call to the extension fails or times out. When set to `TRUE`, request or response processing continues without error. Any subsequent extensions in the extension chain are also executed. When set to `FALSE` or the default setting of `FALSE` is used, one of the following happens: * If response headers have not been delivered to the downstream client, a generic 500 error is returned to the client. The error response can be tailored by configuring a custom error response in the load balancer. * If response headers have been delivered, then the HTTP stream to the downstream client is reset.
     #[serde(rename = "failOpen")]
@@ -408,14 +471,25 @@ pub struct ExtensionChainExtension {
     /// Optional. List of the HTTP headers to forward to the extension (from the client or backend). If omitted, all headers are sent. Each element is a string indicating the header name.
     #[serde(rename = "forwardHeaders")]
     pub forward_headers: Option<Vec<String>>,
-    /// Required. The name for this extension. The name is logged as part of the HTTP request logs. The name must conform with RFC-1034, is restricted to lower-cased letters, numbers and hyphens, and can have a maximum length of 63 characters. Additionally, the first character must be a letter and the last a letter or a number.
+    /// Optional. The metadata provided here is included as part of the `metadata_context` (of type `google.protobuf.Struct`) in the `ProcessingRequest` message sent to the extension server. For `AuthzExtension` resources, the metadata is available under the namespace `com.google.authz_extension.`. For other types of extensions, the metadata is available under the namespace `com.google....`. For example: `com.google.lb_traffic_extension.lbtrafficextension1.chain1.ext1`. The following variables are supported in the metadata: `{forwarding_rule_id}` - substituted with the forwarding rule's fully qualified resource name. This field must not be set for plugin extensions. Setting it results in a validation error. You can set metadata at either the resource level or the extension level. The extension level metadata is recommended because you can pass a different set of metadata through each extension to the backend. This field is subject to following limitations: * The total size of the metadata must be less than 1KiB. * The total number of keys in the metadata must be less than 16. * The length of each key must be less than 64 characters. * The length of each value must be less than 1024 characters. * All values must be strings.
+    pub metadata: Option<HashMap<String, serde_json::Value>>,
+    /// Optional. The name for this extension. The name is logged as part of the HTTP request logs. The name must conform with RFC-1034, is restricted to lower-cased letters, numbers and hyphens, and can have a maximum length of 63 characters. Additionally, the first character must be a letter and the last a letter or a number. This field is required except for AuthzExtension.
     pub name: Option<String>,
-    /// Required. The reference to the service that runs the extension. Currently only callout extensions are supported here. To configure a callout extension, `service` must be a fully-qualified reference to a [backend service](https://cloud.google.com/compute/docs/reference/rest/v1/backendServices) in the format: `https://www.googleapis.com/compute/v1/projects/{project}/regions/{region}/backendServices/{backendService}` or `https://www.googleapis.com/compute/v1/projects/{project}/global/backendServices/{backendService}`.
+    /// Optional. When set to `TRUE`, enables `observability_mode` on the `ext_proc` filter. This makes `ext_proc` calls asynchronous. Envoy doesn't check for the response from `ext_proc` calls. For more information about the filter, see: https://www.envoyproxy.io/docs/envoy/v1.32.3/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#extensions-filters-http-ext-proc-v3-externalprocessor This field is helpful when you want to try out the extension in async log-only mode. Supported by regional `LbTrafficExtension` and `LbRouteExtension` resources. Only `STREAMED` (default) body processing mode is supported.
+    #[serde(rename = "observabilityMode")]
+    pub observability_mode: Option<bool>,
+    /// Optional. Configures the send mode for request body processing. The field can only be set if `supported_events` includes `REQUEST_BODY`. If `supported_events` includes `REQUEST_BODY`, but `request_body_send_mode` is unset, the default value `STREAMED` is used. When this field is set to `FULL_DUPLEX_STREAMED`, `supported_events` must include both `REQUEST_BODY` and `REQUEST_TRAILERS`. This field can be set only for `LbTrafficExtension` and `LbRouteExtension` resources, and only when the `service` field of the extension points to a `BackendService`. Only `FULL_DUPLEX_STREAMED` mode is supported for `LbRouteExtension` resources.
+    #[serde(rename = "requestBodySendMode")]
+    pub request_body_send_mode: Option<String>,
+    /// Optional. Configures the send mode for response processing. If unspecified, the default value `STREAMED` is used. The field can only be set if `supported_events` includes `RESPONSE_BODY`. If `supported_events` includes `RESPONSE_BODY`, but `response_body_send_mode` is unset, the default value `STREAMED` is used. When this field is set to `FULL_DUPLEX_STREAMED`, `supported_events` must include both `RESPONSE_BODY` and `RESPONSE_TRAILERS`. This field can be set only for `LbTrafficExtension` resources, and only when the `service` field of the extension points to a `BackendService`.
+    #[serde(rename = "responseBodySendMode")]
+    pub response_body_send_mode: Option<String>,
+    /// Required. The reference to the service that runs the extension. To configure a callout extension, `service` must be a fully-qualified reference to a [backend service](https://cloud.google.com/compute/docs/reference/rest/v1/backendServices) in the format: `https://www.googleapis.com/compute/v1/projects/{project}/regions/{region}/backendServices/{backendService}` or `https://www.googleapis.com/compute/v1/projects/{project}/global/backendServices/{backendService}`. To configure a plugin extension, `service` must be a reference to a [`WasmPlugin` resource](https://cloud.google.com/service-extensions/docs/reference/rest/v1beta1/projects.locations.wasmPlugins) in the format: `projects/{project}/locations/{location}/wasmPlugins/{plugin}` or `//networkservices.googleapis.com/projects/{project}/locations/{location}/wasmPlugins/{wasmPlugin}`. Plugin extensions are currently supported for the `LbTrafficExtension`, the `LbRouteExtension`, and the `LbEdgeExtension` resources.
     pub service: Option<String>,
-    /// Optional. A set of events during request or response processing for which this extension is called. This field is required for the `LbTrafficExtension` resource. It must not be set for the `LbRouteExtension` resource.
+    /// Optional. A set of events during request or response processing for which this extension is called. For the `LbTrafficExtension` resource, this field is required. For the `LbRouteExtension` resource, this field is optional. If unspecified, `REQUEST_HEADERS` event is assumed as supported. For the `LbEdgeExtension` resource, this field is required and must only contain `REQUEST_HEADERS` event. For the `AuthzExtension` resource, this field is optional. `REQUEST_HEADERS` is the only supported event. If unspecified, `REQUEST_HEADERS` event is assumed as supported.
     #[serde(rename = "supportedEvents")]
     pub supported_events: Option<Vec<String>>,
-    /// Optional. Specifies the timeout for each individual message on the stream. The timeout must be between 10-1000 milliseconds. Required for Callout extensions.
+    /// Optional. Specifies the timeout for each individual message on the stream. The timeout must be between `10`-`10000` milliseconds. Required for callout extensions. This field is not supported for plugin extensions. Setting it results in a validation error.
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
     pub timeout: Option<chrono::Duration>,
 }
@@ -437,7 +511,7 @@ pub struct ExtensionChainMatchCondition {
 
 impl common::Part for ExtensionChainMatchCondition {}
 
-/// Gateway represents the configuration for a proxy, typically a load balancer. It captures the ip:port over which the services are exposed by the proxy, along with any policy configurations. Routes have reference to to Gateways to dictate how requests should be routed by this Gateway. Next id: 33
+/// Gateway represents the configuration for a proxy, typically a load balancer. It captures the ip:port over which the services are exposed by the proxy, along with any policy configurations. Routes have reference to to Gateways to dictate how requests should be routed by this Gateway.
 ///
 /// # Activities
 ///
@@ -472,13 +546,16 @@ pub struct Gateway {
     pub ip_version: Option<String>,
     /// Optional. Set of label tags associated with the Gateway resource.
     pub labels: Option<HashMap<String, String>>,
-    /// Required. Name of the Gateway resource. It matches pattern `projects/*/locations/*/gateways/`.
+    /// Identifier. Name of the Gateway resource. It matches pattern `projects/*/locations/*/gateways/`.
     pub name: Option<String>,
     /// Optional. The relative resource name identifying the VPC network that is using this configuration. For example: `projects/*/global/networks/network-1`. Currently, this field is specific to gateways of type 'SECURE_WEB_GATEWAY'.
     pub network: Option<String>,
-    /// Required. One or more port numbers (1-65535), on which the Gateway will receive traffic. The proxy binds to the specified ports. Gateways of type 'SECURE_WEB_GATEWAY' are limited to 1 port. Gateways of type 'OPEN_MESH' listen on 0.0.0.0 for IPv4 and :: for IPv6 and support multiple ports.
+    /// Required. One or more port numbers (1-65535), on which the Gateway will receive traffic. The proxy binds to the specified ports. Gateways of type 'SECURE_WEB_GATEWAY' are limited to 5 ports. Gateways of type 'OPEN_MESH' listen on 0.0.0.0 for IPv4 and :: for IPv6 and support multiple ports.
     pub ports: Option<Vec<i32>>,
-    /// Optional. Scope determines how configuration across multiple Gateway instances are merged. The configuration for multiple Gateway instances with the same scope will be merged as presented as a single coniguration to the proxy/load balancer. Max length 64 characters. Scope should start with a letter and can only have letters, numbers, hyphens.
+    /// Optional. The routing mode of the Gateway. This field is configurable only for gateways of type SECURE_WEB_GATEWAY. This field is required for gateways of type SECURE_WEB_GATEWAY.
+    #[serde(rename = "routingMode")]
+    pub routing_mode: Option<String>,
+    /// Optional. Scope determines how configuration across multiple Gateway instances are merged. The configuration for multiple Gateway instances with the same scope will be merged as presented as a single configuration to the proxy/load balancer. Max length 64 characters. Scope should start with a letter and can only have letters, numbers, hyphens.
     pub scope: Option<String>,
     /// Output only. Server-defined URL of this resource
     #[serde(rename = "selfLink")]
@@ -499,6 +576,37 @@ pub struct Gateway {
 impl common::RequestValue for Gateway {}
 impl common::ResponseResult for Gateway {}
 
+/// GatewayRouteView defines view-only resource for Routes to a Gateway
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations gateways route views get projects](ProjectLocationGatewayRouteViewGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GatewayRouteView {
+    /// Output only. Identifier. Full path name of the GatewayRouteView resource. Format: projects/{project_number}/locations/{location}/gateways/{gateway}/routeViews/{route_view}
+    pub name: Option<String>,
+    /// Output only. The resource id for the route.
+    #[serde(rename = "routeId")]
+    pub route_id: Option<String>,
+    /// Output only. Location where the route exists.
+    #[serde(rename = "routeLocation")]
+    pub route_location: Option<String>,
+    /// Output only. Project number where the route exists.
+    #[serde(rename = "routeProjectNumber")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub route_project_number: Option<i64>,
+    /// Output only. Type of the route: HttpRoute,GrpcRoute,TcpRoute, or TlsRoute
+    #[serde(rename = "routeType")]
+    pub route_type: Option<String>,
+}
+
+impl common::ResponseResult for GatewayRouteView {}
+
 /// GrpcRoute is the resource defining how gRPC traffic routed by a Mesh or Gateway resource is routed.
 ///
 /// # Activities
@@ -518,15 +626,15 @@ pub struct GrpcRoute {
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Optional. A free-text description of the resource. Max length 1024 characters.
     pub description: Option<String>,
-    /// Optional. Gateways defines a list of gateways this GrpcRoute is attached to, as one of the routing rules to route the requests served by the gateway. Each gateway reference should match the pattern: `projects/*/locations/global/gateways/`
+    /// Optional. Gateways defines a list of gateways this GrpcRoute is attached to, as one of the routing rules to route the requests served by the gateway. Each gateway reference should match the pattern: `projects/*/locations/*/gateways/`
     pub gateways: Option<Vec<String>>,
     /// Required. Service hostnames with an optional port for which this route describes traffic. Format: [:] Hostname is the fully qualified domain name of a network host. This matches the RFC 1123 definition of a hostname with 2 notable exceptions: - IPs are not allowed. - A hostname may be prefixed with a wildcard label (`*.`). The wildcard label must appear by itself as the first label. Hostname can be "precise" which is a domain name without the terminating dot of a network host (e.g. `foo.example.com`) or "wildcard", which is a domain name prefixed with a single wildcard label (e.g. `*.example.com`). Note that as per RFC1035 and RFC1123, a label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character. No other punctuation is allowed. The routes associated with a Mesh or Gateway must have unique hostnames. If you attempt to attach multiple routes with conflicting hostnames, the configuration will be rejected. For example, while it is acceptable for routes for the hostnames `*.foo.bar.com` and `*.bar.com` to be associated with the same route, it is not possible to associate two routes both with `*.bar.com` or both with `bar.com`. If a port is specified, then gRPC clients must use the channel URI with the port to match this rule (i.e. "xds:///service:123"), otherwise they must supply the URI without a port (i.e. "xds:///service").
     pub hostnames: Option<Vec<String>>,
     /// Optional. Set of label tags associated with the GrpcRoute resource.
     pub labels: Option<HashMap<String, String>>,
-    /// Optional. Meshes defines a list of meshes this GrpcRoute is attached to, as one of the routing rules to route the requests served by the mesh. Each mesh reference should match the pattern: `projects/*/locations/global/meshes/`
+    /// Optional. Meshes defines a list of meshes this GrpcRoute is attached to, as one of the routing rules to route the requests served by the mesh. Each mesh reference should match the pattern: `projects/*/locations/*/meshes/`
     pub meshes: Option<Vec<String>>,
-    /// Required. Name of the GrpcRoute resource. It matches pattern `projects/*/locations/global/grpcRoutes/`
+    /// Identifier. Name of the GrpcRoute resource. It matches pattern `projects/*/locations/*/grpcRoutes/`
     pub name: Option<String>,
     /// Required. A list of detailed rules defining how to route traffic. Within a single GrpcRoute, the GrpcRoute.RouteAction associated with the first matching GrpcRoute.RouteRule will be executed. At least one rule must be supplied.
     pub rules: Option<Vec<GrpcRouteRouteRule>>,
@@ -652,7 +760,7 @@ pub struct GrpcRouteMethodMatch {
 
 impl common::Part for GrpcRouteMethodMatch {}
 
-/// The specifications for retries.
+/// The specifications for retries. Specifies one or more conditions for which this retry rule applies. Valid values are:
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -740,7 +848,7 @@ impl common::Part for GrpcRouteRouteRule {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GrpcRouteStatefulSessionAffinityPolicy {
-    /// Required. The cookie TTL value for the Set-Cookie header generated by the data plane. The lifetime of the cookie may be set to a value from 1 to 86400 seconds (24 hours) inclusive.
+    /// Required. The cookie TTL value for the Set-Cookie header generated by the data plane. The lifetime of the cookie may be set to a value from 0 to 86400 seconds (24 hours) inclusive. Set this to 0s to use a session cookie and disable cookie expiration.
     #[serde(rename = "cookieTtl")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
     pub cookie_ttl: Option<chrono::Duration>,
@@ -767,15 +875,15 @@ pub struct HttpRoute {
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Optional. A free-text description of the resource. Max length 1024 characters.
     pub description: Option<String>,
-    /// Optional. Gateways defines a list of gateways this HttpRoute is attached to, as one of the routing rules to route the requests served by the gateway. Each gateway reference should match the pattern: `projects/*/locations/global/gateways/`
+    /// Optional. Gateways defines a list of gateways this HttpRoute is attached to, as one of the routing rules to route the requests served by the gateway. Each gateway reference should match the pattern: `projects/*/locations/*/gateways/`
     pub gateways: Option<Vec<String>>,
     /// Required. Hostnames define a set of hosts that should match against the HTTP host header to select a HttpRoute to process the request. Hostname is the fully qualified domain name of a network host, as defined by RFC 1123 with the exception that: - IPs are not allowed. - A hostname may be prefixed with a wildcard label (`*.`). The wildcard label must appear by itself as the first label. Hostname can be "precise" which is a domain name without the terminating dot of a network host (e.g. `foo.example.com`) or "wildcard", which is a domain name prefixed with a single wildcard label (e.g. `*.example.com`). Note that as per RFC1035 and RFC1123, a label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character. No other punctuation is allowed. The routes associated with a Mesh or Gateways must have unique hostnames. If you attempt to attach multiple routes with conflicting hostnames, the configuration will be rejected. For example, while it is acceptable for routes for the hostnames `*.foo.bar.com` and `*.bar.com` to be associated with the same Mesh (or Gateways under the same scope), it is not possible to associate two routes both with `*.bar.com` or both with `bar.com`.
     pub hostnames: Option<Vec<String>>,
     /// Optional. Set of label tags associated with the HttpRoute resource.
     pub labels: Option<HashMap<String, String>>,
-    /// Optional. Meshes defines a list of meshes this HttpRoute is attached to, as one of the routing rules to route the requests served by the mesh. Each mesh reference should match the pattern: `projects/*/locations/global/meshes/` The attached Mesh should be of a type SIDECAR
+    /// Optional. Meshes defines a list of meshes this HttpRoute is attached to, as one of the routing rules to route the requests served by the mesh. Each mesh reference should match the pattern: `projects/*/locations/*/meshes/` The attached Mesh should be of a type SIDECAR
     pub meshes: Option<Vec<String>>,
-    /// Required. Name of the HttpRoute resource. It matches pattern `projects/*/locations/global/httpRoutes/http_route_name>`.
+    /// Identifier. Name of the HttpRoute resource. It matches pattern `projects/*/locations/*/httpRoutes/http_route_name>`.
     pub name: Option<String>,
     /// Required. Rules that define how traffic is routed and handled. Rules will be matched sequentially based on the RouteMatch specified for the rule.
     pub rules: Option<Vec<HttpRouteRouteRule>>,
@@ -1046,7 +1154,7 @@ pub struct HttpRouteRedirect {
 
 impl common::Part for HttpRouteRedirect {}
 
-/// Specifies the policy on how requests are shadowed to a separate mirrored destination service. The proxy does not wait for responses from the shadow service. Prior to sending traffic to the shadow service, the host/authority header is suffixed with -shadow.
+/// Specifies the policy on how requests are shadowed to a separate mirrored destination service. The proxy does not wait for responses from the shadow service. Prior to sending traffic to the shadow service, the host/authority header is suffixed with -shadow. Mirroring is currently not supported for Cloud Run destinations.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1188,7 +1296,7 @@ impl common::Part for HttpRouteRouteRule {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct HttpRouteStatefulSessionAffinityPolicy {
-    /// Required. The cookie TTL value for the Set-Cookie header generated by the data plane. The lifetime of the cookie may be set to a value from 1 to 86400 seconds (24 hours) inclusive.
+    /// Required. The cookie TTL value for the Set-Cookie header generated by the data plane. The lifetime of the cookie may be set to a value from 0 to 86400 seconds (24 hours) inclusive. Set this to 0s to use a session cookie and disable cookie expiration.
     #[serde(rename = "cookieTtl")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
     pub cookie_ttl: Option<chrono::Duration>,
@@ -1214,6 +1322,46 @@ pub struct HttpRouteURLRewrite {
 
 impl common::Part for HttpRouteURLRewrite {}
 
+/// `LbEdgeExtension` is a resource that lets the extension service influence the selection of backend services and Cloud CDN cache keys by modifying request headers.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations lb edge extensions create projects](ProjectLocationLbEdgeExtensionCreateCall) (request)
+/// * [locations lb edge extensions get projects](ProjectLocationLbEdgeExtensionGetCall) (response)
+/// * [locations lb edge extensions patch projects](ProjectLocationLbEdgeExtensionPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct LbEdgeExtension {
+    /// Output only. The timestamp when the resource was created.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Optional. A human-readable description of the resource.
+    pub description: Option<String>,
+    /// Required. A set of ordered extension chains that contain the match conditions and extensions to execute. Match conditions for each extension chain are evaluated in sequence for a given request. The first extension chain that has a condition that matches the request is executed. Any subsequent extension chains do not execute. Limited to 5 extension chains per resource.
+    #[serde(rename = "extensionChains")]
+    pub extension_chains: Option<Vec<ExtensionChain>>,
+    /// Required. A list of references to the forwarding rules to which this service extension is attached. At least one forwarding rule is required. Only one `LbEdgeExtension` resource can be associated with a forwarding rule.
+    #[serde(rename = "forwardingRules")]
+    pub forwarding_rules: Option<Vec<String>>,
+    /// Optional. Set of labels associated with the `LbEdgeExtension` resource. The format must comply with [the requirements for labels](https://cloud.google.com/compute/docs/labeling-resources#requirements) for Google Cloud resources.
+    pub labels: Option<HashMap<String, String>>,
+    /// Required. All forwarding rules referenced by this extension must share the same load balancing scheme. Supported values: `EXTERNAL_MANAGED`.
+    #[serde(rename = "loadBalancingScheme")]
+    pub load_balancing_scheme: Option<String>,
+    /// Required. Identifier. Name of the `LbEdgeExtension` resource in the following format: `projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+    pub name: Option<String>,
+    /// Output only. The timestamp when the resource was updated.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::RequestValue for LbEdgeExtension {}
+impl common::ResponseResult for LbEdgeExtension {}
+
 /// `LbRouteExtension` is a resource that lets you control where traffic is routed to for a given request.
 ///
 /// # Activities
@@ -1236,15 +1384,15 @@ pub struct LbRouteExtension {
     /// Required. A set of ordered extension chains that contain the match conditions and extensions to execute. Match conditions for each extension chain are evaluated in sequence for a given request. The first extension chain that has a condition that matches the request is executed. Any subsequent extension chains do not execute. Limited to 5 extension chains per resource.
     #[serde(rename = "extensionChains")]
     pub extension_chains: Option<Vec<ExtensionChain>>,
-    /// Required. A list of references to the forwarding rules to which this service extension is attached to. At least one forwarding rule is required. There can be only one `LbRouteExtension` resource per forwarding rule.
+    /// Required. A list of references to the forwarding rules to which this service extension is attached. At least one forwarding rule is required. Only one `LbRouteExtension` resource can be associated with a forwarding rule.
     #[serde(rename = "forwardingRules")]
     pub forwarding_rules: Option<Vec<String>>,
     /// Optional. Set of labels associated with the `LbRouteExtension` resource. The format must comply with [the requirements for labels](https://cloud.google.com/compute/docs/labeling-resources#requirements) for Google Cloud resources.
     pub labels: Option<HashMap<String, String>>,
-    /// Required. All backend services and forwarding rules referenced by this extension must share the same load balancing scheme. Supported values: `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. For more information, refer to [Choosing a load balancer](https://cloud.google.com/load-balancing/docs/backend-service).
+    /// Required. All backend services and forwarding rules referenced by this extension must share the same load balancing scheme. Supported values: `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. For more information, refer to [Backend services overview](https://cloud.google.com/load-balancing/docs/backend-service).
     #[serde(rename = "loadBalancingScheme")]
     pub load_balancing_scheme: Option<String>,
-    /// Optional. The metadata provided here is included as part of the `metadata_context` (of type `google.protobuf.Struct`) in the `ProcessingRequest` message sent to the extension server. The metadata is available under the namespace `com.google.lb_route_extension.`. The following variables are supported in the metadata Struct: `{forwarding_rule_id}` - substituted with the forwarding rule's fully qualified resource name.
+    /// Optional. The metadata provided here is included as part of the `metadata_context` (of type `google.protobuf.Struct`) in the `ProcessingRequest` message sent to the extension server. The metadata applies to all extensions in all extensions chains in this resource. The metadata is available under the key `com.google.lb_route_extension.`. The following variables are supported in the metadata: `{forwarding_rule_id}` - substituted with the forwarding rule's fully qualified resource name. This field must not be set if at least one of the extension chains contains plugin extensions. Setting it results in a validation error. You can set metadata at either the resource level or the extension level. The extension level metadata is recommended because you can pass a different set of metadata through each extension to the backend.
     pub metadata: Option<HashMap<String, serde_json::Value>>,
     /// Required. Identifier. Name of the `LbRouteExtension` resource in the following format: `projects/{project}/locations/{location}/lbRouteExtensions/{lb_route_extension}`.
     pub name: Option<String>,
@@ -1278,15 +1426,15 @@ pub struct LbTrafficExtension {
     /// Required. A set of ordered extension chains that contain the match conditions and extensions to execute. Match conditions for each extension chain are evaluated in sequence for a given request. The first extension chain that has a condition that matches the request is executed. Any subsequent extension chains do not execute. Limited to 5 extension chains per resource.
     #[serde(rename = "extensionChains")]
     pub extension_chains: Option<Vec<ExtensionChain>>,
-    /// Required. A list of references to the forwarding rules to which this service extension is attached to. At least one forwarding rule is required. There can be only one `LBTrafficExtension` resource per forwarding rule.
+    /// Optional. A list of references to the forwarding rules to which this service extension is attached. At least one forwarding rule is required. Only one `LbTrafficExtension` resource can be associated with a forwarding rule.
     #[serde(rename = "forwardingRules")]
     pub forwarding_rules: Option<Vec<String>>,
     /// Optional. Set of labels associated with the `LbTrafficExtension` resource. The format must comply with [the requirements for labels](https://cloud.google.com/compute/docs/labeling-resources#requirements) for Google Cloud resources.
     pub labels: Option<HashMap<String, String>>,
-    /// Required. All backend services and forwarding rules referenced by this extension must share the same load balancing scheme. Supported values: `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. For more information, refer to [Choosing a load balancer](https://cloud.google.com/load-balancing/docs/backend-service).
+    /// Required. All backend services and forwarding rules referenced by this extension must share the same load balancing scheme. Supported values: `INTERNAL_MANAGED` and `EXTERNAL_MANAGED`. For more information, refer to [Backend services overview](https://cloud.google.com/load-balancing/docs/backend-service).
     #[serde(rename = "loadBalancingScheme")]
     pub load_balancing_scheme: Option<String>,
-    /// Optional. The metadata provided here is included in the `ProcessingRequest.metadata_context.filter_metadata` map field. The metadata is available under the key `com.google.lb_traffic_extension.`. The following variables are supported in the metadata: `{forwarding_rule_id}` - substituted with the forwarding rule's fully qualified resource name.
+    /// Optional. The metadata provided here is included as part of the `metadata_context` (of type `google.protobuf.Struct`) in the `ProcessingRequest` message sent to the extension server. The metadata applies to all extensions in all extensions chains in this resource. The metadata is available under the key `com.google.lb_traffic_extension.`. The following variables are supported in the metadata: `{forwarding_rule_id}` - substituted with the forwarding rule's fully qualified resource name. This field must not be set if at least one of the extension chains contains plugin extensions. Setting it results in a validation error. You can set metadata at either the resource level or the extension level. The extension level metadata is recommended because you can pass a different set of metadata through each extension to the backend.
     pub metadata: Option<HashMap<String, serde_json::Value>>,
     /// Required. Identifier. Name of the `LbTrafficExtension` resource in the following format: `projects/{project}/locations/{location}/lbTrafficExtensions/{lb_traffic_extension}`.
     pub name: Option<String>,
@@ -1297,6 +1445,30 @@ pub struct LbTrafficExtension {
 
 impl common::RequestValue for LbTrafficExtension {}
 impl common::ResponseResult for LbTrafficExtension {}
+
+/// Message for response to listing `AuthzExtension` resources.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations authz extensions list projects](ProjectLocationAuthzExtensionListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListAuthzExtensionsResponse {
+    /// The list of `AuthzExtension` resources.
+    #[serde(rename = "authzExtensions")]
+    pub authz_extensions: Option<Vec<AuthzExtension>>,
+    /// A token identifying a page of results that the server returns.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Locations that could not be reached.
+    pub unreachable: Option<Vec<String>>,
+}
+
+impl common::ResponseResult for ListAuthzExtensionsResponse {}
 
 /// Response returned by the ListEndpointPolicies method.
 ///
@@ -1316,9 +1488,35 @@ pub struct ListEndpointPoliciesResponse {
     /// If there might be more results than those appearing in this response, then `next_page_token` is included. To get the next set of results, call this method again using the value of `next_page_token` as `page_token`.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
+    /// Unreachable resources. Populated when the request opts into return_partial_success and reading across collections e.g. when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListEndpointPoliciesResponse {}
+
+/// Response returned by the ListGatewayRouteViews method.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations gateways route views list projects](ProjectLocationGatewayRouteViewListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListGatewayRouteViewsResponse {
+    /// List of GatewayRouteView resources.
+    #[serde(rename = "gatewayRouteViews")]
+    pub gateway_route_views: Option<Vec<GatewayRouteView>>,
+    /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Unreachable resources. Populated when the request attempts to list all resources across all supported locations, while some locations are temporarily unavailable.
+    pub unreachable: Option<Vec<String>>,
+}
+
+impl common::ResponseResult for ListGatewayRouteViewsResponse {}
 
 /// Response returned by the ListGateways method.
 ///
@@ -1361,6 +1559,8 @@ pub struct ListGrpcRoutesResponse {
     /// If there might be more results than those appearing in this response, then `next_page_token` is included. To get the next set of results, call this method again using the value of `next_page_token` as `page_token`.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
+    /// Unreachable resources. Populated when the request opts into return_partial_success and reading across collections e.g. when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListGrpcRoutesResponse {}
@@ -1383,9 +1583,35 @@ pub struct ListHttpRoutesResponse {
     /// If there might be more results than those appearing in this response, then `next_page_token` is included. To get the next set of results, call this method again using the value of `next_page_token` as `page_token`.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
+    /// Unreachable resources. Populated when the request opts into return_partial_success and reading across collections e.g. when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListHttpRoutesResponse {}
+
+/// Message for response to listing `LbEdgeExtension` resources.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations lb edge extensions list projects](ProjectLocationLbEdgeExtensionListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListLbEdgeExtensionsResponse {
+    /// The list of `LbEdgeExtension` resources.
+    #[serde(rename = "lbEdgeExtensions")]
+    pub lb_edge_extensions: Option<Vec<LbEdgeExtension>>,
+    /// A token identifying a page of results that the server returns.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Locations that could not be reached.
+    pub unreachable: Option<Vec<String>>,
+}
+
+impl common::ResponseResult for ListLbEdgeExtensionsResponse {}
 
 /// Message for response to listing `LbRouteExtension` resources.
 ///
@@ -1456,6 +1682,30 @@ pub struct ListLocationsResponse {
 
 impl common::ResponseResult for ListLocationsResponse {}
 
+/// Response returned by the ListMeshRouteViews method.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations meshes route views list projects](ProjectLocationMeshRouteViewListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListMeshRouteViewsResponse {
+    /// List of MeshRouteView resources.
+    #[serde(rename = "meshRouteViews")]
+    pub mesh_route_views: Option<Vec<MeshRouteView>>,
+    /// A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Unreachable resources. Populated when the request attempts to list all resources across all supported locations, while some locations are temporarily unavailable.
+    pub unreachable: Option<Vec<String>>,
+}
+
+impl common::ResponseResult for ListMeshRouteViewsResponse {}
+
 /// Response returned by the ListMeshes method.
 ///
 /// # Activities
@@ -1473,6 +1723,8 @@ pub struct ListMeshesResponse {
     /// If there might be more results than those appearing in this response, then `next_page_token` is included. To get the next set of results, call this method again using the value of `next_page_token` as `page_token`.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
+    /// Unreachable resources. Populated when the request opts into `return_partial_success` and reading across collections e.g. when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListMeshesResponse {}
@@ -1494,6 +1746,8 @@ pub struct ListOperationsResponse {
     pub next_page_token: Option<String>,
     /// A list of operations that matches the specified filter in the request.
     pub operations: Option<Vec<Operation>>,
+    /// Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListOperationsResponse {}
@@ -1516,6 +1770,8 @@ pub struct ListServiceBindingsResponse {
     /// List of ServiceBinding resources.
     #[serde(rename = "serviceBindings")]
     pub service_bindings: Option<Vec<ServiceBinding>>,
+    /// Unreachable resources. Populated when the request attempts to list all resources across all supported locations, while some locations are temporarily unavailable.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListServiceBindingsResponse {}
@@ -1538,6 +1794,8 @@ pub struct ListServiceLbPoliciesResponse {
     /// List of ServiceLbPolicy resources.
     #[serde(rename = "serviceLbPolicies")]
     pub service_lb_policies: Option<Vec<ServiceLbPolicy>>,
+    /// Unreachable resources. Populated when the request attempts to list all resources across all supported locations, while some locations are temporarily unavailable.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListServiceLbPoliciesResponse {}
@@ -1560,6 +1818,8 @@ pub struct ListTcpRoutesResponse {
     /// List of TcpRoute resources.
     #[serde(rename = "tcpRoutes")]
     pub tcp_routes: Option<Vec<TcpRoute>>,
+    /// Unreachable resources. Populated when the request opts into return_partial_success and reading across collections e.g. when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListTcpRoutesResponse {}
@@ -1582,9 +1842,59 @@ pub struct ListTlsRoutesResponse {
     /// List of TlsRoute resources.
     #[serde(rename = "tlsRoutes")]
     pub tls_routes: Option<Vec<TlsRoute>>,
+    /// Unreachable resources. Populated when the request opts into return_partial_success and reading across collections e.g. when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListTlsRoutesResponse {}
+
+/// Response returned by the `ListWasmPluginVersions` method.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations wasm plugins versions list projects](ProjectLocationWasmPluginVersionListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListWasmPluginVersionsResponse {
+    /// If there might be more results than those appearing in this response, then `next_page_token` is included. To get the next set of results, call this method again using the value of `next_page_token` as `page_token`.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Unreachable resources. Populated when the request attempts to list all resources across all supported locations, while some locations are temporarily unavailable.
+    pub unreachable: Option<Vec<String>>,
+    /// List of `WasmPluginVersion` resources.
+    #[serde(rename = "wasmPluginVersions")]
+    pub wasm_plugin_versions: Option<Vec<WasmPluginVersion>>,
+}
+
+impl common::ResponseResult for ListWasmPluginVersionsResponse {}
+
+/// Response returned by the `ListWasmPlugins` method.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations wasm plugins list projects](ProjectLocationWasmPluginListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListWasmPluginsResponse {
+    /// If there might be more results than those appearing in this response, then `next_page_token` is included. To get the next set of results, call this method again using the value of `next_page_token` as `page_token`.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Unreachable resources. Populated when the request attempts to list all resources across all supported locations, while some locations are temporarily unavailable.
+    pub unreachable: Option<Vec<String>>,
+    /// List of `WasmPlugin` resources.
+    #[serde(rename = "wasmPlugins")]
+    pub wasm_plugins: Option<Vec<WasmPlugin>>,
+}
+
+impl common::ResponseResult for ListWasmPluginsResponse {}
 
 /// A resource that represents a Google Cloud location.
 ///
@@ -1641,7 +1951,7 @@ pub struct Mesh {
     pub interception_port: Option<i32>,
     /// Optional. Set of label tags associated with the Mesh resource.
     pub labels: Option<HashMap<String, String>>,
-    /// Required. Name of the Mesh resource. It matches pattern `projects/*/locations/global/meshes/`.
+    /// Identifier. Name of the Mesh resource. It matches pattern `projects/*/locations/*/meshes/`.
     pub name: Option<String>,
     /// Output only. Server-defined URL of this resource
     #[serde(rename = "selfLink")]
@@ -1654,6 +1964,37 @@ pub struct Mesh {
 impl common::RequestValue for Mesh {}
 impl common::ResponseResult for Mesh {}
 
+/// MeshRouteView defines view-only resource for Routes to a Mesh
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations meshes route views get projects](ProjectLocationMeshRouteViewGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MeshRouteView {
+    /// Output only. Identifier. Full path name of the MeshRouteView resource. Format: projects/{project_number}/locations/{location}/meshes/{mesh}/routeViews/{route_view}
+    pub name: Option<String>,
+    /// Output only. The resource id for the route.
+    #[serde(rename = "routeId")]
+    pub route_id: Option<String>,
+    /// Output only. Location where the route exists.
+    #[serde(rename = "routeLocation")]
+    pub route_location: Option<String>,
+    /// Output only. Project number where the route exists.
+    #[serde(rename = "routeProjectNumber")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub route_project_number: Option<i64>,
+    /// Output only. Type of the route: HttpRoute,GrpcRoute,TcpRoute, or TlsRoute
+    #[serde(rename = "routeType")]
+    pub route_type: Option<String>,
+}
+
+impl common::ResponseResult for MeshRouteView {}
+
 /// This resource represents a long-running operation that is the result of a network API call.
 ///
 /// # Activities
@@ -1661,6 +2002,9 @@ impl common::ResponseResult for Mesh {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
+/// * [locations authz extensions create projects](ProjectLocationAuthzExtensionCreateCall) (response)
+/// * [locations authz extensions delete projects](ProjectLocationAuthzExtensionDeleteCall) (response)
+/// * [locations authz extensions patch projects](ProjectLocationAuthzExtensionPatchCall) (response)
 /// * [locations endpoint policies create projects](ProjectLocationEndpointPolicyCreateCall) (response)
 /// * [locations endpoint policies delete projects](ProjectLocationEndpointPolicyDeleteCall) (response)
 /// * [locations endpoint policies patch projects](ProjectLocationEndpointPolicyPatchCall) (response)
@@ -1673,6 +2017,9 @@ impl common::ResponseResult for Mesh {}
 /// * [locations http routes create projects](ProjectLocationHttpRouteCreateCall) (response)
 /// * [locations http routes delete projects](ProjectLocationHttpRouteDeleteCall) (response)
 /// * [locations http routes patch projects](ProjectLocationHttpRoutePatchCall) (response)
+/// * [locations lb edge extensions create projects](ProjectLocationLbEdgeExtensionCreateCall) (response)
+/// * [locations lb edge extensions delete projects](ProjectLocationLbEdgeExtensionDeleteCall) (response)
+/// * [locations lb edge extensions patch projects](ProjectLocationLbEdgeExtensionPatchCall) (response)
 /// * [locations lb route extensions create projects](ProjectLocationLbRouteExtensionCreateCall) (response)
 /// * [locations lb route extensions delete projects](ProjectLocationLbRouteExtensionDeleteCall) (response)
 /// * [locations lb route extensions patch projects](ProjectLocationLbRouteExtensionPatchCall) (response)
@@ -1685,6 +2032,7 @@ impl common::ResponseResult for Mesh {}
 /// * [locations operations get projects](ProjectLocationOperationGetCall) (response)
 /// * [locations service bindings create projects](ProjectLocationServiceBindingCreateCall) (response)
 /// * [locations service bindings delete projects](ProjectLocationServiceBindingDeleteCall) (response)
+/// * [locations service bindings patch projects](ProjectLocationServiceBindingPatchCall) (response)
 /// * [locations service lb policies create projects](ProjectLocationServiceLbPolicyCreateCall) (response)
 /// * [locations service lb policies delete projects](ProjectLocationServiceLbPolicyDeleteCall) (response)
 /// * [locations service lb policies patch projects](ProjectLocationServiceLbPolicyPatchCall) (response)
@@ -1694,6 +2042,11 @@ impl common::ResponseResult for Mesh {}
 /// * [locations tls routes create projects](ProjectLocationTlsRouteCreateCall) (response)
 /// * [locations tls routes delete projects](ProjectLocationTlsRouteDeleteCall) (response)
 /// * [locations tls routes patch projects](ProjectLocationTlsRoutePatchCall) (response)
+/// * [locations wasm plugins versions create projects](ProjectLocationWasmPluginVersionCreateCall) (response)
+/// * [locations wasm plugins versions delete projects](ProjectLocationWasmPluginVersionDeleteCall) (response)
+/// * [locations wasm plugins create projects](ProjectLocationWasmPluginCreateCall) (response)
+/// * [locations wasm plugins delete projects](ProjectLocationWasmPluginDeleteCall) (response)
+/// * [locations wasm plugins patch projects](ProjectLocationWasmPluginPatchCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1725,16 +2078,6 @@ impl common::ResponseResult for Operation {}
 /// * [locations edge cache origins set iam policy projects](ProjectLocationEdgeCacheOriginSetIamPolicyCall) (response)
 /// * [locations edge cache services get iam policy projects](ProjectLocationEdgeCacheServiceGetIamPolicyCall) (response)
 /// * [locations edge cache services set iam policy projects](ProjectLocationEdgeCacheServiceSetIamPolicyCall) (response)
-/// * [locations endpoint policies get iam policy projects](ProjectLocationEndpointPolicyGetIamPolicyCall) (response)
-/// * [locations endpoint policies set iam policy projects](ProjectLocationEndpointPolicySetIamPolicyCall) (response)
-/// * [locations gateways get iam policy projects](ProjectLocationGatewayGetIamPolicyCall) (response)
-/// * [locations gateways set iam policy projects](ProjectLocationGatewaySetIamPolicyCall) (response)
-/// * [locations meshes get iam policy projects](ProjectLocationMeshGetIamPolicyCall) (response)
-/// * [locations meshes set iam policy projects](ProjectLocationMeshSetIamPolicyCall) (response)
-/// * [locations service bindings get iam policy projects](ProjectLocationServiceBindingGetIamPolicyCall) (response)
-/// * [locations service bindings set iam policy projects](ProjectLocationServiceBindingSetIamPolicyCall) (response)
-/// * [locations service lb policies get iam policy projects](ProjectLocationServiceLbPolicyGetIamPolicyCall) (response)
-/// * [locations service lb policies set iam policy projects](ProjectLocationServiceLbPolicySetIamPolicyCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1753,7 +2096,7 @@ pub struct Policy {
 
 impl common::ResponseResult for Policy {}
 
-/// ServiceBinding is the resource that defines a Service Directory Service to be used in a BackendService resource.
+/// ServiceBinding can be used to: - Bind a Service Directory Service to be used in a BackendService resource. This feature will be deprecated soon. - Bind a Private Service Connect producer service to be used in consumer Cloud Service Mesh or Application Load Balancers. - Bind a Cloud Run service to be used in consumer Cloud Service Mesh or Application Load Balancers.
 ///
 /// # Activities
 ///
@@ -1762,6 +2105,7 @@ impl common::ResponseResult for Policy {}
 ///
 /// * [locations service bindings create projects](ProjectLocationServiceBindingCreateCall) (request)
 /// * [locations service bindings get projects](ProjectLocationServiceBindingGetCall) (response)
+/// * [locations service bindings patch projects](ProjectLocationServiceBindingPatchCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1773,11 +2117,11 @@ pub struct ServiceBinding {
     pub description: Option<String>,
     /// Optional. Set of label tags associated with the ServiceBinding resource.
     pub labels: Option<HashMap<String, String>>,
-    /// Required. Name of the ServiceBinding resource. It matches pattern `projects/*/locations/global/serviceBindings/service_binding_name`.
+    /// Identifier. Name of the ServiceBinding resource. It matches pattern `projects/*/locations/*/serviceBindings/`.
     pub name: Option<String>,
-    /// Required. The full Service Directory Service name of the format projects/*/locations/*/namespaces/*/services/*
+    /// Optional. The full Service Directory Service name of the format `projects/*/locations/*/namespaces/*/services/*`. This field is for Service Directory integration which will be deprecated soon.
     pub service: Option<String>,
-    /// Output only. The unique identifier of the Service Directory Service against which the Service Binding resource is validated. This is populated when the Service Binding resource is used in another resource (like Backend Service). This is of the UUID4 format.
+    /// Output only. The unique identifier of the Service Directory Service against which the ServiceBinding resource is validated. This is populated when the Service Binding resource is used in another resource (like Backend Service). This is of the UUID4 format. This field is for Service Directory integration which will be deprecated soon.
     #[serde(rename = "serviceId")]
     pub service_id: Option<String>,
     /// Output only. The timestamp when the resource was updated.
@@ -1813,12 +2157,15 @@ pub struct ServiceLbPolicy {
     /// Optional. Configuration related to health based failover.
     #[serde(rename = "failoverConfig")]
     pub failover_config: Option<ServiceLbPolicyFailoverConfig>,
+    /// Optional. Configuration to provide isolation support for the associated Backend Service.
+    #[serde(rename = "isolationConfig")]
+    pub isolation_config: Option<ServiceLbPolicyIsolationConfig>,
     /// Optional. Set of label tags associated with the ServiceLbPolicy resource.
     pub labels: Option<HashMap<String, String>>,
     /// Optional. The type of load balancing algorithm to be used. The default behavior is WATERFALL_BY_REGION.
     #[serde(rename = "loadBalancingAlgorithm")]
     pub load_balancing_algorithm: Option<String>,
-    /// Required. Name of the ServiceLbPolicy resource. It matches pattern `projects/{project}/locations/{location}/serviceLbPolicies/{service_lb_policy_name}`.
+    /// Identifier. Name of the ServiceLbPolicy resource. It matches pattern `projects/{project}/locations/{location}/serviceLbPolicies/{service_lb_policy_name}`.
     pub name: Option<String>,
     /// Output only. The timestamp when this resource was last updated.
     #[serde(rename = "updateTime")]
@@ -1857,6 +2204,24 @@ pub struct ServiceLbPolicyFailoverConfig {
 
 impl common::Part for ServiceLbPolicyFailoverConfig {}
 
+/// Configuration to provide isolation support for the associated Backend Service.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ServiceLbPolicyIsolationConfig {
+    /// Optional. The isolation granularity of the load balancer.
+    #[serde(rename = "isolationGranularity")]
+    pub isolation_granularity: Option<String>,
+    /// Optional. The isolation mode of the load balancer.
+    #[serde(rename = "isolationMode")]
+    pub isolation_mode: Option<String>,
+}
+
+impl common::Part for ServiceLbPolicyIsolationConfig {}
+
 /// Request message for `SetIamPolicy` method.
 ///
 /// # Activities
@@ -1867,11 +2232,6 @@ impl common::Part for ServiceLbPolicyFailoverConfig {}
 /// * [locations edge cache keysets set iam policy projects](ProjectLocationEdgeCacheKeysetSetIamPolicyCall) (request)
 /// * [locations edge cache origins set iam policy projects](ProjectLocationEdgeCacheOriginSetIamPolicyCall) (request)
 /// * [locations edge cache services set iam policy projects](ProjectLocationEdgeCacheServiceSetIamPolicyCall) (request)
-/// * [locations endpoint policies set iam policy projects](ProjectLocationEndpointPolicySetIamPolicyCall) (request)
-/// * [locations gateways set iam policy projects](ProjectLocationGatewaySetIamPolicyCall) (request)
-/// * [locations meshes set iam policy projects](ProjectLocationMeshSetIamPolicyCall) (request)
-/// * [locations service bindings set iam policy projects](ProjectLocationServiceBindingSetIamPolicyCall) (request)
-/// * [locations service lb policies set iam policy projects](ProjectLocationServiceLbPolicySetIamPolicyCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1922,13 +2282,13 @@ pub struct TcpRoute {
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Optional. A free-text description of the resource. Max length 1024 characters.
     pub description: Option<String>,
-    /// Optional. Gateways defines a list of gateways this TcpRoute is attached to, as one of the routing rules to route the requests served by the gateway. Each gateway reference should match the pattern: `projects/*/locations/global/gateways/`
+    /// Optional. Gateways defines a list of gateways this TcpRoute is attached to, as one of the routing rules to route the requests served by the gateway. Each gateway reference should match the pattern: `projects/*/locations/*/gateways/`
     pub gateways: Option<Vec<String>>,
     /// Optional. Set of label tags associated with the TcpRoute resource.
     pub labels: Option<HashMap<String, String>>,
-    /// Optional. Meshes defines a list of meshes this TcpRoute is attached to, as one of the routing rules to route the requests served by the mesh. Each mesh reference should match the pattern: `projects/*/locations/global/meshes/` The attached Mesh should be of a type SIDECAR
+    /// Optional. Meshes defines a list of meshes this TcpRoute is attached to, as one of the routing rules to route the requests served by the mesh. Each mesh reference should match the pattern: `projects/*/locations/*/meshes/` The attached Mesh should be of a type SIDECAR
     pub meshes: Option<Vec<String>>,
-    /// Required. Name of the TcpRoute resource. It matches pattern `projects/*/locations/global/tcpRoutes/tcp_route_name>`.
+    /// Identifier. Name of the TcpRoute resource. It matches pattern `projects/*/locations/*/tcpRoutes/tcp_route_name>`.
     pub name: Option<String>,
     /// Required. Rules that define how traffic is routed and handled. At least one RouteRule must be supplied. If there are multiple rules then the action taken will be the first rule to match.
     pub rules: Option<Vec<TcpRouteRouteRule>>,
@@ -2023,11 +2383,6 @@ impl common::Part for TcpRouteRouteRule {}
 /// * [locations edge cache keysets test iam permissions projects](ProjectLocationEdgeCacheKeysetTestIamPermissionCall) (request)
 /// * [locations edge cache origins test iam permissions projects](ProjectLocationEdgeCacheOriginTestIamPermissionCall) (request)
 /// * [locations edge cache services test iam permissions projects](ProjectLocationEdgeCacheServiceTestIamPermissionCall) (request)
-/// * [locations endpoint policies test iam permissions projects](ProjectLocationEndpointPolicyTestIamPermissionCall) (request)
-/// * [locations gateways test iam permissions projects](ProjectLocationGatewayTestIamPermissionCall) (request)
-/// * [locations meshes test iam permissions projects](ProjectLocationMeshTestIamPermissionCall) (request)
-/// * [locations service bindings test iam permissions projects](ProjectLocationServiceBindingTestIamPermissionCall) (request)
-/// * [locations service lb policies test iam permissions projects](ProjectLocationServiceLbPolicyTestIamPermissionCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -2048,11 +2403,6 @@ impl common::RequestValue for TestIamPermissionsRequest {}
 /// * [locations edge cache keysets test iam permissions projects](ProjectLocationEdgeCacheKeysetTestIamPermissionCall) (response)
 /// * [locations edge cache origins test iam permissions projects](ProjectLocationEdgeCacheOriginTestIamPermissionCall) (response)
 /// * [locations edge cache services test iam permissions projects](ProjectLocationEdgeCacheServiceTestIamPermissionCall) (response)
-/// * [locations endpoint policies test iam permissions projects](ProjectLocationEndpointPolicyTestIamPermissionCall) (response)
-/// * [locations gateways test iam permissions projects](ProjectLocationGatewayTestIamPermissionCall) (response)
-/// * [locations meshes test iam permissions projects](ProjectLocationMeshTestIamPermissionCall) (response)
-/// * [locations service bindings test iam permissions projects](ProjectLocationServiceBindingTestIamPermissionCall) (response)
-/// * [locations service lb policies test iam permissions projects](ProjectLocationServiceLbPolicyTestIamPermissionCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -2082,13 +2432,13 @@ pub struct TlsRoute {
     pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Optional. A free-text description of the resource. Max length 1024 characters.
     pub description: Option<String>,
-    /// Optional. Gateways defines a list of gateways this TlsRoute is attached to, as one of the routing rules to route the requests served by the gateway. Each gateway reference should match the pattern: `projects/*/locations/global/gateways/`
+    /// Optional. Gateways defines a list of gateways this TlsRoute is attached to, as one of the routing rules to route the requests served by the gateway. Each gateway reference should match the pattern: `projects/*/locations/*/gateways/`
     pub gateways: Option<Vec<String>>,
     /// Optional. Set of label tags associated with the TlsRoute resource.
     pub labels: Option<HashMap<String, String>>,
-    /// Optional. Meshes defines a list of meshes this TlsRoute is attached to, as one of the routing rules to route the requests served by the mesh. Each mesh reference should match the pattern: `projects/*/locations/global/meshes/` The attached Mesh should be of a type SIDECAR
+    /// Optional. Meshes defines a list of meshes this TlsRoute is attached to, as one of the routing rules to route the requests served by the mesh. Each mesh reference should match the pattern: `projects/*/locations/*/meshes/` The attached Mesh should be of a type SIDECAR
     pub meshes: Option<Vec<String>>,
-    /// Required. Name of the TlsRoute resource. It matches pattern `projects/*/locations/global/tlsRoutes/tls_route_name>`.
+    /// Identifier. Name of the TlsRoute resource. It matches pattern `projects/*/locations/*/tlsRoutes/tls_route_name>`.
     pub name: Option<String>,
     /// Required. Rules that define how traffic is routed and handled. At least one RouteRule must be supplied. If there are multiple rules then the action taken will be the first rule to match.
     pub rules: Option<Vec<TlsRouteRouteRule>>,
@@ -2132,13 +2482,13 @@ pub struct TlsRouteRouteDestination {
     /// Required. The URL of a BackendService to route traffic to.
     #[serde(rename = "serviceName")]
     pub service_name: Option<String>,
-    /// Optional. Specifies the proportion of requests forwareded to the backend referenced by the service_name field. This is computed as: - weight/Sum(weights in destinations) Weights in all destinations does not need to sum up to 100.
+    /// Optional. Specifies the proportion of requests forwarded to the backend referenced by the service_name field. This is computed as: - weight/Sum(weights in destinations) Weights in all destinations does not need to sum up to 100.
     pub weight: Option<i32>,
 }
 
 impl common::Part for TlsRouteRouteDestination {}
 
-/// RouteMatch defines the predicate used to match requests to a given action. Multiple match types are "AND"ed for evaluation. If no routeMatch field is specified, this rule will unconditionally match traffic.
+/// RouteMatch defines the predicate used to match requests to a given action. Multiple match types are "AND"ed for evaluation.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -2165,7 +2515,7 @@ impl common::Part for TlsRouteRouteMatch {}
 pub struct TlsRouteRouteRule {
     /// Required. The detailed rule defining how to route matched traffic.
     pub action: Option<TlsRouteRouteAction>,
-    /// Required. RouteMatch defines the predicate used to match requests to a given action. Multiple match types are "OR"ed for evaluation.
+    /// Required. RouteMatch defines the predicate used to match requests to a given action. Multiple match types are "OR"ed for evaluation. Atleast one RouteMatch must be supplied.
     pub matches: Option<Vec<TlsRouteRouteMatch>>,
 }
 
@@ -2184,6 +2534,166 @@ pub struct TrafficPortSelector {
 }
 
 impl common::Part for TrafficPortSelector {}
+
+/// `WasmPlugin` is a resource representing a service executing a customer-provided Wasm module.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations wasm plugins create projects](ProjectLocationWasmPluginCreateCall) (request)
+/// * [locations wasm plugins get projects](ProjectLocationWasmPluginGetCall) (response)
+/// * [locations wasm plugins patch projects](ProjectLocationWasmPluginPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WasmPlugin {
+    /// Output only. The timestamp when the resource was created.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Optional. A human-readable description of the resource.
+    pub description: Option<String>,
+    /// Optional. Set of labels associated with the `WasmPlugin` resource. The format must comply with [the following requirements](https://cloud.google.com/compute/docs/labeling-resources#requirements).
+    pub labels: Option<HashMap<String, String>>,
+    /// Optional. Specifies the logging options for the activity performed by this plugin. If logging is enabled, plugin logs are exported to Cloud Logging. Note that the settings relate to the logs generated by using logging statements in your Wasm code.
+    #[serde(rename = "logConfig")]
+    pub log_config: Option<WasmPluginLogConfig>,
+    /// Optional. The ID of the `WasmPluginVersion` resource that is the currently serving one. The version referred to must be a child of this `WasmPlugin` resource.
+    #[serde(rename = "mainVersionId")]
+    pub main_version_id: Option<String>,
+    /// Identifier. Name of the `WasmPlugin` resource in the following format: `projects/{project}/locations/{location}/wasmPlugins/{wasm_plugin}`.
+    pub name: Option<String>,
+    /// Output only. The timestamp when the resource was updated.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Output only. List of all [extensions](https://cloud.google.com/service-extensions/docs/overview) that use this `WasmPlugin` resource.
+    #[serde(rename = "usedBy")]
+    pub used_by: Option<Vec<WasmPluginUsedBy>>,
+    /// Optional. All versions of this `WasmPlugin` resource in the key-value format. The key is the resource ID, and the value is the `VersionDetails` object. Lets you create or update a `WasmPlugin` resource and its versions in a single request. When the `main_version_id` field is not empty, it must point to one of the `VersionDetails` objects in the map. If provided in a `PATCH` request, the new versions replace the previous set. Any version omitted from the `versions` field is removed. Because the `WasmPluginVersion` resource is immutable, if a `WasmPluginVersion` resource with the same name already exists and differs, the request fails. Note: In a `GET` request, this field is populated only if the field `GetWasmPluginRequest.view` is set to `WASM_PLUGIN_VIEW_FULL`.
+    pub versions: Option<HashMap<String, WasmPluginVersionDetails>>,
+}
+
+impl common::RequestValue for WasmPlugin {}
+impl common::ResponseResult for WasmPlugin {}
+
+/// Specifies the logging options for the activity performed by this plugin. If logging is enabled, plugin logs are exported to Cloud Logging.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WasmPluginLogConfig {
+    /// Optional. Specifies whether to enable logging for activity by this plugin. Defaults to `false`.
+    pub enable: Option<bool>,
+    /// Non-empty default. Specifies the lowest level of the plugin logs that are exported to Cloud Logging. This setting relates to the logs generated by using logging statements in your Wasm code. This field is can be set only if logging is enabled for the plugin. If the field is not provided when logging is enabled, it is set to `INFO` by default.
+    #[serde(rename = "minLogLevel")]
+    pub min_log_level: Option<String>,
+    /// Non-empty default. Configures the sampling rate of activity logs, where `1.0` means all logged activity is reported and `0.0` means no activity is reported. A floating point value between `0.0` and `1.0` indicates that a percentage of log messages is stored. The default value when logging is enabled is `1.0`. The value of the field must be between `0` and `1` (inclusive). This field can be specified only if logging is enabled for this plugin.
+    #[serde(rename = "sampleRate")]
+    pub sample_rate: Option<f32>,
+}
+
+impl common::Part for WasmPluginLogConfig {}
+
+/// Defines a resource that uses the `WasmPlugin` resource.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WasmPluginUsedBy {
+    /// Output only. Full name of the resource https://google.aip.dev/122#full-resource-names, for example `//networkservices.googleapis.com/projects/{project}/locations/{location}/lbRouteExtensions/{extension}`
+    pub name: Option<String>,
+}
+
+impl common::Part for WasmPluginUsedBy {}
+
+/// A single immutable version of a `WasmPlugin` resource. Defines the Wasm module used and optionally its runtime config.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations wasm plugins versions create projects](ProjectLocationWasmPluginVersionCreateCall) (request)
+/// * [locations wasm plugins versions get projects](ProjectLocationWasmPluginVersionGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WasmPluginVersion {
+    /// Output only. The timestamp when the resource was created.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Optional. A human-readable description of the resource.
+    pub description: Option<String>,
+    /// Output only. This field holds the digest (usually checksum) value for the plugin image. The value is calculated based on the `image_uri` field. If the `image_uri` field refers to a container image, the digest value is obtained from the container image. If the `image_uri` field refers to a generic artifact, the digest value is calculated based on the contents of the file.
+    #[serde(rename = "imageDigest")]
+    pub image_digest: Option<String>,
+    /// Optional. URI of the image containing the Wasm module, stored in Artifact Registry. The URI can refer to one of the following repository formats: * Container images: the `image_uri` must point to a container that contains a single file with the name `plugin.wasm`. When a new `WasmPluginVersion` resource is created, the digest of the image is saved in the `image_digest` field. When pulling a container image from Artifact Registry, the digest value is used instead of an image tag. * Generic artifacts: the `image_uri` must be in this format: `projects/{project}/locations/{location}/repositories/{repository}/ genericArtifacts/{package}:{version}`. The specified package and version must contain a file with the name `plugin.wasm`. When a new `WasmPluginVersion` resource is created, the checksum of the contents of the file is saved in the `image_digest` field.
+    #[serde(rename = "imageUri")]
+    pub image_uri: Option<String>,
+    /// Optional. Set of labels associated with the `WasmPluginVersion` resource.
+    pub labels: Option<HashMap<String, String>>,
+    /// Identifier. Name of the `WasmPluginVersion` resource in the following format: `projects/{project}/locations/{location}/wasmPlugins/{wasm_plugin}/ versions/{wasm_plugin_version}`.
+    pub name: Option<String>,
+    /// Configuration for the plugin. The configuration is provided to the plugin at runtime through the `ON_CONFIGURE` callback. When a new `WasmPluginVersion` resource is created, the digest of the contents is saved in the `plugin_config_digest` field.
+    #[serde(rename = "pluginConfigData")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
+    pub plugin_config_data: Option<Vec<u8>>,
+    /// Output only. This field holds the digest (usually checksum) value for the plugin configuration. The value is calculated based on the contents of `plugin_config_data` field or the image defined by the `plugin_config_uri` field.
+    #[serde(rename = "pluginConfigDigest")]
+    pub plugin_config_digest: Option<String>,
+    /// URI of the plugin configuration stored in the Artifact Registry. The configuration is provided to the plugin at runtime through the `ON_CONFIGURE` callback. The URI can refer to one of the following repository formats: * Container images: the `plugin_config_uri` must point to a container that contains a single file with the name `plugin.config`. When a new `WasmPluginVersion` resource is created, the digest of the image is saved in the `plugin_config_digest` field. When pulling a container image from Artifact Registry, the digest value is used instead of an image tag. * Generic artifacts: the `plugin_config_uri` must be in this format: `projects/{project}/locations/{location}/repositories/{repository}/ genericArtifacts/{package}:{version}`. The specified package and version must contain a file with the name `plugin.config`. When a new `WasmPluginVersion` resource is created, the checksum of the contents of the file is saved in the `plugin_config_digest` field.
+    #[serde(rename = "pluginConfigUri")]
+    pub plugin_config_uri: Option<String>,
+    /// Output only. The timestamp when the resource was updated.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::RequestValue for WasmPluginVersion {}
+impl common::ResponseResult for WasmPluginVersion {}
+
+/// Details of a `WasmPluginVersion` resource to be inlined in the `WasmPlugin` resource.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WasmPluginVersionDetails {
+    /// Output only. The timestamp when the resource was created.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Optional. A human-readable description of the resource.
+    pub description: Option<String>,
+    /// Output only. This field holds the digest (usually checksum) value for the plugin image. The value is calculated based on the `image_uri` field. If the `image_uri` field refers to a container image, the digest value is obtained from the container image. If the `image_uri` field refers to a generic artifact, the digest value is calculated based on the contents of the file.
+    #[serde(rename = "imageDigest")]
+    pub image_digest: Option<String>,
+    /// Optional. URI of the image containing the Wasm module, stored in Artifact Registry. The URI can refer to one of the following repository formats: * Container images: the `image_uri` must point to a container that contains a single file with the name `plugin.wasm`. When a new `WasmPluginVersion` resource is created, the digest of the image is saved in the `image_digest` field. When pulling a container image from Artifact Registry, the digest value is used instead of an image tag. * Generic artifacts: the `image_uri` must be in this format: `projects/{project}/locations/{location}/repositories/{repository}/ genericArtifacts/{package}:{version}`. The specified package and version must contain a file with the name `plugin.wasm`. When a new `WasmPluginVersion` resource is created, the checksum of the contents of the file is saved in the `image_digest` field.
+    #[serde(rename = "imageUri")]
+    pub image_uri: Option<String>,
+    /// Optional. Set of labels associated with the `WasmPluginVersion` resource.
+    pub labels: Option<HashMap<String, String>>,
+    /// Configuration for the plugin. The configuration is provided to the plugin at runtime through the `ON_CONFIGURE` callback. When a new `WasmPluginVersion` version is created, the digest of the contents is saved in the `plugin_config_digest` field.
+    #[serde(rename = "pluginConfigData")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
+    pub plugin_config_data: Option<Vec<u8>>,
+    /// Output only. This field holds the digest (usually checksum) value for the plugin configuration. The value is calculated based on the contents of `plugin_config_data` field or the image defined by the `plugin_config_uri` field.
+    #[serde(rename = "pluginConfigDigest")]
+    pub plugin_config_digest: Option<String>,
+    /// URI of the plugin configuration stored in the Artifact Registry. The configuration is provided to the plugin at runtime through the `ON_CONFIGURE` callback. The URI can refer to one of the following repository formats: * Container images: the `plugin_config_uri` must point to a container that contains a single file with the name `plugin.config`. When a new `WasmPluginVersion` resource is created, the digest of the image is saved in the `plugin_config_digest` field. When pulling a container image from Artifact Registry, the digest value is used instead of an image tag. * Generic artifacts: the `plugin_config_uri` must be in this format: `projects/{project}/locations/{location}/repositories/{repository}/ genericArtifacts/{package}:{version}`. The specified package and version must contain a file with the name `plugin.config`. When a new `WasmPluginVersion` resource is created, the checksum of the contents of the file is saved in the `plugin_config_digest` field.
+    #[serde(rename = "pluginConfigUri")]
+    pub plugin_config_uri: Option<String>,
+    /// Output only. The timestamp when the resource was updated.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::Part for WasmPluginVersionDetails {}
 
 // ###################
 // MethodBuilders ###
@@ -2205,9 +2715,20 @@ impl common::Part for TrafficPortSelector {}
 /// use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2218,12 +2739,12 @@ impl common::Part for TrafficPortSelector {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = NetworkServices::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_edge_cache_keysets_get_iam_policy(...)`, `locations_edge_cache_keysets_set_iam_policy(...)`, `locations_edge_cache_keysets_test_iam_permissions(...)`, `locations_edge_cache_origins_get_iam_policy(...)`, `locations_edge_cache_origins_set_iam_policy(...)`, `locations_edge_cache_origins_test_iam_permissions(...)`, `locations_edge_cache_services_get_iam_policy(...)`, `locations_edge_cache_services_set_iam_policy(...)`, `locations_edge_cache_services_test_iam_permissions(...)`, `locations_endpoint_policies_create(...)`, `locations_endpoint_policies_delete(...)`, `locations_endpoint_policies_get(...)`, `locations_endpoint_policies_get_iam_policy(...)`, `locations_endpoint_policies_list(...)`, `locations_endpoint_policies_patch(...)`, `locations_endpoint_policies_set_iam_policy(...)`, `locations_endpoint_policies_test_iam_permissions(...)`, `locations_gateways_create(...)`, `locations_gateways_delete(...)`, `locations_gateways_get(...)`, `locations_gateways_get_iam_policy(...)`, `locations_gateways_list(...)`, `locations_gateways_patch(...)`, `locations_gateways_set_iam_policy(...)`, `locations_gateways_test_iam_permissions(...)`, `locations_get(...)`, `locations_grpc_routes_create(...)`, `locations_grpc_routes_delete(...)`, `locations_grpc_routes_get(...)`, `locations_grpc_routes_list(...)`, `locations_grpc_routes_patch(...)`, `locations_http_routes_create(...)`, `locations_http_routes_delete(...)`, `locations_http_routes_get(...)`, `locations_http_routes_list(...)`, `locations_http_routes_patch(...)`, `locations_lb_route_extensions_create(...)`, `locations_lb_route_extensions_delete(...)`, `locations_lb_route_extensions_get(...)`, `locations_lb_route_extensions_list(...)`, `locations_lb_route_extensions_patch(...)`, `locations_lb_traffic_extensions_create(...)`, `locations_lb_traffic_extensions_delete(...)`, `locations_lb_traffic_extensions_get(...)`, `locations_lb_traffic_extensions_list(...)`, `locations_lb_traffic_extensions_patch(...)`, `locations_list(...)`, `locations_meshes_create(...)`, `locations_meshes_delete(...)`, `locations_meshes_get(...)`, `locations_meshes_get_iam_policy(...)`, `locations_meshes_list(...)`, `locations_meshes_patch(...)`, `locations_meshes_set_iam_policy(...)`, `locations_meshes_test_iam_permissions(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_service_bindings_create(...)`, `locations_service_bindings_delete(...)`, `locations_service_bindings_get(...)`, `locations_service_bindings_get_iam_policy(...)`, `locations_service_bindings_list(...)`, `locations_service_bindings_set_iam_policy(...)`, `locations_service_bindings_test_iam_permissions(...)`, `locations_service_lb_policies_create(...)`, `locations_service_lb_policies_delete(...)`, `locations_service_lb_policies_get(...)`, `locations_service_lb_policies_get_iam_policy(...)`, `locations_service_lb_policies_list(...)`, `locations_service_lb_policies_patch(...)`, `locations_service_lb_policies_set_iam_policy(...)`, `locations_service_lb_policies_test_iam_permissions(...)`, `locations_tcp_routes_create(...)`, `locations_tcp_routes_delete(...)`, `locations_tcp_routes_get(...)`, `locations_tcp_routes_list(...)`, `locations_tcp_routes_patch(...)`, `locations_tls_routes_create(...)`, `locations_tls_routes_delete(...)`, `locations_tls_routes_get(...)`, `locations_tls_routes_list(...)` and `locations_tls_routes_patch(...)`
+/// // like `locations_authz_extensions_create(...)`, `locations_authz_extensions_delete(...)`, `locations_authz_extensions_get(...)`, `locations_authz_extensions_list(...)`, `locations_authz_extensions_patch(...)`, `locations_edge_cache_keysets_get_iam_policy(...)`, `locations_edge_cache_keysets_set_iam_policy(...)`, `locations_edge_cache_keysets_test_iam_permissions(...)`, `locations_edge_cache_origins_get_iam_policy(...)`, `locations_edge_cache_origins_set_iam_policy(...)`, `locations_edge_cache_origins_test_iam_permissions(...)`, `locations_edge_cache_services_get_iam_policy(...)`, `locations_edge_cache_services_set_iam_policy(...)`, `locations_edge_cache_services_test_iam_permissions(...)`, `locations_endpoint_policies_create(...)`, `locations_endpoint_policies_delete(...)`, `locations_endpoint_policies_get(...)`, `locations_endpoint_policies_list(...)`, `locations_endpoint_policies_patch(...)`, `locations_gateways_create(...)`, `locations_gateways_delete(...)`, `locations_gateways_get(...)`, `locations_gateways_list(...)`, `locations_gateways_patch(...)`, `locations_gateways_route_views_get(...)`, `locations_gateways_route_views_list(...)`, `locations_get(...)`, `locations_grpc_routes_create(...)`, `locations_grpc_routes_delete(...)`, `locations_grpc_routes_get(...)`, `locations_grpc_routes_list(...)`, `locations_grpc_routes_patch(...)`, `locations_http_routes_create(...)`, `locations_http_routes_delete(...)`, `locations_http_routes_get(...)`, `locations_http_routes_list(...)`, `locations_http_routes_patch(...)`, `locations_lb_edge_extensions_create(...)`, `locations_lb_edge_extensions_delete(...)`, `locations_lb_edge_extensions_get(...)`, `locations_lb_edge_extensions_list(...)`, `locations_lb_edge_extensions_patch(...)`, `locations_lb_route_extensions_create(...)`, `locations_lb_route_extensions_delete(...)`, `locations_lb_route_extensions_get(...)`, `locations_lb_route_extensions_list(...)`, `locations_lb_route_extensions_patch(...)`, `locations_lb_traffic_extensions_create(...)`, `locations_lb_traffic_extensions_delete(...)`, `locations_lb_traffic_extensions_get(...)`, `locations_lb_traffic_extensions_list(...)`, `locations_lb_traffic_extensions_patch(...)`, `locations_list(...)`, `locations_meshes_create(...)`, `locations_meshes_delete(...)`, `locations_meshes_get(...)`, `locations_meshes_list(...)`, `locations_meshes_patch(...)`, `locations_meshes_route_views_get(...)`, `locations_meshes_route_views_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_service_bindings_create(...)`, `locations_service_bindings_delete(...)`, `locations_service_bindings_get(...)`, `locations_service_bindings_list(...)`, `locations_service_bindings_patch(...)`, `locations_service_lb_policies_create(...)`, `locations_service_lb_policies_delete(...)`, `locations_service_lb_policies_get(...)`, `locations_service_lb_policies_list(...)`, `locations_service_lb_policies_patch(...)`, `locations_tcp_routes_create(...)`, `locations_tcp_routes_delete(...)`, `locations_tcp_routes_get(...)`, `locations_tcp_routes_list(...)`, `locations_tcp_routes_patch(...)`, `locations_tls_routes_create(...)`, `locations_tls_routes_delete(...)`, `locations_tls_routes_get(...)`, `locations_tls_routes_list(...)`, `locations_tls_routes_patch(...)`, `locations_wasm_plugins_create(...)`, `locations_wasm_plugins_delete(...)`, `locations_wasm_plugins_get(...)`, `locations_wasm_plugins_list(...)`, `locations_wasm_plugins_patch(...)`, `locations_wasm_plugins_versions_create(...)`, `locations_wasm_plugins_versions_delete(...)`, `locations_wasm_plugins_versions_get(...)` and `locations_wasm_plugins_versions_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2238,6 +2759,121 @@ where
 impl<'a, C> common::MethodsBuilder for ProjectMethods<'a, C> {}
 
 impl<'a, C> ProjectMethods<'a, C> {
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new `AuthzExtension` resource in a given project and location.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource of the `AuthzExtension` resource. Must be in the format `projects/{project}/locations/{location}`.
+    pub fn locations_authz_extensions_create(
+        &self,
+        request: AuthzExtension,
+        parent: &str,
+    ) -> ProjectLocationAuthzExtensionCreateCall<'a, C> {
+        ProjectLocationAuthzExtensionCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _request_id: Default::default(),
+            _authz_extension_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the specified `AuthzExtension` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the `AuthzExtension` resource to delete. Must be in the format `projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+    pub fn locations_authz_extensions_delete(
+        &self,
+        name: &str,
+    ) -> ProjectLocationAuthzExtensionDeleteCall<'a, C> {
+        ProjectLocationAuthzExtensionDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _request_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets details of the specified `AuthzExtension` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. A name of the `AuthzExtension` resource to get. Must be in the format `projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+    pub fn locations_authz_extensions_get(
+        &self,
+        name: &str,
+    ) -> ProjectLocationAuthzExtensionGetCall<'a, C> {
+        ProjectLocationAuthzExtensionGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists `AuthzExtension` resources in a given project and location.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The project and location from which the `AuthzExtension` resources are listed. These values are specified in the following format: `projects/{project}/locations/{location}`.
+    pub fn locations_authz_extensions_list(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationAuthzExtensionListCall<'a, C> {
+        ProjectLocationAuthzExtensionListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the parameters of the specified `AuthzExtension` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. Identifier. Name of the `AuthzExtension` resource in the following format: `projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+    pub fn locations_authz_extensions_patch(
+        &self,
+        request: AuthzExtension,
+        name: &str,
+    ) -> ProjectLocationAuthzExtensionPatchCall<'a, C> {
+        ProjectLocationAuthzExtensionPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _request_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
@@ -2446,7 +3082,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource of the EndpointPolicy. Must be in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The parent resource of the EndpointPolicy. Must be in the format `projects/*/locations/*`.
     pub fn locations_endpoint_policies_create(
         &self,
         request: EndpointPolicy,
@@ -2469,7 +3105,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the EndpointPolicy to delete. Must be in the format `projects/*/locations/global/endpointPolicies/*`.
+    /// * `name` - Required. A name of the EndpointPolicy to delete. Must be in the format `projects/*/locations/*/endpointPolicies/*`.
     pub fn locations_endpoint_policies_delete(
         &self,
         name: &str,
@@ -2489,7 +3125,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the EndpointPolicy to get. Must be in the format `projects/*/locations/global/endpointPolicies/*`.
+    /// * `name` - Required. A name of the EndpointPolicy to get. Must be in the format `projects/*/locations/*/endpointPolicies/*`.
     pub fn locations_endpoint_policies_get(
         &self,
         name: &str,
@@ -2505,32 +3141,11 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-    ///
-    /// # Arguments
-    ///
-    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_endpoint_policies_get_iam_policy(
-        &self,
-        resource: &str,
-    ) -> ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C> {
-        ProjectLocationEndpointPolicyGetIamPolicyCall {
-            hub: self.hub,
-            _resource: resource.to_string(),
-            _options_requested_policy_version: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Lists EndpointPolicies in a given project and location.
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The project and location from which the EndpointPolicies should be listed, specified in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The project and location from which the EndpointPolicies should be listed, specified in the format `projects/*/locations/*`.
     pub fn locations_endpoint_policies_list(
         &self,
         parent: &str,
@@ -2538,6 +3153,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationEndpointPolicyListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -2553,7 +3169,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the EndpointPolicy resource. It matches pattern `projects/{project}/locations/global/endpointPolicies/{endpoint_policy}`.
+    /// * `name` - Identifier. Name of the EndpointPolicy resource. It matches pattern `projects/{project}/locations/*/endpointPolicies/{endpoint_policy}`.
     pub fn locations_endpoint_policies_patch(
         &self,
         request: EndpointPolicy,
@@ -2572,21 +3188,18 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+    /// Get a single RouteView of a Gateway.
     ///
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_endpoint_policies_set_iam_policy(
+    /// * `name` - Required. Name of the GatewayRouteView resource. Formats: projects/{project_number}/locations/{location}/gateways/{gateway}/routeViews/{route_view}
+    pub fn locations_gateways_route_views_get(
         &self,
-        request: SetIamPolicyRequest,
-        resource: &str,
-    ) -> ProjectLocationEndpointPolicySetIamPolicyCall<'a, C> {
-        ProjectLocationEndpointPolicySetIamPolicyCall {
+        name: &str,
+    ) -> ProjectLocationGatewayRouteViewGetCall<'a, C> {
+        ProjectLocationGatewayRouteViewGetCall {
             hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2595,21 +3208,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+    /// Lists RouteViews
     ///
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_endpoint_policies_test_iam_permissions(
+    /// * `parent` - Required. The Gateway to which a Route is associated. Formats: projects/{project_number}/locations/{location}/gateways/{gateway}
+    pub fn locations_gateways_route_views_list(
         &self,
-        request: TestIamPermissionsRequest,
-        resource: &str,
-    ) -> ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C> {
-        ProjectLocationEndpointPolicyTestIamPermissionCall {
+        parent: &str,
+    ) -> ProjectLocationGatewayRouteViewListCall<'a, C> {
+        ProjectLocationGatewayRouteViewListCall {
             hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2676,27 +3288,6 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-    ///
-    /// # Arguments
-    ///
-    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_gateways_get_iam_policy(
-        &self,
-        resource: &str,
-    ) -> ProjectLocationGatewayGetIamPolicyCall<'a, C> {
-        ProjectLocationGatewayGetIamPolicyCall {
-            hub: self.hub,
-            _resource: resource.to_string(),
-            _options_requested_policy_version: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Lists Gateways in a given project and location.
     ///
     /// # Arguments
@@ -2721,7 +3312,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the Gateway resource. It matches pattern `projects/*/locations/*/gateways/`.
+    /// * `name` - Identifier. Name of the Gateway resource. It matches pattern `projects/*/locations/*/gateways/`.
     pub fn locations_gateways_patch(
         &self,
         request: Gateway,
@@ -2740,58 +3331,12 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_gateways_set_iam_policy(
-        &self,
-        request: SetIamPolicyRequest,
-        resource: &str,
-    ) -> ProjectLocationGatewaySetIamPolicyCall<'a, C> {
-        ProjectLocationGatewaySetIamPolicyCall {
-            hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_gateways_test_iam_permissions(
-        &self,
-        request: TestIamPermissionsRequest,
-        resource: &str,
-    ) -> ProjectLocationGatewayTestIamPermissionCall<'a, C> {
-        ProjectLocationGatewayTestIamPermissionCall {
-            hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Creates a new GrpcRoute in a given project and location.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource of the GrpcRoute. Must be in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The parent resource of the GrpcRoute. Must be in the format `projects/*/locations/*`.
     pub fn locations_grpc_routes_create(
         &self,
         request: GrpcRoute,
@@ -2814,7 +3359,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the GrpcRoute to delete. Must be in the format `projects/*/locations/global/grpcRoutes/*`.
+    /// * `name` - Required. A name of the GrpcRoute to delete. Must be in the format `projects/*/locations/*/grpcRoutes/*`.
     pub fn locations_grpc_routes_delete(
         &self,
         name: &str,
@@ -2834,7 +3379,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the GrpcRoute to get. Must be in the format `projects/*/locations/global/grpcRoutes/*`.
+    /// * `name` - Required. A name of the GrpcRoute to get. Must be in the format `projects/*/locations/*/grpcRoutes/*`.
     pub fn locations_grpc_routes_get(&self, name: &str) -> ProjectLocationGrpcRouteGetCall<'a, C> {
         ProjectLocationGrpcRouteGetCall {
             hub: self.hub,
@@ -2851,7 +3396,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The project and location from which the GrpcRoutes should be listed, specified in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The project and location from which the GrpcRoutes should be listed, specified in the format `projects/*/locations/*`.
     pub fn locations_grpc_routes_list(
         &self,
         parent: &str,
@@ -2859,6 +3404,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationGrpcRouteListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -2874,7 +3420,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the GrpcRoute resource. It matches pattern `projects/*/locations/global/grpcRoutes/`
+    /// * `name` - Identifier. Name of the GrpcRoute resource. It matches pattern `projects/*/locations/*/grpcRoutes/`
     pub fn locations_grpc_routes_patch(
         &self,
         request: GrpcRoute,
@@ -2898,7 +3444,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource of the HttpRoute. Must be in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The parent resource of the HttpRoute. Must be in the format `projects/*/locations/*`.
     pub fn locations_http_routes_create(
         &self,
         request: HttpRoute,
@@ -2921,7 +3467,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the HttpRoute to delete. Must be in the format `projects/*/locations/global/httpRoutes/*`.
+    /// * `name` - Required. A name of the HttpRoute to delete. Must be in the format `projects/*/locations/*/httpRoutes/*`.
     pub fn locations_http_routes_delete(
         &self,
         name: &str,
@@ -2941,7 +3487,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the HttpRoute to get. Must be in the format `projects/*/locations/global/httpRoutes/*`.
+    /// * `name` - Required. A name of the HttpRoute to get. Must be in the format `projects/*/locations/*/httpRoutes/*`.
     pub fn locations_http_routes_get(&self, name: &str) -> ProjectLocationHttpRouteGetCall<'a, C> {
         ProjectLocationHttpRouteGetCall {
             hub: self.hub,
@@ -2958,7 +3504,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The project and location from which the HttpRoutes should be listed, specified in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The project and location from which the HttpRoutes should be listed, specified in the format `projects/*/locations/*`.
     pub fn locations_http_routes_list(
         &self,
         parent: &str,
@@ -2966,6 +3512,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationHttpRouteListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -2981,7 +3528,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the HttpRoute resource. It matches pattern `projects/*/locations/global/httpRoutes/http_route_name>`.
+    /// * `name` - Identifier. Name of the HttpRoute resource. It matches pattern `projects/*/locations/*/httpRoutes/http_route_name>`.
     pub fn locations_http_routes_patch(
         &self,
         request: HttpRoute,
@@ -2992,6 +3539,121 @@ impl<'a, C> ProjectMethods<'a, C> {
             _request: request,
             _name: name.to_string(),
             _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new `LbEdgeExtension` resource in a given project and location.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource of the `LbEdgeExtension` resource. Must be in the format `projects/{project}/locations/{location}`.
+    pub fn locations_lb_edge_extensions_create(
+        &self,
+        request: LbEdgeExtension,
+        parent: &str,
+    ) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C> {
+        ProjectLocationLbEdgeExtensionCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _request_id: Default::default(),
+            _lb_edge_extension_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the specified `LbEdgeExtension` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the `LbEdgeExtension` resource to delete. Must be in the format `projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+    pub fn locations_lb_edge_extensions_delete(
+        &self,
+        name: &str,
+    ) -> ProjectLocationLbEdgeExtensionDeleteCall<'a, C> {
+        ProjectLocationLbEdgeExtensionDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _request_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets details of the specified `LbEdgeExtension` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. A name of the `LbEdgeExtension` resource to get. Must be in the format `projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+    pub fn locations_lb_edge_extensions_get(
+        &self,
+        name: &str,
+    ) -> ProjectLocationLbEdgeExtensionGetCall<'a, C> {
+        ProjectLocationLbEdgeExtensionGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists `LbEdgeExtension` resources in a given project and location.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The project and location from which the `LbEdgeExtension` resources are listed. These values are specified in the following format: `projects/{project}/locations/{location}`.
+    pub fn locations_lb_edge_extensions_list(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationLbEdgeExtensionListCall<'a, C> {
+        ProjectLocationLbEdgeExtensionListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the parameters of the specified `LbEdgeExtension` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. Identifier. Name of the `LbEdgeExtension` resource in the following format: `projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+    pub fn locations_lb_edge_extensions_patch(
+        &self,
+        request: LbEdgeExtension,
+        name: &str,
+    ) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C> {
+        ProjectLocationLbEdgeExtensionPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3070,7 +3732,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The project and location from which the `LbRouteExtension` resources are listed, specified in the following format: `projects/{project}/locations/{location}`.
+    /// * `parent` - Required. The project and location from which the `LbRouteExtension` resources are listed. These values are specified in the following format: `projects/{project}/locations/{location}`.
     pub fn locations_lb_route_extensions_list(
         &self,
         parent: &str,
@@ -3185,7 +3847,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The project and location from which the `LbTrafficExtension` resources are listed, specified in the following format: `projects/{project}/locations/{location}`.
+    /// * `parent` - Required. The project and location from which the `LbTrafficExtension` resources are listed. These values are specified in the following format: `projects/{project}/locations/{location}`.
     pub fn locations_lb_traffic_extensions_list(
         &self,
         parent: &str,
@@ -3230,12 +3892,54 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Get a single RouteView of a Mesh.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. Name of the MeshRouteView resource. Format: projects/{project_number}/locations/{location}/meshes/{mesh}/routeViews/{route_view}
+    pub fn locations_meshes_route_views_get(
+        &self,
+        name: &str,
+    ) -> ProjectLocationMeshRouteViewGetCall<'a, C> {
+        ProjectLocationMeshRouteViewGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists RouteViews
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The Mesh to which a Route is associated. Format: projects/{project_number}/locations/{location}/meshes/{mesh}
+    pub fn locations_meshes_route_views_list(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationMeshRouteViewListCall<'a, C> {
+        ProjectLocationMeshRouteViewListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a new Mesh in a given project and location.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource of the Mesh. Must be in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The parent resource of the Mesh. Must be in the format `projects/*/locations/*`.
     pub fn locations_meshes_create(
         &self,
         request: Mesh,
@@ -3258,7 +3962,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the Mesh to delete. Must be in the format `projects/*/locations/global/meshes/*`.
+    /// * `name` - Required. A name of the Mesh to delete. Must be in the format `projects/*/locations/*/meshes/*`.
     pub fn locations_meshes_delete(&self, name: &str) -> ProjectLocationMeshDeleteCall<'a, C> {
         ProjectLocationMeshDeleteCall {
             hub: self.hub,
@@ -3275,7 +3979,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the Mesh to get. Must be in the format `projects/*/locations/global/meshes/*`.
+    /// * `name` - Required. A name of the Mesh to get. Must be in the format `projects/*/locations/*/meshes/*`.
     pub fn locations_meshes_get(&self, name: &str) -> ProjectLocationMeshGetCall<'a, C> {
         ProjectLocationMeshGetCall {
             hub: self.hub,
@@ -3288,36 +3992,16 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-    ///
-    /// # Arguments
-    ///
-    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_meshes_get_iam_policy(
-        &self,
-        resource: &str,
-    ) -> ProjectLocationMeshGetIamPolicyCall<'a, C> {
-        ProjectLocationMeshGetIamPolicyCall {
-            hub: self.hub,
-            _resource: resource.to_string(),
-            _options_requested_policy_version: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Lists Meshes in a given project and location.
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The project and location from which the Meshes should be listed, specified in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The project and location from which the Meshes should be listed, specified in the format `projects/*/locations/*`.
     pub fn locations_meshes_list(&self, parent: &str) -> ProjectLocationMeshListCall<'a, C> {
         ProjectLocationMeshListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -3333,7 +4017,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the Mesh resource. It matches pattern `projects/*/locations/global/meshes/`.
+    /// * `name` - Identifier. Name of the Mesh resource. It matches pattern `projects/*/locations/*/meshes/`.
     pub fn locations_meshes_patch(
         &self,
         request: Mesh,
@@ -3352,53 +4036,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_meshes_set_iam_policy(
-        &self,
-        request: SetIamPolicyRequest,
-        resource: &str,
-    ) -> ProjectLocationMeshSetIamPolicyCall<'a, C> {
-        ProjectLocationMeshSetIamPolicyCall {
-            hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_meshes_test_iam_permissions(
-        &self,
-        request: TestIamPermissionsRequest,
-        resource: &str,
-    ) -> ProjectLocationMeshTestIamPermissionCall<'a, C> {
-        ProjectLocationMeshTestIamPermissionCall {
-            hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
     ///
     /// # Arguments
     ///
@@ -3467,6 +4105,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
@@ -3483,7 +4122,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource of the ServiceBinding. Must be in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The parent resource of the ServiceBinding. Must be in the format `projects/*/locations/*`.
     pub fn locations_service_bindings_create(
         &self,
         request: ServiceBinding,
@@ -3506,7 +4145,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the ServiceBinding to delete. Must be in the format `projects/*/locations/global/serviceBindings/*`.
+    /// * `name` - Required. A name of the ServiceBinding to delete. Must be in the format `projects/*/locations/*/serviceBindings/*`.
     pub fn locations_service_bindings_delete(
         &self,
         name: &str,
@@ -3526,7 +4165,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the ServiceBinding to get. Must be in the format `projects/*/locations/global/serviceBindings/*`.
+    /// * `name` - Required. A name of the ServiceBinding to get. Must be in the format `projects/*/locations/*/serviceBindings/*`.
     pub fn locations_service_bindings_get(
         &self,
         name: &str,
@@ -3542,32 +4181,11 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-    ///
-    /// # Arguments
-    ///
-    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_service_bindings_get_iam_policy(
-        &self,
-        resource: &str,
-    ) -> ProjectLocationServiceBindingGetIamPolicyCall<'a, C> {
-        ProjectLocationServiceBindingGetIamPolicyCall {
-            hub: self.hub,
-            _resource: resource.to_string(),
-            _options_requested_policy_version: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Lists ServiceBinding in a given project and location.
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The project and location from which the ServiceBindings should be listed, specified in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The project and location from which the ServiceBindings should be listed, specified in the format `projects/*/locations/*`.
     pub fn locations_service_bindings_list(
         &self,
         parent: &str,
@@ -3585,44 +4203,22 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+    /// Updates the parameters of a single ServiceBinding.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_service_bindings_set_iam_policy(
+    /// * `name` - Identifier. Name of the ServiceBinding resource. It matches pattern `projects/*/locations/*/serviceBindings/`.
+    pub fn locations_service_bindings_patch(
         &self,
-        request: SetIamPolicyRequest,
-        resource: &str,
-    ) -> ProjectLocationServiceBindingSetIamPolicyCall<'a, C> {
-        ProjectLocationServiceBindingSetIamPolicyCall {
+        request: ServiceBinding,
+        name: &str,
+    ) -> ProjectLocationServiceBindingPatchCall<'a, C> {
+        ProjectLocationServiceBindingPatchCall {
             hub: self.hub,
             _request: request,
-            _resource: resource.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_service_bindings_test_iam_permissions(
-        &self,
-        request: TestIamPermissionsRequest,
-        resource: &str,
-    ) -> ProjectLocationServiceBindingTestIamPermissionCall<'a, C> {
-        ProjectLocationServiceBindingTestIamPermissionCall {
-            hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
+            _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3695,27 +4291,6 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-    ///
-    /// # Arguments
-    ///
-    /// * `resource` - REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_service_lb_policies_get_iam_policy(
-        &self,
-        resource: &str,
-    ) -> ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C> {
-        ProjectLocationServiceLbPolicyGetIamPolicyCall {
-            hub: self.hub,
-            _resource: resource.to_string(),
-            _options_requested_policy_version: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Lists ServiceLbPolicies in a given project and location.
     ///
     /// # Arguments
@@ -3743,7 +4318,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the ServiceLbPolicy resource. It matches pattern `projects/{project}/locations/{location}/serviceLbPolicies/{service_lb_policy_name}`.
+    /// * `name` - Identifier. Name of the ServiceLbPolicy resource. It matches pattern `projects/{project}/locations/{location}/serviceLbPolicies/{service_lb_policy_name}`.
     pub fn locations_service_lb_policies_patch(
         &self,
         request: ServiceLbPolicy,
@@ -3762,58 +4337,12 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_service_lb_policies_set_iam_policy(
-        &self,
-        request: SetIamPolicyRequest,
-        resource: &str,
-    ) -> ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C> {
-        ProjectLocationServiceLbPolicySetIamPolicyCall {
-            hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    pub fn locations_service_lb_policies_test_iam_permissions(
-        &self,
-        request: TestIamPermissionsRequest,
-        resource: &str,
-    ) -> ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C> {
-        ProjectLocationServiceLbPolicyTestIamPermissionCall {
-            hub: self.hub,
-            _request: request,
-            _resource: resource.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
     /// Creates a new TcpRoute in a given project and location.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource of the TcpRoute. Must be in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The parent resource of the TcpRoute. Must be in the format `projects/*/locations/*`.
     pub fn locations_tcp_routes_create(
         &self,
         request: TcpRoute,
@@ -3836,7 +4365,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the TcpRoute to delete. Must be in the format `projects/*/locations/global/tcpRoutes/*`.
+    /// * `name` - Required. A name of the TcpRoute to delete. Must be in the format `projects/*/locations/*/tcpRoutes/*`.
     pub fn locations_tcp_routes_delete(
         &self,
         name: &str,
@@ -3856,7 +4385,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the TcpRoute to get. Must be in the format `projects/*/locations/global/tcpRoutes/*`.
+    /// * `name` - Required. A name of the TcpRoute to get. Must be in the format `projects/*/locations/*/tcpRoutes/*`.
     pub fn locations_tcp_routes_get(&self, name: &str) -> ProjectLocationTcpRouteGetCall<'a, C> {
         ProjectLocationTcpRouteGetCall {
             hub: self.hub,
@@ -3873,7 +4402,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The project and location from which the TcpRoutes should be listed, specified in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The project and location from which the TcpRoutes should be listed, specified in the format `projects/*/locations/*`.
     pub fn locations_tcp_routes_list(
         &self,
         parent: &str,
@@ -3881,6 +4410,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationTcpRouteListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -3896,7 +4426,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the TcpRoute resource. It matches pattern `projects/*/locations/global/tcpRoutes/tcp_route_name>`.
+    /// * `name` - Identifier. Name of the TcpRoute resource. It matches pattern `projects/*/locations/*/tcpRoutes/tcp_route_name>`.
     pub fn locations_tcp_routes_patch(
         &self,
         request: TcpRoute,
@@ -3920,7 +4450,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource of the TlsRoute. Must be in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The parent resource of the TlsRoute. Must be in the format `projects/*/locations/*`.
     pub fn locations_tls_routes_create(
         &self,
         request: TlsRoute,
@@ -3943,7 +4473,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the TlsRoute to delete. Must be in the format `projects/*/locations/global/tlsRoutes/*`.
+    /// * `name` - Required. A name of the TlsRoute to delete. Must be in the format `projects/*/locations/*/tlsRoutes/*`.
     pub fn locations_tls_routes_delete(
         &self,
         name: &str,
@@ -3963,7 +4493,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. A name of the TlsRoute to get. Must be in the format `projects/*/locations/global/tlsRoutes/*`.
+    /// * `name` - Required. A name of the TlsRoute to get. Must be in the format `projects/*/locations/*/tlsRoutes/*`.
     pub fn locations_tls_routes_get(&self, name: &str) -> ProjectLocationTlsRouteGetCall<'a, C> {
         ProjectLocationTlsRouteGetCall {
             hub: self.hub,
@@ -3980,7 +4510,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Required. The project and location from which the TlsRoutes should be listed, specified in the format `projects/*/locations/global`.
+    /// * `parent` - Required. The project and location from which the TlsRoutes should be listed, specified in the format `projects/*/locations/*`.
     pub fn locations_tls_routes_list(
         &self,
         parent: &str,
@@ -3988,6 +4518,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationTlsRouteListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -4003,13 +4534,210 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Name of the TlsRoute resource. It matches pattern `projects/*/locations/global/tlsRoutes/tls_route_name>`.
+    /// * `name` - Identifier. Name of the TlsRoute resource. It matches pattern `projects/*/locations/*/tlsRoutes/tls_route_name>`.
     pub fn locations_tls_routes_patch(
         &self,
         request: TlsRoute,
         name: &str,
     ) -> ProjectLocationTlsRoutePatchCall<'a, C> {
         ProjectLocationTlsRoutePatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new `WasmPluginVersion` resource in a given project and location.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource of the `WasmPluginVersion` resource. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+    pub fn locations_wasm_plugins_versions_create(
+        &self,
+        request: WasmPluginVersion,
+        parent: &str,
+    ) -> ProjectLocationWasmPluginVersionCreateCall<'a, C> {
+        ProjectLocationWasmPluginVersionCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _wasm_plugin_version_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the specified `WasmPluginVersion` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. A name of the `WasmPluginVersion` resource to delete. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}/versions/{wasm_plugin_version}`.
+    pub fn locations_wasm_plugins_versions_delete(
+        &self,
+        name: &str,
+    ) -> ProjectLocationWasmPluginVersionDeleteCall<'a, C> {
+        ProjectLocationWasmPluginVersionDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets details of the specified `WasmPluginVersion` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. A name of the `WasmPluginVersion` resource to get. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}/versions/{wasm_plugin_version}`.
+    pub fn locations_wasm_plugins_versions_get(
+        &self,
+        name: &str,
+    ) -> ProjectLocationWasmPluginVersionGetCall<'a, C> {
+        ProjectLocationWasmPluginVersionGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists `WasmPluginVersion` resources in a given project and location.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The `WasmPlugin` resource whose `WasmPluginVersion`s are listed, specified in the following format: `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+    pub fn locations_wasm_plugins_versions_list(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationWasmPluginVersionListCall<'a, C> {
+        ProjectLocationWasmPluginVersionListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new `WasmPlugin` resource in a given project and location.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource of the `WasmPlugin` resource. Must be in the format `projects/{project}/locations/global`.
+    pub fn locations_wasm_plugins_create(
+        &self,
+        request: WasmPlugin,
+        parent: &str,
+    ) -> ProjectLocationWasmPluginCreateCall<'a, C> {
+        ProjectLocationWasmPluginCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _wasm_plugin_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the specified `WasmPlugin` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. A name of the `WasmPlugin` resource to delete. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+    pub fn locations_wasm_plugins_delete(
+        &self,
+        name: &str,
+    ) -> ProjectLocationWasmPluginDeleteCall<'a, C> {
+        ProjectLocationWasmPluginDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets details of the specified `WasmPlugin` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. A name of the `WasmPlugin` resource to get. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+    pub fn locations_wasm_plugins_get(
+        &self,
+        name: &str,
+    ) -> ProjectLocationWasmPluginGetCall<'a, C> {
+        ProjectLocationWasmPluginGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _view: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists `WasmPlugin` resources in a given project and location.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The project and location from which the `WasmPlugin` resources are listed, specified in the following format: `projects/{project}/locations/global`.
+    pub fn locations_wasm_plugins_list(
+        &self,
+        parent: &str,
+    ) -> ProjectLocationWasmPluginListCall<'a, C> {
+        ProjectLocationWasmPluginListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the parameters of the specified `WasmPlugin` resource.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Identifier. Name of the `WasmPlugin` resource in the following format: `projects/{project}/locations/{location}/wasmPlugins/{wasm_plugin}`.
+    pub fn locations_wasm_plugins_patch(
+        &self,
+        request: WasmPlugin,
+        name: &str,
+    ) -> ProjectLocationWasmPluginPatchCall<'a, C> {
+        ProjectLocationWasmPluginPatchCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
@@ -4051,6 +4779,7 @@ impl<'a, C> ProjectMethods<'a, C> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _extra_location_types: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -4061,6 +4790,1694 @@ impl<'a, C> ProjectMethods<'a, C> {
 // ###################
 // CallBuilders   ###
 // #################
+
+/// Creates a new `AuthzExtension` resource in a given project and location.
+///
+/// A builder for the *locations.authzExtensions.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// use networkservices1::api::AuthzExtension;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AuthzExtension::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_authz_extensions_create(req, "parent")
+///              .request_id("amet.")
+///              .authz_extension_id("duo")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAuthzExtensionCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _request: AuthzExtension,
+    _parent: String,
+    _request_id: Option<String>,
+    _authz_extension_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationAuthzExtensionCreateCall<'a, C> {}
+
+impl<'a, C> ProjectLocationAuthzExtensionCreateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.authzExtensions.create",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent", "requestId", "authzExtensionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+        if let Some(value) = self._authz_extension_id.as_ref() {
+            params.push("authzExtensionId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/authzExtensions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: AuthzExtension,
+    ) -> ProjectLocationAuthzExtensionCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource of the `AuthzExtension` resource. Must be in the format `projects/{project}/locations/{location}`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAuthzExtensionCreateCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationAuthzExtensionCreateCall<'a, C> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// Required. User-provided ID of the `AuthzExtension` resource to be created.
+    ///
+    /// Sets the *authz extension id* query property to the given value.
+    pub fn authz_extension_id(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationAuthzExtensionCreateCall<'a, C> {
+        self._authz_extension_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationAuthzExtensionCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAuthzExtensionCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAuthzExtensionCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAuthzExtensionCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAuthzExtensionCreateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes the specified `AuthzExtension` resource.
+///
+/// A builder for the *locations.authzExtensions.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_authz_extensions_delete("name")
+///              .request_id("gubergren")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAuthzExtensionDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _name: String,
+    _request_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationAuthzExtensionDeleteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationAuthzExtensionDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.authzExtensions.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["alt", "name", "requestId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the `AuthzExtension` resource to delete. Must be in the format `projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAuthzExtensionDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationAuthzExtensionDeleteCall<'a, C> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationAuthzExtensionDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAuthzExtensionDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAuthzExtensionDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAuthzExtensionDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAuthzExtensionDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets details of the specified `AuthzExtension` resource.
+///
+/// A builder for the *locations.authzExtensions.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_authz_extensions_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAuthzExtensionGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationAuthzExtensionGetCall<'a, C> {}
+
+impl<'a, C> ProjectLocationAuthzExtensionGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, AuthzExtension)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.authzExtensions.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. A name of the `AuthzExtension` resource to get. Must be in the format `projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAuthzExtensionGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationAuthzExtensionGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAuthzExtensionGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAuthzExtensionGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAuthzExtensionGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAuthzExtensionGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Lists `AuthzExtension` resources in a given project and location.
+///
+/// A builder for the *locations.authzExtensions.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_authz_extensions_list("parent")
+///              .page_token("eos")
+///              .page_size(-4)
+///              .order_by("ea")
+///              .filter("ipsum")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAuthzExtensionListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationAuthzExtensionListCall<'a, C> {}
+
+impl<'a, C> ProjectLocationAuthzExtensionListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListAuthzExtensionsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.authzExtensions.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "orderBy",
+            "filter",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/authzExtensions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The project and location from which the `AuthzExtension` resources are listed. These values are specified in the following format: `projects/{project}/locations/{location}`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAuthzExtensionListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. A token identifying a page of results that the server returns.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAuthzExtensionListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Requested page size. The server might return fewer items than requested. If unspecified, the server picks an appropriate default.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAuthzExtensionListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Hint about how to order the results.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationAuthzExtensionListCall<'a, C> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Filtering results.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationAuthzExtensionListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationAuthzExtensionListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAuthzExtensionListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAuthzExtensionListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAuthzExtensionListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAuthzExtensionListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Updates the parameters of the specified `AuthzExtension` resource.
+///
+/// A builder for the *locations.authzExtensions.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// use networkservices1::api::AuthzExtension;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AuthzExtension::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_authz_extensions_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("amet")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAuthzExtensionPatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _request: AuthzExtension,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
+    _request_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationAuthzExtensionPatchCall<'a, C> {}
+
+impl<'a, C> ProjectLocationAuthzExtensionPatchCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.authzExtensions.patch",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in ["alt", "name", "updateMask", "requestId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: AuthzExtension,
+    ) -> ProjectLocationAuthzExtensionPatchCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier. Name of the `AuthzExtension` resource in the following format: `projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAuthzExtensionPatchCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Used to specify the fields to be overwritten in the `AuthzExtension` resource by the update. The fields specified in the `update_mask` are relative to the resource, not the full request. A field is overwritten if it is in the mask. If the user does not specify a mask, then all fields are overwritten.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationAuthzExtensionPatchCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationAuthzExtensionPatchCall<'a, C> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationAuthzExtensionPatchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAuthzExtensionPatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAuthzExtensionPatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAuthzExtensionPatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAuthzExtensionPatchCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
 
 /// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
 ///
@@ -4079,9 +6496,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4092,7 +6520,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -4100,7 +6528,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_edge_cache_keysets_get_iam_policy("resource")
-///              .options_requested_policy_version(-52)
+///              .options_requested_policy_version(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4394,9 +6822,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4407,7 +6846,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -4733,9 +7172,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4746,7 +7196,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -5071,9 +7521,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5084,7 +7545,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -5092,7 +7553,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_edge_cache_origins_get_iam_policy("resource")
-///              .options_requested_policy_version(-51)
+///              .options_requested_policy_version(-16)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5386,9 +7847,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5399,7 +7871,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -5725,9 +8197,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5738,7 +8221,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -6063,9 +8546,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6076,7 +8570,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -6084,7 +8578,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_edge_cache_services_get_iam_policy("resource")
-///              .options_requested_policy_version(-17)
+///              .options_requested_policy_version(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -6378,9 +8872,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6391,7 +8896,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -6717,9 +9222,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6730,7 +9246,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -7056,9 +9572,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7069,7 +9596,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -7082,7 +9609,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_endpoint_policies_create(req, "parent")
-///              .endpoint_policy_id("duo")
+///              .endpoint_policy_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7274,7 +9801,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent resource of the EndpointPolicy. Must be in the format `projects/*/locations/global`.
+    /// Required. The parent resource of the EndpointPolicy. Must be in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7396,9 +9923,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7409,7 +9947,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -7570,7 +10108,7 @@ where
         }
     }
 
-    /// Required. A name of the EndpointPolicy to delete. Must be in the format `projects/*/locations/global/endpointPolicies/*`.
+    /// Required. A name of the EndpointPolicy to delete. Must be in the format `projects/*/locations/*/endpointPolicies/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7682,9 +10220,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7695,7 +10244,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -7856,7 +10405,7 @@ where
         }
     }
 
-    /// Required. A name of the EndpointPolicy to get. Must be in the format `projects/*/locations/global/endpointPolicies/*`.
+    /// Required. A name of the EndpointPolicy to get. Must be in the format `projects/*/locations/*/endpointPolicies/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7951,320 +10500,6 @@ where
     }
 }
 
-/// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-///
-/// A builder for the *locations.endpointPolicies.getIamPolicy* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_endpoint_policies_get_iam_policy("resource")
-///              .options_requested_policy_version(-12)
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _resource: String,
-    _options_requested_policy_version: Option<i32>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C> {}
-
-impl<'a, C> ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.endpointPolicies.getIamPolicy",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-        if let Some(value) = self._options_requested_policy_version.as_ref() {
-            params.push("options.requestedPolicyVersion", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(
-        mut self,
-        new_value: &str,
-    ) -> ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
-    ///
-    /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(
-        mut self,
-        new_value: i32,
-    ) -> ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C> {
-        self._options_requested_policy_version = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationEndpointPolicyGetIamPolicyCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Lists EndpointPolicies in a given project and location.
 ///
 /// A builder for the *locations.endpointPolicies.list* method supported by a *project* resource.
@@ -8282,9 +10517,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8295,7 +10541,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -8303,8 +10549,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_endpoint_policies_list("parent")
-///              .page_token("est")
-///              .page_size(-50)
+///              .return_partial_success(false)
+///              .page_token("sed")
+///              .page_size(-61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8314,6 +10561,7 @@ where
 {
     hub: &'a NetworkServices<C>,
     _parent: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
@@ -8344,15 +10592,26 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -8468,7 +10727,7 @@ where
         }
     }
 
-    /// Required. The project and location from which the EndpointPolicies should be listed, specified in the format `projects/*/locations/global`.
+    /// Required. The project and location from which the EndpointPolicies should be listed, specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8476,6 +10735,16 @@ where
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationEndpointPolicyListCall<'a, C> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. If true, allow partial responses for multi-regional Aggregated List requests. Otherwise if one of the locations is down or unreachable, the Aggregated List request will fail.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationEndpointPolicyListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
         self
     }
     /// The value returned by the last `ListEndpointPoliciesResponse` Indicates that this is a continuation of a prior `ListEndpointPolicies` call, and that the system should return the next page of data.
@@ -8595,9 +10864,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8608,7 +10888,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -8813,7 +11093,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the EndpointPolicy resource. It matches pattern `projects/{project}/locations/global/endpointPolicies/{endpoint_policy}`.
+    /// Identifier. Name of the EndpointPolicy resource. It matches pattern `projects/{project}/locations/*/endpointPolicies/{endpoint_policy}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8918,9 +11198,9 @@ where
     }
 }
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+/// Get a single RouteView of a Gateway.
 ///
-/// A builder for the *locations.endpointPolicies.setIamPolicy* method supported by a *project* resource.
+/// A builder for the *locations.gateways.routeViews.get* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
 ///
 /// # Example
@@ -8931,14 +11211,24 @@ where
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
 /// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::SetIamPolicyRequest;
 /// # async fn dox() {
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8949,42 +11239,36 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = SetIamPolicyRequest::default();
-///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_endpoint_policies_set_iam_policy(req, "resource")
+/// let result = hub.projects().locations_gateways_route_views_get("name")
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationEndpointPolicySetIamPolicyCall<'a, C>
+pub struct ProjectLocationGatewayRouteViewGetCall<'a, C>
 where
     C: 'a,
 {
     hub: &'a NetworkServices<C>,
-    _request: SetIamPolicyRequest,
-    _resource: String,
+    _name: String,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
 }
 
-impl<'a, C> common::CallBuilder for ProjectLocationEndpointPolicySetIamPolicyCall<'a, C> {}
+impl<'a, C> common::CallBuilder for ProjectLocationGatewayRouteViewGetCall<'a, C> {}
 
-impl<'a, C> ProjectLocationEndpointPolicySetIamPolicyCall<'a, C>
+impl<'a, C> ProjectLocationGatewayRouteViewGetCall<'a, C>
 where
     C: common::Connector,
 {
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
+    pub async fn doit(mut self) -> common::Result<(common::Response, GatewayRouteView)> {
         use std::borrow::Cow;
         use std::io::{Read, Seek};
 
@@ -8994,54 +11278,39 @@ where
         let mut dd = common::DefaultDelegate;
         let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.endpointPolicies.setIamPolicy",
-            http_method: hyper::Method::POST,
+            id: "networkservices.projects.locations.gateways.routeViews.get",
+            http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "resource"].iter() {
+        for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
 
         params.extend(self._additional_params.iter());
 
         params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
                 .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let to_remove = ["resource"];
+            let to_remove = ["name"];
             params.remove_params(&to_remove);
         }
 
         let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
 
         loop {
             let token = match self
@@ -9059,14 +11328,11 @@ where
                     }
                 },
             };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
+                    .method(hyper::Method::GET)
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
@@ -9075,11 +11341,8 @@ where
                 }
 
                 let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
             };
@@ -9137,29 +11400,14 @@ where
         }
     }
 
+    /// Required. Name of the GatewayRouteView resource. Formats: projects/{project_number}/locations/{location}/gateways/{gateway}/routeViews/{route_view}
     ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: SetIamPolicyRequest,
-    ) -> ProjectLocationEndpointPolicySetIamPolicyCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
+    /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(
-        mut self,
-        new_value: &str,
-    ) -> ProjectLocationEndpointPolicySetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGatewayRouteViewGetCall<'a, C> {
+        self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9173,7 +11421,7 @@ where
     pub fn delegate(
         mut self,
         new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationEndpointPolicySetIamPolicyCall<'a, C> {
+    ) -> ProjectLocationGatewayRouteViewGetCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -9198,11 +11446,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationEndpointPolicySetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGatewayRouteViewGetCall<'a, C>
     where
         T: AsRef<str>,
     {
@@ -9222,10 +11466,7 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> ProjectLocationEndpointPolicySetIamPolicyCall<'a, C>
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGatewayRouteViewGetCall<'a, C>
     where
         St: AsRef<str>,
     {
@@ -9235,10 +11476,7 @@ where
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationEndpointPolicySetIamPolicyCall<'a, C>
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGatewayRouteViewGetCall<'a, C>
     where
         I: IntoIterator<Item = St>,
         St: AsRef<str>,
@@ -9251,15 +11489,15 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationEndpointPolicySetIamPolicyCall<'a, C> {
+    pub fn clear_scopes(mut self) -> ProjectLocationGatewayRouteViewGetCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-/// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
+/// Lists RouteViews
 ///
-/// A builder for the *locations.endpointPolicies.testIamPermissions* method supported by a *project* resource.
+/// A builder for the *locations.gateways.routeViews.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
 ///
 /// # Example
@@ -9270,14 +11508,24 @@ where
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
 /// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::TestIamPermissionsRequest;
 /// # async fn dox() {
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9288,42 +11536,42 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = TestIamPermissionsRequest::default();
-///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_endpoint_policies_test_iam_permissions(req, "resource")
+/// let result = hub.projects().locations_gateways_route_views_list("parent")
+///              .page_token("sed")
+///              .page_size(-24)
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C>
+pub struct ProjectLocationGatewayRouteViewListCall<'a, C>
 where
     C: 'a,
 {
     hub: &'a NetworkServices<C>,
-    _request: TestIamPermissionsRequest,
-    _resource: String,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
 }
 
-impl<'a, C> common::CallBuilder for ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C> {}
+impl<'a, C> common::CallBuilder for ProjectLocationGatewayRouteViewListCall<'a, C> {}
 
-impl<'a, C> ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C>
+impl<'a, C> ProjectLocationGatewayRouteViewListCall<'a, C>
 where
     C: common::Connector,
 {
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, TestIamPermissionsResponse)> {
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, ListGatewayRouteViewsResponse)> {
         use std::borrow::Cow;
         use std::io::{Read, Seek};
 
@@ -9333,54 +11581,45 @@ where
         let mut dd = common::DefaultDelegate;
         let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.endpointPolicies.testIamPermissions",
-            http_method: hyper::Method::POST,
+            id: "networkservices.projects.locations.gateways.routeViews.list",
+            http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "resource"].iter() {
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
 
         params.extend(self._additional_params.iter());
 
         params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/routeViews";
         if self._scopes.is_empty() {
             self._scopes
                 .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let to_remove = ["resource"];
+            let to_remove = ["parent"];
             params.remove_params(&to_remove);
         }
 
         let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
 
         loop {
             let token = match self
@@ -9398,14 +11637,11 @@ where
                     }
                 },
             };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
+                    .method(hyper::Method::GET)
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
@@ -9414,11 +11650,8 @@ where
                 }
 
                 let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
             };
@@ -9476,29 +11709,28 @@ where
         }
     }
 
+    /// Required. The Gateway to which a Route is associated. Formats: projects/{project_number}/locations/{location}/gateways/{gateway}
     ///
-    /// Sets the *request* property to the given value.
+    /// Sets the *parent* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: TestIamPermissionsRequest,
-    ) -> ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C> {
-        self._request = new_value;
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGatewayRouteViewListCall<'a, C> {
+        self._parent = new_value.to_string();
         self
     }
-    /// REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    /// The value returned by the last `ListGatewayRouteViewsResponse` Indicates that this is a continuation of a prior `ListGatewayRouteViews` call, and that the system should return the next page of data.
     ///
-    /// Sets the *resource* path property to the given value.
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGatewayRouteViewListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of GatewayRouteViews to return per call.
     ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(
-        mut self,
-        new_value: &str,
-    ) -> ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C> {
-        self._resource = new_value.to_string();
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGatewayRouteViewListCall<'a, C> {
+        self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9512,7 +11744,7 @@ where
     pub fn delegate(
         mut self,
         new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C> {
+    ) -> ProjectLocationGatewayRouteViewListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -9537,11 +11769,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGatewayRouteViewListCall<'a, C>
     where
         T: AsRef<str>,
     {
@@ -9561,10 +11789,7 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C>
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGatewayRouteViewListCall<'a, C>
     where
         St: AsRef<str>,
     {
@@ -9574,10 +11799,7 @@ where
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C>
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGatewayRouteViewListCall<'a, C>
     where
         I: IntoIterator<Item = St>,
         St: AsRef<str>,
@@ -9590,7 +11812,7 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationEndpointPolicyTestIamPermissionCall<'a, C> {
+    pub fn clear_scopes(mut self) -> ProjectLocationGatewayRouteViewListCall<'a, C> {
         self._scopes.clear();
         self
     }
@@ -9614,9 +11836,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9627,7 +11860,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -9640,7 +11873,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_gateways_create(req, "parent")
-///              .gateway_id("dolor")
+///              .gateway_id("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9948,9 +12181,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9961,7 +12205,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -10234,9 +12478,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10247,7 +12502,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -10503,307 +12758,6 @@ where
     }
 }
 
-/// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-///
-/// A builder for the *locations.gateways.getIamPolicy* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_gateways_get_iam_policy("resource")
-///              .options_requested_policy_version(-43)
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationGatewayGetIamPolicyCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _resource: String,
-    _options_requested_policy_version: Option<i32>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationGatewayGetIamPolicyCall<'a, C> {}
-
-impl<'a, C> ProjectLocationGatewayGetIamPolicyCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.gateways.getIamPolicy",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-        if let Some(value) = self._options_requested_policy_version.as_ref() {
-            params.push("options.requestedPolicyVersion", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGatewayGetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
-    ///
-    /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(
-        mut self,
-        new_value: i32,
-    ) -> ProjectLocationGatewayGetIamPolicyCall<'a, C> {
-        self._options_requested_policy_version = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationGatewayGetIamPolicyCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGatewayGetIamPolicyCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGatewayGetIamPolicyCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGatewayGetIamPolicyCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationGatewayGetIamPolicyCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Lists Gateways in a given project and location.
 ///
 /// A builder for the *locations.gateways.list* method supported by a *project* resource.
@@ -10821,9 +12775,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10834,7 +12799,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -10842,8 +12807,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_gateways_list("parent")
-///              .page_token("sed")
-///              .page_size(-61)
+///              .page_token("dolore")
+///              .page_size(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11132,9 +13097,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11145,7 +13121,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -11347,7 +13323,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the Gateway resource. It matches pattern `projects/*/locations/*/gateways/`.
+    /// Identifier. Name of the Gateway resource. It matches pattern `projects/*/locations/*/gateways/`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -11452,668 +13428,6 @@ where
     }
 }
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
-///
-/// A builder for the *locations.gateways.setIamPolicy* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::SetIamPolicyRequest;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = SetIamPolicyRequest::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_gateways_set_iam_policy(req, "resource")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationGatewaySetIamPolicyCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _request: SetIamPolicyRequest,
-    _resource: String,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationGatewaySetIamPolicyCall<'a, C> {}
-
-impl<'a, C> ProjectLocationGatewaySetIamPolicyCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.gateways.setIamPolicy",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "resource"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: SetIamPolicyRequest,
-    ) -> ProjectLocationGatewaySetIamPolicyCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGatewaySetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationGatewaySetIamPolicyCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGatewaySetIamPolicyCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGatewaySetIamPolicyCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGatewaySetIamPolicyCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationGatewaySetIamPolicyCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
-/// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
-///
-/// A builder for the *locations.gateways.testIamPermissions* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::TestIamPermissionsRequest;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = TestIamPermissionsRequest::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_gateways_test_iam_permissions(req, "resource")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationGatewayTestIamPermissionCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _request: TestIamPermissionsRequest,
-    _resource: String,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationGatewayTestIamPermissionCall<'a, C> {}
-
-impl<'a, C> ProjectLocationGatewayTestIamPermissionCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, TestIamPermissionsResponse)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.gateways.testIamPermissions",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "resource"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: TestIamPermissionsRequest,
-    ) -> ProjectLocationGatewayTestIamPermissionCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(
-        mut self,
-        new_value: &str,
-    ) -> ProjectLocationGatewayTestIamPermissionCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationGatewayTestIamPermissionCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationGatewayTestIamPermissionCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGatewayTestIamPermissionCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationGatewayTestIamPermissionCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationGatewayTestIamPermissionCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Creates a new GrpcRoute in a given project and location.
 ///
 /// A builder for the *locations.grpcRoutes.create* method supported by a *project* resource.
@@ -12132,9 +13446,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12145,7 +13470,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -12158,7 +13483,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_grpc_routes_create(req, "parent")
-///              .grpc_route_id("et")
+///              .grpc_route_id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12347,7 +13672,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent resource of the GrpcRoute. Must be in the format `projects/*/locations/global`.
+    /// Required. The parent resource of the GrpcRoute. Must be in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -12466,9 +13791,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12479,7 +13815,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -12640,7 +13976,7 @@ where
         }
     }
 
-    /// Required. A name of the GrpcRoute to delete. Must be in the format `projects/*/locations/global/grpcRoutes/*`.
+    /// Required. A name of the GrpcRoute to delete. Must be in the format `projects/*/locations/*/grpcRoutes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12752,9 +14088,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12765,7 +14112,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -12926,7 +14273,7 @@ where
         }
     }
 
-    /// Required. A name of the GrpcRoute to get. Must be in the format `projects/*/locations/global/grpcRoutes/*`.
+    /// Required. A name of the GrpcRoute to get. Must be in the format `projects/*/locations/*/grpcRoutes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -13038,9 +14385,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13051,7 +14409,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -13059,8 +14417,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_grpc_routes_list("parent")
-///              .page_token("sed")
-///              .page_size(-20)
+///              .return_partial_success(false)
+///              .page_token("Stet")
+///              .page_size(-99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13070,6 +14429,7 @@ where
 {
     hub: &'a NetworkServices<C>,
     _parent: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
@@ -13098,15 +14458,26 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -13222,7 +14593,7 @@ where
         }
     }
 
-    /// Required. The project and location from which the GrpcRoutes should be listed, specified in the format `projects/*/locations/global`.
+    /// Required. The project and location from which the GrpcRoutes should be listed, specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13230,6 +14601,16 @@ where
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationGrpcRouteListCall<'a, C> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. If true, allow partial responses for multi-regional Aggregated List requests. Otherwise if one of the locations is down or unreachable, the Aggregated List request will fail.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationGrpcRouteListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
         self
     }
     /// The value returned by the last `ListGrpcRoutesResponse` Indicates that this is a continuation of a prior `ListGrpcRoutes` call, and that the system should return the next page of data.
@@ -13349,9 +14730,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13362,7 +14754,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -13564,7 +14956,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the GrpcRoute resource. It matches pattern `projects/*/locations/global/grpcRoutes/`
+    /// Identifier. Name of the GrpcRoute resource. It matches pattern `projects/*/locations/*/grpcRoutes/`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -13687,9 +15079,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13700,7 +15103,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -13713,7 +15116,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_http_routes_create(req, "parent")
-///              .http_route_id("voluptua.")
+///              .http_route_id("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13902,7 +15305,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent resource of the HttpRoute. Must be in the format `projects/*/locations/global`.
+    /// Required. The parent resource of the HttpRoute. Must be in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -14021,9 +15424,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14034,7 +15448,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -14195,7 +15609,7 @@ where
         }
     }
 
-    /// Required. A name of the HttpRoute to delete. Must be in the format `projects/*/locations/global/httpRoutes/*`.
+    /// Required. A name of the HttpRoute to delete. Must be in the format `projects/*/locations/*/httpRoutes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -14307,9 +15721,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14320,7 +15745,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -14481,7 +15906,7 @@ where
         }
     }
 
-    /// Required. A name of the HttpRoute to get. Must be in the format `projects/*/locations/global/httpRoutes/*`.
+    /// Required. A name of the HttpRoute to get. Must be in the format `projects/*/locations/*/httpRoutes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -14593,9 +16018,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14606,7 +16042,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -14614,8 +16050,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_http_routes_list("parent")
-///              .page_token("dolor")
-///              .page_size(-18)
+///              .return_partial_success(true)
+///              .page_token("Lorem")
+///              .page_size(-29)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14625,6 +16062,7 @@ where
 {
     hub: &'a NetworkServices<C>,
     _parent: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
@@ -14653,15 +16091,26 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -14777,7 +16226,7 @@ where
         }
     }
 
-    /// Required. The project and location from which the HttpRoutes should be listed, specified in the format `projects/*/locations/global`.
+    /// Required. The project and location from which the HttpRoutes should be listed, specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -14785,6 +16234,16 @@ where
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationHttpRouteListCall<'a, C> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. If true, allow partial responses for multi-regional Aggregated List requests. Otherwise if one of the locations is down or unreachable, the Aggregated List request will fail.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationHttpRouteListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
         self
     }
     /// The value returned by the last `ListHttpRoutesResponse` Indicates that this is a continuation of a prior `ListHttpRoutes` call, and that the system should return the next page of data.
@@ -14904,9 +16363,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14917,7 +16387,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -15119,7 +16589,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the HttpRoute resource. It matches pattern `projects/*/locations/global/httpRoutes/http_route_name>`.
+    /// Identifier. Name of the HttpRoute resource. It matches pattern `projects/*/locations/*/httpRoutes/http_route_name>`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -15224,6 +16694,1702 @@ where
     }
 }
 
+/// Creates a new `LbEdgeExtension` resource in a given project and location.
+///
+/// A builder for the *locations.lbEdgeExtensions.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// use networkservices1::api::LbEdgeExtension;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = LbEdgeExtension::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_lb_edge_extensions_create(req, "parent")
+///              .request_id("accusam")
+///              .lb_edge_extension_id("takimata")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationLbEdgeExtensionCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _request: LbEdgeExtension,
+    _parent: String,
+    _request_id: Option<String>,
+    _lb_edge_extension_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationLbEdgeExtensionCreateCall<'a, C> {}
+
+impl<'a, C> ProjectLocationLbEdgeExtensionCreateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.lbEdgeExtensions.create",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent", "requestId", "lbEdgeExtensionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+        if let Some(value) = self._lb_edge_extension_id.as_ref() {
+            params.push("lbEdgeExtensionId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/lbEdgeExtensions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: LbEdgeExtension,
+    ) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource of the `LbEdgeExtension` resource. Must be in the format `projects/{project}/locations/{location}`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// Required. User-provided ID of the `LbEdgeExtension` resource to be created.
+    ///
+    /// Sets the *lb edge extension id* query property to the given value.
+    pub fn lb_edge_extension_id(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C> {
+        self._lb_edge_extension_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationLbEdgeExtensionCreateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes the specified `LbEdgeExtension` resource.
+///
+/// A builder for the *locations.lbEdgeExtensions.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_lb_edge_extensions_delete("name")
+///              .request_id("voluptua.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationLbEdgeExtensionDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _name: String,
+    _request_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationLbEdgeExtensionDeleteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationLbEdgeExtensionDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.lbEdgeExtensions.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["alt", "name", "requestId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name of the `LbEdgeExtension` resource to delete. Must be in the format `projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationLbEdgeExtensionDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationLbEdgeExtensionDeleteCall<'a, C> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationLbEdgeExtensionDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationLbEdgeExtensionDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationLbEdgeExtensionDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationLbEdgeExtensionDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationLbEdgeExtensionDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets details of the specified `LbEdgeExtension` resource.
+///
+/// A builder for the *locations.lbEdgeExtensions.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_lb_edge_extensions_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationLbEdgeExtensionGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationLbEdgeExtensionGetCall<'a, C> {}
+
+impl<'a, C> ProjectLocationLbEdgeExtensionGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, LbEdgeExtension)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.lbEdgeExtensions.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. A name of the `LbEdgeExtension` resource to get. Must be in the format `projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationLbEdgeExtensionGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationLbEdgeExtensionGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationLbEdgeExtensionGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationLbEdgeExtensionGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationLbEdgeExtensionGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationLbEdgeExtensionGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Lists `LbEdgeExtension` resources in a given project and location.
+///
+/// A builder for the *locations.lbEdgeExtensions.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_lb_edge_extensions_list("parent")
+///              .page_token("consetetur")
+///              .page_size(-2)
+///              .order_by("sed")
+///              .filter("takimata")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationLbEdgeExtensionListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationLbEdgeExtensionListCall<'a, C> {}
+
+impl<'a, C> ProjectLocationLbEdgeExtensionListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, ListLbEdgeExtensionsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.lbEdgeExtensions.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "orderBy",
+            "filter",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/lbEdgeExtensions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The project and location from which the `LbEdgeExtension` resources are listed. These values are specified in the following format: `projects/{project}/locations/{location}`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationLbEdgeExtensionListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. A token identifying a page of results that the server returns.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationLbEdgeExtensionListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Requested page size. The server might return fewer items than requested. If unspecified, the server picks an appropriate default.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationLbEdgeExtensionListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. Hint about how to order the results.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationLbEdgeExtensionListCall<'a, C> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Filtering results.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationLbEdgeExtensionListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationLbEdgeExtensionListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationLbEdgeExtensionListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationLbEdgeExtensionListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationLbEdgeExtensionListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationLbEdgeExtensionListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Updates the parameters of the specified `LbEdgeExtension` resource.
+///
+/// A builder for the *locations.lbEdgeExtensions.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// use networkservices1::api::LbEdgeExtension;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = LbEdgeExtension::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_lb_edge_extensions_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("gubergren")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationLbEdgeExtensionPatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _request: LbEdgeExtension,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
+    _request_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationLbEdgeExtensionPatchCall<'a, C> {}
+
+impl<'a, C> ProjectLocationLbEdgeExtensionPatchCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.lbEdgeExtensions.patch",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in ["alt", "name", "updateMask", "requestId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: LbEdgeExtension,
+    ) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier. Name of the `LbEdgeExtension` resource in the following format: `projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. Used to specify the fields to be overwritten in the `LbEdgeExtension` resource by the update. The fields specified in the `update_mask` are relative to the resource, not the full request. A field is overwritten if it is in the mask. If the user does not specify a mask, then all fields are overwritten.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationLbEdgeExtensionPatchCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Creates a new `LbRouteExtension` resource in a given project and location.
 ///
 /// A builder for the *locations.lbRouteExtensions.create* method supported by a *project* resource.
@@ -15242,9 +18408,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15255,7 +18432,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -15268,8 +18445,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lb_route_extensions_create(req, "parent")
-///              .request_id("Stet")
-///              .lb_route_extension_id("dolor")
+///              .request_id("accusam")
+///              .lb_route_extension_id("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15475,7 +18652,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(
@@ -15600,9 +18777,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15613,7 +18801,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -15621,7 +18809,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lb_route_extensions_delete("name")
-///              .request_id("vero")
+///              .request_id("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15789,7 +18977,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(
@@ -15904,9 +19092,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15917,7 +19116,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -16190,9 +19389,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16203,7 +19413,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -16211,9 +19421,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lb_route_extensions_list("parent")
-///              .page_token("Stet")
-///              .page_size(-76)
-///              .order_by("elitr")
+///              .page_token("amet.")
+///              .page_size(-17)
+///              .order_by("sadipscing")
 ///              .filter("Lorem")
 ///              .doit().await;
 /// # }
@@ -16395,7 +19605,7 @@ where
         }
     }
 
-    /// Required. The project and location from which the `LbRouteExtension` resources are listed, specified in the following format: `projects/{project}/locations/{location}`.
+    /// Required. The project and location from which the `LbRouteExtension` resources are listed. These values are specified in the following format: `projects/{project}/locations/{location}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -16419,7 +19629,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Hint for how to order the results.
+    /// Optional. Hint about how to order the results.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationLbRouteExtensionListCall<'a, C> {
@@ -16536,9 +19746,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16549,7 +19770,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -16769,7 +19990,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. Used to specify the fields to be overwritten in the `LbRouteExtension` resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field is overwritten if it is in the mask. If the user does not specify a mask, then all fields are overwritten.
+    /// Optional. Used to specify the fields to be overwritten in the `LbRouteExtension` resource by the update. The fields specified in the `update_mask` are relative to the resource, not the full request. A field is overwritten if it is in the mask. If the user does not specify a mask, then all fields are overwritten.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(
@@ -16779,7 +20000,7 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(
@@ -16892,9 +20113,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16905,7 +20137,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -16918,8 +20150,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lb_traffic_extensions_create(req, "parent")
-///              .request_id("accusam")
-///              .lb_traffic_extension_id("takimata")
+///              .request_id("At")
+///              .lb_traffic_extension_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17125,7 +20357,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(
@@ -17254,9 +20486,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17267,7 +20510,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -17275,7 +20518,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lb_traffic_extensions_delete("name")
-///              .request_id("voluptua.")
+///              .request_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17443,7 +20686,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(
@@ -17562,9 +20805,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17575,7 +20829,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -17848,9 +21102,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17861,7 +21126,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -17869,10 +21134,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lb_traffic_extensions_list("parent")
-///              .page_token("consetetur")
-///              .page_size(-2)
-///              .order_by("sed")
-///              .filter("takimata")
+///              .page_token("ipsum")
+///              .page_size(-18)
+///              .order_by("sanctus")
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18053,7 +21318,7 @@ where
         }
     }
 
-    /// Required. The project and location from which the `LbTrafficExtension` resources are listed, specified in the following format: `projects/{project}/locations/{location}`.
+    /// Required. The project and location from which the `LbTrafficExtension` resources are listed. These values are specified in the following format: `projects/{project}/locations/{location}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -18080,7 +21345,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Optional. Hint for how to order the results.
+    /// Optional. Hint about how to order the results.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationLbTrafficExtensionListCall<'a, C> {
@@ -18200,9 +21465,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18213,7 +21489,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -18227,7 +21503,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_lb_traffic_extensions_patch(req, "name")
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .request_id("gubergren")
+///              .request_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18433,7 +21709,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. Used to specify the fields to be overwritten in the `LbTrafficExtension` resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field is overwritten if it is in the mask. If the user does not specify a mask, then all fields are overwritten.
+    /// Optional. Used to specify the fields to be overwritten in the `LbTrafficExtension` resource by the update. The fields specified in the `update_mask` are relative to the resource, not the full request. A field is overwritten if it is in the mask. If the user does not specify a mask, then all fields are overwritten.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(
@@ -18443,7 +21719,7 @@ where
         self._update_mask = Some(new_value);
         self
     }
-    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server can ignore the request if it has already been completed. The server guarantees that for 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server ignores the second request This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(
@@ -18545,6 +21821,624 @@ where
     }
 }
 
+/// Get a single RouteView of a Mesh.
+///
+/// A builder for the *locations.meshes.routeViews.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_meshes_route_views_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationMeshRouteViewGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationMeshRouteViewGetCall<'a, C> {}
+
+impl<'a, C> ProjectLocationMeshRouteViewGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, MeshRouteView)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.meshes.routeViews.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. Name of the MeshRouteView resource. Format: projects/{project_number}/locations/{location}/meshes/{mesh}/routeViews/{route_view}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationMeshRouteViewGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationMeshRouteViewGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationMeshRouteViewGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationMeshRouteViewGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationMeshRouteViewGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationMeshRouteViewGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Lists RouteViews
+///
+/// A builder for the *locations.meshes.routeViews.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_meshes_route_views_list("parent")
+///              .page_token("dolores")
+///              .page_size(-68)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationMeshRouteViewListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationMeshRouteViewListCall<'a, C> {}
+
+impl<'a, C> ProjectLocationMeshRouteViewListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListMeshRouteViewsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.meshes.routeViews.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/routeViews";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The Mesh to which a Route is associated. Format: projects/{project_number}/locations/{location}/meshes/{mesh}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationMeshRouteViewListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The value returned by the last `ListMeshRouteViewsResponse` Indicates that this is a continuation of a prior `ListMeshRouteViews` call, and that the system should return the next page of data.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationMeshRouteViewListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of MeshRouteViews to return per call.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationMeshRouteViewListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationMeshRouteViewListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationMeshRouteViewListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationMeshRouteViewListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationMeshRouteViewListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationMeshRouteViewListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Creates a new Mesh in a given project and location.
 ///
 /// A builder for the *locations.meshes.create* method supported by a *project* resource.
@@ -18563,9 +22457,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18576,7 +22481,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -18589,7 +22494,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_meshes_create(req, "parent")
-///              .mesh_id("accusam")
+///              .mesh_id("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18778,7 +22683,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent resource of the Mesh. Must be in the format `projects/*/locations/global`.
+    /// Required. The parent resource of the Mesh. Must be in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -18897,9 +22802,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18910,7 +22826,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -19071,7 +22987,7 @@ where
         }
     }
 
-    /// Required. A name of the Mesh to delete. Must be in the format `projects/*/locations/global/meshes/*`.
+    /// Required. A name of the Mesh to delete. Must be in the format `projects/*/locations/*/meshes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -19183,9 +23099,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19196,7 +23123,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -19357,7 +23284,7 @@ where
         }
     }
 
-    /// Required. A name of the Mesh to get. Must be in the format `projects/*/locations/global/meshes/*`.
+    /// Required. A name of the Mesh to get. Must be in the format `projects/*/locations/*/meshes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -19452,307 +23379,6 @@ where
     }
 }
 
-/// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-///
-/// A builder for the *locations.meshes.getIamPolicy* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_meshes_get_iam_policy("resource")
-///              .options_requested_policy_version(-34)
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationMeshGetIamPolicyCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _resource: String,
-    _options_requested_policy_version: Option<i32>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationMeshGetIamPolicyCall<'a, C> {}
-
-impl<'a, C> ProjectLocationMeshGetIamPolicyCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.meshes.getIamPolicy",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-        if let Some(value) = self._options_requested_policy_version.as_ref() {
-            params.push("options.requestedPolicyVersion", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationMeshGetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
-    ///
-    /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(
-        mut self,
-        new_value: i32,
-    ) -> ProjectLocationMeshGetIamPolicyCall<'a, C> {
-        self._options_requested_policy_version = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationMeshGetIamPolicyCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationMeshGetIamPolicyCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationMeshGetIamPolicyCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationMeshGetIamPolicyCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationMeshGetIamPolicyCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Lists Meshes in a given project and location.
 ///
 /// A builder for the *locations.meshes.list* method supported by a *project* resource.
@@ -19770,9 +23396,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19783,7 +23420,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -19791,8 +23428,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_meshes_list("parent")
-///              .page_token("amet.")
-///              .page_size(-17)
+///              .return_partial_success(true)
+///              .page_token("nonumy")
+///              .page_size(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19802,6 +23440,7 @@ where
 {
     hub: &'a NetworkServices<C>,
     _parent: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
@@ -19830,15 +23469,26 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -19954,7 +23604,7 @@ where
         }
     }
 
-    /// Required. The project and location from which the Meshes should be listed, specified in the format `projects/*/locations/global`.
+    /// Required. The project and location from which the Meshes should be listed, specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -19962,6 +23612,13 @@ where
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationMeshListCall<'a, C> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. If true, allow partial responses for multi-regional Aggregated List requests. Otherwise if one of the locations is down or unreachable, the Aggregated List request will fail.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(mut self, new_value: bool) -> ProjectLocationMeshListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
         self
     }
     /// The value returned by the last `ListMeshesResponse` Indicates that this is a continuation of a prior `ListMeshes` call, and that the system should return the next page of data.
@@ -20081,9 +23738,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20094,7 +23762,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -20296,7 +23964,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the Mesh resource. It matches pattern `projects/*/locations/global/meshes/`.
+    /// Identifier. Name of the Mesh resource. It matches pattern `projects/*/locations/*/meshes/`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -20401,659 +24069,7 @@ where
     }
 }
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
-///
-/// A builder for the *locations.meshes.setIamPolicy* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::SetIamPolicyRequest;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = SetIamPolicyRequest::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_meshes_set_iam_policy(req, "resource")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationMeshSetIamPolicyCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _request: SetIamPolicyRequest,
-    _resource: String,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationMeshSetIamPolicyCall<'a, C> {}
-
-impl<'a, C> ProjectLocationMeshSetIamPolicyCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.meshes.setIamPolicy",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "resource"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: SetIamPolicyRequest,
-    ) -> ProjectLocationMeshSetIamPolicyCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationMeshSetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationMeshSetIamPolicyCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationMeshSetIamPolicyCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationMeshSetIamPolicyCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationMeshSetIamPolicyCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationMeshSetIamPolicyCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
-/// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
-///
-/// A builder for the *locations.meshes.testIamPermissions* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::TestIamPermissionsRequest;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = TestIamPermissionsRequest::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_meshes_test_iam_permissions(req, "resource")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationMeshTestIamPermissionCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _request: TestIamPermissionsRequest,
-    _resource: String,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationMeshTestIamPermissionCall<'a, C> {}
-
-impl<'a, C> ProjectLocationMeshTestIamPermissionCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, TestIamPermissionsResponse)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.meshes.testIamPermissions",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "resource"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: TestIamPermissionsRequest,
-    ) -> ProjectLocationMeshTestIamPermissionCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationMeshTestIamPermissionCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationMeshTestIamPermissionCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationMeshTestIamPermissionCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationMeshTestIamPermissionCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationMeshTestIamPermissionCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationMeshTestIamPermissionCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
-/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
 ///
 /// A builder for the *locations.operations.cancel* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -21071,9 +24087,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21084,7 +24111,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -21396,9 +24423,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21409,7 +24447,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -21682,9 +24720,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21695,7 +24744,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -21968,9 +25017,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21981,7 +25041,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -21989,9 +25049,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("sit")
-///              .page_size(-35)
-///              .filter("tempor")
+///              .return_partial_success(false)
+///              .page_token("amet")
+///              .page_size(-57)
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22001,6 +25062,7 @@ where
 {
     hub: &'a NetworkServices<C>,
     _name: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -22030,15 +25092,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -22167,6 +25241,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `"projects/example/locations/-"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationOperationListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -22291,9 +25375,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22304,7 +25399,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -22317,7 +25412,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_bindings_create(req, "parent")
-///              .service_binding_id("ipsum")
+///              .service_binding_id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22509,7 +25604,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent resource of the ServiceBinding. Must be in the format `projects/*/locations/global`.
+    /// Required. The parent resource of the ServiceBinding. Must be in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -22631,9 +25726,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22644,7 +25750,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -22805,7 +25911,7 @@ where
         }
     }
 
-    /// Required. A name of the ServiceBinding to delete. Must be in the format `projects/*/locations/global/serviceBindings/*`.
+    /// Required. A name of the ServiceBinding to delete. Must be in the format `projects/*/locations/*/serviceBindings/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -22917,9 +26023,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22930,7 +26047,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -23091,7 +26208,7 @@ where
         }
     }
 
-    /// Required. A name of the ServiceBinding to get. Must be in the format `projects/*/locations/global/serviceBindings/*`.
+    /// Required. A name of the ServiceBinding to get. Must be in the format `projects/*/locations/*/serviceBindings/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -23186,320 +26303,6 @@ where
     }
 }
 
-/// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-///
-/// A builder for the *locations.serviceBindings.getIamPolicy* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_service_bindings_get_iam_policy("resource")
-///              .options_requested_policy_version(-7)
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationServiceBindingGetIamPolicyCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _resource: String,
-    _options_requested_policy_version: Option<i32>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationServiceBindingGetIamPolicyCall<'a, C> {}
-
-impl<'a, C> ProjectLocationServiceBindingGetIamPolicyCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.serviceBindings.getIamPolicy",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-        if let Some(value) = self._options_requested_policy_version.as_ref() {
-            params.push("options.requestedPolicyVersion", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(
-        mut self,
-        new_value: &str,
-    ) -> ProjectLocationServiceBindingGetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
-    ///
-    /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(
-        mut self,
-        new_value: i32,
-    ) -> ProjectLocationServiceBindingGetIamPolicyCall<'a, C> {
-        self._options_requested_policy_version = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationServiceBindingGetIamPolicyCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationServiceBindingGetIamPolicyCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> ProjectLocationServiceBindingGetIamPolicyCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationServiceBindingGetIamPolicyCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationServiceBindingGetIamPolicyCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Lists ServiceBinding in a given project and location.
 ///
 /// A builder for the *locations.serviceBindings.list* method supported by a *project* resource.
@@ -23517,9 +26320,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23530,7 +26344,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -23538,8 +26352,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_bindings_list("parent")
-///              .page_token("diam")
-///              .page_size(-19)
+///              .page_token("aliquyam")
+///              .page_size(-94)
 ///              .doit().await;
 /// # }
 /// ```
@@ -23701,7 +26515,7 @@ where
         }
     }
 
-    /// Required. The project and location from which the ServiceBindings should be listed, specified in the format `projects/*/locations/global`.
+    /// Required. The project and location from which the ServiceBindings should be listed, specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -23810,9 +26624,9 @@ where
     }
 }
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
+/// Updates the parameters of a single ServiceBinding.
 ///
-/// A builder for the *locations.serviceBindings.setIamPolicy* method supported by a *project* resource.
+/// A builder for the *locations.serviceBindings.patch* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
 ///
 /// # Example
@@ -23823,14 +26637,25 @@ where
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
 /// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::SetIamPolicyRequest;
+/// use networkservices1::api::ServiceBinding;
 /// # async fn dox() {
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23841,42 +26666,44 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = SetIamPolicyRequest::default();
+/// let mut req = ServiceBinding::default();
 ///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_service_bindings_set_iam_policy(req, "resource")
+/// let result = hub.projects().locations_service_bindings_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceBindingSetIamPolicyCall<'a, C>
+pub struct ProjectLocationServiceBindingPatchCall<'a, C>
 where
     C: 'a,
 {
     hub: &'a NetworkServices<C>,
-    _request: SetIamPolicyRequest,
-    _resource: String,
+    _request: ServiceBinding,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
 }
 
-impl<'a, C> common::CallBuilder for ProjectLocationServiceBindingSetIamPolicyCall<'a, C> {}
+impl<'a, C> common::CallBuilder for ProjectLocationServiceBindingPatchCall<'a, C> {}
 
-impl<'a, C> ProjectLocationServiceBindingSetIamPolicyCall<'a, C>
+impl<'a, C> ProjectLocationServiceBindingPatchCall<'a, C>
 where
     C: common::Connector,
 {
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
         use std::borrow::Cow;
         use std::io::{Read, Seek};
 
@@ -23886,35 +26713,38 @@ where
         let mut dd = common::DefaultDelegate;
         let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
         dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.serviceBindings.setIamPolicy",
-            http_method: hyper::Method::POST,
+            id: "networkservices.projects.locations.serviceBindings.patch",
+            http_method: hyper::Method::PATCH,
         });
 
-        for &field in ["alt", "resource"].iter() {
+        for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
 
         params.extend(self._additional_params.iter());
 
         params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
             self._scopes
                 .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
         {
-            let to_remove = ["resource"];
+            let to_remove = ["name"];
             params.remove_params(&to_remove);
         }
 
@@ -23958,7 +26788,7 @@ where
                 let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
+                    .method(hyper::Method::PATCH)
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
@@ -24036,22 +26866,29 @@ where
     /// we provide this method for API completeness.
     pub fn request(
         mut self,
-        new_value: SetIamPolicyRequest,
-    ) -> ProjectLocationServiceBindingSetIamPolicyCall<'a, C> {
+        new_value: ServiceBinding,
+    ) -> ProjectLocationServiceBindingPatchCall<'a, C> {
         self._request = new_value;
         self
     }
-    /// REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
+    /// Identifier. Name of the ServiceBinding resource. It matches pattern `projects/*/locations/*/serviceBindings/`.
     ///
-    /// Sets the *resource* path property to the given value.
+    /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(
+    pub fn name(mut self, new_value: &str) -> ProjectLocationServiceBindingPatchCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. Field mask is used to specify the fields to be overwritten in the ServiceBinding resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field will be overwritten if it is in the mask. If the user does not provide a mask then all fields will be overwritten.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
         mut self,
-        new_value: &str,
-    ) -> ProjectLocationServiceBindingSetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
+        new_value: common::FieldMask,
+    ) -> ProjectLocationServiceBindingPatchCall<'a, C> {
+        self._update_mask = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -24065,7 +26902,7 @@ where
     pub fn delegate(
         mut self,
         new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationServiceBindingSetIamPolicyCall<'a, C> {
+    ) -> ProjectLocationServiceBindingPatchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -24090,11 +26927,7 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationServiceBindingSetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceBindingPatchCall<'a, C>
     where
         T: AsRef<str>,
     {
@@ -24114,10 +26947,7 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> ProjectLocationServiceBindingSetIamPolicyCall<'a, C>
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationServiceBindingPatchCall<'a, C>
     where
         St: AsRef<str>,
     {
@@ -24127,10 +26957,7 @@ where
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationServiceBindingSetIamPolicyCall<'a, C>
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationServiceBindingPatchCall<'a, C>
     where
         I: IntoIterator<Item = St>,
         St: AsRef<str>,
@@ -24143,346 +26970,7 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationServiceBindingSetIamPolicyCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
-/// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
-///
-/// A builder for the *locations.serviceBindings.testIamPermissions* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::TestIamPermissionsRequest;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = TestIamPermissionsRequest::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_service_bindings_test_iam_permissions(req, "resource")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationServiceBindingTestIamPermissionCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _request: TestIamPermissionsRequest,
-    _resource: String,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationServiceBindingTestIamPermissionCall<'a, C> {}
-
-impl<'a, C> ProjectLocationServiceBindingTestIamPermissionCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, TestIamPermissionsResponse)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.serviceBindings.testIamPermissions",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "resource"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: TestIamPermissionsRequest,
-    ) -> ProjectLocationServiceBindingTestIamPermissionCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(
-        mut self,
-        new_value: &str,
-    ) -> ProjectLocationServiceBindingTestIamPermissionCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationServiceBindingTestIamPermissionCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationServiceBindingTestIamPermissionCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> ProjectLocationServiceBindingTestIamPermissionCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationServiceBindingTestIamPermissionCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationServiceBindingTestIamPermissionCall<'a, C> {
+    pub fn clear_scopes(mut self) -> ProjectLocationServiceBindingPatchCall<'a, C> {
         self._scopes.clear();
         self
     }
@@ -24506,9 +26994,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24519,7 +27018,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -24532,7 +27031,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_lb_policies_create(req, "parent")
-///              .service_lb_policy_id("no")
+///              .service_lb_policy_id("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24846,9 +27345,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24859,7 +27369,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -25132,9 +27642,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25145,7 +27666,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -25401,320 +27922,6 @@ where
     }
 }
 
-/// Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
-///
-/// A builder for the *locations.serviceLbPolicies.getIamPolicy* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_service_lb_policies_get_iam_policy("resource")
-///              .options_requested_policy_version(-61)
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _resource: String,
-    _options_requested_policy_version: Option<i32>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C> {}
-
-impl<'a, C> ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.serviceLbPolicies.getIamPolicy",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in ["alt", "resource", "options.requestedPolicyVersion"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-        if let Some(value) = self._options_requested_policy_version.as_ref() {
-            params.push("options.requestedPolicyVersion", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(
-        mut self,
-        new_value: &str,
-    ) -> ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
-    ///
-    /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(
-        mut self,
-        new_value: i32,
-    ) -> ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C> {
-        self._options_requested_policy_version = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationServiceLbPolicyGetIamPolicyCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Lists ServiceLbPolicies in a given project and location.
 ///
 /// A builder for the *locations.serviceLbPolicies.list* method supported by a *project* resource.
@@ -25732,9 +27939,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25745,7 +27963,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -25753,8 +27971,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_lb_policies_list("parent")
-///              .page_token("At")
-///              .page_size(-45)
+///              .page_token("Lorem")
+///              .page_size(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26045,9 +28263,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26058,7 +28287,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -26263,7 +28492,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the ServiceLbPolicy resource. It matches pattern `projects/{project}/locations/{location}/serviceLbPolicies/{service_lb_policy_name}`.
+    /// Identifier. Name of the ServiceLbPolicy resource. It matches pattern `projects/{project}/locations/{location}/serviceLbPolicies/{service_lb_policy_name}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -26368,684 +28597,6 @@ where
     }
 }
 
-/// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
-///
-/// A builder for the *locations.serviceLbPolicies.setIamPolicy* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::SetIamPolicyRequest;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = SetIamPolicyRequest::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_service_lb_policies_set_iam_policy(req, "resource")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _request: SetIamPolicyRequest,
-    _resource: String,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C> {}
-
-impl<'a, C> ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, Policy)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.serviceLbPolicies.setIamPolicy",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "resource"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:setIamPolicy";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: SetIamPolicyRequest,
-    ) -> ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(
-        mut self,
-        new_value: &str,
-    ) -> ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationServiceLbPolicySetIamPolicyCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
-/// Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning.
-///
-/// A builder for the *locations.serviceLbPolicies.testIamPermissions* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_networkservices1 as networkservices1;
-/// use networkservices1::api::TestIamPermissionsRequest;
-/// # async fn dox() {
-/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = NetworkServices::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = TestIamPermissionsRequest::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_service_lb_policies_test_iam_permissions(req, "resource")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a NetworkServices<C>,
-    _request: TestIamPermissionsRequest,
-    _resource: String,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C> {}
-
-impl<'a, C> ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, TestIamPermissionsResponse)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "networkservices.projects.locations.serviceLbPolicies.testIamPermissions",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "resource"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("resource", self._resource);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:testIamPermissions";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["resource"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: TestIamPermissionsRequest,
-    ) -> ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.
-    ///
-    /// Sets the *resource* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn resource(
-        mut self,
-        new_value: &str,
-    ) -> ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C> {
-        self._resource = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectLocationServiceLbPolicyTestIamPermissionCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Creates a new TcpRoute in a given project and location.
 ///
 /// A builder for the *locations.tcpRoutes.create* method supported by a *project* resource.
@@ -27064,9 +28615,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27077,7 +28639,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -27090,7 +28652,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_tcp_routes_create(req, "parent")
-///              .tcp_route_id("aliquyam")
+///              .tcp_route_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27279,7 +28841,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent resource of the TcpRoute. Must be in the format `projects/*/locations/global`.
+    /// Required. The parent resource of the TcpRoute. Must be in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -27398,9 +28960,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27411,7 +28984,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -27572,7 +29145,7 @@ where
         }
     }
 
-    /// Required. A name of the TcpRoute to delete. Must be in the format `projects/*/locations/global/tcpRoutes/*`.
+    /// Required. A name of the TcpRoute to delete. Must be in the format `projects/*/locations/*/tcpRoutes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -27684,9 +29257,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27697,7 +29281,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -27858,7 +29442,7 @@ where
         }
     }
 
-    /// Required. A name of the TcpRoute to get. Must be in the format `projects/*/locations/global/tcpRoutes/*`.
+    /// Required. A name of the TcpRoute to get. Must be in the format `projects/*/locations/*/tcpRoutes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -27970,9 +29554,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27983,7 +29578,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -27991,8 +29586,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_tcp_routes_list("parent")
-///              .page_token("sea")
-///              .page_size(-96)
+///              .return_partial_success(false)
+///              .page_token("dolore")
+///              .page_size(-40)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28002,6 +29598,7 @@ where
 {
     hub: &'a NetworkServices<C>,
     _parent: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
@@ -28030,15 +29627,26 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -28154,7 +29762,7 @@ where
         }
     }
 
-    /// Required. The project and location from which the TcpRoutes should be listed, specified in the format `projects/*/locations/global`.
+    /// Required. The project and location from which the TcpRoutes should be listed, specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -28162,6 +29770,16 @@ where
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationTcpRouteListCall<'a, C> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. If true, allow partial responses for multi-regional Aggregated List requests. Otherwise if one of the locations is down or unreachable, the Aggregated List request will fail.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationTcpRouteListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
         self
     }
     /// The value returned by the last `ListTcpRoutesResponse` Indicates that this is a continuation of a prior `ListTcpRoutes` call, and that the system should return the next page of data.
@@ -28281,9 +29899,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28294,7 +29923,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -28496,7 +30125,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the TcpRoute resource. It matches pattern `projects/*/locations/global/tcpRoutes/tcp_route_name>`.
+    /// Identifier. Name of the TcpRoute resource. It matches pattern `projects/*/locations/*/tcpRoutes/tcp_route_name>`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -28619,9 +30248,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28632,7 +30272,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -28645,7 +30285,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_tls_routes_create(req, "parent")
-///              .tls_route_id("est")
+///              .tls_route_id("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -28834,7 +30474,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent resource of the TlsRoute. Must be in the format `projects/*/locations/global`.
+    /// Required. The parent resource of the TlsRoute. Must be in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -28953,9 +30593,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28966,7 +30617,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -29127,7 +30778,7 @@ where
         }
     }
 
-    /// Required. A name of the TlsRoute to delete. Must be in the format `projects/*/locations/global/tlsRoutes/*`.
+    /// Required. A name of the TlsRoute to delete. Must be in the format `projects/*/locations/*/tlsRoutes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -29239,9 +30890,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29252,7 +30914,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -29413,7 +31075,7 @@ where
         }
     }
 
-    /// Required. A name of the TlsRoute to get. Must be in the format `projects/*/locations/global/tlsRoutes/*`.
+    /// Required. A name of the TlsRoute to get. Must be in the format `projects/*/locations/*/tlsRoutes/*`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -29525,9 +31187,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29538,7 +31211,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -29546,8 +31219,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_tls_routes_list("parent")
-///              .page_token("diam")
-///              .page_size(-57)
+///              .return_partial_success(false)
+///              .page_token("sea")
+///              .page_size(-59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29557,6 +31231,7 @@ where
 {
     hub: &'a NetworkServices<C>,
     _parent: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn common::Delegate>,
@@ -29585,15 +31260,26 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -29709,7 +31395,7 @@ where
         }
     }
 
-    /// Required. The project and location from which the TlsRoutes should be listed, specified in the format `projects/*/locations/global`.
+    /// Required. The project and location from which the TlsRoutes should be listed, specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -29717,6 +31403,16 @@ where
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> ProjectLocationTlsRouteListCall<'a, C> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. If true, allow partial responses for multi-regional Aggregated List requests. Otherwise if one of the locations is down or unreachable, the Aggregated List request will fail.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationTlsRouteListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
         self
     }
     /// The value returned by the last `ListTlsRoutesResponse` Indicates that this is a continuation of a prior `ListTlsRoutes` call, and that the system should return the next page of data.
@@ -29836,9 +31532,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29849,7 +31556,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -30051,7 +31758,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Name of the TlsRoute resource. It matches pattern `projects/*/locations/global/tlsRoutes/tls_route_name>`.
+    /// Identifier. Name of the TlsRoute resource. It matches pattern `projects/*/locations/*/tlsRoutes/tls_route_name>`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -30156,6 +31863,2914 @@ where
     }
 }
 
+/// Creates a new `WasmPluginVersion` resource in a given project and location.
+///
+/// A builder for the *locations.wasmPlugins.versions.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// use networkservices1::api::WasmPluginVersion;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = WasmPluginVersion::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_wasm_plugins_versions_create(req, "parent")
+///              .wasm_plugin_version_id("At")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWasmPluginVersionCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _request: WasmPluginVersion,
+    _parent: String,
+    _wasm_plugin_version_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWasmPluginVersionCreateCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWasmPluginVersionCreateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.wasmPlugins.versions.create",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent", "wasmPluginVersionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._wasm_plugin_version_id.as_ref() {
+            params.push("wasmPluginVersionId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/versions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: WasmPluginVersion,
+    ) -> ProjectLocationWasmPluginVersionCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource of the `WasmPluginVersion` resource. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWasmPluginVersionCreateCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. User-provided ID of the `WasmPluginVersion` resource to be created.
+    ///
+    /// Sets the *wasm plugin version id* query property to the given value.
+    pub fn wasm_plugin_version_id(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationWasmPluginVersionCreateCall<'a, C> {
+        self._wasm_plugin_version_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWasmPluginVersionCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationWasmPluginVersionCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWasmPluginVersionCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationWasmPluginVersionCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWasmPluginVersionCreateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes the specified `WasmPluginVersion` resource.
+///
+/// A builder for the *locations.wasmPlugins.versions.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_wasm_plugins_versions_delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWasmPluginVersionDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWasmPluginVersionDeleteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWasmPluginVersionDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.wasmPlugins.versions.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. A name of the `WasmPluginVersion` resource to delete. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}/versions/{wasm_plugin_version}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWasmPluginVersionDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWasmPluginVersionDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationWasmPluginVersionDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWasmPluginVersionDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationWasmPluginVersionDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWasmPluginVersionDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets details of the specified `WasmPluginVersion` resource.
+///
+/// A builder for the *locations.wasmPlugins.versions.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_wasm_plugins_versions_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWasmPluginVersionGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWasmPluginVersionGetCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWasmPluginVersionGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, WasmPluginVersion)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.wasmPlugins.versions.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. A name of the `WasmPluginVersion` resource to get. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}/versions/{wasm_plugin_version}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWasmPluginVersionGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWasmPluginVersionGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWasmPluginVersionGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWasmPluginVersionGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWasmPluginVersionGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWasmPluginVersionGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Lists `WasmPluginVersion` resources in a given project and location.
+///
+/// A builder for the *locations.wasmPlugins.versions.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_wasm_plugins_versions_list("parent")
+///              .page_token("erat")
+///              .page_size(-10)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWasmPluginVersionListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWasmPluginVersionListCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWasmPluginVersionListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, ListWasmPluginVersionsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.wasmPlugins.versions.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/versions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The `WasmPlugin` resource whose `WasmPluginVersion`s are listed, specified in the following format: `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWasmPluginVersionListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The value returned by the last `ListWasmPluginVersionsResponse` call. Indicates that this is a continuation of a prior `ListWasmPluginVersions` call, and that the next page of data is to be returned.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationWasmPluginVersionListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of `WasmPluginVersion` resources to return per call. If not specified, at most 50 `WasmPluginVersion` resources are returned. The maximum value is 1000; values above 1000 are coerced to 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationWasmPluginVersionListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWasmPluginVersionListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWasmPluginVersionListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWasmPluginVersionListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWasmPluginVersionListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWasmPluginVersionListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Creates a new `WasmPlugin` resource in a given project and location.
+///
+/// A builder for the *locations.wasmPlugins.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// use networkservices1::api::WasmPlugin;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = WasmPlugin::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_wasm_plugins_create(req, "parent")
+///              .wasm_plugin_id("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWasmPluginCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _request: WasmPlugin,
+    _parent: String,
+    _wasm_plugin_id: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWasmPluginCreateCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWasmPluginCreateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.wasmPlugins.create",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "parent", "wasmPluginId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._wasm_plugin_id.as_ref() {
+            params.push("wasmPluginId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/wasmPlugins";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: WasmPlugin) -> ProjectLocationWasmPluginCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource of the `WasmPlugin` resource. Must be in the format `projects/{project}/locations/global`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWasmPluginCreateCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. User-provided ID of the `WasmPlugin` resource to be created.
+    ///
+    /// Sets the *wasm plugin id* query property to the given value.
+    pub fn wasm_plugin_id(mut self, new_value: &str) -> ProjectLocationWasmPluginCreateCall<'a, C> {
+        self._wasm_plugin_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWasmPluginCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWasmPluginCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWasmPluginCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWasmPluginCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWasmPluginCreateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes the specified `WasmPlugin` resource.
+///
+/// A builder for the *locations.wasmPlugins.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_wasm_plugins_delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWasmPluginDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWasmPluginDeleteCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWasmPluginDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.wasmPlugins.delete",
+            http_method: hyper::Method::DELETE,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. A name of the `WasmPlugin` resource to delete. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWasmPluginDeleteCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWasmPluginDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWasmPluginDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWasmPluginDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWasmPluginDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWasmPluginDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets details of the specified `WasmPlugin` resource.
+///
+/// A builder for the *locations.wasmPlugins.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_wasm_plugins_get("name")
+///              .view("sea")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWasmPluginGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _name: String,
+    _view: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWasmPluginGetCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWasmPluginGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, WasmPlugin)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.wasmPlugins.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "view"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._view.as_ref() {
+            params.push("view", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. A name of the `WasmPlugin` resource to get. Must be in the format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWasmPluginGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Determines how much data must be returned in the response. See [AIP-157](https://google.aip.dev/157).
+    ///
+    /// Sets the *view* query property to the given value.
+    pub fn view(mut self, new_value: &str) -> ProjectLocationWasmPluginGetCall<'a, C> {
+        self._view = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWasmPluginGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWasmPluginGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWasmPluginGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWasmPluginGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWasmPluginGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Lists `WasmPlugin` resources in a given project and location.
+///
+/// A builder for the *locations.wasmPlugins.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_wasm_plugins_list("parent")
+///              .page_token("sit")
+///              .page_size(-32)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWasmPluginListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWasmPluginListCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWasmPluginListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListWasmPluginsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.wasmPlugins.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/wasmPlugins";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The project and location from which the `WasmPlugin` resources are listed, specified in the following format: `projects/{project}/locations/global`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationWasmPluginListCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The value returned by the last `ListWasmPluginsResponse` call. Indicates that this is a continuation of a prior `ListWasmPlugins` call, and that the next page of data is to be returned.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationWasmPluginListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of `WasmPlugin` resources to return per call. If not specified, at most 50 `WasmPlugin` resources are returned. The maximum value is 1000; values above 1000 are coerced to 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationWasmPluginListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWasmPluginListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWasmPluginListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWasmPluginListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWasmPluginListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWasmPluginListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Updates the parameters of the specified `WasmPlugin` resource.
+///
+/// A builder for the *locations.wasmPlugins.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkservices1 as networkservices1;
+/// use networkservices1::api::WasmPlugin;
+/// # async fn dox() {
+/// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = NetworkServices::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = WasmPlugin::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_wasm_plugins_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationWasmPluginPatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a NetworkServices<C>,
+    _request: WasmPlugin,
+    _name: String,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationWasmPluginPatchCall<'a, C> {}
+
+impl<'a, C> ProjectLocationWasmPluginPatchCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "networkservices.projects.locations.wasmPlugins.patch",
+            http_method: hyper::Method::PATCH,
+        });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: WasmPlugin) -> ProjectLocationWasmPluginPatchCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Identifier. Name of the `WasmPlugin` resource in the following format: `projects/{project}/locations/{location}/wasmPlugins/{wasm_plugin}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationWasmPluginPatchCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. Used to specify the fields to be overwritten in the `WasmPlugin` resource by the update. The fields specified in the `update_mask` field are relative to the resource, not the full request. An omitted `update_mask` field is treated as an implied `update_mask` field equivalent to all fields that are populated (that have a non-empty value). The `update_mask` field supports a special value `*`, which means that each field in the given `WasmPlugin` resource (including the empty ones) replaces the current value.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> ProjectLocationWasmPluginPatchCall<'a, C> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationWasmPluginPatchCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationWasmPluginPatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationWasmPluginPatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationWasmPluginPatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationWasmPluginPatchCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets information about a location.
 ///
 /// A builder for the *locations.get* method supported by a *project* resource.
@@ -30173,9 +34788,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30186,7 +34812,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -30459,9 +35085,20 @@ where
 /// # use networkservices1::{NetworkServices, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30472,7 +35109,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = NetworkServices::new(client, auth);
@@ -30480,9 +35117,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("Lorem")
-///              .page_size(-17)
-///              .filter("Stet")
+///              .page_token("consetetur")
+///              .page_size(-62)
+///              .filter("dolor")
+///              .add_extra_location_types("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -30495,6 +35133,7 @@ where
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
+    _extra_location_types: Vec<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -30521,14 +35160,23 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "pageToken",
+            "pageSize",
+            "filter",
+            "extraLocationTypes",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
@@ -30538,6 +35186,11 @@ where
         }
         if let Some(value) = self._filter.as_ref() {
             params.push("filter", value);
+        }
+        if !self._extra_location_types.is_empty() {
+            for f in self._extra_location_types.iter() {
+                params.push("extraLocationTypes", f);
+            }
         }
 
         params.extend(self._additional_params.iter());
@@ -30677,6 +35330,14 @@ where
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
         self._filter = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.
+    ///
+    /// Append the given value to the *extra location types* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_extra_location_types(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+        self._extra_location_types.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

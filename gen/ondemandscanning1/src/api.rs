@@ -58,9 +58,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -71,7 +82,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = OnDemandScanning::new(client, auth);
@@ -120,7 +131,7 @@ impl<'a, C> OnDemandScanning<C> {
         OnDemandScanning {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://ondemandscanning.googleapis.com/".to_string(),
             _root_url: "https://ondemandscanning.googleapis.com/".to_string(),
         }
@@ -131,7 +142,7 @@ impl<'a, C> OnDemandScanning<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -251,6 +262,25 @@ pub struct AttestationOccurrence {
 
 impl common::Part for AttestationOccurrence {}
 
+/// BaseImage describes a base image of a container image.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BaseImage {
+    /// The number of layers that the base image is composed of.
+    #[serde(rename = "layerCount")]
+    pub layer_count: Option<i32>,
+    /// The name of the base image.
+    pub name: Option<String>,
+    /// The repository name in which the base image is from.
+    pub repository: Option<String>,
+}
+
+impl common::Part for BaseImage {}
+
 /// There is no detailed description.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -259,7 +289,7 @@ impl common::Part for AttestationOccurrence {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BinarySourceInfo {
-    /// The binary package. This is significant when the source is different than the binary itself. Historically if they've differed, we've stored the name of the source and its version in the package/version fields, but we should also store the binary package info, as that's what's actually installed. See b/175908657#comment15.
+    /// The binary package. This is significant when the source is different than the binary itself. Historically if they've differed, we've stored the name of the source and its version in the package/version fields, but we should also store the binary package info, as that's what's actually installed.
     #[serde(rename = "binaryVersion")]
     pub binary_version: Option<PackageVersion>,
     /// The source package. Similar to the above, this is significant when the source is different than the binary itself. Since the top-level package/version fields are based on an if/else, we need a separate field for both binary and source if we want to know definitively where the data is coming from.
@@ -401,6 +431,21 @@ pub struct BuilderConfig {
 }
 
 impl common::Part for BuilderConfig {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct CISAKnownExploitedVulnerabilities {
+    /// Whether the vulnerability is known to have been leveraged as part of a ransomware campaign.
+    #[serde(rename = "knownRansomwareCampaignUse")]
+    pub known_ransomware_campaign_use: Option<String>,
+}
+
+impl common::Part for CISAKnownExploitedVulnerabilities {}
 
 /// Common Vulnerability Scoring System. For details, see https://www.first.org/cvss/specification-document This is a message we will try to use for storing various versions of CVSS rather than making a separate proto for storing a specific version.
 ///
@@ -643,15 +688,14 @@ pub struct DiscoveryOccurrence {
     pub continuous_analysis: Option<String>,
     /// The CPE of the resource being scanned.
     pub cpe: Option<String>,
+    /// Files that make up the resource described by the occurrence.
+    pub files: Option<Vec<File>>,
     /// The last time this resource was scanned.
     #[serde(rename = "lastScanTime")]
     pub last_scan_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// The status of an SBOM generation.
     #[serde(rename = "sbomStatus")]
     pub sbom_status: Option<SBOMStatus>,
-    /// The status of an vulnerability attestation generation.
-    #[serde(rename = "vulnerabilityAttestation")]
-    pub vulnerability_attestation: Option<VulnerabilityAttestation>,
 }
 
 impl common::Part for DiscoveryOccurrence {}
@@ -711,6 +755,38 @@ pub struct EnvelopeSignature {
 
 impl common::Part for EnvelopeSignature {}
 
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ExploitPredictionScoringSystem {
+    /// The percentile of the current score, the proportion of all scored vulnerabilities with the same or a lower EPSS score
+    pub percentile: Option<f64>,
+    /// The EPSS score representing the probability [0-1] of exploitation in the wild in the next 30 days
+    pub score: Option<f64>,
+}
+
+impl common::Part for ExploitPredictionScoringSystem {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct File {
+    /// no description provided
+    pub digest: Option<HashMap<String, String>>,
+    /// no description provided
+    pub name: Option<String>,
+}
+
+impl common::Part for File {}
+
 /// Container message for hashes of byte content of files, used in source messages to verify integrity of source input to the build.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -737,6 +813,9 @@ pub struct FileLocation {
     /// For jars that are contained inside .war files, this filepath can indicate the path to war file combined with the path to jar file.
     #[serde(rename = "filePath")]
     pub file_path: Option<String>,
+    /// no description provided
+    #[serde(rename = "layerDetails")]
+    pub layer_details: Option<LayerDetails>,
 }
 
 impl common::Part for FileLocation {}
@@ -803,6 +882,25 @@ pub struct GitSourceContext {
 
 impl common::Part for GitSourceContext {}
 
+/// BaseImage describes a base image of a container image.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GrafeasV1BaseImage {
+    /// The number of layers that the base image is composed of.
+    #[serde(rename = "layerCount")]
+    pub layer_count: Option<i32>,
+    /// The name of the base image.
+    pub name: Option<String>,
+    /// The repository name in which the base image is from.
+    pub repository: Option<String>,
+}
+
+impl common::Part for GrafeasV1BaseImage {}
+
 /// Indicates the location at which a package was found.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -814,9 +912,37 @@ pub struct GrafeasV1FileLocation {
     /// For jars that are contained inside .war files, this filepath can indicate the path to war file combined with the path to jar file.
     #[serde(rename = "filePath")]
     pub file_path: Option<String>,
+    /// Each package found in a file should have its own layer metadata (that is, information from the origin layer of the package).
+    #[serde(rename = "layerDetails")]
+    pub layer_details: Option<GrafeasV1LayerDetails>,
 }
 
 impl common::Part for GrafeasV1FileLocation {}
+
+/// Details about the layer a package was found in.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GrafeasV1LayerDetails {
+    /// The base images the layer is found within.
+    #[serde(rename = "baseImages")]
+    pub base_images: Option<Vec<GrafeasV1BaseImage>>,
+    /// The layer chain ID (sha256 hash) of the layer in the container image. https://github.com/opencontainers/image-spec/blob/main/config.md#layer-chainid
+    #[serde(rename = "chainId")]
+    pub chain_id: Option<String>,
+    /// The layer build command that was used to build the layer. This may not be found in all layers depending on how the container image is built.
+    pub command: Option<String>,
+    /// The diff ID (typically a sha256 hash) of the layer in the container image.
+    #[serde(rename = "diffId")]
+    pub diff_id: Option<String>,
+    /// The index of the layer in the container image.
+    pub index: Option<i32>,
+}
+
+impl common::Part for GrafeasV1LayerDetails {}
 
 /// Identifies the entity that executed the recipe, which is trusted to have correctly performed the operation and populated this provenance.
 ///
@@ -1119,6 +1245,31 @@ pub struct Layer {
 
 impl common::Part for Layer {}
 
+/// Details about the layer a package was found in.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct LayerDetails {
+    /// The base images the layer is found within.
+    #[serde(rename = "baseImages")]
+    pub base_images: Option<Vec<BaseImage>>,
+    /// The layer chain ID (sha256 hash) of the layer in the container image. https://github.com/opencontainers/image-spec/blob/main/config.md#layer-chainid
+    #[serde(rename = "chainId")]
+    pub chain_id: Option<String>,
+    /// The layer build command that was used to build the layer. This may not be found in all layers depending on how the container image is built.
+    pub command: Option<String>,
+    /// The diff ID (sha256 hash) of the layer in the container image.
+    #[serde(rename = "diffId")]
+    pub diff_id: Option<String>,
+    /// The index of the layer in the container image.
+    pub index: Option<i32>,
+}
+
+impl common::Part for LayerDetails {}
+
 /// License information.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1152,6 +1303,8 @@ pub struct ListOperationsResponse {
     pub next_page_token: Option<String>,
     /// A list of operations that matches the specified filter in the request.
     pub operations: Option<Vec<Operation>>,
+    /// Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListOperationsResponse {}
@@ -1321,6 +1474,8 @@ pub struct Occurrence {
     /// Describes a specific SBOM reference occurrences.
     #[serde(rename = "sbomReference")]
     pub sbom_reference: Option<SBOMReferenceOccurrence>,
+    /// Describes a secret.
+    pub secret: Option<SecretOccurrence>,
     /// Output only. The time this occurrence was last updated.
     #[serde(rename = "updateTime")]
     pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -1388,6 +1543,9 @@ pub struct PackageData {
     /// HashDigest stores the SHA512 hash digest of the jar file if the package is of type Maven. This field will be unset for non Maven packages.
     #[serde(rename = "hashDigest")]
     pub hash_digest: Option<String>,
+    /// no description provided
+    #[serde(rename = "layerDetails")]
+    pub layer_details: Option<LayerDetails>,
     /// The list of licenses found that are related to a given package. Note that licenses may also be stored on the BinarySourceInfo. If there is no BinarySourceInfo (because there's no concept of source vs binary), then it will be stored here, while if there are BinarySourceInfos, it will be stored there, as one source can have multiple binaries with different licenses.
     pub licenses: Option<Vec<String>>,
     /// The maintainer of the package.
@@ -1402,7 +1560,7 @@ pub struct PackageData {
     /// The type of package: os, maven, go, etc.
     #[serde(rename = "packageType")]
     pub package_type: Option<String>,
-    /// CVEs that this package is no longer vulnerable to go/drydock-dd-custom-binary-scanning
+    /// CVEs that this package is no longer vulnerable to
     #[serde(rename = "patchedCve")]
     pub patched_cve: Option<Vec<String>>,
     /// DEPRECATED
@@ -1656,6 +1814,23 @@ impl common::Part for ResourceDescriptor {}
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Risk {
+    /// CISA maintains the authoritative source of vulnerabilities that have been exploited in the wild.
+    #[serde(rename = "cisaKev")]
+    pub cisa_kev: Option<CISAKnownExploitedVulnerabilities>,
+    /// The Exploit Prediction Scoring System (EPSS) estimates the likelihood (probability) that a software vulnerability will be exploited in the wild.
+    pub epss: Option<ExploitPredictionScoringSystem>,
+}
+
+impl common::Part for Risk {}
+
+/// There is no detailed description.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RunDetails {
     /// no description provided
     pub builder: Option<ProvenanceBuilder>,
@@ -1745,6 +1920,58 @@ pub struct SbomReferenceIntotoPredicate {
 }
 
 impl common::Part for SbomReferenceIntotoPredicate {}
+
+/// The location of the secret.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SecretLocation {
+    /// The secret is found from a file.
+    #[serde(rename = "fileLocation")]
+    pub file_location: Option<GrafeasV1FileLocation>,
+}
+
+impl common::Part for SecretLocation {}
+
+/// The occurrence provides details of a secret.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SecretOccurrence {
+    /// Required. Type of secret.
+    pub kind: Option<String>,
+    /// Optional. Locations where the secret is detected.
+    pub locations: Option<Vec<SecretLocation>>,
+    /// Optional. Status of the secret.
+    pub statuses: Option<Vec<SecretStatus>>,
+}
+
+impl common::Part for SecretOccurrence {}
+
+/// The status of the secret with a timestamp.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SecretStatus {
+    /// Optional. Optional message about the status code.
+    pub message: Option<String>,
+    /// Optional. The status of the secret.
+    pub status: Option<String>,
+    /// Optional. The time the secret status was last updated.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::Part for SecretStatus {}
 
 /// Verifiers (e.g. Kritis implementations) MUST verify signatures with respect to the trust anchors defined in policy (e.g. a Kritis policy). Typically this means that the verifier has been configured with a map from `public_key_id` to public key material (and any required parameters, e.g. signing algorithm). In particular, verification implementations MUST NOT treat the signature `public_key_id` as anything more than a key lookup hint. The `public_key_id` DOES NOT validate or authenticate a public key; it only provides a mechanism for quickly selecting a public key ALREADY CONFIGURED on the verifier through a trusted channel. Verification implementations MUST reject signatures in any of the following circumstances: * The `public_key_id` is not recognized by the verifier. * The public key that `public_key_id` refers to does not verify the signature with respect to the payload. The `signature` contents SHOULD NOT be "attached" (where the payload is included with the serialized `signature` bytes). Verifiers MUST ignore any "attached" payload and only verify signatures with respect to explicitly provided payload (e.g. a `payload` field on the proto message that holds this Signature, or the canonical serialization of the proto message that holds this signature).
 ///
@@ -2088,25 +2315,6 @@ pub struct VexAssessment {
 
 impl common::Part for VexAssessment {}
 
-/// The status of an vulnerability attestation generation.
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct VulnerabilityAttestation {
-    /// If failure, the error reason for why the attestation generation failed.
-    pub error: Option<String>,
-    /// The last time we attempted to generate an attestation.
-    #[serde(rename = "lastAttemptTime")]
-    pub last_attempt_time: Option<chrono::DateTime<chrono::offset::Utc>>,
-    /// The success/failure state of the latest attestation attempt.
-    pub state: Option<String>,
-}
-
-impl common::Part for VulnerabilityAttestation {}
-
 /// An occurrence of a severity vulnerability on a resource.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2144,6 +2352,8 @@ pub struct VulnerabilityOccurrence {
     /// Output only. URLs related to this vulnerability.
     #[serde(rename = "relatedUrls")]
     pub related_urls: Option<Vec<RelatedUrl>>,
+    /// Risk information about the vulnerability, such as CISA, EPSS, etc.
+    pub risk: Option<Risk>,
     /// Output only. The note provider assigned severity of this vulnerability.
     pub severity: Option<String>,
     /// Output only. A one sentence description of this vulnerability.
@@ -2208,9 +2418,20 @@ impl common::Part for WindowsUpdate {}
 /// use ondemandscanning1::{OnDemandScanning, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2221,7 +2442,7 @@ impl common::Part for WindowsUpdate {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = OnDemandScanning::new(client, auth);
@@ -2243,7 +2464,7 @@ impl<'a, C> common::MethodsBuilder for ProjectMethods<'a, C> {}
 impl<'a, C> ProjectMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
     ///
     /// # Arguments
     ///
@@ -2309,6 +2530,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
@@ -2386,7 +2608,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 // CallBuilders   ###
 // #################
 
-/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
 ///
 /// A builder for the *locations.operations.cancel* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -2403,9 +2625,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use ondemandscanning1::{OnDemandScanning, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2416,7 +2649,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = OnDemandScanning::new(client, auth);
@@ -2689,9 +2922,20 @@ where
 /// # use ondemandscanning1::{OnDemandScanning, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2702,7 +2946,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = OnDemandScanning::new(client, auth);
@@ -2975,9 +3219,20 @@ where
 /// # use ondemandscanning1::{OnDemandScanning, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2988,7 +3243,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = OnDemandScanning::new(client, auth);
@@ -3261,9 +3516,20 @@ where
 /// # use ondemandscanning1::{OnDemandScanning, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3274,7 +3540,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = OnDemandScanning::new(client, auth);
@@ -3282,9 +3548,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("amet.")
-///              .page_size(-20)
-///              .filter("ipsum")
+///              .return_partial_success(true)
+///              .page_token("duo")
+///              .page_size(-55)
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3294,6 +3561,7 @@ where
 {
     hub: &'a OnDemandScanning<C>,
     _name: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -3323,15 +3591,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -3460,6 +3740,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `"projects/example/locations/-"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationOperationListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -3583,9 +3873,20 @@ where
 /// # use ondemandscanning1::{OnDemandScanning, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3596,7 +3897,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = OnDemandScanning::new(client, auth);
@@ -3604,7 +3905,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_wait("name")
-///              .timeout(chrono::Duration::seconds(6569141))
+///              .timeout(chrono::Duration::seconds(3438423))
 ///              .doit().await;
 /// # }
 /// ```
@@ -3884,9 +4185,20 @@ where
 /// # use ondemandscanning1::{OnDemandScanning, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3897,7 +4209,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = OnDemandScanning::new(client, auth);
@@ -3905,8 +4217,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_scans_vulnerabilities_list("parent")
-///              .page_token("eos")
-///              .page_size(-4)
+///              .page_token("ea")
+///              .page_size(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4200,9 +4512,20 @@ where
 /// # use ondemandscanning1::{OnDemandScanning, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4213,7 +4536,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = OnDemandScanning::new(client, auth);

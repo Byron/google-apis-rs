@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *6.0.0+20240618*, where *20240618* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *drive* crate version *7.0.0+20251218*, where *20251218* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *drive* *v3* API can be found at the
-//! [official documentation site](https://developers.google.com/drive/).
+//! [official documentation site](https://developers.google.com/workspace/drive/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/drive3).
 //! # Features
 //!
@@ -13,6 +13,10 @@
 //!
 //! * [about](api::About)
 //!  * [*get*](api::AboutGetCall)
+//! * accessproposals
+//!  * [*get*](api::AccessproposalGetCall), [*list*](api::AccessproposalListCall) and [*resolve*](api::AccessproposalResolveCall)
+//! * [approvals](api::Approval)
+//!  * [*get*](api::ApprovalGetCall) and [*list*](api::ApprovalListCall)
 //! * [apps](api::App)
 //!  * [*get*](api::AppGetCall) and [*list*](api::AppListCall)
 //! * [changes](api::Change)
@@ -24,7 +28,9 @@
 //! * [drives](api::Drive)
 //!  * [*create*](api::DriveCreateCall), [*delete*](api::DriveDeleteCall), [*get*](api::DriveGetCall), [*hide*](api::DriveHideCall), [*list*](api::DriveListCall), [*unhide*](api::DriveUnhideCall) and [*update*](api::DriveUpdateCall)
 //! * [files](api::File)
-//!  * [*copy*](api::FileCopyCall), [*create*](api::FileCreateCall), [*delete*](api::FileDeleteCall), [*empty trash*](api::FileEmptyTrashCall), [*export*](api::FileExportCall), [*generate ids*](api::FileGenerateIdCall), [*get*](api::FileGetCall), [*list*](api::FileListCall), [*list labels*](api::FileListLabelCall), [*modify labels*](api::FileModifyLabelCall), [*update*](api::FileUpdateCall) and [*watch*](api::FileWatchCall)
+//!  * [*copy*](api::FileCopyCall), [*create*](api::FileCreateCall), [*delete*](api::FileDeleteCall), [*download*](api::FileDownloadCall), [*empty trash*](api::FileEmptyTrashCall), [*export*](api::FileExportCall), [*generate ids*](api::FileGenerateIdCall), [*get*](api::FileGetCall), [*list*](api::FileListCall), [*list labels*](api::FileListLabelCall), [*modify labels*](api::FileModifyLabelCall), [*update*](api::FileUpdateCall) and [*watch*](api::FileWatchCall)
+//! * [operations](api::Operation)
+//!  * [*get*](api::OperationGetCall)
 //! * [permissions](api::Permission)
 //!  * [*create*](api::PermissionCreateCall), [*delete*](api::PermissionDeleteCall), [*get*](api::PermissionGetCall), [*list*](api::PermissionListCall) and [*update*](api::PermissionUpdateCall)
 //! * [replies](api::Reply)
@@ -88,6 +94,7 @@
 //! let r = hub.files().copy(...).doit().await
 //! let r = hub.files().create(...).doit().await
 //! let r = hub.files().delete(...).doit().await
+//! let r = hub.files().download(...).doit().await
 //! let r = hub.files().empty_trash(...).doit().await
 //! let r = hub.files().export(...).doit().await
 //! let r = hub.files().generate_ids(...).doit().await
@@ -135,9 +142,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -148,7 +166,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = DriveHub::new(client, auth);

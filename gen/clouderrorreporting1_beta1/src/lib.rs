@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Clouderrorreporting* crate version *6.0.0+20240621*, where *20240621* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Clouderrorreporting* crate version *7.0.0+20251205*, where *20251205* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Clouderrorreporting* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/error-reporting/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Clouderrorreporting) ...
 //!
 //! * projects
-//!  * [*delete events*](api::ProjectDeleteEventCall), [*events list*](api::ProjectEventListCall), [*events report*](api::ProjectEventReportCall), [*group stats list*](api::ProjectGroupStatListCall), [*groups get*](api::ProjectGroupGetCall) and [*groups update*](api::ProjectGroupUpdateCall)
+//!  * [*delete events*](api::ProjectDeleteEventCall), [*events list*](api::ProjectEventListCall), [*events report*](api::ProjectEventReportCall), [*group stats list*](api::ProjectGroupStatListCall), [*groups get*](api::ProjectGroupGetCall), [*groups update*](api::ProjectGroupUpdateCall), [*locations delete events*](api::ProjectLocationDeleteEventCall), [*locations events list*](api::ProjectLocationEventListCall), [*locations group stats list*](api::ProjectLocationGroupStatListCall), [*locations groups get*](api::ProjectLocationGroupGetCall) and [*locations groups update*](api::ProjectLocationGroupUpdateCall)
 //!
 //!
 //!
@@ -49,6 +49,8 @@
 //! ```ignore
 //! let r = hub.projects().groups_get(...).doit().await
 //! let r = hub.projects().groups_update(...).doit().await
+//! let r = hub.projects().locations_groups_get(...).doit().await
+//! let r = hub.projects().locations_groups_update(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -88,9 +90,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -101,7 +114,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Clouderrorreporting::new(client, auth);

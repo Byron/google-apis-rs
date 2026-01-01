@@ -4,12 +4,12 @@
 [package]
 
 name = "google-homegraph1"
-version = "7.0.0+20240621"
+version = "7.0.0+20251218"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Home Graph Service (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/homegraph1"
 homepage = "https://developers.home.google.com/cloud-to-cloud/get-started"
-documentation = "https://docs.rs/google-homegraph1/7.0.0+20240621"
+documentation = "https://docs.rs/google-homegraph1/7.0.0+20251218"
 license = "MIT"
 keywords = ["homegraph", "google", "protocol", "web", "api"]
 autobins = false

@@ -66,7 +66,6 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_storage1 as storage1;
-/// use storage1::api::Object;
 /// use storage1::{Result, Error};
 /// # async fn dox() {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -79,9 +78,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -92,34 +102,21 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Object::default();
-///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .user_project("Stet")
-///              .source_generation(-13)
-///              .rewrite_token("et")
-///              .projection("sed")
-///              .max_bytes_rewritten_per_call(-24)
-///              .if_source_metageneration_not_match(-68)
-///              .if_source_metageneration_match(-76)
-///              .if_source_generation_not_match(-31)
-///              .if_source_generation_match(-93)
-///              .if_metageneration_not_match(-20)
-///              .if_metageneration_match(-34)
-///              .if_generation_not_match(-22)
-///              .if_generation_match(-28)
-///              .destination_predefined_acl("amet.")
-///              .destination_kms_key_name("consetetur")
+/// let result = hub.buckets().list("project")
+///              .user_project("duo")
+///              .soft_deleted(true)
+///              .return_partial_success(false)
+///              .projection("ut")
+///              .prefix("gubergren")
+///              .page_token("rebum.")
+///              .max_results(44)
 ///              .doit().await;
 ///
 /// match result {
@@ -157,7 +154,7 @@ impl<'a, C> Storage<C> {
         Storage {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/7.0.0".to_string(),
             _base_url: "https://storage.googleapis.com/storage/v1/".to_string(),
             _root_url: "https://storage.googleapis.com/".to_string(),
         }
@@ -198,7 +195,7 @@ impl<'a, C> Storage<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/7.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -225,6 +222,28 @@ impl<'a, C> Storage<C> {
 // ############
 // SCHEMAS ###
 // ##########
+/// An AdvanceRelocateBucketOperation request.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [operations advance relocate bucket buckets](BucketOperationAdvanceRelocateBucketCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AdvanceRelocateBucketOperationRequest {
+    /// Specifies the time when the relocation will revert to the sync stage if the relocation hasn't succeeded.
+    #[serde(rename = "expireTime")]
+    pub expire_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Specifies the duration after which the relocation will revert to the sync stage if the relocation hasn't succeeded. Optional, if not supplied, a default value of 12h will be used.
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub ttl: Option<chrono::Duration>,
+}
+
+impl common::RequestValue for AdvanceRelocateBucketOperationRequest {}
+
 /// An Anywhere Cache instance.
 ///
 /// # Activities
@@ -318,9 +337,12 @@ impl common::ResponseResult for AnywhereCaches {}
 /// * [list buckets](BucketListCall) (none)
 /// * [lock retention policy buckets](BucketLockRetentionPolicyCall) (response)
 /// * [patch buckets](BucketPatchCall) (request|response)
+/// * [relocate buckets](BucketRelocateCall) (none)
+/// * [restore buckets](BucketRestoreCall) (response)
 /// * [set iam policy buckets](BucketSetIamPolicyCall) (none)
 /// * [test iam permissions buckets](BucketTestIamPermissionCall) (none)
 /// * [update buckets](BucketUpdateCall) (request|response)
+/// * [operations advance relocate bucket buckets](BucketOperationAdvanceRelocateBucketCall) (none)
 /// * [operations cancel buckets](BucketOperationCancelCall) (none)
 /// * [operations get buckets](BucketOperationGetCall) (none)
 /// * [operations list buckets](BucketOperationListCall) (none)
@@ -349,6 +371,12 @@ pub struct Bucket {
     pub encryption: Option<BucketEncryption>,
     /// HTTP 1.1 Entity tag for the bucket.
     pub etag: Option<String>,
+    /// The generation of this bucket.
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub generation: Option<i64>,
+    /// The hard delete time of the bucket in RFC 3339 format.
+    #[serde(rename = "hardDeleteTime")]
+    pub hard_delete_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// The bucket's hierarchical namespace configuration.
     #[serde(rename = "hierarchicalNamespace")]
     pub hierarchical_namespace: Option<BucketHierarchicalNamespace>,
@@ -357,13 +385,16 @@ pub struct Bucket {
     pub iam_configuration: Option<BucketIamConfiguration>,
     /// The ID of the bucket. For buckets, the id and name properties are the same.
     pub id: Option<String>,
+    /// The bucket's IP filter configuration. Specifies the network sources that are allowed to access the operations on the bucket, as well as its underlying objects. Only enforced when the mode is set to 'Enabled'.
+    #[serde(rename = "ipFilter")]
+    pub ip_filter: Option<BucketIpFilter>,
     /// The kind of item this is. For buckets, this is always storage#bucket.
     pub kind: Option<String>,
     /// User-provided labels, in key/value pairs.
     pub labels: Option<HashMap<String, String>>,
-    /// The bucket's lifecycle configuration. See lifecycle management for more information.
+    /// The bucket's lifecycle configuration. See [Lifecycle Management](https://cloud.google.com/storage/docs/lifecycle) for more information.
     pub lifecycle: Option<BucketLifecycle>,
-    /// The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer's guide for the authoritative list.
+    /// The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the [Developer's Guide](https://cloud.google.com/storage/docs/locations) for the authoritative list.
     pub location: Option<String>,
     /// The type of the bucket location.
     #[serde(rename = "locationType")]
@@ -390,6 +421,9 @@ pub struct Bucket {
     /// The Recovery Point Objective (RPO) of this bucket. Set to ASYNC_TURBO to turn on Turbo Replication on a bucket.
     pub rpo: Option<String>,
     /// Reserved for future use.
+    #[serde(rename = "satisfiesPZI")]
+    pub satisfies_pzi: Option<bool>,
+    /// Reserved for future use.
     #[serde(rename = "satisfiesPZS")]
     pub satisfies_pzs: Option<bool>,
     /// The URI of this bucket.
@@ -398,7 +432,10 @@ pub struct Bucket {
     /// The bucket's soft delete policy, which defines the period of time that soft-deleted objects will be retained, and cannot be permanently deleted.
     #[serde(rename = "softDeletePolicy")]
     pub soft_delete_policy: Option<BucketSoftDeletePolicy>,
-    /// The bucket's default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, ARCHIVE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.
+    /// The soft delete time of the bucket in RFC 3339 format.
+    #[serde(rename = "softDeleteTime")]
+    pub soft_delete_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The bucket's default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, ARCHIVE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see [Storage Classes](https://cloud.google.com/storage/docs/storage-classes).
     #[serde(rename = "storageClass")]
     pub storage_class: Option<String>,
     /// The creation time of the bucket in RFC 3339 format.
@@ -408,7 +445,7 @@ pub struct Bucket {
     pub updated: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// The bucket's versioning configuration.
     pub versioning: Option<BucketVersioning>,
-    /// The bucket's website configuration, controlling how the service behaves when accessing bucket contents as a web site. See the Static Website Examples for more information.
+    /// The bucket's website configuration, controlling how the service behaves when accessing bucket contents as a web site. See the [Static Website Examples](https://cloud.google.com/storage/docs/static-website) for more information.
     pub website: Option<BucketWebsite>,
 }
 
@@ -545,6 +582,8 @@ pub struct Buckets {
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
+    /// The list of bucket resource names that could not be reached during the listing operation.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for Buckets {}
@@ -567,6 +606,12 @@ pub struct BulkRestoreObjectsRequest {
     /// If true, copies the source object's ACL; otherwise, uses the bucket's default object ACL. The default is false.
     #[serde(rename = "copySourceAcl")]
     pub copy_source_acl: Option<bool>,
+    /// Restores only the objects that were created after this time.
+    #[serde(rename = "createdAfterTime")]
+    pub created_after_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Restores only the objects that were created before this time.
+    #[serde(rename = "createdBeforeTime")]
+    pub created_before_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Restores only the objects matching any of the specified glob(s). If this parameter is not specified, all objects will be restored within the specified time range.
     #[serde(rename = "matchGlobs")]
     pub match_globs: Option<Vec<String>>,
@@ -635,6 +680,9 @@ impl common::ResponseResult for Channel {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ComposeRequest {
+    /// If true, the source objects will be deleted.
+    #[serde(rename = "deleteSourceObjects")]
+    pub delete_source_objects: Option<bool>,
     /// Properties of the resulting object.
     pub destination: Option<Object>,
     /// The kind of item this is.
@@ -766,6 +814,7 @@ impl common::ResponseResult for GoogleLongrunningListOperationsResponse {}
 ///
 /// * [insert anywhere caches](AnywhereCachInsertCall) (response)
 /// * [update anywhere caches](AnywhereCachUpdateCall) (response)
+/// * [relocate buckets](BucketRelocateCall) (response)
 /// * [rename folders](FolderRenameCall) (response)
 /// * [bulk restore objects](ObjectBulkRestoreCall) (response)
 /// * [operations get buckets](BucketOperationGetCall) (response)
@@ -1040,6 +1089,7 @@ impl common::ResponseResult for Notifications {}
 /// * [get iam policy objects](ObjectGetIamPolicyCall) (none)
 /// * [insert objects](ObjectInsertCall) (request|response)
 /// * [list objects](ObjectListCall) (none)
+/// * [move objects](ObjectMoveCall) (response)
 /// * [patch objects](ObjectPatchCall) (request|response)
 /// * [restore objects](ObjectRestoreCall) (response)
 /// * [rewrite objects](ObjectRewriteCall) (request)
@@ -1073,7 +1123,9 @@ pub struct Object {
     /// Content-Type of the object data. If an object is stored without a Content-Type, it is served as application/octet-stream.
     #[serde(rename = "contentType")]
     pub content_type: Option<String>,
-    /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64 in big-endian byte order. For more information about using the CRC32c checksum, see Hashes and ETags: Best Practices.
+    /// User-defined or system-defined object contexts. Each object context is a key-payload pair, where the key provides the identification and the payload holds the associated value and additional metadata.
+    pub contexts: Option<ObjectContexts>,
+    /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64 in big-endian byte order. For more information about using the CRC32c checksum, see [Data Validation and Change Detection](https://cloud.google.com/storage/docs/data-validation).
     pub crc32c: Option<String>,
     /// A timestamp in RFC 3339 format specified by the user for an object.
     #[serde(rename = "customTime")]
@@ -1099,7 +1151,7 @@ pub struct Object {
     /// Not currently supported. Specifying the parameter causes the request to fail with status code 400 - Bad Request.
     #[serde(rename = "kmsKeyName")]
     pub kms_key_name: Option<String>,
-    /// MD5 hash of the data; encoded using base64. For more information about using the MD5 hash, see Hashes and ETags: Best Practices.
+    /// MD5 hash of the data; encoded using base64. For more information about using the MD5 hash, see [Data Validation and Change Detection](https://cloud.google.com/storage/docs/data-validation).
     #[serde(rename = "md5Hash")]
     pub md5_hash: Option<String>,
     /// Media download link.
@@ -1114,6 +1166,9 @@ pub struct Object {
     pub name: Option<String>,
     /// The owner of the object. This will always be the uploader of the object.
     pub owner: Option<ObjectOwner>,
+    /// Restore token used to differentiate deleted objects with the same name and generation. This field is only returned for deleted objects in hierarchical namespace buckets.
+    #[serde(rename = "restoreToken")]
+    pub restore_token: Option<String>,
     /// A collection of object level retention parameters.
     pub retention: Option<ObjectRetention>,
     /// A server-determined value that specifies the earliest time that the object's retention period expires. This value is in RFC 3339 format. Note 1: This field is not provided for objects with an active event-based hold, since retention expiration is unknown until the hold is removed. Note 2: This value can be provided even when temporary hold is set (so that the user can reason about policy without having to first unset the temporary hold).
@@ -1140,6 +1195,9 @@ pub struct Object {
     /// The time at which the object became noncurrent in RFC 3339 format. Will be returned if and only if this version of the object has been deleted.
     #[serde(rename = "timeDeleted")]
     pub time_deleted: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The time when the object was finalized.
+    #[serde(rename = "timeFinalized")]
+    pub time_finalized: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// The time at which the object's storage class was last changed. When the object is initially created, it will be set to timeCreated.
     #[serde(rename = "timeStorageClassUpdated")]
     pub time_storage_class_updated: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -1240,6 +1298,26 @@ pub struct ObjectAccessControls {
 
 impl common::ResponseResult for ObjectAccessControls {}
 
+/// The payload of a single user-defined object context.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ObjectCustomContextPayload {
+    /// The time at which the object context was created in RFC 3339 format.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The time at which the object context was last updated in RFC 3339 format.
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The value of the object context.
+    pub value: Option<String>,
+}
+
+impl common::Part for ObjectCustomContextPayload {}
+
 /// A list of objects.
 ///
 /// # Activities
@@ -1298,6 +1376,32 @@ pub struct Policy {
 
 impl common::RequestValue for Policy {}
 impl common::ResponseResult for Policy {}
+
+/// A Relocate Bucket request.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [relocate buckets](BucketRelocateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RelocateBucketRequest {
+    /// The bucket's new custom placement configuration if relocating to a Custom Dual Region.
+    #[serde(rename = "destinationCustomPlacementConfig")]
+    pub destination_custom_placement_config:
+        Option<RelocateBucketRequestDestinationCustomPlacementConfig>,
+    /// The new location the bucket will be relocated to.
+    #[serde(rename = "destinationLocation")]
+    pub destination_location: Option<String>,
+    /// If true, validate the operation, but do not actually relocate the bucket.
+    #[serde(rename = "validateOnly")]
+    pub validate_only: Option<bool>,
+}
+
+impl common::RequestValue for RelocateBucketRequest {}
 
 /// A rewrite response.
 ///
@@ -1369,26 +1473,26 @@ pub struct TestIamPermissionsResponse {
     /// The kind of item this is.
     pub kind: Option<String>,
     /// The permissions held by the caller. Permissions are always of the format storage.resource.capability, where resource is one of buckets, objects, or managedFolders. The supported permissions are as follows:  
-    /// - storage.buckets.delete — Delete bucket.  
-    /// - storage.buckets.get — Read bucket metadata.  
-    /// - storage.buckets.getIamPolicy — Read bucket IAM policy.  
-    /// - storage.buckets.create — Create bucket.  
-    /// - storage.buckets.list — List buckets.  
-    /// - storage.buckets.setIamPolicy — Update bucket IAM policy.  
-    /// - storage.buckets.update — Update bucket metadata.  
-    /// - storage.objects.delete — Delete object.  
-    /// - storage.objects.get — Read object data and metadata.  
-    /// - storage.objects.getIamPolicy — Read object IAM policy.  
-    /// - storage.objects.create — Create object.  
-    /// - storage.objects.list — List objects.  
-    /// - storage.objects.setIamPolicy — Update object IAM policy.  
-    /// - storage.objects.update — Update object metadata.
-    /// - storage.managedFolders.delete — Delete managed folder.  
-    /// - storage.managedFolders.get — Read managed folder metadata.  
-    /// - storage.managedFolders.getIamPolicy — Read managed folder IAM policy.  
-    /// - storage.managedFolders.create — Create managed folder.  
-    /// - storage.managedFolders.list — List managed folders.  
-    /// - storage.managedFolders.setIamPolicy — Update managed folder IAM policy.
+    /// - storage.buckets.delete - Delete bucket.  
+    /// - storage.buckets.get - Read bucket metadata.  
+    /// - storage.buckets.getIamPolicy - Read bucket IAM policy.  
+    /// - storage.buckets.create - Create bucket.  
+    /// - storage.buckets.list - List buckets.  
+    /// - storage.buckets.setIamPolicy - Update bucket IAM policy.  
+    /// - storage.buckets.update - Update bucket metadata.  
+    /// - storage.objects.delete - Delete object.  
+    /// - storage.objects.get - Read object data and metadata.  
+    /// - storage.objects.getIamPolicy - Read object IAM policy.  
+    /// - storage.objects.create - Create object.  
+    /// - storage.objects.list - List objects.  
+    /// - storage.objects.setIamPolicy - Update object IAM policy.  
+    /// - storage.objects.update - Update object metadata.
+    /// - storage.managedFolders.delete - Delete managed folder.  
+    /// - storage.managedFolders.get - Read managed folder metadata.  
+    /// - storage.managedFolders.getIamPolicy - Read managed folder IAM policy.  
+    /// - storage.managedFolders.create - Create managed folder.  
+    /// - storage.managedFolders.list - List managed folders.  
+    /// - storage.managedFolders.setIamPolicy - Update managed folder IAM policy.
     pub permissions: Option<Vec<String>>,
 }
 
@@ -1481,13 +1585,82 @@ impl common::Part for BucketCustomPlacementConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BucketEncryption {
+    /// If set, the new objects created in this bucket must comply with this enforcement config. Changing this has no effect on existing objects; it applies to new objects only. If omitted, the new objects are allowed to be encrypted with Customer Managed Encryption type by default.
+    #[serde(rename = "customerManagedEncryptionEnforcementConfig")]
+    pub customer_managed_encryption_enforcement_config:
+        Option<BucketEncryptionCustomerManagedEncryptionEnforcementConfig>,
+    /// If set, the new objects created in this bucket must comply with this enforcement config. Changing this has no effect on existing objects; it applies to new objects only. If omitted, the new objects are allowed to be encrypted with Customer Supplied Encryption type by default.
+    #[serde(rename = "customerSuppliedEncryptionEnforcementConfig")]
+    pub customer_supplied_encryption_enforcement_config:
+        Option<BucketEncryptionCustomerSuppliedEncryptionEnforcementConfig>,
     /// A Cloud KMS key that will be used to encrypt objects inserted into this bucket, if no encryption method is specified.
     #[serde(rename = "defaultKmsKeyName")]
     pub default_kms_key_name: Option<String>,
+    /// If set, the new objects created in this bucket must comply with this enforcement config. Changing this has no effect on existing objects; it applies to new objects only. If omitted, the new objects are allowed to be encrypted with Google Managed Encryption type by default.
+    #[serde(rename = "googleManagedEncryptionEnforcementConfig")]
+    pub google_managed_encryption_enforcement_config:
+        Option<BucketEncryptionGoogleManagedEncryptionEnforcementConfig>,
 }
 
 impl common::NestedType for BucketEncryption {}
 impl common::Part for BucketEncryption {}
+
+/// If set, the new objects created in this bucket must comply with this enforcement config. Changing this has no effect on existing objects; it applies to new objects only. If omitted, the new objects are allowed to be encrypted with Customer Managed Encryption type by default.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BucketEncryptionCustomerManagedEncryptionEnforcementConfig {
+    /// Server-determined value that indicates the time from which configuration was enforced and effective. This value is in RFC 3339 format.
+    #[serde(rename = "effectiveTime")]
+    pub effective_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Restriction mode for Customer-Managed Encryption Keys. Defaults to NotRestricted.
+    #[serde(rename = "restrictionMode")]
+    pub restriction_mode: Option<String>,
+}
+
+impl common::NestedType for BucketEncryptionCustomerManagedEncryptionEnforcementConfig {}
+impl common::Part for BucketEncryptionCustomerManagedEncryptionEnforcementConfig {}
+
+/// If set, the new objects created in this bucket must comply with this enforcement config. Changing this has no effect on existing objects; it applies to new objects only. If omitted, the new objects are allowed to be encrypted with Customer Supplied Encryption type by default.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BucketEncryptionCustomerSuppliedEncryptionEnforcementConfig {
+    /// Server-determined value that indicates the time from which configuration was enforced and effective. This value is in RFC 3339 format.
+    #[serde(rename = "effectiveTime")]
+    pub effective_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Restriction mode for Customer-Supplied Encryption Keys. Defaults to NotRestricted.
+    #[serde(rename = "restrictionMode")]
+    pub restriction_mode: Option<String>,
+}
+
+impl common::NestedType for BucketEncryptionCustomerSuppliedEncryptionEnforcementConfig {}
+impl common::Part for BucketEncryptionCustomerSuppliedEncryptionEnforcementConfig {}
+
+/// If set, the new objects created in this bucket must comply with this enforcement config. Changing this has no effect on existing objects; it applies to new objects only. If omitted, the new objects are allowed to be encrypted with Google Managed Encryption type by default.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BucketEncryptionGoogleManagedEncryptionEnforcementConfig {
+    /// Server-determined value that indicates the time from which configuration was enforced and effective. This value is in RFC 3339 format.
+    #[serde(rename = "effectiveTime")]
+    pub effective_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// Restriction mode for Google-Managed Encryption Keys. Defaults to NotRestricted.
+    #[serde(rename = "restrictionMode")]
+    pub restriction_mode: Option<String>,
+}
+
+impl common::NestedType for BucketEncryptionGoogleManagedEncryptionEnforcementConfig {}
+impl common::Part for BucketEncryptionGoogleManagedEncryptionEnforcementConfig {}
 
 /// The bucket's hierarchical namespace configuration.
 ///
@@ -1562,7 +1735,68 @@ pub struct BucketIamConfigurationUniformBucketLevelAccess {
 impl common::NestedType for BucketIamConfigurationUniformBucketLevelAccess {}
 impl common::Part for BucketIamConfigurationUniformBucketLevelAccess {}
 
-/// The bucket's lifecycle configuration. See lifecycle management for more information.
+/// The bucket's IP filter configuration. Specifies the network sources that are allowed to access the operations on the bucket, as well as its underlying objects. Only enforced when the mode is set to 'Enabled'.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BucketIpFilter {
+    /// Whether to allow all service agents to access the bucket regardless of the IP filter configuration.
+    #[serde(rename = "allowAllServiceAgentAccess")]
+    pub allow_all_service_agent_access: Option<bool>,
+    /// Whether to allow cross-org VPCs in the bucket's IP filter configuration.
+    #[serde(rename = "allowCrossOrgVpcs")]
+    pub allow_cross_org_vpcs: Option<bool>,
+    /// The mode of the IP filter. Valid values are 'Enabled' and 'Disabled'.
+    pub mode: Option<String>,
+    /// The public network source of the bucket's IP filter.
+    #[serde(rename = "publicNetworkSource")]
+    pub public_network_source: Option<BucketIpFilterPublicNetworkSource>,
+    /// The list of [VPC network](https://cloud.google.com/vpc/docs/vpc) sources of the bucket's IP filter.
+    #[serde(rename = "vpcNetworkSources")]
+    pub vpc_network_sources: Option<Vec<BucketIpFilterVpcNetworkSources>>,
+}
+
+impl common::NestedType for BucketIpFilter {}
+impl common::Part for BucketIpFilter {}
+
+/// The public network source of the bucket's IP filter.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BucketIpFilterPublicNetworkSource {
+    /// The list of public IPv4, IPv6 cidr ranges that are allowed to access the bucket.
+    #[serde(rename = "allowedIpCidrRanges")]
+    pub allowed_ip_cidr_ranges: Option<Vec<String>>,
+}
+
+impl common::NestedType for BucketIpFilterPublicNetworkSource {}
+impl common::Part for BucketIpFilterPublicNetworkSource {}
+
+/// The list of [VPC network](https://cloud.google.com/vpc/docs/vpc) sources of the bucket's IP filter.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BucketIpFilterVpcNetworkSources {
+    /// The list of IPv4, IPv6 cidr ranges subnetworks that are allowed to access the bucket.
+    #[serde(rename = "allowedIpCidrRanges")]
+    pub allowed_ip_cidr_ranges: Option<Vec<String>>,
+    /// Name of the network. Format: projects/{PROJECT_ID}/global/networks/{NETWORK_NAME}
+    pub network: Option<String>,
+}
+
+impl common::NestedType for BucketIpFilterVpcNetworkSources {}
+impl common::Part for BucketIpFilterVpcNetworkSources {}
+
+/// The bucket's lifecycle configuration. See [Lifecycle Management](https://cloud.google.com/storage/docs/lifecycle) for more information.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1771,7 +2005,7 @@ pub struct BucketVersioning {
 impl common::NestedType for BucketVersioning {}
 impl common::Part for BucketVersioning {}
 
-/// The bucket's website configuration, controlling how the service behaves when accessing bucket contents as a web site. See the Static Website Examples for more information.
+/// The bucket's website configuration, controlling how the service behaves when accessing bucket contents as a web site. See the [Static Website Examples](https://cloud.google.com/storage/docs/static-website) for more information.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1893,6 +2127,21 @@ pub struct FolderPendingRenameInfo {
 impl common::NestedType for FolderPendingRenameInfo {}
 impl common::Part for FolderPendingRenameInfo {}
 
+/// User-defined or system-defined object contexts. Each object context is a key-payload pair, where the key provides the identification and the payload holds the associated value and additional metadata.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ObjectContexts {
+    /// User-defined object contexts.
+    pub custom: Option<HashMap<String, ObjectCustomContextPayload>>,
+}
+
+impl common::NestedType for ObjectContexts {}
+impl common::Part for ObjectContexts {}
+
 /// Metadata of customer-supplied encryption key, if the object is encrypted by such a key.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1977,32 +2226,48 @@ pub struct PolicyBindings {
     /// The condition that is associated with this binding. NOTE: an unsatisfied condition will not allow user access via current binding. Different bindings, including their conditions, are examined independently.
     pub condition: Option<Expr>,
     /// A collection of identifiers for members who may assume the provided role. Recognized identifiers are as follows:  
-    /// - allUsers — A special identifier that represents anyone on the internet; with or without a Google account.  
-    /// - allAuthenticatedUsers — A special identifier that represents anyone who is authenticated with a Google account or a service account.  
-    /// - user:emailid — An email address that represents a specific account. For example, user:alice@gmail.com or user:joe@example.com.  
-    /// - serviceAccount:emailid — An email address that represents a service account. For example,  serviceAccount:my-other-app@appspot.gserviceaccount.com .  
-    /// - group:emailid — An email address that represents a Google group. For example, group:admins@example.com.  
-    /// - domain:domain — A Google Apps domain name that represents all the users of that domain. For example, domain:google.com or domain:example.com.  
-    /// - projectOwner:projectid — Owners of the given project. For example, projectOwner:my-example-project  
-    /// - projectEditor:projectid — Editors of the given project. For example, projectEditor:my-example-project  
-    /// - projectViewer:projectid — Viewers of the given project. For example, projectViewer:my-example-project
+    /// - allUsers - A special identifier that represents anyone on the internet; with or without a Google account.  
+    /// - allAuthenticatedUsers - A special identifier that represents anyone who is authenticated with a Google account or a service account.  
+    /// - user:emailid - An email address that represents a specific account. For example, user:alice@gmail.com or user:joe@example.com.  
+    /// - serviceAccount:emailid - An email address that represents a service account. For example,  serviceAccount:my-other-app@appspot.gserviceaccount.com .  
+    /// - group:emailid - An email address that represents a Google group. For example, group:admins@example.com.  
+    /// - domain:domain - A Google Apps domain name that represents all the users of that domain. For example, domain:google.com or domain:example.com.  
+    /// - projectOwner:projectid - Owners of the given project. For example, projectOwner:my-example-project  
+    /// - projectEditor:projectid - Editors of the given project. For example, projectEditor:my-example-project  
+    /// - projectViewer:projectid - Viewers of the given project. For example, projectViewer:my-example-project
     pub members: Option<Vec<String>>,
     /// The role to which members belong. Two types of roles are supported: new IAM roles, which grant permissions that do not map directly to those provided by ACLs, and legacy IAM roles, which do map directly to ACL permissions. All roles are of the format roles/storage.specificRole.
     /// The new IAM roles are:  
-    /// - roles/storage.admin — Full control of Google Cloud Storage resources.  
-    /// - roles/storage.objectViewer — Read-Only access to Google Cloud Storage objects.  
-    /// - roles/storage.objectCreator — Access to create objects in Google Cloud Storage.  
-    /// - roles/storage.objectAdmin — Full control of Google Cloud Storage objects.   The legacy IAM roles are:  
-    /// - roles/storage.legacyObjectReader — Read-only access to objects without listing. Equivalent to an ACL entry on an object with the READER role.  
-    /// - roles/storage.legacyObjectOwner — Read/write access to existing objects without listing. Equivalent to an ACL entry on an object with the OWNER role.  
-    /// - roles/storage.legacyBucketReader — Read access to buckets with object listing. Equivalent to an ACL entry on a bucket with the READER role.  
-    /// - roles/storage.legacyBucketWriter — Read access to buckets with object listing/creation/deletion. Equivalent to an ACL entry on a bucket with the WRITER role.  
-    /// - roles/storage.legacyBucketOwner — Read and write access to existing buckets with object listing/creation/deletion. Equivalent to an ACL entry on a bucket with the OWNER role.
+    /// - roles/storage.admin - Full control of Google Cloud Storage resources.  
+    /// - roles/storage.objectViewer - Read-Only access to Google Cloud Storage objects.  
+    /// - roles/storage.objectCreator - Access to create objects in Google Cloud Storage.  
+    /// - roles/storage.objectAdmin - Full control of Google Cloud Storage objects.   The legacy IAM roles are:  
+    /// - roles/storage.legacyObjectReader - Read-only access to objects without listing. Equivalent to an ACL entry on an object with the READER role.  
+    /// - roles/storage.legacyObjectOwner - Read/write access to existing objects without listing. Equivalent to an ACL entry on an object with the OWNER role.  
+    /// - roles/storage.legacyBucketReader - Read access to buckets with object listing. Equivalent to an ACL entry on a bucket with the READER role.  
+    /// - roles/storage.legacyBucketWriter - Read access to buckets with object listing/creation/deletion. Equivalent to an ACL entry on a bucket with the WRITER role.  
+    /// - roles/storage.legacyBucketOwner - Read and write access to existing buckets with object listing/creation/deletion. Equivalent to an ACL entry on a bucket with the OWNER role.
     pub role: Option<String>,
 }
 
 impl common::NestedType for PolicyBindings {}
 impl common::Part for PolicyBindings {}
+
+/// The bucket's new custom placement configuration if relocating to a Custom Dual Region.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RelocateBucketRequestDestinationCustomPlacementConfig {
+    /// The list of regional locations in which data is placed.
+    #[serde(rename = "dataLocations")]
+    pub data_locations: Option<Vec<String>>,
+}
+
+impl common::NestedType for RelocateBucketRequestDestinationCustomPlacementConfig {}
+impl common::Part for RelocateBucketRequestDestinationCustomPlacementConfig {}
 
 // ###################
 // MethodBuilders ###
@@ -2024,9 +2289,20 @@ impl common::Part for PolicyBindings {}
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2037,7 +2313,7 @@ impl common::Part for PolicyBindings {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
@@ -2214,9 +2490,20 @@ impl<'a, C> AnywhereCachMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2227,7 +2514,7 @@ impl<'a, C> AnywhereCachMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
@@ -2400,9 +2687,20 @@ impl<'a, C> BucketAccessControlMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2413,12 +2711,12 @@ impl<'a, C> BucketAccessControlMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `get_storage_layout(...)`, `insert(...)`, `list(...)`, `lock_retention_policy(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)`, `patch(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
+/// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `get_storage_layout(...)`, `insert(...)`, `list(...)`, `lock_retention_policy(...)`, `operations_advance_relocate_bucket(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)`, `patch(...)`, `relocate(...)`, `restore(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.buckets();
 /// # }
@@ -2435,7 +2733,7 @@ impl<'a, C> common::MethodsBuilder for BucketMethods<'a, C> {}
 impl<'a, C> BucketMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes an empty bucket.
+    /// Deletes an empty bucket. Deletions are permanent unless soft delete is enabled on the bucket.
     ///
     /// # Arguments
     ///
@@ -2465,9 +2763,11 @@ impl<'a, C> BucketMethods<'a, C> {
             hub: self.hub,
             _bucket: bucket.to_string(),
             _user_project: Default::default(),
+            _soft_deleted: Default::default(),
             _projection: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
+            _generation: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2547,6 +2847,8 @@ impl<'a, C> BucketMethods<'a, C> {
             hub: self.hub,
             _project: project.to_string(),
             _user_project: Default::default(),
+            _soft_deleted: Default::default(),
+            _return_partial_success: Default::default(),
             _projection: Default::default(),
             _prefix: Default::default(),
             _page_token: Default::default(),
@@ -2600,6 +2902,50 @@ impl<'a, C> BucketMethods<'a, C> {
             _predefined_acl: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Initiates a long-running Relocate Bucket operation on the specified bucket.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of the bucket to be moved.
+    pub fn relocate(
+        &self,
+        request: RelocateBucketRequest,
+        bucket: &str,
+    ) -> BucketRelocateCall<'a, C> {
+        BucketRelocateCall {
+            hub: self.hub,
+            _request: request,
+            _bucket: bucket.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Restores a soft-deleted bucket.
+    ///
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    /// * `generation` - Generation of a bucket.
+    pub fn restore(&self, bucket: &str, generation: i64) -> BucketRestoreCall<'a, C> {
+        BucketRestoreCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _generation: generation,
+            _user_project: Default::default(),
+            _projection: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2669,6 +3015,32 @@ impl<'a, C> BucketMethods<'a, C> {
             _predefined_acl: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Starts asynchronous advancement of the relocate bucket operation in the case of required write downtime, to allow it to lock the bucket at the source location, and proceed with the bucket location swap. The server makes a best effort to advance the relocate bucket operation, but success is not guaranteed.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `bucket` - Name of the bucket to advance the relocate for.
+    /// * `operationId` - ID of the operation resource.
+    pub fn operations_advance_relocate_bucket(
+        &self,
+        request: AdvanceRelocateBucketOperationRequest,
+        bucket: &str,
+        operation_id: &str,
+    ) -> BucketOperationAdvanceRelocateBucketCall<'a, C> {
+        BucketOperationAdvanceRelocateBucketCall {
+            hub: self.hub,
+            _request: request,
+            _bucket: bucket.to_string(),
+            _operation_id: operation_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2758,9 +3130,20 @@ impl<'a, C> BucketMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2771,7 +3154,7 @@ impl<'a, C> BucketMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
@@ -2825,9 +3208,20 @@ impl<'a, C> ChannelMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2838,7 +3232,7 @@ impl<'a, C> ChannelMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
@@ -3017,9 +3411,20 @@ impl<'a, C> DefaultObjectAccessControlMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3030,7 +3435,7 @@ impl<'a, C> DefaultObjectAccessControlMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
@@ -3180,9 +3585,20 @@ impl<'a, C> FolderMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3193,7 +3609,7 @@ impl<'a, C> FolderMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
@@ -3391,9 +3807,20 @@ impl<'a, C> ManagedFolderMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3404,7 +3831,7 @@ impl<'a, C> ManagedFolderMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
@@ -3519,9 +3946,20 @@ impl<'a, C> NotificationMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3532,7 +3970,7 @@ impl<'a, C> NotificationMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
@@ -3736,9 +4174,20 @@ impl<'a, C> ObjectAccessControlMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3749,12 +4198,12 @@ impl<'a, C> ObjectAccessControlMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `bulk_restore(...)`, `compose(...)`, `copy(...)`, `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `patch(...)`, `restore(...)`, `rewrite(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)`, `update(...)` and `watch_all(...)`
+/// // like `bulk_restore(...)`, `compose(...)`, `copy(...)`, `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `move_(...)`, `patch(...)`, `restore(...)`, `rewrite(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)`, `update(...)` and `watch_all(...)`
 /// // to build up your call.
 /// let rb = hub.objects();
 /// # }
@@ -3908,6 +4357,7 @@ impl<'a, C> ObjectMethods<'a, C> {
             _object: object.to_string(),
             _user_project: Default::default(),
             _soft_deleted: Default::default(),
+            _restore_token: Default::default(),
             _projection: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
@@ -3992,8 +4442,45 @@ impl<'a, C> ObjectMethods<'a, C> {
             _match_glob: Default::default(),
             _include_trailing_delimiter: Default::default(),
             _include_folders_as_prefixes: Default::default(),
+            _filter: Default::default(),
             _end_offset: Default::default(),
             _delimiter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Moves the source object to the destination object in the same bucket.
+    ///
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of the bucket in which the object resides.
+    /// * `sourceObject` - Name of the source object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding).
+    /// * `destinationObject` - Name of the destination object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding).
+    pub fn move_(
+        &self,
+        bucket: &str,
+        source_object: &str,
+        destination_object: &str,
+    ) -> ObjectMoveCall<'a, C> {
+        ObjectMoveCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _source_object: source_object.to_string(),
+            _destination_object: destination_object.to_string(),
+            _user_project: Default::default(),
+            _projection: Default::default(),
+            _if_source_metageneration_not_match: Default::default(),
+            _if_source_metageneration_match: Default::default(),
+            _if_source_generation_not_match: Default::default(),
+            _if_source_generation_match: Default::default(),
+            _if_metageneration_not_match: Default::default(),
+            _if_metageneration_match: Default::default(),
+            _if_generation_not_match: Default::default(),
+            _if_generation_match: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -4037,7 +4524,7 @@ impl<'a, C> ObjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `bucket` - Name of the bucket in which the object resides.
-    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding).
     /// * `generation` - Selects a specific revision of this object.
     pub fn restore(&self, bucket: &str, object: &str, generation: i64) -> ObjectRestoreCall<'a, C> {
         ObjectRestoreCall {
@@ -4046,6 +4533,7 @@ impl<'a, C> ObjectMethods<'a, C> {
             _object: object.to_string(),
             _generation: generation,
             _user_project: Default::default(),
+            _restore_token: Default::default(),
             _projection: Default::default(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
@@ -4237,9 +4725,20 @@ impl<'a, C> ObjectMethods<'a, C> {
 /// use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -4250,7 +4749,7 @@ impl<'a, C> ObjectMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Storage::new(client, auth);
@@ -4362,7 +4861,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the state of an HMAC key. See the HMAC Key resource descriptor for valid states.
+    /// Updates the state of an HMAC key. See the [HMAC Key resource descriptor](https://cloud.google.com/storage/docs/json_api/v1/projects/hmacKeys/update#request-body) for valid states.
     ///
     /// # Arguments
     ///
@@ -4427,9 +4926,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4440,7 +4950,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -4502,7 +5012,7 @@ where
             self.hub._base_url.clone() + "b/{bucket}/anywhereCaches/{anywhereCacheId}/disable";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -4674,7 +5184,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4728,9 +5238,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4741,7 +5262,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -4802,7 +5323,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/anywhereCaches/{anywhereCacheId}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -4974,7 +5495,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5029,9 +5550,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5042,7 +5574,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -5107,7 +5639,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/anywhereCaches";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -5294,7 +5826,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5348,9 +5880,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5361,7 +5904,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -5369,8 +5912,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.anywhere_caches().list("bucket")
-///              .page_token("dolor")
-///              .page_size(-20)
+///              .page_token("Lorem")
+///              .page_size(-25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5430,7 +5973,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/anywhereCaches";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -5601,7 +6144,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5655,9 +6198,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5668,7 +6222,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -5730,7 +6284,7 @@ where
             self.hub._base_url.clone() + "b/{bucket}/anywhereCaches/{anywhereCacheId}/pause";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -5902,7 +6456,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5956,9 +6510,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5969,7 +6534,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -6031,7 +6596,7 @@ where
             self.hub._base_url.clone() + "b/{bucket}/anywhereCaches/{anywhereCacheId}/resume";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -6203,7 +6768,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6258,9 +6823,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6271,7 +6847,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -6338,7 +6914,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/anywhereCaches/{anywhereCacheId}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -6540,7 +7116,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6594,9 +7170,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6607,7 +7194,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -6615,7 +7202,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().delete("bucket", "entity")
-///              .user_project("no")
+///              .user_project("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6672,7 +7259,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -6833,7 +7420,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6887,9 +7474,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6900,7 +7498,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -6908,7 +7506,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().get("bucket", "entity")
-///              .user_project("takimata")
+///              .user_project("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6966,7 +7564,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -7140,7 +7738,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7195,9 +7793,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7208,7 +7817,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -7221,7 +7830,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().insert(req, "bucket")
-///              .user_project("voluptua.")
+///              .user_project("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7278,7 +7887,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/acl";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -7475,7 +8084,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7529,9 +8138,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7542,7 +8162,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -7550,7 +8170,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().list("bucket")
-///              .user_project("erat")
+///              .user_project("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7606,7 +8226,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/acl";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -7770,7 +8390,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7825,9 +8445,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7838,7 +8469,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -7851,7 +8482,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().patch(req, "bucket", "entity")
-///              .user_project("sed")
+///              .user_project("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7910,7 +8541,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8117,7 +8748,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8172,9 +8803,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8185,7 +8827,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -8198,7 +8840,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bucket_access_controls().update(req, "bucket", "entity")
-///              .user_project("gubergren")
+///              .user_project("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8257,7 +8899,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/acl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8464,7 +9106,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8501,7 +9143,7 @@ where
     }
 }
 
-/// Permanently deletes an empty bucket.
+/// Deletes an empty bucket. Deletions are permanent unless soft delete is enabled on the bucket.
 ///
 /// A builder for the *delete* method supported by a *bucket* resource.
 /// It is not used directly, but through a [`BucketMethods`] instance.
@@ -8518,9 +9160,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8531,7 +9184,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -8539,9 +9192,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().delete("bucket")
-///              .user_project("accusam")
-///              .if_metageneration_not_match(-78)
-///              .if_metageneration_match(-34)
+///              .user_project("et")
+///              .if_metageneration_not_match(-95)
+///              .if_metageneration_match(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8611,7 +9264,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8773,7 +9426,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -8827,9 +9480,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8840,7 +9504,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -8848,10 +9512,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get("bucket")
-///              .user_project("dolore")
-///              .projection("voluptua.")
-///              .if_metageneration_not_match(-2)
-///              .if_metageneration_match(-17)
+///              .user_project("duo")
+///              .soft_deleted(false)
+///              .projection("vero")
+///              .if_metageneration_not_match(-88)
+///              .if_metageneration_match(-65)
+///              .generation(-76)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8862,9 +9528,11 @@ where
     hub: &'a Storage<C>,
     _bucket: String,
     _user_project: Option<String>,
+    _soft_deleted: Option<bool>,
     _projection: Option<String>,
     _if_metageneration_not_match: Option<i64>,
     _if_metageneration_match: Option<i64>,
+    _generation: Option<i64>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -8895,9 +9563,11 @@ where
             "alt",
             "bucket",
             "userProject",
+            "softDeleted",
             "projection",
             "ifMetagenerationNotMatch",
             "ifMetagenerationMatch",
+            "generation",
         ]
         .iter()
         {
@@ -8907,10 +9577,13 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
         params.push("bucket", self._bucket);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
+        }
+        if let Some(value) = self._soft_deleted.as_ref() {
+            params.push("softDeleted", value.to_string());
         }
         if let Some(value) = self._projection.as_ref() {
             params.push("projection", value);
@@ -8921,6 +9594,9 @@ where
         if let Some(value) = self._if_metageneration_match.as_ref() {
             params.push("ifMetagenerationMatch", value.to_string());
         }
+        if let Some(value) = self._generation.as_ref() {
+            params.push("generation", value.to_string());
+        }
 
         params.extend(self._additional_params.iter());
 
@@ -8928,7 +9604,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9047,6 +9723,13 @@ where
         self._user_project = Some(new_value.to_string());
         self
     }
+    /// If true, return the soft-deleted version of this bucket. The default is false. For more information, see [Soft Delete](https://cloud.google.com/storage/docs/soft-delete).
+    ///
+    /// Sets the *soft deleted* query property to the given value.
+    pub fn soft_deleted(mut self, new_value: bool) -> BucketGetCall<'a, C> {
+        self._soft_deleted = Some(new_value);
+        self
+    }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
@@ -9066,6 +9749,13 @@ where
     /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: i64) -> BucketGetCall<'a, C> {
         self._if_metageneration_match = Some(new_value);
+        self
+    }
+    /// If present, specifies the generation of the bucket. This is required if softDeleted is true.
+    ///
+    /// Sets the *generation* query property to the given value.
+    pub fn generation(mut self, new_value: i64) -> BucketGetCall<'a, C> {
+        self._generation = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9110,7 +9800,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9164,9 +9854,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9177,7 +9878,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -9186,7 +9887,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get_iam_policy("bucket")
 ///              .user_project("Lorem")
-///              .options_requested_policy_version(-38)
+///              .options_requested_policy_version(-29)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9253,7 +9954,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/iam";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9427,7 +10128,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9481,9 +10182,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9494,7 +10206,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -9502,7 +10214,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().get_storage_layout("bucket")
-///              .prefix("est")
+///              .prefix("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9558,7 +10270,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/storageLayout";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9722,7 +10434,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9777,9 +10489,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9790,7 +10513,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -9803,11 +10526,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().insert(req, "project")
-///              .user_project("sed")
-///              .projection("sit")
-///              .predefined_default_object_acl("et")
-///              .predefined_acl("tempor")
-///              .enable_object_retention(true)
+///              .user_project("takimata")
+///              .projection("consetetur")
+///              .predefined_default_object_acl("voluptua.")
+///              .predefined_acl("et")
+///              .enable_object_retention(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9890,7 +10613,7 @@ where
         let mut url = self.hub._base_url.clone() + "b";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         let url = params.parse_with_url(&url);
@@ -10100,7 +10823,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10154,9 +10877,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10167,7 +10901,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -10176,10 +10910,12 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().list("project")
 ///              .user_project("sed")
-///              .projection("diam")
-///              .prefix("dolores")
-///              .page_token("dolores")
-///              .max_results(33)
+///              .soft_deleted(true)
+///              .return_partial_success(false)
+///              .projection("accusam")
+///              .prefix("voluptua.")
+///              .page_token("dolore")
+///              .max_results(67)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10190,6 +10926,8 @@ where
     hub: &'a Storage<C>,
     _project: String,
     _user_project: Option<String>,
+    _soft_deleted: Option<bool>,
+    _return_partial_success: Option<bool>,
     _projection: Option<String>,
     _prefix: Option<String>,
     _page_token: Option<String>,
@@ -10224,6 +10962,8 @@ where
             "alt",
             "project",
             "userProject",
+            "softDeleted",
+            "returnPartialSuccess",
             "projection",
             "prefix",
             "pageToken",
@@ -10237,10 +10977,16 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        let mut params = Params::with_capacity(10 + self._additional_params.len());
         params.push("project", self._project);
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
+        }
+        if let Some(value) = self._soft_deleted.as_ref() {
+            params.push("softDeleted", value.to_string());
+        }
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
         }
         if let Some(value) = self._projection.as_ref() {
             params.push("projection", value);
@@ -10261,7 +11007,7 @@ where
         let mut url = self.hub._base_url.clone() + "b";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         let url = params.parse_with_url(&url);
@@ -10371,6 +11117,20 @@ where
         self._user_project = Some(new_value.to_string());
         self
     }
+    /// If true, only soft-deleted bucket versions will be returned. The default is false. For more information, see [Soft Delete](https://cloud.google.com/storage/docs/soft-delete).
+    ///
+    /// Sets the *soft deleted* query property to the given value.
+    pub fn soft_deleted(mut self, new_value: bool) -> BucketListCall<'a, C> {
+        self._soft_deleted = Some(new_value);
+        self
+    }
+    /// If true, return a list of bucket resource names for buckets that are in unreachable locations.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(mut self, new_value: bool) -> BucketListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// Set of properties to return. Defaults to noAcl.
     ///
     /// Sets the *projection* query property to the given value.
@@ -10441,7 +11201,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10495,9 +11255,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10508,15 +11279,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.buckets().lock_retention_policy("bucket", -11)
-///              .user_project("et")
+/// let result = hub.buckets().lock_retention_policy("bucket", -78)
+///              .user_project("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10577,7 +11348,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/lockRetentionPolicy";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -10754,7 +11525,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10809,9 +11580,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10822,7 +11604,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -10835,12 +11617,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().patch(req, "bucket")
-///              .user_project("sed")
-///              .projection("no")
-///              .predefined_default_object_acl("nonumy")
-///              .predefined_acl("At")
-///              .if_metageneration_not_match(-45)
-///              .if_metageneration_match(-32)
+///              .user_project("sadipscing")
+///              .projection("Lorem")
+///              .predefined_default_object_acl("invidunt")
+///              .predefined_acl("no")
+///              .if_metageneration_not_match(-7)
+///              .if_metageneration_match(-27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10928,7 +11710,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -11154,7 +11936,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11191,6 +11973,664 @@ where
     }
 }
 
+/// Initiates a long-running Relocate Bucket operation on the specified bucket.
+///
+/// A builder for the *relocate* method supported by a *bucket* resource.
+/// It is not used directly, but through a [`BucketMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_storage1 as storage1;
+/// use storage1::api::RelocateBucketRequest;
+/// # async fn dox() {
+/// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Storage::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RelocateBucketRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.buckets().relocate(req, "bucket")
+///              .doit().await;
+/// # }
+/// ```
+pub struct BucketRelocateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Storage<C>,
+    _request: RelocateBucketRequest,
+    _bucket: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for BucketRelocateCall<'a, C> {}
+
+impl<'a, C> BucketRelocateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleLongrunningOperation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "storage.buckets.relocate",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "bucket"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("bucket", self._bucket);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/relocate";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["bucket"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RelocateBucketRequest) -> BucketRelocateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the bucket to be moved.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> BucketRelocateCall<'a, C> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BucketRelocateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *alt* (query-string) - Data format for the response.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    pub fn param<T>(mut self, name: T, value: T) -> BucketRelocateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::DevstorageReadWrite`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> BucketRelocateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BucketRelocateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> BucketRelocateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Restores a soft-deleted bucket.
+///
+/// A builder for the *restore* method supported by a *bucket* resource.
+/// It is not used directly, but through a [`BucketMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_storage1 as storage1;
+/// # async fn dox() {
+/// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Storage::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.buckets().restore("bucket", -35)
+///              .user_project("tempor")
+///              .projection("aliquyam")
+///              .doit().await;
+/// # }
+/// ```
+pub struct BucketRestoreCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Storage<C>,
+    _bucket: String,
+    _generation: i64,
+    _user_project: Option<String>,
+    _projection: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for BucketRestoreCall<'a, C> {}
+
+impl<'a, C> BucketRestoreCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Bucket)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "storage.buckets.restore",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "bucket", "generation", "userProject", "projection"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("bucket", self._bucket);
+        params.push("generation", self._generation.to_string());
+        if let Some(value) = self._user_project.as_ref() {
+            params.push("userProject", value);
+        }
+        if let Some(value) = self._projection.as_ref() {
+            params.push("projection", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/restore";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["bucket"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Name of a bucket.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> BucketRestoreCall<'a, C> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// Generation of a bucket.
+    ///
+    /// Sets the *generation* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn generation(mut self, new_value: i64) -> BucketRestoreCall<'a, C> {
+        self._generation = new_value;
+        self
+    }
+    /// The project to be billed for this request. Required for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> BucketRestoreCall<'a, C> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// Set of properties to return. Defaults to full.
+    ///
+    /// Sets the *projection* query property to the given value.
+    pub fn projection(mut self, new_value: &str) -> BucketRestoreCall<'a, C> {
+        self._projection = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> BucketRestoreCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *alt* (query-string) - Data format for the response.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    pub fn param<T>(mut self, name: T, value: T) -> BucketRestoreCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::DevstorageReadWrite`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> BucketRestoreCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BucketRestoreCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> BucketRestoreCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Updates an IAM policy for the specified bucket.
 ///
 /// A builder for the *setIamPolicy* method supported by a *bucket* resource.
@@ -11209,9 +12649,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11222,7 +12673,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -11235,7 +12686,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().set_iam_policy(req, "bucket")
-///              .user_project("sadipscing")
+///              .user_project("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11292,7 +12743,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/iam";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -11486,7 +12937,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11540,9 +12991,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11553,15 +13015,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.buckets().test_iam_permissions("bucket", &vec!["aliquyam".into()])
-///              .user_project("amet")
+/// let result = hub.buckets().test_iam_permissions("bucket", &vec!["Lorem".into()])
+///              .user_project("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11623,7 +13085,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/iam/testPermissions";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -11798,7 +13260,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11853,9 +13315,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11866,7 +13339,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -11879,12 +13352,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().update(req, "bucket")
-///              .user_project("et")
-///              .projection("sea")
-///              .predefined_default_object_acl("consetetur")
-///              .predefined_acl("consetetur")
-///              .if_metageneration_not_match(-65)
-///              .if_metageneration_match(-7)
+///              .user_project("diam")
+///              .projection("dolores")
+///              .predefined_default_object_acl("dolores")
+///              .predefined_acl("et")
+///              .if_metageneration_not_match(-93)
+///              .if_metageneration_match(-11)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11972,7 +13445,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -12198,7 +13671,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12235,6 +13708,344 @@ where
     }
 }
 
+/// Starts asynchronous advancement of the relocate bucket operation in the case of required write downtime, to allow it to lock the bucket at the source location, and proceed with the bucket location swap. The server makes a best effort to advance the relocate bucket operation, but success is not guaranteed.
+///
+/// A builder for the *operations.advanceRelocateBucket* method supported by a *bucket* resource.
+/// It is not used directly, but through a [`BucketMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_storage1 as storage1;
+/// use storage1::api::AdvanceRelocateBucketOperationRequest;
+/// # async fn dox() {
+/// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Storage::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AdvanceRelocateBucketOperationRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.buckets().operations_advance_relocate_bucket(req, "bucket", "operationId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct BucketOperationAdvanceRelocateBucketCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Storage<C>,
+    _request: AdvanceRelocateBucketOperationRequest,
+    _bucket: String,
+    _operation_id: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for BucketOperationAdvanceRelocateBucketCall<'a, C> {}
+
+impl<'a, C> BucketOperationAdvanceRelocateBucketCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<common::Response> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "storage.buckets.operations.advanceRelocateBucket",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["bucket", "operationId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("bucket", self._bucket);
+        params.push("operationId", self._operation_id);
+
+        params.extend(self._additional_params.iter());
+
+        let mut url = self.hub._base_url.clone()
+            + "b/{bucket}/operations/{operationId}/advanceRelocateBucket";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in
+            [("{bucket}", "bucket"), ("{operationId}", "operationId")].iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["operationId", "bucket"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = common::Response::from_parts(parts, body);
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: AdvanceRelocateBucketOperationRequest,
+    ) -> BucketOperationAdvanceRelocateBucketCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Name of the bucket to advance the relocate for.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> BucketOperationAdvanceRelocateBucketCall<'a, C> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// ID of the operation resource.
+    ///
+    /// Sets the *operation id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn operation_id(
+        mut self,
+        new_value: &str,
+    ) -> BucketOperationAdvanceRelocateBucketCall<'a, C> {
+        self._operation_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BucketOperationAdvanceRelocateBucketCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *alt* (query-string) - Data format for the response.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    pub fn param<T>(mut self, name: T, value: T) -> BucketOperationAdvanceRelocateBucketCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::DevstorageReadWrite`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> BucketOperationAdvanceRelocateBucketCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BucketOperationAdvanceRelocateBucketCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> BucketOperationAdvanceRelocateBucketCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed.
 ///
 /// A builder for the *operations.cancel* method supported by a *bucket* resource.
@@ -12252,9 +14063,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12265,7 +14087,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -12325,7 +14147,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/operations/{operationId}/cancel";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -12481,7 +14303,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12535,9 +14357,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12548,7 +14381,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -12609,7 +14442,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/operations/{operationId}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -12778,7 +14611,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -12832,9 +14665,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12845,7 +14689,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -12853,9 +14697,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().operations_list("bucket")
-///              .page_token("sit")
-///              .page_size(-93)
-///              .filter("eos")
+///              .page_token("aliquyam")
+///              .page_size(-69)
+///              .filter("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12921,7 +14765,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/operations";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -13099,7 +14943,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13154,9 +14998,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13167,7 +15022,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -13229,7 +15084,7 @@ where
         let mut url = self.hub._base_url.clone() + "channels/stop";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         let url = params.parse_with_url(&url);
@@ -13381,7 +15236,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13435,9 +15290,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13448,7 +15314,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -13456,7 +15322,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().delete("bucket", "entity")
-///              .user_project("Stet")
+///              .user_project("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13513,7 +15379,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -13674,7 +15540,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -13728,9 +15594,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13741,7 +15618,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -13749,7 +15626,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().get("bucket", "entity")
-///              .user_project("et")
+///              .user_project("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13807,7 +15684,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -13981,7 +15858,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14036,9 +15913,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14049,7 +15937,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -14062,7 +15950,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().insert(req, "bucket")
-///              .user_project("et")
+///              .user_project("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14119,7 +16007,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -14316,7 +16204,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14370,9 +16258,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14383,7 +16282,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -14391,9 +16290,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().list("bucket")
-///              .user_project("dolore")
-///              .if_metageneration_not_match(-40)
-///              .if_metageneration_match(-51)
+///              .user_project("est")
+///              .if_metageneration_not_match(-82)
+///              .if_metageneration_match(-94)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14465,7 +16364,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -14649,7 +16548,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14704,9 +16603,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14717,7 +16627,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -14730,7 +16640,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().patch(req, "bucket", "entity")
-///              .user_project("erat")
+///              .user_project("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14789,7 +16699,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -14996,7 +16906,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15051,9 +16961,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15064,7 +16985,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -15077,7 +16998,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().update(req, "bucket", "entity")
-///              .user_project("accusam")
+///              .user_project("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15136,7 +17057,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/defaultObjectAcl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -15343,7 +17264,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15397,9 +17318,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15410,7 +17342,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -15418,8 +17350,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().delete("bucket", "folder")
-///              .if_metageneration_not_match(-51)
-///              .if_metageneration_match(-22)
+///              .if_metageneration_not_match(-15)
+///              .if_metageneration_match(-19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15487,7 +17419,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/folders/{folder}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -15652,7 +17584,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -15706,9 +17638,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15719,7 +17662,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -15727,8 +17670,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().get("bucket", "folder")
-///              .if_metageneration_not_match(-22)
-///              .if_metageneration_match(-48)
+///              .if_metageneration_not_match(-10)
+///              .if_metageneration_match(-74)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15798,7 +17741,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/folders/{folder}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -15976,7 +17919,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16031,9 +17974,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16044,7 +17998,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -16057,7 +18011,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().insert(req, "bucket")
-///              .recursive(true)
+///              .recursive(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16114,7 +18068,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/folders";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -16256,7 +18210,7 @@ where
         self._bucket = new_value.to_string();
         self
     }
-    /// If true, any parent folder which doesn’t exist will be created automatically.
+    /// If true, any parent folder which doesn't exist will be created automatically.
     ///
     /// Sets the *recursive* query property to the given value.
     pub fn recursive(mut self, new_value: bool) -> FolderInsertCall<'a, C> {
@@ -16305,7 +18259,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16359,9 +18313,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16372,7 +18337,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -16380,12 +18345,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().list("bucket")
-///              .start_offset("gubergren")
-///              .prefix("justo")
-///              .page_token("sea")
-///              .page_size(-96)
-///              .end_offset("sit")
-///              .delimiter("aliquyam")
+///              .start_offset("Lorem")
+///              .prefix("accusam")
+///              .page_token("amet")
+///              .page_size(-31)
+///              .end_offset("dolores")
+///              .delimiter("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16472,7 +18437,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/folders";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -16668,7 +18633,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -16722,9 +18687,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16735,7 +18711,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -16743,8 +18719,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().rename("bucket", "sourceFolder", "destinationFolder")
-///              .if_source_metageneration_not_match(-46)
-///              .if_source_metageneration_match(-62)
+///              .if_source_metageneration_not_match(-51)
+///              .if_source_metageneration_match(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16818,7 +18794,7 @@ where
             + "b/{bucket}/folders/{sourceFolder}/renameTo/folders/{destinationFolder}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17012,7 +18988,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17066,9 +19042,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17079,7 +19066,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -17087,9 +19074,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().delete("bucket", "managedFolder")
-///              .if_metageneration_not_match(-61)
-///              .if_metageneration_match(-2)
-///              .allow_non_empty(true)
+///              .if_metageneration_not_match(-22)
+///              .if_metageneration_match(-48)
+///              .allow_non_empty(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17162,7 +19149,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/managedFolders/{managedFolder}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17339,7 +19326,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17393,9 +19380,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17406,7 +19404,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -17414,8 +19412,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().get("bucket", "managedFolder")
-///              .if_metageneration_not_match(-62)
-///              .if_metageneration_match(-45)
+///              .if_metageneration_not_match(-22)
+///              .if_metageneration_match(-12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17485,7 +19483,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/managedFolders/{managedFolder}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -17668,7 +19666,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17722,9 +19720,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17735,7 +19744,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -17743,8 +19752,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().get_iam_policy("bucket", "managedFolder")
-///              .user_project("duo")
-///              .options_requested_policy_version(-53)
+///              .user_project("consetetur")
+///              .options_requested_policy_version(-98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17814,7 +19823,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/managedFolders/{managedFolder}/iam";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -18000,7 +20009,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18055,9 +20064,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18068,7 +20088,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -18133,7 +20153,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/managedFolders";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -18320,7 +20340,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18374,9 +20394,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18387,7 +20418,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -18395,9 +20426,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().list("bucket")
-///              .prefix("rebum.")
-///              .page_token("dolor")
-///              .page_size(-6)
+///              .prefix("At")
+///              .page_token("dolores")
+///              .page_size(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18461,7 +20492,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/managedFolders";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -18639,7 +20670,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18694,9 +20725,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18707,7 +20749,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -18720,7 +20762,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().set_iam_policy(req, "bucket", "managedFolder")
-///              .user_project("no")
+///              .user_project("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18779,7 +20821,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/managedFolders/{managedFolder}/iam";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -18985,7 +21027,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19039,9 +21081,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19052,14 +21105,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_folders().test_iam_permissions("bucket", "managedFolder", &vec!["kasd".into()])
+/// let result = hub.managed_folders().test_iam_permissions("bucket", "managedFolder", &vec!["ipsum".into()])
 ///              .user_project("Lorem")
 ///              .doit().await;
 /// # }
@@ -19133,7 +21186,7 @@ where
             + "b/{bucket}/managedFolders/{managedFolder}/iam/testPermissions";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -19320,7 +21373,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19374,9 +21427,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19387,7 +21451,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -19395,7 +21459,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().delete("bucket", "notification")
-///              .user_project("rebum.")
+///              .user_project("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19452,7 +21516,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/notificationConfigs/{notification}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -19615,7 +21679,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19669,9 +21733,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19682,7 +21757,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -19690,7 +21765,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().get("bucket", "notification")
-///              .user_project("eos")
+///              .user_project("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19748,7 +21823,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/notificationConfigs/{notification}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -19924,7 +21999,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -19979,9 +22054,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19992,7 +22078,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -20005,7 +22091,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().insert(req, "bucket")
-///              .user_project("dolore")
+///              .user_project("magna")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20062,7 +22148,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/notificationConfigs";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -20256,7 +22342,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20310,9 +22396,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20323,7 +22420,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -20331,7 +22428,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().list("bucket")
-///              .user_project("ut")
+///              .user_project("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20387,7 +22484,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/notificationConfigs";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -20551,7 +22648,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20605,9 +22702,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20618,7 +22726,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -20626,8 +22734,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().delete("bucket", "object", "entity")
-///              .user_project("duo")
-///              .generation(-45)
+///              .user_project("amet.")
+///              .generation(-11)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20690,7 +22798,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -20874,7 +22982,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -20928,9 +23036,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20941,7 +23060,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -20949,8 +23068,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().get("bucket", "object", "entity")
-///              .user_project("kasd")
-///              .generation(-95)
+///              .user_project("Lorem")
+///              .generation(-58)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21023,7 +23142,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -21220,7 +23339,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21275,9 +23394,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21288,7 +23418,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -21301,8 +23431,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().insert(req, "bucket", "object")
-///              .user_project("et")
-///              .generation(-56)
+///              .user_project("tempor")
+///              .generation(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21365,7 +23495,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -21579,7 +23709,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21633,9 +23763,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21646,7 +23787,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -21654,8 +23795,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().list("bucket", "object")
-///              .user_project("rebum.")
-///              .generation(-27)
+///              .user_project("dolore")
+///              .generation(-97)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21717,7 +23858,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -21898,7 +24039,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -21953,9 +24094,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21966,7 +24118,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -21979,8 +24131,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().patch(req, "bucket", "object", "entity")
-///              .user_project("aliquyam")
-///              .generation(-37)
+///              .user_project("vero")
+///              .generation(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22054,7 +24206,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -22284,7 +24436,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -22339,9 +24491,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22352,7 +24515,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -22365,8 +24528,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().update(req, "bucket", "object", "entity")
-///              .user_project("dolores")
-///              .generation(-96)
+///              .user_project("duo")
+///              .generation(-63)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22440,7 +24603,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/acl/{entity}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -22670,7 +24833,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -22725,9 +24888,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22738,7 +24912,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -22803,7 +24977,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/bulkRestore";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -22990,7 +25164,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23045,9 +25219,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23058,7 +25243,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -23071,11 +25256,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().compose(req, "destinationBucket", "destinationObject")
-///              .user_project("clita")
-///              .kms_key_name("dolor")
-///              .if_metageneration_match(-82)
-///              .if_generation_match(-83)
-///              .destination_predefined_acl("diam")
+///              .user_project("et")
+///              .kms_key_name("Lorem")
+///              .if_metageneration_match(-33)
+///              .if_generation_match(-59)
+///              .destination_predefined_acl("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23162,7 +25347,7 @@ where
             self.hub._base_url.clone() + "b/{destinationBucket}/o/{destinationObject}/compose";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -23396,7 +25581,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23451,9 +25636,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23464,7 +25660,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -23477,19 +25673,19 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().copy(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .user_project("tempor")
-///              .source_generation(-43)
-///              .projection("est")
-///              .if_source_metageneration_not_match(-9)
-///              .if_source_metageneration_match(-99)
-///              .if_source_generation_not_match(-79)
-///              .if_source_generation_match(-77)
-///              .if_metageneration_not_match(-81)
-///              .if_metageneration_match(-71)
-///              .if_generation_not_match(-5)
-///              .if_generation_match(-73)
-///              .destination_predefined_acl("dolores")
-///              .destination_kms_key_name("consetetur")
+///              .user_project("aliquyam")
+///              .source_generation(-37)
+///              .projection("sit")
+///              .if_source_metageneration_not_match(-26)
+///              .if_source_metageneration_match(-16)
+///              .if_source_generation_not_match(-19)
+///              .if_source_generation_match(-96)
+///              .if_metageneration_not_match(-19)
+///              .if_metageneration_match(-30)
+///              .if_generation_not_match(-38)
+///              .if_generation_match(-64)
+///              .destination_predefined_acl("dolor")
+///              .destination_kms_key_name("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23621,7 +25817,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{sourceBucket}/o/{sourceObject}/copyTo/b/{destinationBucket}/o/{destinationObject}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -23938,7 +26134,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -23992,9 +26188,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24005,7 +26212,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -24013,12 +26220,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().delete("bucket", "object")
-///              .user_project("sadipscing")
-///              .if_metageneration_not_match(-42)
-///              .if_metageneration_match(-10)
-///              .if_generation_not_match(-50)
-///              .if_generation_match(-15)
-///              .generation(-62)
+///              .user_project("nonumy")
+///              .if_metageneration_not_match(-18)
+///              .if_metageneration_match(-8)
+///              .if_generation_not_match(-23)
+///              .if_generation_match(-39)
+///              .generation(-43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24106,7 +26313,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -24299,7 +26506,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24358,9 +26565,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24371,7 +26589,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -24379,14 +26597,15 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().get("bucket", "object")
-///              .user_project("sit")
-///              .soft_deleted(true)
-///              .projection("Lorem")
-///              .if_metageneration_not_match(-21)
-///              .if_metageneration_match(-88)
-///              .if_generation_not_match(-1)
-///              .if_generation_match(-80)
-///              .generation(-91)
+///              .user_project("dolor")
+///              .soft_deleted(false)
+///              .restore_token("At")
+///              .projection("erat")
+///              .if_metageneration_not_match(-71)
+///              .if_metageneration_match(-5)
+///              .if_generation_not_match(-73)
+///              .if_generation_match(-19)
+///              .generation(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24399,6 +26618,7 @@ where
     _object: String,
     _user_project: Option<String>,
     _soft_deleted: Option<bool>,
+    _restore_token: Option<String>,
     _projection: Option<String>,
     _if_metageneration_not_match: Option<i64>,
     _if_metageneration_match: Option<i64>,
@@ -24436,6 +26656,7 @@ where
             "object",
             "userProject",
             "softDeleted",
+            "restoreToken",
             "projection",
             "ifMetagenerationNotMatch",
             "ifMetagenerationMatch",
@@ -24451,7 +26672,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(11 + self._additional_params.len());
+        let mut params = Params::with_capacity(12 + self._additional_params.len());
         params.push("bucket", self._bucket);
         params.push("object", self._object);
         if let Some(value) = self._user_project.as_ref() {
@@ -24459,6 +26680,9 @@ where
         }
         if let Some(value) = self._soft_deleted.as_ref() {
             params.push("softDeleted", value.to_string());
+        }
+        if let Some(value) = self._restore_token.as_ref() {
+            params.push("restoreToken", value);
         }
         if let Some(value) = self._projection.as_ref() {
             params.push("projection", value);
@@ -24494,7 +26718,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -24628,11 +26852,18 @@ where
         self._user_project = Some(new_value.to_string());
         self
     }
-    /// If true, only soft-deleted object versions will be listed. The default is false. For more information, see Soft Delete.
+    /// If true, only soft-deleted object versions will be listed. The default is false. For more information, see [Soft Delete](https://cloud.google.com/storage/docs/soft-delete).
     ///
     /// Sets the *soft deleted* query property to the given value.
     pub fn soft_deleted(mut self, new_value: bool) -> ObjectGetCall<'a, C> {
         self._soft_deleted = Some(new_value);
+        self
+    }
+    /// Restore token used to differentiate soft-deleted objects with the same name and generation. Only applicable for hierarchical namespace buckets and if softDeleted is set to true. This parameter is optional, and is only required in the rare case when there are multiple soft-deleted objects with the same name and generation.
+    ///
+    /// Sets the *restore token* query property to the given value.
+    pub fn restore_token(mut self, new_value: &str) -> ObjectGetCall<'a, C> {
+        self._restore_token = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to noAcl.
@@ -24719,7 +26950,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -24773,9 +27004,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24786,7 +27028,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -24794,8 +27036,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().get_iam_policy("bucket", "object")
-///              .user_project("kasd")
-///              .generation(-21)
+///              .user_project("sadipscing")
+///              .generation(-42)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24857,7 +27099,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/iam";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -25038,7 +27280,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -25094,9 +27336,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25107,7 +27360,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -25120,16 +27373,16 @@ where
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().insert(req, "bucket")
-///              .user_project("At")
-///              .projection("erat")
-///              .predefined_acl("clita")
-///              .name("vero")
-///              .kms_key_name("invidunt")
-///              .if_metageneration_not_match(-91)
-///              .if_metageneration_match(-81)
-///              .if_generation_not_match(-31)
-///              .if_generation_match(-19)
-///              .content_encoding("ipsum")
+///              .user_project("ipsum")
+///              .projection("Stet")
+///              .predefined_acl("gubergren")
+///              .name("ipsum")
+///              .kms_key_name("no")
+///              .if_metageneration_not_match(-98)
+///              .if_metageneration_match(-13)
+///              .if_generation_not_match(-47)
+///              .if_generation_match(-56)
+///              .content_encoding("justo")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -25258,7 +27511,7 @@ where
         params.push("uploadType", upload_type);
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -25651,7 +27904,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -25705,9 +27958,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25718,7 +27982,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -25727,18 +27991,19 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().list("bucket")
 ///              .versions(false)
-///              .user_project("elitr")
-///              .start_offset("consetetur")
+///              .user_project("nonumy")
+///              .start_offset("sea")
 ///              .soft_deleted(false)
-///              .projection("clita")
-///              .prefix("sit")
-///              .page_token("takimata")
-///              .max_results(70)
-///              .match_glob("diam")
-///              .include_trailing_delimiter(true)
+///              .projection("kasd")
+///              .prefix("justo")
+///              .page_token("ea")
+///              .max_results(24)
+///              .match_glob("erat")
+///              .include_trailing_delimiter(false)
 ///              .include_folders_as_prefixes(false)
-///              .end_offset("diam")
-///              .delimiter("diam")
+///              .filter("nonumy")
+///              .end_offset("erat")
+///              .delimiter("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25759,6 +28024,7 @@ where
     _match_glob: Option<String>,
     _include_trailing_delimiter: Option<bool>,
     _include_folders_as_prefixes: Option<bool>,
+    _filter: Option<String>,
     _end_offset: Option<String>,
     _delimiter: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
@@ -25801,6 +28067,7 @@ where
             "matchGlob",
             "includeTrailingDelimiter",
             "includeFoldersAsPrefixes",
+            "filter",
             "endOffset",
             "delimiter",
         ]
@@ -25812,7 +28079,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(16 + self._additional_params.len());
+        let mut params = Params::with_capacity(17 + self._additional_params.len());
         params.push("bucket", self._bucket);
         if let Some(value) = self._versions.as_ref() {
             params.push("versions", value.to_string());
@@ -25847,6 +28114,9 @@ where
         if let Some(value) = self._include_folders_as_prefixes.as_ref() {
             params.push("includeFoldersAsPrefixes", value.to_string());
         }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
         if let Some(value) = self._end_offset.as_ref() {
             params.push("endOffset", value);
         }
@@ -25860,7 +28130,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -25972,7 +28242,7 @@ where
         self._bucket = new_value.to_string();
         self
     }
-    /// If true, lists all versions of an object as distinct results. The default is false. For more information, see Object Versioning.
+    /// If true, lists all versions of an object as distinct results. The default is false. For more information, see [Object Versioning](https://cloud.google.com/storage/docs/object-versioning).
     ///
     /// Sets the *versions* query property to the given value.
     pub fn versions(mut self, new_value: bool) -> ObjectListCall<'a, C> {
@@ -25993,7 +28263,7 @@ where
         self._start_offset = Some(new_value.to_string());
         self
     }
-    /// If true, only soft-deleted object versions will be listed. The default is false. For more information, see Soft Delete.
+    /// If true, only soft-deleted object versions will be listed. The default is false. For more information, see [Soft Delete](https://cloud.google.com/storage/docs/soft-delete).
     ///
     /// Sets the *soft deleted* query property to the given value.
     pub fn soft_deleted(mut self, new_value: bool) -> ObjectListCall<'a, C> {
@@ -26047,6 +28317,13 @@ where
     /// Sets the *include folders as prefixes* query property to the given value.
     pub fn include_folders_as_prefixes(mut self, new_value: bool) -> ObjectListCall<'a, C> {
         self._include_folders_as_prefixes = Some(new_value);
+        self
+    }
+    /// Filter the returned objects. Currently only supported for the contexts field. If delimiter is set, the returned prefixes are exempt from this filter.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ObjectListCall<'a, C> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// Filter results to objects whose names are lexicographically before endOffset. If startOffset is also set, the objects listed will have names between startOffset (inclusive) and endOffset (exclusive).
@@ -26105,7 +28382,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -26142,6 +28419,465 @@ where
     }
 }
 
+/// Moves the source object to the destination object in the same bucket.
+///
+/// A builder for the *move* method supported by a *object* resource.
+/// It is not used directly, but through a [`ObjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_storage1 as storage1;
+/// # async fn dox() {
+/// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Storage::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.objects().move_("bucket", "sourceObject", "destinationObject")
+///              .user_project("eos")
+///              .projection("duo")
+///              .if_source_metageneration_not_match(-94)
+///              .if_source_metageneration_match(-46)
+///              .if_source_generation_not_match(-72)
+///              .if_source_generation_match(-14)
+///              .if_metageneration_not_match(-1)
+///              .if_metageneration_match(-48)
+///              .if_generation_not_match(-59)
+///              .if_generation_match(-31)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ObjectMoveCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Storage<C>,
+    _bucket: String,
+    _source_object: String,
+    _destination_object: String,
+    _user_project: Option<String>,
+    _projection: Option<String>,
+    _if_source_metageneration_not_match: Option<i64>,
+    _if_source_metageneration_match: Option<i64>,
+    _if_source_generation_not_match: Option<i64>,
+    _if_source_generation_match: Option<i64>,
+    _if_metageneration_not_match: Option<i64>,
+    _if_metageneration_match: Option<i64>,
+    _if_generation_not_match: Option<i64>,
+    _if_generation_match: Option<i64>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ObjectMoveCall<'a, C> {}
+
+impl<'a, C> ObjectMoveCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Object)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "storage.objects.move",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in [
+            "alt",
+            "bucket",
+            "sourceObject",
+            "destinationObject",
+            "userProject",
+            "projection",
+            "ifSourceMetagenerationNotMatch",
+            "ifSourceMetagenerationMatch",
+            "ifSourceGenerationNotMatch",
+            "ifSourceGenerationMatch",
+            "ifMetagenerationNotMatch",
+            "ifMetagenerationMatch",
+            "ifGenerationNotMatch",
+            "ifGenerationMatch",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(15 + self._additional_params.len());
+        params.push("bucket", self._bucket);
+        params.push("sourceObject", self._source_object);
+        params.push("destinationObject", self._destination_object);
+        if let Some(value) = self._user_project.as_ref() {
+            params.push("userProject", value);
+        }
+        if let Some(value) = self._projection.as_ref() {
+            params.push("projection", value);
+        }
+        if let Some(value) = self._if_source_metageneration_not_match.as_ref() {
+            params.push("ifSourceMetagenerationNotMatch", value.to_string());
+        }
+        if let Some(value) = self._if_source_metageneration_match.as_ref() {
+            params.push("ifSourceMetagenerationMatch", value.to_string());
+        }
+        if let Some(value) = self._if_source_generation_not_match.as_ref() {
+            params.push("ifSourceGenerationNotMatch", value.to_string());
+        }
+        if let Some(value) = self._if_source_generation_match.as_ref() {
+            params.push("ifSourceGenerationMatch", value.to_string());
+        }
+        if let Some(value) = self._if_metageneration_not_match.as_ref() {
+            params.push("ifMetagenerationNotMatch", value.to_string());
+        }
+        if let Some(value) = self._if_metageneration_match.as_ref() {
+            params.push("ifMetagenerationMatch", value.to_string());
+        }
+        if let Some(value) = self._if_generation_not_match.as_ref() {
+            params.push("ifGenerationNotMatch", value.to_string());
+        }
+        if let Some(value) = self._if_generation_match.as_ref() {
+            params.push("ifGenerationMatch", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url =
+            self.hub._base_url.clone() + "b/{bucket}/o/{sourceObject}/moveTo/o/{destinationObject}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{bucket}", "bucket"),
+            ("{sourceObject}", "sourceObject"),
+            ("{destinationObject}", "destinationObject"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["destinationObject", "sourceObject", "bucket"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Name of the bucket in which the object resides.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> ObjectMoveCall<'a, C> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// Name of the source object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding).
+    ///
+    /// Sets the *source object* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn source_object(mut self, new_value: &str) -> ObjectMoveCall<'a, C> {
+        self._source_object = new_value.to_string();
+        self
+    }
+    /// Name of the destination object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding).
+    ///
+    /// Sets the *destination object* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn destination_object(mut self, new_value: &str) -> ObjectMoveCall<'a, C> {
+        self._destination_object = new_value.to_string();
+        self
+    }
+    /// The project to be billed for this request. Required for Requester Pays buckets.
+    ///
+    /// Sets the *user project* query property to the given value.
+    pub fn user_project(mut self, new_value: &str) -> ObjectMoveCall<'a, C> {
+        self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// Set of properties to return. Defaults to noAcl.
+    ///
+    /// Sets the *projection* query property to the given value.
+    pub fn projection(mut self, new_value: &str) -> ObjectMoveCall<'a, C> {
+        self._projection = Some(new_value.to_string());
+        self
+    }
+    /// Makes the operation conditional on whether the source object's current metageneration does not match the given value. `ifSourceMetagenerationMatch` and `ifSourceMetagenerationNotMatch` conditions are mutually exclusive: it's an error for both of them to be set in the request.
+    ///
+    /// Sets the *if source metageneration not match* query property to the given value.
+    pub fn if_source_metageneration_not_match(mut self, new_value: i64) -> ObjectMoveCall<'a, C> {
+        self._if_source_metageneration_not_match = Some(new_value);
+        self
+    }
+    /// Makes the operation conditional on whether the source object's current metageneration matches the given value. `ifSourceMetagenerationMatch` and `ifSourceMetagenerationNotMatch` conditions are mutually exclusive: it's an error for both of them to be set in the request.
+    ///
+    /// Sets the *if source metageneration match* query property to the given value.
+    pub fn if_source_metageneration_match(mut self, new_value: i64) -> ObjectMoveCall<'a, C> {
+        self._if_source_metageneration_match = Some(new_value);
+        self
+    }
+    /// Makes the operation conditional on whether the source object's current generation does not match the given value. `ifSourceGenerationMatch` and `ifSourceGenerationNotMatch` conditions are mutually exclusive: it's an error for both of them to be set in the request.
+    ///
+    /// Sets the *if source generation not match* query property to the given value.
+    pub fn if_source_generation_not_match(mut self, new_value: i64) -> ObjectMoveCall<'a, C> {
+        self._if_source_generation_not_match = Some(new_value);
+        self
+    }
+    /// Makes the operation conditional on whether the source object's current generation matches the given value. `ifSourceGenerationMatch` and `ifSourceGenerationNotMatch` conditions are mutually exclusive: it's an error for both of them to be set in the request.
+    ///
+    /// Sets the *if source generation match* query property to the given value.
+    pub fn if_source_generation_match(mut self, new_value: i64) -> ObjectMoveCall<'a, C> {
+        self._if_source_generation_match = Some(new_value);
+        self
+    }
+    /// Makes the operation conditional on whether the destination object's current metageneration does not match the given value. `ifMetagenerationMatch` and `ifMetagenerationNotMatch` conditions are mutually exclusive: it's an error for both of them to be set in the request.
+    ///
+    /// Sets the *if metageneration not match* query property to the given value.
+    pub fn if_metageneration_not_match(mut self, new_value: i64) -> ObjectMoveCall<'a, C> {
+        self._if_metageneration_not_match = Some(new_value);
+        self
+    }
+    /// Makes the operation conditional on whether the destination object's current metageneration matches the given value. `ifMetagenerationMatch` and `ifMetagenerationNotMatch` conditions are mutually exclusive: it's an error for both of them to be set in the request.
+    ///
+    /// Sets the *if metageneration match* query property to the given value.
+    pub fn if_metageneration_match(mut self, new_value: i64) -> ObjectMoveCall<'a, C> {
+        self._if_metageneration_match = Some(new_value);
+        self
+    }
+    /// Makes the operation conditional on whether the destination object's current generation does not match the given value. If no live object exists, the precondition fails. Setting to 0 makes the operation succeed only if there is a live version of the object.`ifGenerationMatch` and `ifGenerationNotMatch` conditions are mutually exclusive: it's an error for both of them to be set in the request.
+    ///
+    /// Sets the *if generation not match* query property to the given value.
+    pub fn if_generation_not_match(mut self, new_value: i64) -> ObjectMoveCall<'a, C> {
+        self._if_generation_not_match = Some(new_value);
+        self
+    }
+    /// Makes the operation conditional on whether the destination object's current generation matches the given value. Setting to 0 makes the operation succeed only if there are no live versions of the object. `ifGenerationMatch` and `ifGenerationNotMatch` conditions are mutually exclusive: it's an error for both of them to be set in the request.
+    ///
+    /// Sets the *if generation match* query property to the given value.
+    pub fn if_generation_match(mut self, new_value: i64) -> ObjectMoveCall<'a, C> {
+        self._if_generation_match = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> ObjectMoveCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *alt* (query-string) - Data format for the response.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    pub fn param<T>(mut self, name: T, value: T) -> ObjectMoveCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::DevstorageReadWrite`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ObjectMoveCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ObjectMoveCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ObjectMoveCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Patches an object's metadata.
 ///
 /// A builder for the *patch* method supported by a *object* resource.
@@ -26160,9 +28896,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26173,7 +28920,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -26186,15 +28933,15 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().patch(req, "bucket", "object")
-///              .user_project("ea")
-///              .projection("dolore")
-///              .predefined_acl("ipsum")
-///              .override_unlocked_retention(true)
-///              .if_metageneration_not_match(-27)
-///              .if_metageneration_match(-53)
-///              .if_generation_not_match(-98)
-///              .if_generation_match(-101)
-///              .generation(-15)
+///              .user_project("Lorem")
+///              .projection("At")
+///              .predefined_acl("diam")
+///              .override_unlocked_retention(false)
+///              .if_metageneration_not_match(-93)
+///              .if_metageneration_match(-18)
+///              .if_generation_not_match(-17)
+///              .if_generation_match(-84)
+///              .generation(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26300,7 +29047,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -26557,7 +29304,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -26611,9 +29358,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26624,21 +29382,22 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.objects().restore("bucket", "object", -32)
-///              .user_project("erat")
-///              .projection("ut")
-///              .if_metageneration_not_match(-18)
-///              .if_metageneration_match(-51)
-///              .if_generation_not_match(-66)
-///              .if_generation_match(-35)
-///              .copy_source_acl(true)
+/// let result = hub.objects().restore("bucket", "object", -53)
+///              .user_project("sit")
+///              .restore_token("Lorem")
+///              .projection("Stet")
+///              .if_metageneration_not_match(-70)
+///              .if_metageneration_match(-94)
+///              .if_generation_not_match(-32)
+///              .if_generation_match(-31)
+///              .copy_source_acl(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26651,6 +29410,7 @@ where
     _object: String,
     _generation: i64,
     _user_project: Option<String>,
+    _restore_token: Option<String>,
     _projection: Option<String>,
     _if_metageneration_not_match: Option<i64>,
     _if_metageneration_match: Option<i64>,
@@ -26689,6 +29449,7 @@ where
             "object",
             "generation",
             "userProject",
+            "restoreToken",
             "projection",
             "ifMetagenerationNotMatch",
             "ifMetagenerationMatch",
@@ -26704,12 +29465,15 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(12 + self._additional_params.len());
+        let mut params = Params::with_capacity(13 + self._additional_params.len());
         params.push("bucket", self._bucket);
         params.push("object", self._object);
         params.push("generation", self._generation.to_string());
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
+        }
+        if let Some(value) = self._restore_token.as_ref() {
+            params.push("restoreToken", value);
         }
         if let Some(value) = self._projection.as_ref() {
             params.push("projection", value);
@@ -26736,7 +29500,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/restore";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -26848,7 +29612,7 @@ where
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see [Encoding URI Path Parts](https://cloud.google.com/storage/docs/request-endpoints#encoding).
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -26873,6 +29637,13 @@ where
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectRestoreCall<'a, C> {
         self._user_project = Some(new_value.to_string());
+        self
+    }
+    /// Restore token used to differentiate sof-deleted objects with the same name and generation. Only applicable for hierarchical namespace buckets. This parameter is optional, and is only required in the rare case when there are multiple soft-deleted objects with the same name and generation.
+    ///
+    /// Sets the *restore token* query property to the given value.
+    pub fn restore_token(mut self, new_value: &str) -> ObjectRestoreCall<'a, C> {
+        self._restore_token = Some(new_value.to_string());
         self
     }
     /// Set of properties to return. Defaults to full.
@@ -26959,7 +29730,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -27014,9 +29785,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27027,7 +29809,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -27040,21 +29822,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .user_project("kasd")
-///              .source_generation(-39)
-///              .rewrite_token("dolor")
-///              .projection("amet")
-///              .max_bytes_rewritten_per_call(-3)
-///              .if_source_metageneration_not_match(-16)
-///              .if_source_metageneration_match(-60)
-///              .if_source_generation_not_match(-100)
-///              .if_source_generation_match(-5)
-///              .if_metageneration_not_match(-24)
-///              .if_metageneration_match(-94)
-///              .if_generation_not_match(-90)
-///              .if_generation_match(-4)
-///              .destination_predefined_acl("sadipscing")
-///              .destination_kms_key_name("dolor")
+///              .user_project("sed")
+///              .source_generation(-65)
+///              .rewrite_token("aliquyam")
+///              .projection("kasd")
+///              .max_bytes_rewritten_per_call(-101)
+///              .if_source_metageneration_not_match(-48)
+///              .if_source_metageneration_match(-63)
+///              .if_source_generation_not_match(-39)
+///              .if_source_generation_match(-54)
+///              .if_metageneration_not_match(-97)
+///              .if_metageneration_match(-3)
+///              .if_generation_not_match(-16)
+///              .if_generation_match(-60)
+///              .destination_predefined_acl("ipsum")
+///              .destination_kms_key_name("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27196,7 +29978,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{sourceBucket}/o/{sourceObject}/rewriteTo/b/{destinationBucket}/o/{destinationObject}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -27530,7 +30312,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -27585,9 +30367,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27598,7 +30391,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -27611,8 +30404,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().set_iam_policy(req, "bucket", "object")
-///              .user_project("et")
-///              .generation(-48)
+///              .user_project("eirmod")
+///              .generation(-4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27675,7 +30468,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/iam";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -27886,7 +30679,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -27940,9 +30733,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27953,16 +30757,16 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.objects().test_iam_permissions("bucket", "object", &vec!["diam".into()])
-///              .user_project("ipsum")
-///              .generation(-38)
+/// let result = hub.objects().test_iam_permissions("bucket", "object", &vec!["dolor".into()])
+///              .user_project("consetetur")
+///              .generation(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28039,7 +30843,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}/iam/testPermissions";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -28231,7 +31035,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -28286,9 +31090,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28299,7 +31114,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -28312,15 +31127,15 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().update(req, "bucket", "object")
-///              .user_project("At")
+///              .user_project("nonumy")
 ///              .projection("diam")
-///              .predefined_acl("amet")
-///              .override_unlocked_retention(false)
-///              .if_metageneration_not_match(-90)
-///              .if_metageneration_match(-31)
-///              .if_generation_not_match(-20)
-///              .if_generation_match(-35)
-///              .generation(-1)
+///              .predefined_acl("ipsum")
+///              .override_unlocked_retention(true)
+///              .if_metageneration_not_match(-15)
+///              .if_metageneration_match(-78)
+///              .if_generation_not_match(-77)
+///              .if_generation_match(-92)
+///              .generation(-47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28426,7 +31241,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -28683,7 +31498,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -28738,9 +31553,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28751,7 +31577,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -28764,16 +31590,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().watch_all(req, "bucket")
-///              .versions(true)
-///              .user_project("accusam")
-///              .start_offset("et")
-///              .projection("nonumy")
-///              .prefix("accusam")
-///              .page_token("ut")
-///              .max_results(23)
-///              .include_trailing_delimiter(true)
-///              .end_offset("dolor")
-///              .delimiter("amet")
+///              .versions(false)
+///              .user_project("erat")
+///              .start_offset("duo")
+///              .projection("et")
+///              .prefix("erat")
+///              .page_token("sit")
+///              .max_results(28)
+///              .include_trailing_delimiter(false)
+///              .end_offset("accusam")
+///              .delimiter("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -28881,7 +31707,7 @@ where
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/watch";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -29023,7 +31849,7 @@ where
         self._bucket = new_value.to_string();
         self
     }
-    /// If true, lists all versions of an object as distinct results. The default is false. For more information, see Object Versioning.
+    /// If true, lists all versions of an object as distinct results. The default is false. For more information, see [Object Versioning](https://cloud.google.com/storage/docs/object-versioning).
     ///
     /// Sets the *versions* query property to the given value.
     pub fn versions(mut self, new_value: bool) -> ObjectWatchAllCall<'a, C> {
@@ -29138,7 +31964,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -29192,9 +32018,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29205,7 +32042,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -29213,7 +32050,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_create("projectId", "serviceAccountEmail")
-///              .user_project("ipsum")
+///              .user_project("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -29271,7 +32108,7 @@ where
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/hmacKeys";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -29445,7 +32282,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -29499,9 +32336,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29512,7 +32360,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -29520,7 +32368,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_delete("projectId", "accessId")
-///              .user_project("sea")
+///              .user_project("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -29577,7 +32425,7 @@ where
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/hmacKeys/{accessId}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadWrite.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -29740,7 +32588,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadWrite`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -29794,9 +32642,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29807,7 +32666,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -29815,7 +32674,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_get("projectId", "accessId")
-///              .user_project("Stet")
+///              .user_project("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -29873,7 +32732,7 @@ where
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/hmacKeys/{accessId}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -30049,7 +32908,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -30103,9 +32962,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30116,7 +32986,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -30124,11 +32994,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_list("projectId")
-///              .user_project("no")
+///              .user_project("duo")
 ///              .show_deleted_keys(true)
-///              .service_account_email("ipsum")
-///              .page_token("sea")
-///              .max_results(3)
+///              .service_account_email("Stet")
+///              .page_token("sadipscing")
+///              .max_results(90)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30210,7 +33080,7 @@ where
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/hmacKeys";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -30402,7 +33272,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -30439,7 +33309,7 @@ where
     }
 }
 
-/// Updates the state of an HMAC key. See the HMAC Key resource descriptor for valid states.
+/// Updates the state of an HMAC key. See the [HMAC Key resource descriptor](https://cloud.google.com/storage/docs/json_api/v1/projects/hmacKeys/update#request-body) for valid states.
 ///
 /// A builder for the *hmacKeys.update* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -30457,9 +33327,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30470,7 +33351,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -30483,7 +33364,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_update(req, "projectId", "accessId")
-///              .user_project("At")
+///              .user_project("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -30542,7 +33423,7 @@ where
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/hmacKeys/{accessId}";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageFullControl.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -30748,7 +33629,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageFullControl`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -30802,9 +33683,20 @@ where
 /// # use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30815,7 +33707,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Storage::new(client, auth);
@@ -30823,7 +33715,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_account_get("projectId")
-///              .user_project("takimata")
+///              .user_project("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -30879,7 +33771,7 @@ where
         let mut url = self.hub._base_url.clone() + "projects/{projectId}/serviceAccount";
         if self._scopes.is_empty() {
             self._scopes
-                .insert(Scope::CloudPlatform.as_ref().to_string());
+                .insert(Scope::DevstorageReadOnly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -31043,7 +33935,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
+    /// [`Scope::DevstorageReadOnly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *6.0.0+20240626*, where *20240626* is the exact revision of the *androidpublisher:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Android Publisher* crate version *7.0.0+20251216*, where *20251216* is the exact revision of the *androidpublisher:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
 //!
 //! Everything else about the *Android Publisher* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -14,7 +14,7 @@
 //! * applications
 //!  * [*data safety*](api::ApplicationDataSafetyCall), [*device tier configs create*](api::ApplicationDeviceTierConfigCreateCall), [*device tier configs get*](api::ApplicationDeviceTierConfigGetCall) and [*device tier configs list*](api::ApplicationDeviceTierConfigListCall)
 //! * apprecovery
-//!  * [*add targeting*](api::ApprecoveryAddTargetingCall), [*app recoveries*](api::ApprecoveryAppRecoveryCall), [*cancel*](api::ApprecoveryCancelCall), [*create*](api::ApprecoveryCreateCall) and [*deploy*](api::ApprecoveryDeployCall)
+//!  * [*add targeting*](api::ApprecoveryAddTargetingCall), [*cancel*](api::ApprecoveryCancelCall), [*create*](api::ApprecoveryCreateCall), [*deploy*](api::ApprecoveryDeployCall) and [*list*](api::ApprecoveryListCall)
 //! * edits
 //!  * [*apks addexternallyhosted*](api::EditApkAddexternallyhostedCall), [*apks list*](api::EditApkListCall), [*apks upload*](api::EditApkUploadCall), [*bundles list*](api::EditBundleListCall), [*bundles upload*](api::EditBundleUploadCall), [*commit*](api::EditCommitCall), [*countryavailability get*](api::EditCountryavailabilityGetCall), [*delete*](api::EditDeleteCall), [*deobfuscationfiles upload*](api::EditDeobfuscationfileUploadCall), [*details get*](api::EditDetailGetCall), [*details patch*](api::EditDetailPatchCall), [*details update*](api::EditDetailUpdateCall), [*expansionfiles get*](api::EditExpansionfileGetCall), [*expansionfiles patch*](api::EditExpansionfilePatchCall), [*expansionfiles update*](api::EditExpansionfileUpdateCall), [*expansionfiles upload*](api::EditExpansionfileUploadCall), [*get*](api::EditGetCall), [*images delete*](api::EditImageDeleteCall), [*images deleteall*](api::EditImageDeleteallCall), [*images list*](api::EditImageListCall), [*images upload*](api::EditImageUploadCall), [*insert*](api::EditInsertCall), [*listings delete*](api::EditListingDeleteCall), [*listings deleteall*](api::EditListingDeleteallCall), [*listings get*](api::EditListingGetCall), [*listings list*](api::EditListingListCall), [*listings patch*](api::EditListingPatchCall), [*listings update*](api::EditListingUpdateCall), [*testers get*](api::EditTesterGetCall), [*testers patch*](api::EditTesterPatchCall), [*testers update*](api::EditTesterUpdateCall), [*tracks create*](api::EditTrackCreateCall), [*tracks get*](api::EditTrackGetCall), [*tracks list*](api::EditTrackListCall), [*tracks patch*](api::EditTrackPatchCall), [*tracks update*](api::EditTrackUpdateCall) and [*validate*](api::EditValidateCall)
 //! * externaltransactions
@@ -28,11 +28,11 @@
 //! * internalappsharingartifacts
 //!  * [*uploadapk*](api::InternalappsharingartifactUploadapkCall) and [*uploadbundle*](api::InternalappsharingartifactUploadbundleCall)
 //! * monetization
-//!  * [*convert region prices*](api::MonetizationConvertRegionPriceCall), [*subscriptions archive*](api::MonetizationSubscriptionArchiveCall), [*subscriptions base plans activate*](api::MonetizationSubscriptionBasePlanActivateCall), [*subscriptions base plans batch migrate prices*](api::MonetizationSubscriptionBasePlanBatchMigratePriceCall), [*subscriptions base plans batch update states*](api::MonetizationSubscriptionBasePlanBatchUpdateStateCall), [*subscriptions base plans deactivate*](api::MonetizationSubscriptionBasePlanDeactivateCall), [*subscriptions base plans delete*](api::MonetizationSubscriptionBasePlanDeleteCall), [*subscriptions base plans migrate prices*](api::MonetizationSubscriptionBasePlanMigratePriceCall), [*subscriptions base plans offers activate*](api::MonetizationSubscriptionBasePlanOfferActivateCall), [*subscriptions base plans offers batch get*](api::MonetizationSubscriptionBasePlanOfferBatchGetCall), [*subscriptions base plans offers batch update*](api::MonetizationSubscriptionBasePlanOfferBatchUpdateCall), [*subscriptions base plans offers batch update states*](api::MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall), [*subscriptions base plans offers create*](api::MonetizationSubscriptionBasePlanOfferCreateCall), [*subscriptions base plans offers deactivate*](api::MonetizationSubscriptionBasePlanOfferDeactivateCall), [*subscriptions base plans offers delete*](api::MonetizationSubscriptionBasePlanOfferDeleteCall), [*subscriptions base plans offers get*](api::MonetizationSubscriptionBasePlanOfferGetCall), [*subscriptions base plans offers list*](api::MonetizationSubscriptionBasePlanOfferListCall), [*subscriptions base plans offers patch*](api::MonetizationSubscriptionBasePlanOfferPatchCall), [*subscriptions batch get*](api::MonetizationSubscriptionBatchGetCall), [*subscriptions batch update*](api::MonetizationSubscriptionBatchUpdateCall), [*subscriptions create*](api::MonetizationSubscriptionCreateCall), [*subscriptions delete*](api::MonetizationSubscriptionDeleteCall), [*subscriptions get*](api::MonetizationSubscriptionGetCall), [*subscriptions list*](api::MonetizationSubscriptionListCall) and [*subscriptions patch*](api::MonetizationSubscriptionPatchCall)
-//! * orders
-//!  * [*refund*](api::OrderRefundCall)
+//!  * [*convert region prices*](api::MonetizationConvertRegionPriceCall), [*onetimeproducts batch delete*](api::MonetizationOnetimeproductBatchDeleteCall), [*onetimeproducts batch get*](api::MonetizationOnetimeproductBatchGetCall), [*onetimeproducts batch update*](api::MonetizationOnetimeproductBatchUpdateCall), [*onetimeproducts delete*](api::MonetizationOnetimeproductDeleteCall), [*onetimeproducts get*](api::MonetizationOnetimeproductGetCall), [*onetimeproducts list*](api::MonetizationOnetimeproductListCall), [*onetimeproducts patch*](api::MonetizationOnetimeproductPatchCall), [*onetimeproducts purchase options batch delete*](api::MonetizationOnetimeproductPurchaseOptionBatchDeleteCall), [*onetimeproducts purchase options batch update states*](api::MonetizationOnetimeproductPurchaseOptionBatchUpdateStateCall), [*onetimeproducts purchase options offers activate*](api::MonetizationOnetimeproductPurchaseOptionOfferActivateCall), [*onetimeproducts purchase options offers batch delete*](api::MonetizationOnetimeproductPurchaseOptionOfferBatchDeleteCall), [*onetimeproducts purchase options offers batch get*](api::MonetizationOnetimeproductPurchaseOptionOfferBatchGetCall), [*onetimeproducts purchase options offers batch update*](api::MonetizationOnetimeproductPurchaseOptionOfferBatchUpdateCall), [*onetimeproducts purchase options offers batch update states*](api::MonetizationOnetimeproductPurchaseOptionOfferBatchUpdateStateCall), [*onetimeproducts purchase options offers cancel*](api::MonetizationOnetimeproductPurchaseOptionOfferCancelCall), [*onetimeproducts purchase options offers deactivate*](api::MonetizationOnetimeproductPurchaseOptionOfferDeactivateCall), [*onetimeproducts purchase options offers list*](api::MonetizationOnetimeproductPurchaseOptionOfferListCall), [*subscriptions archive*](api::MonetizationSubscriptionArchiveCall), [*subscriptions base plans activate*](api::MonetizationSubscriptionBasePlanActivateCall), [*subscriptions base plans batch migrate prices*](api::MonetizationSubscriptionBasePlanBatchMigratePriceCall), [*subscriptions base plans batch update states*](api::MonetizationSubscriptionBasePlanBatchUpdateStateCall), [*subscriptions base plans deactivate*](api::MonetizationSubscriptionBasePlanDeactivateCall), [*subscriptions base plans delete*](api::MonetizationSubscriptionBasePlanDeleteCall), [*subscriptions base plans migrate prices*](api::MonetizationSubscriptionBasePlanMigratePriceCall), [*subscriptions base plans offers activate*](api::MonetizationSubscriptionBasePlanOfferActivateCall), [*subscriptions base plans offers batch get*](api::MonetizationSubscriptionBasePlanOfferBatchGetCall), [*subscriptions base plans offers batch update*](api::MonetizationSubscriptionBasePlanOfferBatchUpdateCall), [*subscriptions base plans offers batch update states*](api::MonetizationSubscriptionBasePlanOfferBatchUpdateStateCall), [*subscriptions base plans offers create*](api::MonetizationSubscriptionBasePlanOfferCreateCall), [*subscriptions base plans offers deactivate*](api::MonetizationSubscriptionBasePlanOfferDeactivateCall), [*subscriptions base plans offers delete*](api::MonetizationSubscriptionBasePlanOfferDeleteCall), [*subscriptions base plans offers get*](api::MonetizationSubscriptionBasePlanOfferGetCall), [*subscriptions base plans offers list*](api::MonetizationSubscriptionBasePlanOfferListCall), [*subscriptions base plans offers patch*](api::MonetizationSubscriptionBasePlanOfferPatchCall), [*subscriptions batch get*](api::MonetizationSubscriptionBatchGetCall), [*subscriptions batch update*](api::MonetizationSubscriptionBatchUpdateCall), [*subscriptions create*](api::MonetizationSubscriptionCreateCall), [*subscriptions delete*](api::MonetizationSubscriptionDeleteCall), [*subscriptions get*](api::MonetizationSubscriptionGetCall), [*subscriptions list*](api::MonetizationSubscriptionListCall) and [*subscriptions patch*](api::MonetizationSubscriptionPatchCall)
+//! * [orders](api::Order)
+//!  * [*batchget*](api::OrderBatchgetCall), [*get*](api::OrderGetCall) and [*refund*](api::OrderRefundCall)
 //! * purchases
-//!  * [*products acknowledge*](api::PurchaseProductAcknowledgeCall), [*products consume*](api::PurchaseProductConsumeCall), [*products get*](api::PurchaseProductGetCall), [*subscriptions acknowledge*](api::PurchaseSubscriptionAcknowledgeCall), [*subscriptions cancel*](api::PurchaseSubscriptionCancelCall), [*subscriptions defer*](api::PurchaseSubscriptionDeferCall), [*subscriptions get*](api::PurchaseSubscriptionGetCall), [*subscriptions refund*](api::PurchaseSubscriptionRefundCall), [*subscriptions revoke*](api::PurchaseSubscriptionRevokeCall), [*subscriptionsv2 get*](api::PurchaseSubscriptionsv2GetCall), [*subscriptionsv2 revoke*](api::PurchaseSubscriptionsv2RevokeCall) and [*voidedpurchases list*](api::PurchaseVoidedpurchaseListCall)
+//!  * [*products acknowledge*](api::PurchaseProductAcknowledgeCall), [*products consume*](api::PurchaseProductConsumeCall), [*products get*](api::PurchaseProductGetCall), [*productsv2 getproductpurchasev2*](api::PurchaseProductsv2Getproductpurchasev2Call), [*subscriptions acknowledge*](api::PurchaseSubscriptionAcknowledgeCall), [*subscriptions cancel*](api::PurchaseSubscriptionCancelCall), [*subscriptions defer*](api::PurchaseSubscriptionDeferCall), [*subscriptions get*](api::PurchaseSubscriptionGetCall), [*subscriptions refund*](api::PurchaseSubscriptionRefundCall), [*subscriptions revoke*](api::PurchaseSubscriptionRevokeCall), [*subscriptionsv2 cancel*](api::PurchaseSubscriptionsv2CancelCall), [*subscriptionsv2 get*](api::PurchaseSubscriptionsv2GetCall), [*subscriptionsv2 revoke*](api::PurchaseSubscriptionsv2RevokeCall) and [*voidedpurchases list*](api::PurchaseVoidedpurchaseListCall)
 //! * [reviews](api::Review)
 //!  * [*get*](api::ReviewGetCall), [*list*](api::ReviewListCall) and [*reply*](api::ReviewReplyCall)
 //! * systemapks
@@ -133,9 +133,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -146,7 +157,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = AndroidPublisher::new(client, auth);
