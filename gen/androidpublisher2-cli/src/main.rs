@@ -52,7 +52,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().apklistings_delete(
             opt.value_of("package-name").unwrap_or(""),
@@ -125,7 +125,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().apklistings_deleteall(
             opt.value_of("package-name").unwrap_or(""),
@@ -197,7 +197,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().apklistings_get(
             opt.value_of("package-name").unwrap_or(""),
@@ -286,7 +286,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().apklistings_list(
             opt.value_of("package-name").unwrap_or(""),
@@ -435,7 +435,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().apklistings_patch(
             request,
@@ -586,7 +586,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().apklistings_update(
             request,
@@ -1426,7 +1426,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().deobfuscationfiles_upload(
             opt.value_of("package-name").unwrap_or(""),
@@ -1936,7 +1936,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().expansionfiles_get(
             opt.value_of("package-name").unwrap_or(""),
@@ -2086,7 +2086,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().expansionfiles_patch(
             request,
@@ -2237,7 +2237,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().expansionfiles_update(
             request,
@@ -2327,7 +2327,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().expansionfiles_upload(
             opt.value_of("package-name").unwrap_or(""),
@@ -6744,7 +6744,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/androidpublisher2", config_dir))
         .build()
@@ -8520,7 +8522,7 @@ async fn main() {
 
     let mut app = App::new("androidpublisher2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20200331")
+           .version("7.0.0+20200331")
            .about("Accesses Android application developers' Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli")
            .arg(Arg::with_name("url")
@@ -8598,7 +8600,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

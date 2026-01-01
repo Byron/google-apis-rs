@@ -80,18 +80,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "reason" => Some((
-                    "reason",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "properties" => Some((
                     "properties",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Map,
+                    },
+                )),
+                "reason" => Some((
+                    "reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 _ => {
@@ -212,6 +212,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -229,6 +232,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["view"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -398,15 +402,15 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
-                "reason" => Some((
-                    "reason",
+                "approval-name" => Some((
+                    "approvalName",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "approval-name" => Some((
-                    "approvalName",
+                "reason" => Some((
+                    "reason",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1121,155 +1125,8 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
-                "usage-reporting-id" => Some((
-                    "usageReportingId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "new-pending-offer" => Some((
-                    "newPendingOffer",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "product-external-name" => Some((
-                    "productExternalName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "quote-external-name" => Some((
-                    "quoteExternalName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "message-to-user" => Some((
-                    "messageToUser",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "subscription-end-time" => Some((
-                    "subscriptionEndTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "product" => Some((
-                    "product",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "new-offer-start-time" => Some((
-                    "newOfferStartTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "new-offer-end-time" => Some((
-                    "newOfferEndTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "new-pending-plan" => Some((
-                    "newPendingPlan",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "offer-duration" => Some((
-                    "offerDuration",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "new-pending-offer-duration" => Some((
-                    "newPendingOfferDuration",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "state" => Some((
-                    "state",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "order-id" => Some((
-                    "orderId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "provider" => Some((
-                    "provider",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "offer" => Some((
-                    "offer",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "offer-end-time" => Some((
-                    "offerEndTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "account" => Some((
                     "account",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "plan" => Some((
-                    "plan",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1282,11 +1139,158 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "entitlement-benefit-ids" => Some((
                     "entitlementBenefitIds",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "message-to-user" => Some((
+                    "messageToUser",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "new-offer-end-time" => Some((
+                    "newOfferEndTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "new-offer-start-time" => Some((
+                    "newOfferStartTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "new-pending-offer" => Some((
+                    "newPendingOffer",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "new-pending-offer-duration" => Some((
+                    "newPendingOfferDuration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "new-pending-plan" => Some((
+                    "newPendingPlan",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "offer" => Some((
+                    "offer",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "offer-duration" => Some((
+                    "offerDuration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "offer-end-time" => Some((
+                    "offerEndTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "order-id" => Some((
+                    "orderId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "plan" => Some((
+                    "plan",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product" => Some((
+                    "product",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-external-name" => Some((
+                    "productExternalName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "provider" => Some((
+                    "provider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "quote-external-name" => Some((
+                    "quoteExternalName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "state" => Some((
+                    "state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "subscription-end-time" => Some((
+                    "subscriptionEndTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "usage-reporting-id" => Some((
+                    "usageReportingId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 _ => {
@@ -1587,15 +1591,15 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
-                "reason" => Some((
-                    "reason",
+                "pending-plan-name" => Some((
+                    "pendingPlanName",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "pending-plan-name" => Some((
-                    "pendingPlanName",
+                "reason" => Some((
+                    "reason",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1948,7 +1952,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/cloudcommerceprocurement1", config_dir))
         .build()
@@ -2312,7 +2318,7 @@ async fn main() {
 
     let mut app = App::new("cloudcommerceprocurement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240804")
+           .version("7.0.0+20251214")
            .about("Partner API for the Cloud Commerce Procurement Service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudcommerceprocurement1_cli")
            .arg(Arg::with_name("url")
@@ -2377,7 +2383,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloudchannel* API at revision *20240625*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloudchannel* API at revision *20251216*. The CLI is at version *7.0.0*.
 
 ```bash
 cloudchannel1 [options]
@@ -86,6 +86,10 @@ cloudchannel1 [options]
                 sku-groups-billable-skus-list <parent> [-p <v>]... [-o <out>]
                 sku-groups-list <parent> [-p <v>]... [-o <out>]
                 unregister <account> (-r <kv>)... [-p <v>]... [-o <out>]
+        integrators
+                list-subscribers <integrator> [-p <v>]... [-o <out>]
+                register-subscriber <integrator> (-r <kv>)... [-p <v>]... [-o <out>]
+                unregister-subscriber <integrator> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]

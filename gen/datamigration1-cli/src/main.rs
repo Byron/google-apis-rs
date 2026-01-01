@@ -71,850 +71,150 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "alloydb.cluster-id" => Some((
-                    "alloydb.clusterId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.database-version" => Some((
-                    "alloydb.settings.databaseVersion",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.encryption-config.kms-key-name" => Some((
-                    "alloydb.settings.encryptionConfig.kmsKeyName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.initial-user.password" => Some((
-                    "alloydb.settings.initialUser.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.initial-user.password-set" => Some((
-                    "alloydb.settings.initialUser.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.initial-user.user" => Some((
-                    "alloydb.settings.initialUser.user",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.labels" => Some((
-                    "alloydb.settings.labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.database-flags" => Some((
-                    "alloydb.settings.primaryInstanceSettings.databaseFlags",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.id" => Some((
-                    "alloydb.settings.primaryInstanceSettings.id",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.labels" => Some((
-                    "alloydb.settings.primaryInstanceSettings.labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.machine-config.cpu-count" => Some((
-                    "alloydb.settings.primaryInstanceSettings.machineConfig.cpuCount",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.private-ip" => Some((
-                    "alloydb.settings.primaryInstanceSettings.privateIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.vpc-network" => Some((
-                    "alloydb.settings.vpcNetwork",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.additional-public-ip" => Some((
-                    "cloudsql.additionalPublicIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.cloud-sql-id" => Some((
-                    "cloudsql.cloudSqlId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.private-ip" => Some((
-                    "cloudsql.privateIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.public-ip" => Some((
-                    "cloudsql.publicIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.activation-policy" => Some((
-                    "cloudsql.settings.activationPolicy",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.auto-storage-increase" => Some((
-                    "cloudsql.settings.autoStorageIncrease",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.availability-type" => Some((
-                    "cloudsql.settings.availabilityType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.cmek-key-name" => Some((
-                    "cloudsql.settings.cmekKeyName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.collation" => Some((
-                    "cloudsql.settings.collation",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.data-cache-config.data-cache-enabled" => Some((
-                    "cloudsql.settings.dataCacheConfig.dataCacheEnabled",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.data-disk-size-gb" => Some((
-                    "cloudsql.settings.dataDiskSizeGb",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.data-disk-type" => Some((
-                    "cloudsql.settings.dataDiskType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.database-flags" => Some((
-                    "cloudsql.settings.databaseFlags",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "cloudsql.settings.database-version" => Some((
-                    "cloudsql.settings.databaseVersion",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.edition" => Some((
-                    "cloudsql.settings.edition",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.ip-config.allocated-ip-range" => Some((
-                    "cloudsql.settings.ipConfig.allocatedIpRange",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.ip-config.enable-ipv4" => Some((
-                    "cloudsql.settings.ipConfig.enableIpv4",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.ip-config.private-network" => Some((
-                    "cloudsql.settings.ipConfig.privateNetwork",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.ip-config.require-ssl" => Some((
-                    "cloudsql.settings.ipConfig.requireSsl",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.root-password" => Some((
-                    "cloudsql.settings.rootPassword",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.root-password-set" => Some((
-                    "cloudsql.settings.rootPasswordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.secondary-zone" => Some((
-                    "cloudsql.settings.secondaryZone",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.source-id" => Some((
-                    "cloudsql.settings.sourceId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.storage-auto-resize-limit" => Some((
-                    "cloudsql.settings.storageAutoResizeLimit",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.tier" => Some((
-                    "cloudsql.settings.tier",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.user-labels" => Some((
-                    "cloudsql.settings.userLabels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "cloudsql.settings.zone" => Some((
-                    "cloudsql.settings.zone",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "error.code" => Some((
-                    "error.code",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "error.message" => Some((
-                    "error.message",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "labels" => Some((
-                    "labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "mysql.cloud-sql-id" => Some((
-                    "mysql.cloudSqlId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.host" => Some((
-                    "mysql.host",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.password" => Some((
-                    "mysql.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.password-set" => Some((
-                    "mysql.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.port" => Some((
-                    "mysql.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.ssl.ca-certificate" => Some((
-                    "mysql.ssl.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.ssl.client-certificate" => Some((
-                    "mysql.ssl.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.ssl.client-key" => Some((
-                    "mysql.ssl.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.ssl.type" => Some((
-                    "mysql.ssl.type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.username" => Some((
-                    "mysql.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.database-service" => Some((
-                    "oracle.databaseService",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.hostname" => Some((
-                    "oracle.forwardSshConnectivity.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.password" => Some((
-                    "oracle.forwardSshConnectivity.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.port" => Some((
-                    "oracle.forwardSshConnectivity.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.private-key" => Some((
-                    "oracle.forwardSshConnectivity.privateKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.username" => Some((
-                    "oracle.forwardSshConnectivity.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.host" => Some((
-                    "oracle.host",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.password" => Some((
-                    "oracle.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.password-set" => Some((
-                    "oracle.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.port" => Some((
-                    "oracle.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.private-connectivity.private-connection" => Some((
-                    "oracle.privateConnectivity.privateConnection",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.ssl.ca-certificate" => Some((
-                    "oracle.ssl.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.ssl.client-certificate" => Some((
-                    "oracle.ssl.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.ssl.client-key" => Some((
-                    "oracle.ssl.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.ssl.type" => Some((
-                    "oracle.ssl.type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.username" => Some((
-                    "oracle.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.alloydb-cluster-id" => Some((
-                    "postgresql.alloydbClusterId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.cloud-sql-id" => Some((
-                    "postgresql.cloudSqlId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.host" => Some((
-                    "postgresql.host",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.network-architecture" => Some((
-                    "postgresql.networkArchitecture",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.password" => Some((
-                    "postgresql.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.password-set" => Some((
-                    "postgresql.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.port" => Some((
-                    "postgresql.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.private-service-connect-connectivity.service-attachment" => Some((
-                    "postgresql.privateServiceConnectConnectivity.serviceAttachment",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.ssl.ca-certificate" => Some((
-                    "postgresql.ssl.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.ssl.client-certificate" => Some((
-                    "postgresql.ssl.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.ssl.client-key" => Some((
-                    "postgresql.ssl.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.ssl.type" => Some((
-                    "postgresql.ssl.type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.username" => Some((
-                    "postgresql.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "provider" => Some((
-                    "provider",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.backups.gcs-bucket" => Some((
-                    "sqlserver.backups.gcsBucket",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.backups.gcs-prefix" => Some((
-                    "sqlserver.backups.gcsPrefix",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.cloud-sql-id" => Some((
-                    "sqlserver.cloudSqlId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.hostname" => Some((
-                    "sqlserver.forwardSshConnectivity.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.password" => Some((
-                    "sqlserver.forwardSshConnectivity.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.port" => Some((
-                    "sqlserver.forwardSshConnectivity.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.private-key" => Some((
-                    "sqlserver.forwardSshConnectivity.privateKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.username" => Some((
-                    "sqlserver.forwardSshConnectivity.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.host" => Some((
-                    "sqlserver.host",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.password" => Some((
-                    "sqlserver.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.password-set" => Some((
-                    "sqlserver.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.port" => Some((
-                    "sqlserver.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.private-connectivity.private-connection" => Some((
-                    "sqlserver.privateConnectivity.privateConnection",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.private-service-connect-connectivity.service-attachment" => Some((
-                    "sqlserver.privateServiceConnectConnectivity.serviceAttachment",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.ssl.ca-certificate" => Some((
-                    "sqlserver.ssl.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.ssl.client-certificate" => Some((
-                    "sqlserver.ssl.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.ssl.client-key" => Some((
-                    "sqlserver.ssl.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.ssl.type" => Some((
-                    "sqlserver.ssl.type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.username" => Some((
-                    "sqlserver.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "state" => Some((
-                    "state",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "activation-policy",
-                            "additional-public-ip",
-                            "allocated-ip-range",
-                            "alloydb",
-                            "alloydb-cluster-id",
-                            "auto-storage-increase",
-                            "availability-type",
-                            "backups",
-                            "ca-certificate",
-                            "client-certificate",
-                            "client-key",
-                            "cloud-sql-id",
-                            "cloudsql",
-                            "cluster-id",
-                            "cmek-key-name",
-                            "code",
-                            "collation",
-                            "cpu-count",
-                            "create-time",
-                            "data-cache-config",
-                            "data-cache-enabled",
-                            "data-disk-size-gb",
-                            "data-disk-type",
-                            "database-flags",
-                            "database-service",
-                            "database-version",
-                            "display-name",
-                            "edition",
-                            "enable-ipv4",
-                            "encryption-config",
-                            "error",
-                            "forward-ssh-connectivity",
-                            "gcs-bucket",
-                            "gcs-prefix",
-                            "host",
-                            "hostname",
-                            "id",
-                            "initial-user",
-                            "ip-config",
-                            "kms-key-name",
-                            "labels",
-                            "machine-config",
-                            "message",
-                            "mysql",
-                            "name",
-                            "network-architecture",
-                            "oracle",
-                            "password",
-                            "password-set",
-                            "port",
-                            "postgresql",
-                            "primary-instance-settings",
-                            "private-connection",
-                            "private-connectivity",
-                            "private-ip",
-                            "private-key",
-                            "private-network",
-                            "private-service-connect-connectivity",
-                            "provider",
-                            "public-ip",
-                            "require-ssl",
-                            "root-password",
-                            "root-password-set",
-                            "secondary-zone",
-                            "service-attachment",
-                            "settings",
-                            "source-id",
-                            "sqlserver",
-                            "ssl",
-                            "state",
-                            "storage-auto-resize-limit",
-                            "tier",
-                            "type",
-                            "update-time",
-                            "user",
-                            "user-labels",
-                            "username",
-                            "vpc-network",
-                            "zone",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "alloydb.cluster-id" => Some(("alloydb.clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.database-version" => Some(("alloydb.settings.databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.encryption-config.kms-key-name" => Some(("alloydb.settings.encryptionConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.initial-user.password" => Some(("alloydb.settings.initialUser.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.initial-user.password-set" => Some(("alloydb.settings.initialUser.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "alloydb.settings.initial-user.user" => Some(("alloydb.settings.initialUser.user", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.labels" => Some(("alloydb.settings.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "alloydb.settings.primary-instance-settings.database-flags" => Some(("alloydb.settings.primaryInstanceSettings.databaseFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "alloydb.settings.primary-instance-settings.id" => Some(("alloydb.settings.primaryInstanceSettings.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.instance-network-config.enable-outbound-public-ip" => Some(("alloydb.settings.primaryInstanceSettings.instanceNetworkConfig.enableOutboundPublicIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.instance-network-config.enable-public-ip" => Some(("alloydb.settings.primaryInstanceSettings.instanceNetworkConfig.enablePublicIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.labels" => Some(("alloydb.settings.primaryInstanceSettings.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "alloydb.settings.primary-instance-settings.machine-config.cpu-count" => Some(("alloydb.settings.primaryInstanceSettings.machineConfig.cpuCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.machine-config.machine-type" => Some(("alloydb.settings.primaryInstanceSettings.machineConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.outbound-public-ip-addresses" => Some(("alloydb.settings.primaryInstanceSettings.outboundPublicIpAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "alloydb.settings.primary-instance-settings.private-ip" => Some(("alloydb.settings.primaryInstanceSettings.privateIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.vpc-network" => Some(("alloydb.settings.vpcNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.additional-public-ip" => Some(("cloudsql.additionalPublicIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.cloud-sql-id" => Some(("cloudsql.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.private-ip" => Some(("cloudsql.privateIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.public-ip" => Some(("cloudsql.publicIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.activation-policy" => Some(("cloudsql.settings.activationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.auto-storage-increase" => Some(("cloudsql.settings.autoStorageIncrease", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.availability-type" => Some(("cloudsql.settings.availabilityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.cmek-key-name" => Some(("cloudsql.settings.cmekKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.collation" => Some(("cloudsql.settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-cache-config.data-cache-enabled" => Some(("cloudsql.settings.dataCacheConfig.dataCacheEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-disk-provisioned-iops" => Some(("cloudsql.settings.dataDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-disk-provisioned-throughput" => Some(("cloudsql.settings.dataDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-disk-size-gb" => Some(("cloudsql.settings.dataDiskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-disk-type" => Some(("cloudsql.settings.dataDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.database-flags" => Some(("cloudsql.settings.databaseFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cloudsql.settings.database-version" => Some(("cloudsql.settings.databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.database-version-name" => Some(("cloudsql.settings.databaseVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.edition" => Some(("cloudsql.settings.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.ip-config.allocated-ip-range" => Some(("cloudsql.settings.ipConfig.allocatedIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.ip-config.enable-ipv4" => Some(("cloudsql.settings.ipConfig.enableIpv4", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.ip-config.private-network" => Some(("cloudsql.settings.ipConfig.privateNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.ip-config.require-ssl" => Some(("cloudsql.settings.ipConfig.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.root-password" => Some(("cloudsql.settings.rootPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.root-password-set" => Some(("cloudsql.settings.rootPasswordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.secondary-zone" => Some(("cloudsql.settings.secondaryZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.source-id" => Some(("cloudsql.settings.sourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.storage-auto-resize-limit" => Some(("cloudsql.settings.storageAutoResizeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.tier" => Some(("cloudsql.settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.user-labels" => Some(("cloudsql.settings.userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cloudsql.settings.zone" => Some(("cloudsql.settings.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "mysql.cloud-sql-id" => Some(("mysql.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.host" => Some(("mysql.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.password" => Some(("mysql.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.password-set" => Some(("mysql.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mysql.port" => Some(("mysql.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "mysql.ssl.ca-certificate" => Some(("mysql.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.ssl.client-certificate" => Some(("mysql.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.ssl.client-key" => Some(("mysql.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.ssl.ssl-flags" => Some(("mysql.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "mysql.ssl.type" => Some(("mysql.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.username" => Some(("mysql.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.database-service" => Some(("oracle.databaseService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.hostname" => Some(("oracle.forwardSshConnectivity.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.password" => Some(("oracle.forwardSshConnectivity.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.port" => Some(("oracle.forwardSshConnectivity.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.private-key" => Some(("oracle.forwardSshConnectivity.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.username" => Some(("oracle.forwardSshConnectivity.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.host" => Some(("oracle.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.asm-service" => Some(("oracle.oracleAsmConfig.asmService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.hostname" => Some(("oracle.oracleAsmConfig.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.password" => Some(("oracle.oracleAsmConfig.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.password-set" => Some(("oracle.oracleAsmConfig.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.port" => Some(("oracle.oracleAsmConfig.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.ssl.ca-certificate" => Some(("oracle.oracleAsmConfig.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.ssl.client-certificate" => Some(("oracle.oracleAsmConfig.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.ssl.client-key" => Some(("oracle.oracleAsmConfig.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.ssl.ssl-flags" => Some(("oracle.oracleAsmConfig.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "oracle.oracle-asm-config.ssl.type" => Some(("oracle.oracleAsmConfig.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.username" => Some(("oracle.oracleAsmConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.password" => Some(("oracle.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.password-set" => Some(("oracle.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle.port" => Some(("oracle.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle.private-connectivity.private-connection" => Some(("oracle.privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.ssl.ca-certificate" => Some(("oracle.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.ssl.client-certificate" => Some(("oracle.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.ssl.client-key" => Some(("oracle.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.ssl.ssl-flags" => Some(("oracle.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "oracle.ssl.type" => Some(("oracle.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.username" => Some(("oracle.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.alloydb-cluster-id" => Some(("postgresql.alloydbClusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.cloud-sql-id" => Some(("postgresql.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.database" => Some(("postgresql.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.host" => Some(("postgresql.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.network-architecture" => Some(("postgresql.networkArchitecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.password" => Some(("postgresql.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.password-set" => Some(("postgresql.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "postgresql.port" => Some(("postgresql.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "postgresql.private-service-connect-connectivity.service-attachment" => Some(("postgresql.privateServiceConnectConnectivity.serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.ssl.ca-certificate" => Some(("postgresql.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.ssl.client-certificate" => Some(("postgresql.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.ssl.client-key" => Some(("postgresql.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.ssl.ssl-flags" => Some(("postgresql.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "postgresql.ssl.type" => Some(("postgresql.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.username" => Some(("postgresql.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "provider" => Some(("provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver.backups.gcs-bucket" => Some(("sqlserver.backups.gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.backups.gcs-prefix" => Some(("sqlserver.backups.gcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.cloud-sql-id" => Some(("sqlserver.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.cloud-sql-project-id" => Some(("sqlserver.cloudSqlProjectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.database" => Some(("sqlserver.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.dbm-port" => Some(("sqlserver.dbmPort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.hostname" => Some(("sqlserver.forwardSshConnectivity.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.password" => Some(("sqlserver.forwardSshConnectivity.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.port" => Some(("sqlserver.forwardSshConnectivity.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.private-key" => Some(("sqlserver.forwardSshConnectivity.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.username" => Some(("sqlserver.forwardSshConnectivity.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.host" => Some(("sqlserver.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.password" => Some(("sqlserver.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.password-set" => Some(("sqlserver.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver.port" => Some(("sqlserver.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.private-connectivity.private-connection" => Some(("sqlserver.privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.private-service-connect-connectivity.service-attachment" => Some(("sqlserver.privateServiceConnectConnectivity.serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.ca-certificate" => Some(("sqlserver.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.client-certificate" => Some(("sqlserver.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.client-key" => Some(("sqlserver.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.ssl-flags" => Some(("sqlserver.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "sqlserver.ssl.type" => Some(("sqlserver.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.username" => Some(("sqlserver.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "additional-public-ip", "allocated-ip-range", "alloydb", "alloydb-cluster-id", "asm-service", "auto-storage-increase", "availability-type", "backups", "ca-certificate", "client-certificate", "client-key", "cloud-sql-id", "cloud-sql-project-id", "cloudsql", "cluster-id", "cmek-key-name", "code", "collation", "cpu-count", "create-time", "data-cache-config", "data-cache-enabled", "data-disk-provisioned-iops", "data-disk-provisioned-throughput", "data-disk-size-gb", "data-disk-type", "database", "database-flags", "database-service", "database-version", "database-version-name", "dbm-port", "display-name", "edition", "enable-ipv4", "enable-outbound-public-ip", "enable-public-ip", "encryption-config", "error", "forward-ssh-connectivity", "gcs-bucket", "gcs-prefix", "host", "hostname", "id", "initial-user", "instance-network-config", "ip-config", "kms-key-name", "labels", "machine-config", "machine-type", "message", "mysql", "name", "network-architecture", "oracle", "oracle-asm-config", "outbound-public-ip-addresses", "password", "password-set", "port", "postgresql", "primary-instance-settings", "private-connection", "private-connectivity", "private-ip", "private-key", "private-network", "private-service-connect-connectivity", "provider", "public-ip", "require-ssl", "role", "root-password", "root-password-set", "satisfies-pzi", "satisfies-pzs", "secondary-zone", "service-attachment", "settings", "source-id", "sqlserver", "ssl", "ssl-flags", "state", "storage-auto-resize-limit", "tier", "type", "update-time", "user", "user-labels", "username", "vpc-network", "zone"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -1426,850 +726,150 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "alloydb.cluster-id" => Some((
-                    "alloydb.clusterId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.database-version" => Some((
-                    "alloydb.settings.databaseVersion",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.encryption-config.kms-key-name" => Some((
-                    "alloydb.settings.encryptionConfig.kmsKeyName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.initial-user.password" => Some((
-                    "alloydb.settings.initialUser.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.initial-user.password-set" => Some((
-                    "alloydb.settings.initialUser.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.initial-user.user" => Some((
-                    "alloydb.settings.initialUser.user",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.labels" => Some((
-                    "alloydb.settings.labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.database-flags" => Some((
-                    "alloydb.settings.primaryInstanceSettings.databaseFlags",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.id" => Some((
-                    "alloydb.settings.primaryInstanceSettings.id",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.labels" => Some((
-                    "alloydb.settings.primaryInstanceSettings.labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.machine-config.cpu-count" => Some((
-                    "alloydb.settings.primaryInstanceSettings.machineConfig.cpuCount",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.primary-instance-settings.private-ip" => Some((
-                    "alloydb.settings.primaryInstanceSettings.privateIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "alloydb.settings.vpc-network" => Some((
-                    "alloydb.settings.vpcNetwork",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.additional-public-ip" => Some((
-                    "cloudsql.additionalPublicIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.cloud-sql-id" => Some((
-                    "cloudsql.cloudSqlId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.private-ip" => Some((
-                    "cloudsql.privateIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.public-ip" => Some((
-                    "cloudsql.publicIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.activation-policy" => Some((
-                    "cloudsql.settings.activationPolicy",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.auto-storage-increase" => Some((
-                    "cloudsql.settings.autoStorageIncrease",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.availability-type" => Some((
-                    "cloudsql.settings.availabilityType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.cmek-key-name" => Some((
-                    "cloudsql.settings.cmekKeyName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.collation" => Some((
-                    "cloudsql.settings.collation",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.data-cache-config.data-cache-enabled" => Some((
-                    "cloudsql.settings.dataCacheConfig.dataCacheEnabled",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.data-disk-size-gb" => Some((
-                    "cloudsql.settings.dataDiskSizeGb",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.data-disk-type" => Some((
-                    "cloudsql.settings.dataDiskType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.database-flags" => Some((
-                    "cloudsql.settings.databaseFlags",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "cloudsql.settings.database-version" => Some((
-                    "cloudsql.settings.databaseVersion",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.edition" => Some((
-                    "cloudsql.settings.edition",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.ip-config.allocated-ip-range" => Some((
-                    "cloudsql.settings.ipConfig.allocatedIpRange",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.ip-config.enable-ipv4" => Some((
-                    "cloudsql.settings.ipConfig.enableIpv4",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.ip-config.private-network" => Some((
-                    "cloudsql.settings.ipConfig.privateNetwork",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.ip-config.require-ssl" => Some((
-                    "cloudsql.settings.ipConfig.requireSsl",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.root-password" => Some((
-                    "cloudsql.settings.rootPassword",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.root-password-set" => Some((
-                    "cloudsql.settings.rootPasswordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.secondary-zone" => Some((
-                    "cloudsql.settings.secondaryZone",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.source-id" => Some((
-                    "cloudsql.settings.sourceId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.storage-auto-resize-limit" => Some((
-                    "cloudsql.settings.storageAutoResizeLimit",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.tier" => Some((
-                    "cloudsql.settings.tier",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "cloudsql.settings.user-labels" => Some((
-                    "cloudsql.settings.userLabels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "cloudsql.settings.zone" => Some((
-                    "cloudsql.settings.zone",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "error.code" => Some((
-                    "error.code",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "error.message" => Some((
-                    "error.message",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "labels" => Some((
-                    "labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "mysql.cloud-sql-id" => Some((
-                    "mysql.cloudSqlId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.host" => Some((
-                    "mysql.host",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.password" => Some((
-                    "mysql.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.password-set" => Some((
-                    "mysql.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.port" => Some((
-                    "mysql.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.ssl.ca-certificate" => Some((
-                    "mysql.ssl.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.ssl.client-certificate" => Some((
-                    "mysql.ssl.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.ssl.client-key" => Some((
-                    "mysql.ssl.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.ssl.type" => Some((
-                    "mysql.ssl.type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "mysql.username" => Some((
-                    "mysql.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.database-service" => Some((
-                    "oracle.databaseService",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.hostname" => Some((
-                    "oracle.forwardSshConnectivity.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.password" => Some((
-                    "oracle.forwardSshConnectivity.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.port" => Some((
-                    "oracle.forwardSshConnectivity.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.private-key" => Some((
-                    "oracle.forwardSshConnectivity.privateKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.forward-ssh-connectivity.username" => Some((
-                    "oracle.forwardSshConnectivity.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.host" => Some((
-                    "oracle.host",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.password" => Some((
-                    "oracle.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.password-set" => Some((
-                    "oracle.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.port" => Some((
-                    "oracle.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.private-connectivity.private-connection" => Some((
-                    "oracle.privateConnectivity.privateConnection",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.ssl.ca-certificate" => Some((
-                    "oracle.ssl.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.ssl.client-certificate" => Some((
-                    "oracle.ssl.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.ssl.client-key" => Some((
-                    "oracle.ssl.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.ssl.type" => Some((
-                    "oracle.ssl.type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "oracle.username" => Some((
-                    "oracle.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.alloydb-cluster-id" => Some((
-                    "postgresql.alloydbClusterId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.cloud-sql-id" => Some((
-                    "postgresql.cloudSqlId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.host" => Some((
-                    "postgresql.host",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.network-architecture" => Some((
-                    "postgresql.networkArchitecture",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.password" => Some((
-                    "postgresql.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.password-set" => Some((
-                    "postgresql.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.port" => Some((
-                    "postgresql.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.private-service-connect-connectivity.service-attachment" => Some((
-                    "postgresql.privateServiceConnectConnectivity.serviceAttachment",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.ssl.ca-certificate" => Some((
-                    "postgresql.ssl.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.ssl.client-certificate" => Some((
-                    "postgresql.ssl.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.ssl.client-key" => Some((
-                    "postgresql.ssl.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.ssl.type" => Some((
-                    "postgresql.ssl.type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "postgresql.username" => Some((
-                    "postgresql.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "provider" => Some((
-                    "provider",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.backups.gcs-bucket" => Some((
-                    "sqlserver.backups.gcsBucket",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.backups.gcs-prefix" => Some((
-                    "sqlserver.backups.gcsPrefix",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.cloud-sql-id" => Some((
-                    "sqlserver.cloudSqlId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.hostname" => Some((
-                    "sqlserver.forwardSshConnectivity.hostname",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.password" => Some((
-                    "sqlserver.forwardSshConnectivity.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.port" => Some((
-                    "sqlserver.forwardSshConnectivity.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.private-key" => Some((
-                    "sqlserver.forwardSshConnectivity.privateKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.forward-ssh-connectivity.username" => Some((
-                    "sqlserver.forwardSshConnectivity.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.host" => Some((
-                    "sqlserver.host",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.password" => Some((
-                    "sqlserver.password",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.password-set" => Some((
-                    "sqlserver.passwordSet",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.port" => Some((
-                    "sqlserver.port",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.private-connectivity.private-connection" => Some((
-                    "sqlserver.privateConnectivity.privateConnection",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.private-service-connect-connectivity.service-attachment" => Some((
-                    "sqlserver.privateServiceConnectConnectivity.serviceAttachment",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.ssl.ca-certificate" => Some((
-                    "sqlserver.ssl.caCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.ssl.client-certificate" => Some((
-                    "sqlserver.ssl.clientCertificate",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.ssl.client-key" => Some((
-                    "sqlserver.ssl.clientKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.ssl.type" => Some((
-                    "sqlserver.ssl.type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver.username" => Some((
-                    "sqlserver.username",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "state" => Some((
-                    "state",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "activation-policy",
-                            "additional-public-ip",
-                            "allocated-ip-range",
-                            "alloydb",
-                            "alloydb-cluster-id",
-                            "auto-storage-increase",
-                            "availability-type",
-                            "backups",
-                            "ca-certificate",
-                            "client-certificate",
-                            "client-key",
-                            "cloud-sql-id",
-                            "cloudsql",
-                            "cluster-id",
-                            "cmek-key-name",
-                            "code",
-                            "collation",
-                            "cpu-count",
-                            "create-time",
-                            "data-cache-config",
-                            "data-cache-enabled",
-                            "data-disk-size-gb",
-                            "data-disk-type",
-                            "database-flags",
-                            "database-service",
-                            "database-version",
-                            "display-name",
-                            "edition",
-                            "enable-ipv4",
-                            "encryption-config",
-                            "error",
-                            "forward-ssh-connectivity",
-                            "gcs-bucket",
-                            "gcs-prefix",
-                            "host",
-                            "hostname",
-                            "id",
-                            "initial-user",
-                            "ip-config",
-                            "kms-key-name",
-                            "labels",
-                            "machine-config",
-                            "message",
-                            "mysql",
-                            "name",
-                            "network-architecture",
-                            "oracle",
-                            "password",
-                            "password-set",
-                            "port",
-                            "postgresql",
-                            "primary-instance-settings",
-                            "private-connection",
-                            "private-connectivity",
-                            "private-ip",
-                            "private-key",
-                            "private-network",
-                            "private-service-connect-connectivity",
-                            "provider",
-                            "public-ip",
-                            "require-ssl",
-                            "root-password",
-                            "root-password-set",
-                            "secondary-zone",
-                            "service-attachment",
-                            "settings",
-                            "source-id",
-                            "sqlserver",
-                            "ssl",
-                            "state",
-                            "storage-auto-resize-limit",
-                            "tier",
-                            "type",
-                            "update-time",
-                            "user",
-                            "user-labels",
-                            "username",
-                            "vpc-network",
-                            "zone",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "alloydb.cluster-id" => Some(("alloydb.clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.database-version" => Some(("alloydb.settings.databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.encryption-config.kms-key-name" => Some(("alloydb.settings.encryptionConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.initial-user.password" => Some(("alloydb.settings.initialUser.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.initial-user.password-set" => Some(("alloydb.settings.initialUser.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "alloydb.settings.initial-user.user" => Some(("alloydb.settings.initialUser.user", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.labels" => Some(("alloydb.settings.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "alloydb.settings.primary-instance-settings.database-flags" => Some(("alloydb.settings.primaryInstanceSettings.databaseFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "alloydb.settings.primary-instance-settings.id" => Some(("alloydb.settings.primaryInstanceSettings.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.instance-network-config.enable-outbound-public-ip" => Some(("alloydb.settings.primaryInstanceSettings.instanceNetworkConfig.enableOutboundPublicIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.instance-network-config.enable-public-ip" => Some(("alloydb.settings.primaryInstanceSettings.instanceNetworkConfig.enablePublicIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.labels" => Some(("alloydb.settings.primaryInstanceSettings.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "alloydb.settings.primary-instance-settings.machine-config.cpu-count" => Some(("alloydb.settings.primaryInstanceSettings.machineConfig.cpuCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.machine-config.machine-type" => Some(("alloydb.settings.primaryInstanceSettings.machineConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.primary-instance-settings.outbound-public-ip-addresses" => Some(("alloydb.settings.primaryInstanceSettings.outboundPublicIpAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "alloydb.settings.primary-instance-settings.private-ip" => Some(("alloydb.settings.primaryInstanceSettings.privateIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alloydb.settings.vpc-network" => Some(("alloydb.settings.vpcNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.additional-public-ip" => Some(("cloudsql.additionalPublicIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.cloud-sql-id" => Some(("cloudsql.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.private-ip" => Some(("cloudsql.privateIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.public-ip" => Some(("cloudsql.publicIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.activation-policy" => Some(("cloudsql.settings.activationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.auto-storage-increase" => Some(("cloudsql.settings.autoStorageIncrease", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.availability-type" => Some(("cloudsql.settings.availabilityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.cmek-key-name" => Some(("cloudsql.settings.cmekKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.collation" => Some(("cloudsql.settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-cache-config.data-cache-enabled" => Some(("cloudsql.settings.dataCacheConfig.dataCacheEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-disk-provisioned-iops" => Some(("cloudsql.settings.dataDiskProvisionedIops", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-disk-provisioned-throughput" => Some(("cloudsql.settings.dataDiskProvisionedThroughput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-disk-size-gb" => Some(("cloudsql.settings.dataDiskSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.data-disk-type" => Some(("cloudsql.settings.dataDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.database-flags" => Some(("cloudsql.settings.databaseFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cloudsql.settings.database-version" => Some(("cloudsql.settings.databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.database-version-name" => Some(("cloudsql.settings.databaseVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.edition" => Some(("cloudsql.settings.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.ip-config.allocated-ip-range" => Some(("cloudsql.settings.ipConfig.allocatedIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.ip-config.enable-ipv4" => Some(("cloudsql.settings.ipConfig.enableIpv4", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.ip-config.private-network" => Some(("cloudsql.settings.ipConfig.privateNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.ip-config.require-ssl" => Some(("cloudsql.settings.ipConfig.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.root-password" => Some(("cloudsql.settings.rootPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.root-password-set" => Some(("cloudsql.settings.rootPasswordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.secondary-zone" => Some(("cloudsql.settings.secondaryZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.source-id" => Some(("cloudsql.settings.sourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.storage-auto-resize-limit" => Some(("cloudsql.settings.storageAutoResizeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.tier" => Some(("cloudsql.settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloudsql.settings.user-labels" => Some(("cloudsql.settings.userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "cloudsql.settings.zone" => Some(("cloudsql.settings.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "mysql.cloud-sql-id" => Some(("mysql.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.host" => Some(("mysql.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.password" => Some(("mysql.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.password-set" => Some(("mysql.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mysql.port" => Some(("mysql.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "mysql.ssl.ca-certificate" => Some(("mysql.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.ssl.client-certificate" => Some(("mysql.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.ssl.client-key" => Some(("mysql.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.ssl.ssl-flags" => Some(("mysql.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "mysql.ssl.type" => Some(("mysql.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mysql.username" => Some(("mysql.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.database-service" => Some(("oracle.databaseService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.hostname" => Some(("oracle.forwardSshConnectivity.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.password" => Some(("oracle.forwardSshConnectivity.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.port" => Some(("oracle.forwardSshConnectivity.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.private-key" => Some(("oracle.forwardSshConnectivity.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.forward-ssh-connectivity.username" => Some(("oracle.forwardSshConnectivity.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.host" => Some(("oracle.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.asm-service" => Some(("oracle.oracleAsmConfig.asmService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.hostname" => Some(("oracle.oracleAsmConfig.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.password" => Some(("oracle.oracleAsmConfig.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.password-set" => Some(("oracle.oracleAsmConfig.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.port" => Some(("oracle.oracleAsmConfig.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.ssl.ca-certificate" => Some(("oracle.oracleAsmConfig.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.ssl.client-certificate" => Some(("oracle.oracleAsmConfig.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.ssl.client-key" => Some(("oracle.oracleAsmConfig.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.ssl.ssl-flags" => Some(("oracle.oracleAsmConfig.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "oracle.oracle-asm-config.ssl.type" => Some(("oracle.oracleAsmConfig.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.oracle-asm-config.username" => Some(("oracle.oracleAsmConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.password" => Some(("oracle.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.password-set" => Some(("oracle.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle.port" => Some(("oracle.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle.private-connectivity.private-connection" => Some(("oracle.privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.ssl.ca-certificate" => Some(("oracle.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.ssl.client-certificate" => Some(("oracle.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.ssl.client-key" => Some(("oracle.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.ssl.ssl-flags" => Some(("oracle.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "oracle.ssl.type" => Some(("oracle.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle.username" => Some(("oracle.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.alloydb-cluster-id" => Some(("postgresql.alloydbClusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.cloud-sql-id" => Some(("postgresql.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.database" => Some(("postgresql.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.host" => Some(("postgresql.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.network-architecture" => Some(("postgresql.networkArchitecture", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.password" => Some(("postgresql.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.password-set" => Some(("postgresql.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "postgresql.port" => Some(("postgresql.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "postgresql.private-service-connect-connectivity.service-attachment" => Some(("postgresql.privateServiceConnectConnectivity.serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.ssl.ca-certificate" => Some(("postgresql.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.ssl.client-certificate" => Some(("postgresql.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.ssl.client-key" => Some(("postgresql.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.ssl.ssl-flags" => Some(("postgresql.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "postgresql.ssl.type" => Some(("postgresql.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postgresql.username" => Some(("postgresql.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "provider" => Some(("provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver.backups.gcs-bucket" => Some(("sqlserver.backups.gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.backups.gcs-prefix" => Some(("sqlserver.backups.gcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.cloud-sql-id" => Some(("sqlserver.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.cloud-sql-project-id" => Some(("sqlserver.cloudSqlProjectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.database" => Some(("sqlserver.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.dbm-port" => Some(("sqlserver.dbmPort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.hostname" => Some(("sqlserver.forwardSshConnectivity.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.password" => Some(("sqlserver.forwardSshConnectivity.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.port" => Some(("sqlserver.forwardSshConnectivity.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.private-key" => Some(("sqlserver.forwardSshConnectivity.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.username" => Some(("sqlserver.forwardSshConnectivity.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.host" => Some(("sqlserver.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.password" => Some(("sqlserver.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.password-set" => Some(("sqlserver.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver.port" => Some(("sqlserver.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.private-connectivity.private-connection" => Some(("sqlserver.privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.private-service-connect-connectivity.service-attachment" => Some(("sqlserver.privateServiceConnectConnectivity.serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.ca-certificate" => Some(("sqlserver.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.client-certificate" => Some(("sqlserver.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.client-key" => Some(("sqlserver.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.ssl-flags" => Some(("sqlserver.ssl.sslFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "sqlserver.ssl.type" => Some(("sqlserver.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.username" => Some(("sqlserver.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "additional-public-ip", "allocated-ip-range", "alloydb", "alloydb-cluster-id", "asm-service", "auto-storage-increase", "availability-type", "backups", "ca-certificate", "client-certificate", "client-key", "cloud-sql-id", "cloud-sql-project-id", "cloudsql", "cluster-id", "cmek-key-name", "code", "collation", "cpu-count", "create-time", "data-cache-config", "data-cache-enabled", "data-disk-provisioned-iops", "data-disk-provisioned-throughput", "data-disk-size-gb", "data-disk-type", "database", "database-flags", "database-service", "database-version", "database-version-name", "dbm-port", "display-name", "edition", "enable-ipv4", "enable-outbound-public-ip", "enable-public-ip", "encryption-config", "error", "forward-ssh-connectivity", "gcs-bucket", "gcs-prefix", "host", "hostname", "id", "initial-user", "instance-network-config", "ip-config", "kms-key-name", "labels", "machine-config", "machine-type", "message", "mysql", "name", "network-architecture", "oracle", "oracle-asm-config", "outbound-public-ip-addresses", "password", "password-set", "port", "postgresql", "primary-instance-settings", "private-connection", "private-connectivity", "private-ip", "private-key", "private-network", "private-service-connect-connectivity", "provider", "public-ip", "require-ssl", "role", "root-password", "root-password-set", "satisfies-pzi", "satisfies-pzs", "secondary-zone", "service-attachment", "settings", "source-id", "sqlserver", "ssl", "ssl-flags", "state", "storage-auto-resize-limit", "tier", "type", "update-time", "user", "user-labels", "username", "vpc-network", "zone"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -3180,6 +1780,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "destination-provider" => Some((
+                    "destinationProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "display-name" => Some((
                     "displayName",
                     JsonTypeInfo {
@@ -3236,6 +1843,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "source-provider" => Some((
+                    "sourceProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -3249,6 +1863,7 @@ where
                         &vec![
                             "create-time",
                             "destination",
+                            "destination-provider",
                             "display-name",
                             "engine",
                             "global-settings",
@@ -3257,6 +1872,7 @@ where
                             "latest-commit-time",
                             "name",
                             "source",
+                            "source-provider",
                             "update-time",
                             "version",
                         ],
@@ -4595,6 +3211,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "destination-provider" => Some((
+                    "destinationProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "display-name" => Some((
                     "displayName",
                     JsonTypeInfo {
@@ -4651,6 +3274,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "source-provider" => Some((
+                    "sourceProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -4664,6 +3294,7 @@ where
                         &vec![
                             "create-time",
                             "destination",
+                            "destination-provider",
                             "display-name",
                             "engine",
                             "global-settings",
@@ -4672,6 +3303,7 @@ where
                             "latest-commit-time",
                             "name",
                             "source",
+                            "source-provider",
                             "update-time",
                             "version",
                         ],
@@ -5678,6 +4310,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -5695,7 +4330,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -5771,282 +4410,66 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "cmek-key-name" => Some((
-                    "cmekKeyName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "conversion-workspace.commit-id" => Some((
-                    "conversionWorkspace.commitId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "conversion-workspace.name" => Some((
-                    "conversionWorkspace.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "destination" => Some((
-                    "destination",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "destination-database.engine" => Some((
-                    "destinationDatabase.engine",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "destination-database.provider" => Some((
-                    "destinationDatabase.provider",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "dump-path" => Some((
-                    "dumpPath",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "dump-type" => Some((
-                    "dumpType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "duration" => Some((
-                    "duration",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "end-time" => Some((
-                    "endTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "error.code" => Some((
-                    "error.code",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "error.message" => Some((
-                    "error.message",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "filter" => Some((
-                    "filter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "labels" => Some((
-                    "labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "performance-config.dump-parallel-level" => Some((
-                    "performanceConfig.dumpParallelLevel",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "phase" => Some((
-                    "phase",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "reverse-ssh-connectivity.vm" => Some((
-                    "reverseSshConnectivity.vm",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "reverse-ssh-connectivity.vm-ip" => Some((
-                    "reverseSshConnectivity.vmIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "reverse-ssh-connectivity.vm-port" => Some((
-                    "reverseSshConnectivity.vmPort",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "reverse-ssh-connectivity.vpc" => Some((
-                    "reverseSshConnectivity.vpc",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "source" => Some((
-                    "source",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "source-database.engine" => Some((
-                    "sourceDatabase.engine",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "source-database.provider" => Some((
-                    "sourceDatabase.provider",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver-homogeneous-migration-job-config.backup-file-pattern" => Some((
-                    "sqlserverHomogeneousMigrationJobConfig.backupFilePattern",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver-homogeneous-migration-job-config.use-diff-backup" => Some((
-                    "sqlserverHomogeneousMigrationJobConfig.useDiffBackup",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "state" => Some((
-                    "state",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "type" => Some((
-                    "type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "vpc-peering-connectivity.vpc" => Some((
-                    "vpcPeeringConnectivity.vpc",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "backup-file-pattern",
-                            "cmek-key-name",
-                            "code",
-                            "commit-id",
-                            "conversion-workspace",
-                            "create-time",
-                            "destination",
-                            "destination-database",
-                            "display-name",
-                            "dump-parallel-level",
-                            "dump-path",
-                            "dump-type",
-                            "duration",
-                            "end-time",
-                            "engine",
-                            "error",
-                            "filter",
-                            "labels",
-                            "message",
-                            "name",
-                            "performance-config",
-                            "phase",
-                            "provider",
-                            "reverse-ssh-connectivity",
-                            "source",
-                            "source-database",
-                            "sqlserver-homogeneous-migration-job-config",
-                            "state",
-                            "type",
-                            "update-time",
-                            "use-diff-backup",
-                            "vm",
-                            "vm-ip",
-                            "vm-port",
-                            "vpc",
-                            "vpc-peering-connectivity",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "cmek-key-name" => Some(("cmekKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversion-workspace.commit-id" => Some(("conversionWorkspace.commitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversion-workspace.name" => Some(("conversionWorkspace.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination" => Some(("destination", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-database.engine" => Some(("destinationDatabase.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-database.provider" => Some(("destinationDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dump-path" => Some(("dumpPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dump-type" => Some(("dumpType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "objects-config.source-objects-config.objects-selection-type" => Some(("objectsConfig.sourceObjectsConfig.objectsSelectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.binary-log-parser.log-file-directories.archived-log-directory" => Some(("oracleToPostgresConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.archivedLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.binary-log-parser.log-file-directories.online-log-directory" => Some(("oracleToPostgresConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.onlineLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.cdc-start-position" => Some(("oracleToPostgresConfig.oracleSourceConfig.cdcStartPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.max-concurrent-cdc-connections" => Some(("oracleToPostgresConfig.oracleSourceConfig.maxConcurrentCdcConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.max-concurrent-full-dump-connections" => Some(("oracleToPostgresConfig.oracleSourceConfig.maxConcurrentFullDumpConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.skip-full-dump" => Some(("oracleToPostgresConfig.oracleSourceConfig.skipFullDump", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.postgres-destination-config.max-concurrent-connections" => Some(("oracleToPostgresConfig.postgresDestinationConfig.maxConcurrentConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.postgres-destination-config.transaction-timeout" => Some(("oracleToPostgresConfig.postgresDestinationConfig.transactionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "performance-config.dump-parallel-level" => Some(("performanceConfig.dumpParallelLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phase" => Some(("phase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reverse-ssh-connectivity.vm" => Some(("reverseSshConnectivity.vm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reverse-ssh-connectivity.vm-ip" => Some(("reverseSshConnectivity.vmIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reverse-ssh-connectivity.vm-port" => Some(("reverseSshConnectivity.vmPort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "reverse-ssh-connectivity.vpc" => Some(("reverseSshConnectivity.vpc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "source" => Some(("source", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-database.engine" => Some(("sourceDatabase.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-database.provider" => Some(("sourceDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.backup-file-pattern" => Some(("sqlserverHomogeneousMigrationJobConfig.backupFilePattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.dag-config.linked-server" => Some(("sqlserverHomogeneousMigrationJobConfig.dagConfig.linkedServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.dag-config.source-ag" => Some(("sqlserverHomogeneousMigrationJobConfig.dagConfig.sourceAg", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.promote-when-ready" => Some(("sqlserverHomogeneousMigrationJobConfig.promoteWhenReady", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.use-diff-backup" => Some(("sqlserverHomogeneousMigrationJobConfig.useDiffBackup", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.postgres-destination-config.max-concurrent-connections" => Some(("sqlserverToPostgresConfig.postgresDestinationConfig.maxConcurrentConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.postgres-destination-config.transaction-timeout" => Some(("sqlserverToPostgresConfig.postgresDestinationConfig.transactionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.sqlserver-source-config.cdc-start-position" => Some(("sqlserverToPostgresConfig.sqlserverSourceConfig.cdcStartPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.sqlserver-source-config.max-concurrent-cdc-connections" => Some(("sqlserverToPostgresConfig.sqlserverSourceConfig.maxConcurrentCdcConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.sqlserver-source-config.max-concurrent-full-dump-connections" => Some(("sqlserverToPostgresConfig.sqlserverSourceConfig.maxConcurrentFullDumpConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.sqlserver-source-config.skip-full-dump" => Some(("sqlserverToPostgresConfig.sqlserverSourceConfig.skipFullDump", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-peering-connectivity.vpc" => Some(("vpcPeeringConnectivity.vpc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived-log-directory", "backup-file-pattern", "binary-log-parser", "cdc-start-position", "cmek-key-name", "code", "commit-id", "conversion-workspace", "create-time", "dag-config", "destination", "destination-database", "display-name", "dump-parallel-level", "dump-path", "dump-type", "duration", "end-time", "engine", "error", "filter", "labels", "linked-server", "log-file-directories", "max-concurrent-cdc-connections", "max-concurrent-connections", "max-concurrent-full-dump-connections", "message", "name", "objects-config", "objects-selection-type", "online-log-directory", "oracle-source-config", "oracle-to-postgres-config", "performance-config", "phase", "postgres-destination-config", "promote-when-ready", "provider", "reverse-ssh-connectivity", "satisfies-pzi", "satisfies-pzs", "skip-full-dump", "source", "source-ag", "source-database", "source-objects-config", "sqlserver-homogeneous-migration-job-config", "sqlserver-source-config", "sqlserver-to-postgres-config", "state", "transaction-timeout", "type", "update-time", "use-diff-backup", "vm", "vm-ip", "vm-port", "vpc", "vpc-peering-connectivity"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -6292,6 +4715,87 @@ where
                 request,
                 opt.value_of("name").unwrap_or(""),
             );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_migration_jobs_fetch_source_objects(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_migration_jobs_fetch_source_objects(opt.value_of("name").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -6983,7 +5487,273 @@ where
         }
     }
 
-    async fn _projects_locations_migration_jobs_patch(
+    async fn _projects_locations_migration_jobs_objects_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_migration_jobs_objects_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_migration_jobs_objects_get_iam_policy(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_migration_jobs_objects_get_iam_policy(
+                opt.value_of("resource").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "options-requested-policy-version", "int32")
+                            })
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["options-requested-policy-version"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_migration_jobs_objects_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_migration_jobs_objects_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_migration_jobs_objects_lookup(
         &self,
         opt: &ArgMatches<'n>,
         dry_run: bool,
@@ -7014,225 +5784,29 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
-                "cmek-key-name" => Some((
-                    "cmekKeyName",
+                "source-object-identifier.database" => Some((
+                    "sourceObjectIdentifier.database",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "conversion-workspace.commit-id" => Some((
-                    "conversionWorkspace.commitId",
+                "source-object-identifier.schema" => Some((
+                    "sourceObjectIdentifier.schema",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "conversion-workspace.name" => Some((
-                    "conversionWorkspace.name",
+                "source-object-identifier.table" => Some((
+                    "sourceObjectIdentifier.table",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "destination" => Some((
-                    "destination",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "destination-database.engine" => Some((
-                    "destinationDatabase.engine",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "destination-database.provider" => Some((
-                    "destinationDatabase.provider",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "dump-path" => Some((
-                    "dumpPath",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "dump-type" => Some((
-                    "dumpType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "duration" => Some((
-                    "duration",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "end-time" => Some((
-                    "endTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "error.code" => Some((
-                    "error.code",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "error.message" => Some((
-                    "error.message",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "filter" => Some((
-                    "filter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "labels" => Some((
-                    "labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "performance-config.dump-parallel-level" => Some((
-                    "performanceConfig.dumpParallelLevel",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "phase" => Some((
-                    "phase",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "reverse-ssh-connectivity.vm" => Some((
-                    "reverseSshConnectivity.vm",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "reverse-ssh-connectivity.vm-ip" => Some((
-                    "reverseSshConnectivity.vmIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "reverse-ssh-connectivity.vm-port" => Some((
-                    "reverseSshConnectivity.vmPort",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "reverse-ssh-connectivity.vpc" => Some((
-                    "reverseSshConnectivity.vpc",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "source" => Some((
-                    "source",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "source-database.engine" => Some((
-                    "sourceDatabase.engine",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "source-database.provider" => Some((
-                    "sourceDatabase.provider",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver-homogeneous-migration-job-config.backup-file-pattern" => Some((
-                    "sqlserverHomogeneousMigrationJobConfig.backupFilePattern",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "sqlserver-homogeneous-migration-job-config.use-diff-backup" => Some((
-                    "sqlserverHomogeneousMigrationJobConfig.useDiffBackup",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "state" => Some((
-                    "state",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "type" => Some((
-                    "type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "vpc-peering-connectivity.vpc" => Some((
-                    "vpcPeeringConnectivity.vpc",
+                "source-object-identifier.type" => Some((
+                    "sourceObjectIdentifier.type",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -7242,42 +5816,11 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
-                            "backup-file-pattern",
-                            "cmek-key-name",
-                            "code",
-                            "commit-id",
-                            "conversion-workspace",
-                            "create-time",
-                            "destination",
-                            "destination-database",
-                            "display-name",
-                            "dump-parallel-level",
-                            "dump-path",
-                            "dump-type",
-                            "duration",
-                            "end-time",
-                            "engine",
-                            "error",
-                            "filter",
-                            "labels",
-                            "message",
-                            "name",
-                            "performance-config",
-                            "phase",
-                            "provider",
-                            "reverse-ssh-connectivity",
-                            "source",
-                            "source-database",
-                            "sqlserver-homogeneous-migration-job-config",
-                            "state",
+                            "database",
+                            "schema",
+                            "source-object-identifier",
+                            "table",
                             "type",
-                            "update-time",
-                            "use-diff-backup",
-                            "vm",
-                            "vm-ip",
-                            "vm-port",
-                            "vpc",
-                            "vpc-peering-connectivity",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -7288,6 +5831,474 @@ where
                     None
                 }
             };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::LookupMigrationJobObjectRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_migration_jobs_objects_lookup(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_migration_jobs_objects_set_iam_policy(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "policy.etag" => Some((
+                    "policy.etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "policy.version" => Some((
+                    "policy.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-mask" => Some((
+                    "updateMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["etag", "policy", "update-mask", "version"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_migration_jobs_objects_set_iam_policy(
+                request,
+                opt.value_of("resource").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_migration_jobs_objects_test_iam_permissions(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "permissions" => Some((
+                    "permissions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_migration_jobs_objects_test_iam_permissions(
+                request,
+                opt.value_of("resource").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_migration_jobs_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "cmek-key-name" => Some(("cmekKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversion-workspace.commit-id" => Some(("conversionWorkspace.commitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversion-workspace.name" => Some(("conversionWorkspace.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination" => Some(("destination", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-database.engine" => Some(("destinationDatabase.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-database.provider" => Some(("destinationDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dump-path" => Some(("dumpPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dump-type" => Some(("dumpType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "error.message" => Some(("error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "objects-config.source-objects-config.objects-selection-type" => Some(("objectsConfig.sourceObjectsConfig.objectsSelectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.binary-log-parser.log-file-directories.archived-log-directory" => Some(("oracleToPostgresConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.archivedLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.binary-log-parser.log-file-directories.online-log-directory" => Some(("oracleToPostgresConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.onlineLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.cdc-start-position" => Some(("oracleToPostgresConfig.oracleSourceConfig.cdcStartPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.max-concurrent-cdc-connections" => Some(("oracleToPostgresConfig.oracleSourceConfig.maxConcurrentCdcConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.max-concurrent-full-dump-connections" => Some(("oracleToPostgresConfig.oracleSourceConfig.maxConcurrentFullDumpConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.oracle-source-config.skip-full-dump" => Some(("oracleToPostgresConfig.oracleSourceConfig.skipFullDump", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.postgres-destination-config.max-concurrent-connections" => Some(("oracleToPostgresConfig.postgresDestinationConfig.maxConcurrentConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "oracle-to-postgres-config.postgres-destination-config.transaction-timeout" => Some(("oracleToPostgresConfig.postgresDestinationConfig.transactionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "performance-config.dump-parallel-level" => Some(("performanceConfig.dumpParallelLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phase" => Some(("phase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reverse-ssh-connectivity.vm" => Some(("reverseSshConnectivity.vm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reverse-ssh-connectivity.vm-ip" => Some(("reverseSshConnectivity.vmIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reverse-ssh-connectivity.vm-port" => Some(("reverseSshConnectivity.vmPort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "reverse-ssh-connectivity.vpc" => Some(("reverseSshConnectivity.vpc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "source" => Some(("source", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-database.engine" => Some(("sourceDatabase.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-database.provider" => Some(("sourceDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.backup-file-pattern" => Some(("sqlserverHomogeneousMigrationJobConfig.backupFilePattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.dag-config.linked-server" => Some(("sqlserverHomogeneousMigrationJobConfig.dagConfig.linkedServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.dag-config.source-ag" => Some(("sqlserverHomogeneousMigrationJobConfig.dagConfig.sourceAg", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.promote-when-ready" => Some(("sqlserverHomogeneousMigrationJobConfig.promoteWhenReady", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.use-diff-backup" => Some(("sqlserverHomogeneousMigrationJobConfig.useDiffBackup", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.postgres-destination-config.max-concurrent-connections" => Some(("sqlserverToPostgresConfig.postgresDestinationConfig.maxConcurrentConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.postgres-destination-config.transaction-timeout" => Some(("sqlserverToPostgresConfig.postgresDestinationConfig.transactionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.sqlserver-source-config.cdc-start-position" => Some(("sqlserverToPostgresConfig.sqlserverSourceConfig.cdcStartPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.sqlserver-source-config.max-concurrent-cdc-connections" => Some(("sqlserverToPostgresConfig.sqlserverSourceConfig.maxConcurrentCdcConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.sqlserver-source-config.max-concurrent-full-dump-connections" => Some(("sqlserverToPostgresConfig.sqlserverSourceConfig.maxConcurrentFullDumpConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver-to-postgres-config.sqlserver-source-config.skip-full-dump" => Some(("sqlserverToPostgresConfig.sqlserverSourceConfig.skipFullDump", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-peering-connectivity.vpc" => Some(("vpcPeeringConnectivity.vpc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived-log-directory", "backup-file-pattern", "binary-log-parser", "cdc-start-position", "cmek-key-name", "code", "commit-id", "conversion-workspace", "create-time", "dag-config", "destination", "destination-database", "display-name", "dump-parallel-level", "dump-path", "dump-type", "duration", "end-time", "engine", "error", "filter", "labels", "linked-server", "log-file-directories", "max-concurrent-cdc-connections", "max-concurrent-connections", "max-concurrent-full-dump-connections", "message", "name", "objects-config", "objects-selection-type", "online-log-directory", "oracle-source-config", "oracle-to-postgres-config", "performance-config", "phase", "postgres-destination-config", "promote-when-ready", "provider", "reverse-ssh-connectivity", "satisfies-pzi", "satisfies-pzs", "skip-full-dump", "source", "source-ag", "source-database", "source-objects-config", "sqlserver-homogeneous-migration-job-config", "sqlserver-source-config", "sqlserver-to-postgres-config", "state", "transaction-timeout", "type", "update-time", "use-diff-backup", "vm", "vm-ip", "vm-port", "vpc", "vpc-peering-connectivity"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -7416,8 +6427,22 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "objects-filter.source-objects-config.objects-selection-type" => Some((
+                    "objectsFilter.sourceObjectsConfig.objectsSelectionType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "objects-filter",
+                            "objects-selection-type",
+                            "source-objects-config",
+                        ],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -7544,6 +6569,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "objects-filter.source-objects-config.objects-selection-type" => Some((
+                    "objectsFilter.sourceObjectsConfig.objectsSelectionType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "restart-failed-objects" => Some((
+                    "restartFailedObjects",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "skip-validation" => Some((
                     "skipValidation",
                     JsonTypeInfo {
@@ -7552,7 +6591,16 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["skip-validation"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "objects-filter",
+                            "objects-selection-type",
+                            "restart-failed-objects",
+                            "skip-validation",
+                            "source-objects-config",
+                        ],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -8364,295 +7412,67 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "migration-job.cmek-key-name" => Some((
-                    "migrationJob.cmekKeyName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.conversion-workspace.commit-id" => Some((
-                    "migrationJob.conversionWorkspace.commitId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.conversion-workspace.name" => Some((
-                    "migrationJob.conversionWorkspace.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.create-time" => Some((
-                    "migrationJob.createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.destination" => Some((
-                    "migrationJob.destination",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.destination-database.engine" => Some((
-                    "migrationJob.destinationDatabase.engine",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.destination-database.provider" => Some((
-                    "migrationJob.destinationDatabase.provider",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.display-name" => Some((
-                    "migrationJob.displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.dump-path" => Some((
-                    "migrationJob.dumpPath",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.dump-type" => Some((
-                    "migrationJob.dumpType",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.duration" => Some((
-                    "migrationJob.duration",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.end-time" => Some((
-                    "migrationJob.endTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.error.code" => Some((
-                    "migrationJob.error.code",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.error.message" => Some((
-                    "migrationJob.error.message",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.filter" => Some((
-                    "migrationJob.filter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.labels" => Some((
-                    "migrationJob.labels",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Map,
-                    },
-                )),
-                "migration-job.name" => Some((
-                    "migrationJob.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.performance-config.dump-parallel-level" => Some((
-                    "migrationJob.performanceConfig.dumpParallelLevel",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.phase" => Some((
-                    "migrationJob.phase",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.reverse-ssh-connectivity.vm" => Some((
-                    "migrationJob.reverseSshConnectivity.vm",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.reverse-ssh-connectivity.vm-ip" => Some((
-                    "migrationJob.reverseSshConnectivity.vmIp",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.reverse-ssh-connectivity.vm-port" => Some((
-                    "migrationJob.reverseSshConnectivity.vmPort",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.reverse-ssh-connectivity.vpc" => Some((
-                    "migrationJob.reverseSshConnectivity.vpc",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.source" => Some((
-                    "migrationJob.source",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.source-database.engine" => Some((
-                    "migrationJob.sourceDatabase.engine",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.source-database.provider" => Some((
-                    "migrationJob.sourceDatabase.provider",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.sqlserver-homogeneous-migration-job-config.backup-file-pattern" => {
-                    Some((
-                        "migrationJob.sqlserverHomogeneousMigrationJobConfig.backupFilePattern",
-                        JsonTypeInfo {
-                            jtype: JsonType::String,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "migration-job.sqlserver-homogeneous-migration-job-config.use-diff-backup" => {
-                    Some((
-                        "migrationJob.sqlserverHomogeneousMigrationJobConfig.useDiffBackup",
-                        JsonTypeInfo {
-                            jtype: JsonType::Boolean,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "migration-job.state" => Some((
-                    "migrationJob.state",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.type" => Some((
-                    "migrationJob.type",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.update-time" => Some((
-                    "migrationJob.updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "migration-job.vpc-peering-connectivity.vpc" => Some((
-                    "migrationJob.vpcPeeringConnectivity.vpc",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-mask" => Some((
-                    "updateMask",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "backup-file-pattern",
-                            "cmek-key-name",
-                            "code",
-                            "commit-id",
-                            "conversion-workspace",
-                            "create-time",
-                            "destination",
-                            "destination-database",
-                            "display-name",
-                            "dump-parallel-level",
-                            "dump-path",
-                            "dump-type",
-                            "duration",
-                            "end-time",
-                            "engine",
-                            "error",
-                            "filter",
-                            "labels",
-                            "message",
-                            "migration-job",
-                            "name",
-                            "performance-config",
-                            "phase",
-                            "provider",
-                            "reverse-ssh-connectivity",
-                            "source",
-                            "source-database",
-                            "sqlserver-homogeneous-migration-job-config",
-                            "state",
-                            "type",
-                            "update-mask",
-                            "update-time",
-                            "use-diff-backup",
-                            "vm",
-                            "vm-ip",
-                            "vm-port",
-                            "vpc",
-                            "vpc-peering-connectivity",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "migration-job.cmek-key-name" => Some(("migrationJob.cmekKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.conversion-workspace.commit-id" => Some(("migrationJob.conversionWorkspace.commitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.conversion-workspace.name" => Some(("migrationJob.conversionWorkspace.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.create-time" => Some(("migrationJob.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.destination" => Some(("migrationJob.destination", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.destination-database.engine" => Some(("migrationJob.destinationDatabase.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.destination-database.provider" => Some(("migrationJob.destinationDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.display-name" => Some(("migrationJob.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.dump-path" => Some(("migrationJob.dumpPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.dump-type" => Some(("migrationJob.dumpType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.duration" => Some(("migrationJob.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.end-time" => Some(("migrationJob.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.error.code" => Some(("migrationJob.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "migration-job.error.message" => Some(("migrationJob.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.filter" => Some(("migrationJob.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.labels" => Some(("migrationJob.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "migration-job.name" => Some(("migrationJob.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.objects-config.source-objects-config.objects-selection-type" => Some(("migrationJob.objectsConfig.sourceObjectsConfig.objectsSelectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.oracle-to-postgres-config.oracle-source-config.binary-log-parser.log-file-directories.archived-log-directory" => Some(("migrationJob.oracleToPostgresConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.archivedLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.oracle-to-postgres-config.oracle-source-config.binary-log-parser.log-file-directories.online-log-directory" => Some(("migrationJob.oracleToPostgresConfig.oracleSourceConfig.binaryLogParser.logFileDirectories.onlineLogDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.oracle-to-postgres-config.oracle-source-config.cdc-start-position" => Some(("migrationJob.oracleToPostgresConfig.oracleSourceConfig.cdcStartPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.oracle-to-postgres-config.oracle-source-config.max-concurrent-cdc-connections" => Some(("migrationJob.oracleToPostgresConfig.oracleSourceConfig.maxConcurrentCdcConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "migration-job.oracle-to-postgres-config.oracle-source-config.max-concurrent-full-dump-connections" => Some(("migrationJob.oracleToPostgresConfig.oracleSourceConfig.maxConcurrentFullDumpConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "migration-job.oracle-to-postgres-config.oracle-source-config.skip-full-dump" => Some(("migrationJob.oracleToPostgresConfig.oracleSourceConfig.skipFullDump", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "migration-job.oracle-to-postgres-config.postgres-destination-config.max-concurrent-connections" => Some(("migrationJob.oracleToPostgresConfig.postgresDestinationConfig.maxConcurrentConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "migration-job.oracle-to-postgres-config.postgres-destination-config.transaction-timeout" => Some(("migrationJob.oracleToPostgresConfig.postgresDestinationConfig.transactionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.performance-config.dump-parallel-level" => Some(("migrationJob.performanceConfig.dumpParallelLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.phase" => Some(("migrationJob.phase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.reverse-ssh-connectivity.vm" => Some(("migrationJob.reverseSshConnectivity.vm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.reverse-ssh-connectivity.vm-ip" => Some(("migrationJob.reverseSshConnectivity.vmIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.reverse-ssh-connectivity.vm-port" => Some(("migrationJob.reverseSshConnectivity.vmPort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "migration-job.reverse-ssh-connectivity.vpc" => Some(("migrationJob.reverseSshConnectivity.vpc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.satisfies-pzi" => Some(("migrationJob.satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "migration-job.satisfies-pzs" => Some(("migrationJob.satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "migration-job.source" => Some(("migrationJob.source", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.source-database.engine" => Some(("migrationJob.sourceDatabase.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.source-database.provider" => Some(("migrationJob.sourceDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-homogeneous-migration-job-config.backup-file-pattern" => Some(("migrationJob.sqlserverHomogeneousMigrationJobConfig.backupFilePattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-homogeneous-migration-job-config.dag-config.linked-server" => Some(("migrationJob.sqlserverHomogeneousMigrationJobConfig.dagConfig.linkedServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-homogeneous-migration-job-config.dag-config.source-ag" => Some(("migrationJob.sqlserverHomogeneousMigrationJobConfig.dagConfig.sourceAg", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-homogeneous-migration-job-config.promote-when-ready" => Some(("migrationJob.sqlserverHomogeneousMigrationJobConfig.promoteWhenReady", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-homogeneous-migration-job-config.use-diff-backup" => Some(("migrationJob.sqlserverHomogeneousMigrationJobConfig.useDiffBackup", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-to-postgres-config.postgres-destination-config.max-concurrent-connections" => Some(("migrationJob.sqlserverToPostgresConfig.postgresDestinationConfig.maxConcurrentConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-to-postgres-config.postgres-destination-config.transaction-timeout" => Some(("migrationJob.sqlserverToPostgresConfig.postgresDestinationConfig.transactionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-to-postgres-config.sqlserver-source-config.cdc-start-position" => Some(("migrationJob.sqlserverToPostgresConfig.sqlserverSourceConfig.cdcStartPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-to-postgres-config.sqlserver-source-config.max-concurrent-cdc-connections" => Some(("migrationJob.sqlserverToPostgresConfig.sqlserverSourceConfig.maxConcurrentCdcConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-to-postgres-config.sqlserver-source-config.max-concurrent-full-dump-connections" => Some(("migrationJob.sqlserverToPostgresConfig.sqlserverSourceConfig.maxConcurrentFullDumpConnections", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-to-postgres-config.sqlserver-source-config.skip-full-dump" => Some(("migrationJob.sqlserverToPostgresConfig.sqlserverSourceConfig.skipFullDump", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "migration-job.state" => Some(("migrationJob.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.type" => Some(("migrationJob.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.update-time" => Some(("migrationJob.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.vpc-peering-connectivity.vpc" => Some(("migrationJob.vpcPeeringConnectivity.vpc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived-log-directory", "backup-file-pattern", "binary-log-parser", "cdc-start-position", "cmek-key-name", "code", "commit-id", "conversion-workspace", "create-time", "dag-config", "destination", "destination-database", "display-name", "dump-parallel-level", "dump-path", "dump-type", "duration", "end-time", "engine", "error", "filter", "labels", "linked-server", "log-file-directories", "max-concurrent-cdc-connections", "max-concurrent-connections", "max-concurrent-full-dump-connections", "message", "migration-job", "name", "objects-config", "objects-selection-type", "online-log-directory", "oracle-source-config", "oracle-to-postgres-config", "performance-config", "phase", "postgres-destination-config", "promote-when-ready", "provider", "reverse-ssh-connectivity", "satisfies-pzi", "satisfies-pzs", "skip-full-dump", "source", "source-ag", "source-database", "source-objects-config", "sqlserver-homogeneous-migration-job-config", "sqlserver-source-config", "sqlserver-to-postgres-config", "state", "transaction-timeout", "type", "update-mask", "update-time", "use-diff-backup", "vm", "vm-ip", "vm-port", "vpc", "vpc-peering-connectivity"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -9048,6 +7868,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -9078,7 +7905,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -9198,6 +8034,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "psc-interface-config.network-attachment" => Some((
+                    "pscInterfaceConfig.networkAttachment",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "satisfies-pzi" => Some((
+                    "satisfiesPzi",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "satisfies-pzs" => Some((
+                    "satisfiesPzs",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "state" => Some((
                     "state",
                     JsonTypeInfo {
@@ -9237,6 +8094,10 @@ where
                             "labels",
                             "message",
                             "name",
+                            "network-attachment",
+                            "psc-interface-config",
+                            "satisfies-pzi",
+                            "satisfies-pzs",
                             "state",
                             "subnet",
                             "update-time",
@@ -9275,6 +8136,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "validate-only" => {
+                    call = call.validate_only(
+                        value
+                            .map(|v| arg_from_str(v, err, "validate-only", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "skip-validation" => {
                     call = call.skip_validation(
                         value
@@ -9306,9 +8174,14 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["private-connection-id", "request-id", "skip-validation"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "private-connection-id",
+                                        "request-id",
+                                        "skip-validation",
+                                        "validate-only",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -10216,6 +9089,13 @@ where
                         )
                         .await;
                 }
+                ("locations-migration-jobs-fetch-source-objects", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_migration_jobs_fetch_source_objects(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-migration-jobs-generate-ssh-script", Some(opt)) => {
                     call_result = self
                         ._projects_locations_migration_jobs_generate_ssh_script(
@@ -10243,6 +9123,42 @@ where
                 ("locations-migration-jobs-list", Some(opt)) => {
                     call_result = self
                         ._projects_locations_migration_jobs_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-migration-jobs-objects-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_migration_jobs_objects_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-migration-jobs-objects-get-iam-policy", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_migration_jobs_objects_get_iam_policy(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-migration-jobs-objects-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_migration_jobs_objects_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-migration-jobs-objects-lookup", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_migration_jobs_objects_lookup(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-migration-jobs-objects-set-iam-policy", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_migration_jobs_objects_set_iam_policy(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-migration-jobs-objects-test-iam-permissions", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_migration_jobs_objects_test_iam_permissions(
+                            opt, dry_run, &mut err,
+                        )
                         .await;
                 }
                 ("locations-migration-jobs-patch", Some(opt)) => {
@@ -10399,7 +9315,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/datamigration1", config_dir))
         .build()
@@ -10452,7 +9370,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-connection-profiles-create', 'locations-connection-profiles-delete', 'locations-connection-profiles-get', 'locations-connection-profiles-get-iam-policy', 'locations-connection-profiles-list', 'locations-connection-profiles-patch', 'locations-connection-profiles-set-iam-policy', 'locations-connection-profiles-test-iam-permissions', 'locations-conversion-workspaces-apply', 'locations-conversion-workspaces-commit', 'locations-conversion-workspaces-convert', 'locations-conversion-workspaces-create', 'locations-conversion-workspaces-delete', 'locations-conversion-workspaces-describe-conversion-workspace-revisions', 'locations-conversion-workspaces-describe-database-entities', 'locations-conversion-workspaces-get', 'locations-conversion-workspaces-get-iam-policy', 'locations-conversion-workspaces-list', 'locations-conversion-workspaces-mapping-rules-create', 'locations-conversion-workspaces-mapping-rules-delete', 'locations-conversion-workspaces-mapping-rules-get', 'locations-conversion-workspaces-mapping-rules-import', 'locations-conversion-workspaces-mapping-rules-list', 'locations-conversion-workspaces-patch', 'locations-conversion-workspaces-rollback', 'locations-conversion-workspaces-search-background-jobs', 'locations-conversion-workspaces-seed', 'locations-conversion-workspaces-set-iam-policy', 'locations-conversion-workspaces-test-iam-permissions', 'locations-fetch-static-ips', 'locations-get', 'locations-list', 'locations-migration-jobs-create', 'locations-migration-jobs-delete', 'locations-migration-jobs-demote-destination', 'locations-migration-jobs-generate-ssh-script', 'locations-migration-jobs-generate-tcp-proxy-script', 'locations-migration-jobs-get', 'locations-migration-jobs-get-iam-policy', 'locations-migration-jobs-list', 'locations-migration-jobs-patch', 'locations-migration-jobs-promote', 'locations-migration-jobs-restart', 'locations-migration-jobs-resume', 'locations-migration-jobs-set-iam-policy', 'locations-migration-jobs-start', 'locations-migration-jobs-stop', 'locations-migration-jobs-test-iam-permissions', 'locations-migration-jobs-verify', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-private-connections-create', 'locations-private-connections-delete', 'locations-private-connections-get', 'locations-private-connections-get-iam-policy', 'locations-private-connections-list', 'locations-private-connections-set-iam-policy' and 'locations-private-connections-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-connection-profiles-create', 'locations-connection-profiles-delete', 'locations-connection-profiles-get', 'locations-connection-profiles-get-iam-policy', 'locations-connection-profiles-list', 'locations-connection-profiles-patch', 'locations-connection-profiles-set-iam-policy', 'locations-connection-profiles-test-iam-permissions', 'locations-conversion-workspaces-apply', 'locations-conversion-workspaces-commit', 'locations-conversion-workspaces-convert', 'locations-conversion-workspaces-create', 'locations-conversion-workspaces-delete', 'locations-conversion-workspaces-describe-conversion-workspace-revisions', 'locations-conversion-workspaces-describe-database-entities', 'locations-conversion-workspaces-get', 'locations-conversion-workspaces-get-iam-policy', 'locations-conversion-workspaces-list', 'locations-conversion-workspaces-mapping-rules-create', 'locations-conversion-workspaces-mapping-rules-delete', 'locations-conversion-workspaces-mapping-rules-get', 'locations-conversion-workspaces-mapping-rules-import', 'locations-conversion-workspaces-mapping-rules-list', 'locations-conversion-workspaces-patch', 'locations-conversion-workspaces-rollback', 'locations-conversion-workspaces-search-background-jobs', 'locations-conversion-workspaces-seed', 'locations-conversion-workspaces-set-iam-policy', 'locations-conversion-workspaces-test-iam-permissions', 'locations-fetch-static-ips', 'locations-get', 'locations-list', 'locations-migration-jobs-create', 'locations-migration-jobs-delete', 'locations-migration-jobs-demote-destination', 'locations-migration-jobs-fetch-source-objects', 'locations-migration-jobs-generate-ssh-script', 'locations-migration-jobs-generate-tcp-proxy-script', 'locations-migration-jobs-get', 'locations-migration-jobs-get-iam-policy', 'locations-migration-jobs-list', 'locations-migration-jobs-objects-get', 'locations-migration-jobs-objects-get-iam-policy', 'locations-migration-jobs-objects-list', 'locations-migration-jobs-objects-lookup', 'locations-migration-jobs-objects-set-iam-policy', 'locations-migration-jobs-objects-test-iam-permissions', 'locations-migration-jobs-patch', 'locations-migration-jobs-promote', 'locations-migration-jobs-restart', 'locations-migration-jobs-resume', 'locations-migration-jobs-set-iam-policy', 'locations-migration-jobs-start', 'locations-migration-jobs-stop', 'locations-migration-jobs-test-iam-permissions', 'locations-migration-jobs-verify', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-private-connections-create', 'locations-private-connections-delete', 'locations-private-connections-get', 'locations-private-connections-get-iam-policy', 'locations-private-connections-list', 'locations-private-connections-set-iam-policy' and 'locations-private-connections-test-iam-permissions'", vec![
             ("locations-connection-profiles-create",
                     Some(r##"Creates a new connection profile in a given project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-connection-profiles-create",
@@ -11238,6 +10156,26 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-migration-jobs-fetch-source-objects",
+                    Some(r##"Retrieves objects from the source database that can be selected for data migration. This is applicable for the following migrations: 1. PostgreSQL to Cloud SQL for PostgreSQL 2. PostgreSQL to AlloyDB for PostgreSQL."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-migration-jobs-fetch-source-objects",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name for the migration job for which source objects should be returned."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-migration-jobs-generate-ssh-script",
                     Some(r##"Generate a SSH configuration script to configure the reverse SSH connectivity."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-migration-jobs-generate-ssh-script",
@@ -11337,6 +10275,141 @@ async fn main() {
                      Some(r##"Required. The parent which owns this collection of migrationJobs."##),
                      Some(true),
                      Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-migration-jobs-objects-get",
+                    Some(r##"Use this method to get details about a migration job object."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-migration-jobs-objects-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the migration job object resource to get."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-migration-jobs-objects-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-migration-jobs-objects-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-migration-jobs-objects-list",
+                    Some(r##"Use this method to list the objects of a specific migration job."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-migration-jobs-objects-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent migration job that owns the collection of objects."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-migration-jobs-objects-lookup",
+                    Some(r##"Use this method to look up a migration job object by its source object identifier."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-migration-jobs-objects-lookup",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent migration job that owns the collection of objects."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-migration-jobs-objects-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-migration-jobs-objects-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-migration-jobs-objects-test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-migration-jobs-objects-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -11574,7 +10647,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datamigration1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -11818,7 +10891,7 @@ async fn main() {
 
     let mut app = App::new("datamigration1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240621")
+           .version("7.0.0+20251210")
            .about("Manage Cloud Database Migration Service resources on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datamigration1_cli")
            .arg(Arg::with_name("url")
@@ -11883,7 +10956,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

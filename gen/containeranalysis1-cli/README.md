@@ -25,18 +25,32 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container Analysis* API at revision *20240625*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Container Analysis* API at revision *20251212*. The CLI is at version *7.0.0*.
 
 ```bash
 containeranalysis1 [options]
         projects
+                locations-notes-batch-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-notes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-notes-delete <name> [-p <v>]... [-o <out>]
                 locations-notes-get <name> [-p <v>]... [-o <out>]
+                locations-notes-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-notes-list <parent> [-p <v>]... [-o <out>]
                 locations-notes-occurrences-list <name> [-p <v>]... [-o <out>]
+                locations-notes-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-notes-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-notes-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-occurrences-batch-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-occurrences-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-occurrences-delete <name> [-p <v>]... [-o <out>]
                 locations-occurrences-get <name> [-p <v>]... [-o <out>]
+                locations-occurrences-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-occurrences-get-notes <name> [-p <v>]... [-o <out>]
                 locations-occurrences-get-vulnerability-summary <parent> [-p <v>]... [-o <out>]
                 locations-occurrences-list <parent> [-p <v>]... [-o <out>]
+                locations-occurrences-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-occurrences-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-occurrences-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-resources-export-sbom <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 notes-batch-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 notes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]

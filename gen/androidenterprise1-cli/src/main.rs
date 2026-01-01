@@ -590,6 +590,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "policy.policy-id" => Some((
+                    "policy.policyId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "policy.product-availability-policy" => Some((
                     "policy.productAvailabilityPolicy",
                     JsonTypeInfo {
@@ -641,6 +648,7 @@ where
                             "management-type",
                             "model",
                             "policy",
+                            "policy-id",
                             "product",
                             "product-availability-policy",
                             "report",
@@ -703,6 +711,178 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _enrollment_tokens_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "duration" => Some((
+                    "duration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "enrollment-token-type" => Some((
+                    "enrollmentTokenType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "google-authentication-options.authentication-requirement" => Some((
+                    "googleAuthenticationOptions.authenticationRequirement",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "google-authentication-options.required-account-email" => Some((
+                    "googleAuthenticationOptions.requiredAccountEmail",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token" => Some((
+                    "token",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "authentication-requirement",
+                            "duration",
+                            "enrollment-token-type",
+                            "google-authentication-options",
+                            "required-account-email",
+                            "token",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::EnrollmentToken = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .enrollment_tokens()
+            .create(request, opt.value_of("enterprise-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -856,91 +1036,6 @@ where
                                 v.extend(
                                     ["completion-token", "enterprise-token"].iter().map(|v| *v),
                                 );
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _enterprises_create_enrollment_token(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .enterprises()
-            .create_enrollment_token(opt.value_of("enterprise-id").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "device-type" => {
-                    call = call.device_type(value.unwrap_or(""));
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["device-type"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -1223,6 +1318,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "enterprise-type" => Some((
+                    "enterpriseType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "google-authentication-settings.dedicated-devices-allowed" => Some((
                     "googleAuthenticationSettings.dedicatedDevicesAllowed",
                     JsonTypeInfo {
@@ -1239,6 +1341,13 @@ where
                 )),
                 "id" => Some((
                     "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-google-domain-type" => Some((
+                    "managedGoogleDomainType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1263,9 +1372,11 @@ where
                         key,
                         &vec![
                             "dedicated-devices-allowed",
+                            "enterprise-type",
                             "google-authentication-required",
                             "google-authentication-settings",
                             "id",
+                            "managed-google-domain-type",
                             "name",
                             "primary-domain",
                         ],
@@ -1364,13 +1475,16 @@ where
         }
     }
 
-    async fn _enterprises_generate_signup_url(
+    async fn _enterprises_generate_enterprise_upgrade_url(
         &self,
         opt: &ArgMatches<'n>,
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.enterprises().generate_signup_url();
+        let mut call = self
+            .hub
+            .enterprises()
+            .generate_enterprise_upgrade_url(opt.value_of("enterprise-id").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1379,8 +1493,11 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "callback-url" => {
-                    call = call.callback_url(value.unwrap_or(""));
+                "allowed-domains" => {
+                    call = call.add_allowed_domains(value.unwrap_or(""));
+                }
+                "admin-email" => {
+                    call = call.admin_email(value.unwrap_or(""));
                 }
                 _ => {
                     let mut found = false;
@@ -1399,7 +1516,99 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["callback-url"].iter().map(|v| *v));
+                                v.extend(["admin-email", "allowed-domains"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _enterprises_generate_signup_url(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.enterprises().generate_signup_url();
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "callback-url" => {
+                    call = call.callback_url(value.unwrap_or(""));
+                }
+                "allowed-domains" => {
+                    call = call.add_allowed_domains(value.unwrap_or(""));
+                }
+                "admin-email" => {
+                    call = call.admin_email(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["admin-email", "allowed-domains", "callback-url"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -7786,6 +7995,17 @@ where
                     writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
+            ("enrollment-tokens", Some(opt)) => match opt.subcommand() {
+                ("create", Some(opt)) => {
+                    call_result = self._enrollment_tokens_create(opt, dry_run, &mut err).await;
+                }
+                _ => {
+                    err.issues.push(CLIError::MissingMethodError(
+                        "enrollment-tokens".to_string(),
+                    ));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
+                }
+            },
             ("enterprises", Some(opt)) => match opt.subcommand() {
                 ("acknowledge-notification-set", Some(opt)) => {
                     call_result = self
@@ -7797,11 +8017,6 @@ where
                         ._enterprises_complete_signup(opt, dry_run, &mut err)
                         .await;
                 }
-                ("create-enrollment-token", Some(opt)) => {
-                    call_result = self
-                        ._enterprises_create_enrollment_token(opt, dry_run, &mut err)
-                        .await;
-                }
                 ("create-web-token", Some(opt)) => {
                     call_result = self
                         ._enterprises_create_web_token(opt, dry_run, &mut err)
@@ -7809,6 +8024,11 @@ where
                 }
                 ("enroll", Some(opt)) => {
                     call_result = self._enterprises_enroll(opt, dry_run, &mut err).await;
+                }
+                ("generate-enterprise-upgrade-url", Some(opt)) => {
+                    call_result = self
+                        ._enterprises_generate_enterprise_upgrade_url(opt, dry_run, &mut err)
+                        .await;
                 }
                 ("generate-signup-url", Some(opt)) => {
                     call_result = self
@@ -8207,7 +8427,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/androidenterprise1", config_dir))
         .build()
@@ -8442,7 +8664,34 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'create-enrollment-token', 'create-web-token', 'enroll', 'generate-signup-url', 'get', 'get-service-account', 'get-store-layout', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-store-layout' and 'unenroll'", vec![
+            ("enrollment-tokens", "methods: 'create'", vec![
+            ("create",
+                    Some(r##"Returns a token for device enrollment. The DPC can encode this token within the QR/NFC/zero-touch enrollment payload or fetch it before calling the on-device API to authenticate the user. The token can be generated for each device or reused across multiple devices."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enrollment-tokens_create",
+                  vec![
+                    (Some(r##"enterprise-id"##),
+                     None,
+                     Some(r##"Required. The ID of the enterprise."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+            ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'create-web-token', 'enroll', 'generate-enterprise-upgrade-url', 'generate-signup-url', 'get', 'get-service-account', 'get-store-layout', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-store-layout' and 'unenroll'", vec![
             ("acknowledge-notification-set",
                     Some(r##"Acknowledges notifications that were received from Enterprises.PullNotificationSet to prevent subsequent calls from returning the same notifications."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_acknowledge-notification-set",
@@ -8457,26 +8706,6 @@ async fn main() {
                     Some(r##"Completes the signup flow, by specifying the Completion token and Enterprise token. This request must not be called multiple times for a given Enterprise Token."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_complete-signup",
                   vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("create-enrollment-token",
-                    Some(r##"Returns a token for device enrollment. The DPC can encode this token within the QR/NFC/zero-touch enrollment payload or fetch it before calling the on-device API to authenticate the user. The token can be generated for each device or reused across multiple devices."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_create-enrollment-token",
-                  vec![
-                    (Some(r##"enterprise-id"##),
-                     None,
-                     Some(r##"The ID of the enterprise."##),
-                     Some(true),
-                     Some(false)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -8538,6 +8767,26 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("generate-enterprise-upgrade-url",
+                    Some(r##"Generates an enterprise upgrade URL to upgrade an existing managed Google Play Accounts enterprise to a managed Google domain. See the guide to upgrading an enterprise for more details."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_generate-enterprise-upgrade-url",
+                  vec![
+                    (Some(r##"enterprise-id"##),
+                     None,
+                     Some(r##"Required. The ID of the enterprise."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("generate-signup-url",
                     Some(r##"Generates a sign-up URL."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_generate-signup-url",
@@ -8574,7 +8823,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get-service-account",
-                    Some(r##"Returns a service account and credentials. The service account can be bound to the enterprise by calling setAccount. The service account is unique to this enterprise and EMM, and will be deleted if the enterprise is unbound. The credentials contain private key data and are not stored server-side. This method can only be called after calling Enterprises.Enroll or Enterprises.CompleteSignup, and before Enterprises.SetAccount; at other times it will return an error. Subsequent calls after the first will generate a new, unique set of credentials, and invalidate the previously generated credentials. Once the service account is bound to the enterprise, it can be managed using the serviceAccountKeys resource."##),
+                    Some(r##"Returns a service account and credentials. The service account can be bound to the enterprise by calling setAccount. The service account is unique to this enterprise and EMM, and will be deleted if the enterprise is unbound. The credentials contain private key data and are not stored server-side. This method can only be called after calling Enterprises.Enroll or Enterprises.CompleteSignup, and before Enterprises.SetAccount; at other times it will return an error. Subsequent calls after the first will generate a new, unique set of credentials, and invalidate the previously generated credentials. Once the service account is bound to the enterprise, it can be managed using the serviceAccountKeys resource. *Note:* After you create a key, you might need to wait for 60 seconds or more before you perform another operation with the key. If you try to perform an operation with the key immediately after you create the key, and you receive an error, you can retry the request with exponential backoff ."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_get-service-account",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -10221,7 +10470,7 @@ async fn main() {
 
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251211")
            .about("Manages the deployment of apps to Android Enterprise devices.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")
@@ -10286,7 +10535,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

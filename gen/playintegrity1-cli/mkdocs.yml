@@ -1,4 +1,4 @@
-site_name: Play Integrity v6.0.0+20240625
+site_name: Play Integrity v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-playintegrity1-cli
 site_description: A complete library to interact with Play Integrity (protocol v1)
 
@@ -9,8 +9,11 @@ site_dir: build_html
 
 nav:
 - Home: 'index.md'
+- 'Device Recall':
+    - 'Write': 'device-recall_write.md'
 - 'Methods':
     - 'Decode Integrity Token': 'methods_decode-integrity-token.md'
+    - 'Decode Pc Integrity Token': 'methods_decode-pc-integrity-token.md'
 
 theme: readthedocs
 

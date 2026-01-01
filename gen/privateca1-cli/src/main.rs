@@ -1460,11 +1460,26 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "user-defined-access-urls.aia-issuing-certificate-urls" => Some((
+                    "userDefinedAccessUrls.aiaIssuingCertificateUrls",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "user-defined-access-urls.crl-access-urls" => Some((
+                    "userDefinedAccessUrls.crlAccessUrls",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
                             "access-urls",
+                            "aia-issuing-certificate-urls",
                             "aia-ocsp-servers",
                             "algorithm",
                             "base-key-usage",
@@ -1541,6 +1556,7 @@ where
                             "type",
                             "update-time",
                             "uris",
+                            "user-defined-access-urls",
                             "x509-config",
                         ],
                     );
@@ -2782,11 +2798,26 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "user-defined-access-urls.aia-issuing-certificate-urls" => Some((
+                    "userDefinedAccessUrls.aiaIssuingCertificateUrls",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "user-defined-access-urls.crl-access-urls" => Some((
+                    "userDefinedAccessUrls.crlAccessUrls",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
                             "access-urls",
+                            "aia-issuing-certificate-urls",
                             "aia-ocsp-servers",
                             "algorithm",
                             "base-key-usage",
@@ -2863,6 +2894,7 @@ where
                             "type",
                             "update-time",
                             "uris",
+                            "user-defined-access-urls",
                             "x509-config",
                         ],
                     );
@@ -3166,6 +3198,7 @@ where
                     "certificate-description.subject-description.subject-alt-name.ip-addresses" => Some(("certificateDescription.subjectDescription.subjectAltName.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "certificate-description.subject-description.subject-alt-name.uris" => Some(("certificateDescription.subjectDescription.subjectAltName.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "certificate-description.subject-key-id.key-id" => Some(("certificateDescription.subjectKeyId.keyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "certificate-description.tbs-certificate-digest" => Some(("certificateDescription.tbsCertificateDigest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "certificate-description.x509-description.aia-ocsp-servers" => Some(("certificateDescription.x509Description.aiaOcspServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "certificate-description.x509-description.ca-options.is-ca" => Some(("certificateDescription.x509Description.caOptions.isCa", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "certificate-description.x509-description.ca-options.max-issuer-path-length" => Some(("certificateDescription.x509Description.caOptions.maxIssuerPathLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3249,7 +3282,7 @@ where
                     "subject-mode" => Some(("subjectMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-issuing-certificate-urls", "aia-ocsp-servers", "authority-key-id", "base-key-usage", "ca-options", "cert-fingerprint", "cert-sign", "certificate-description", "certificate-template", "client-auth", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-distribution-points", "crl-sign", "data-encipherment", "decipher-only", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "extended-key-usage", "format", "hex-serial-number", "ip-addresses", "is-ca", "issuer-certificate-authority", "key", "key-agreement", "key-encipherment", "key-id", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "not-after-time", "not-before-time", "ocsp-signing", "organization", "organizational-unit", "pem-certificate", "pem-certificate-chain", "pem-csr", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "revocation-details", "revocation-state", "revocation-time", "server-auth", "sha256-hash", "street-address", "subject", "subject-alt-name", "subject-config", "subject-description", "subject-key-id", "subject-mode", "time-stamping", "update-time", "uris", "x509-config", "x509-description"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-issuing-certificate-urls", "aia-ocsp-servers", "authority-key-id", "base-key-usage", "ca-options", "cert-fingerprint", "cert-sign", "certificate-description", "certificate-template", "client-auth", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-distribution-points", "crl-sign", "data-encipherment", "decipher-only", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "extended-key-usage", "format", "hex-serial-number", "ip-addresses", "is-ca", "issuer-certificate-authority", "key", "key-agreement", "key-encipherment", "key-id", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "not-after-time", "not-before-time", "ocsp-signing", "organization", "organizational-unit", "pem-certificate", "pem-certificate-chain", "pem-csr", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "revocation-details", "revocation-state", "revocation-time", "server-auth", "sha256-hash", "street-address", "subject", "subject-alt-name", "subject-config", "subject-description", "subject-key-id", "subject-mode", "tbs-certificate-digest", "time-stamping", "update-time", "uris", "x509-config", "x509-description"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3603,6 +3636,7 @@ where
                     "certificate-description.subject-description.subject-alt-name.ip-addresses" => Some(("certificateDescription.subjectDescription.subjectAltName.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "certificate-description.subject-description.subject-alt-name.uris" => Some(("certificateDescription.subjectDescription.subjectAltName.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "certificate-description.subject-key-id.key-id" => Some(("certificateDescription.subjectKeyId.keyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "certificate-description.tbs-certificate-digest" => Some(("certificateDescription.tbsCertificateDigest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "certificate-description.x509-description.aia-ocsp-servers" => Some(("certificateDescription.x509Description.aiaOcspServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "certificate-description.x509-description.ca-options.is-ca" => Some(("certificateDescription.x509Description.caOptions.isCa", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "certificate-description.x509-description.ca-options.max-issuer-path-length" => Some(("certificateDescription.x509Description.caOptions.maxIssuerPathLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3686,7 +3720,7 @@ where
                     "subject-mode" => Some(("subjectMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-issuing-certificate-urls", "aia-ocsp-servers", "authority-key-id", "base-key-usage", "ca-options", "cert-fingerprint", "cert-sign", "certificate-description", "certificate-template", "client-auth", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-distribution-points", "crl-sign", "data-encipherment", "decipher-only", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "extended-key-usage", "format", "hex-serial-number", "ip-addresses", "is-ca", "issuer-certificate-authority", "key", "key-agreement", "key-encipherment", "key-id", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "not-after-time", "not-before-time", "ocsp-signing", "organization", "organizational-unit", "pem-certificate", "pem-certificate-chain", "pem-csr", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "revocation-details", "revocation-state", "revocation-time", "server-auth", "sha256-hash", "street-address", "subject", "subject-alt-name", "subject-config", "subject-description", "subject-key-id", "subject-mode", "time-stamping", "update-time", "uris", "x509-config", "x509-description"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-issuing-certificate-urls", "aia-ocsp-servers", "authority-key-id", "base-key-usage", "ca-options", "cert-fingerprint", "cert-sign", "certificate-description", "certificate-template", "client-auth", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-distribution-points", "crl-sign", "data-encipherment", "decipher-only", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "extended-key-usage", "format", "hex-serial-number", "ip-addresses", "is-ca", "issuer-certificate-authority", "key", "key-agreement", "key-encipherment", "key-id", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "not-after-time", "not-before-time", "ocsp-signing", "organization", "organizational-unit", "pem-certificate", "pem-certificate-chain", "pem-csr", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "revocation-details", "revocation-state", "revocation-time", "server-auth", "sha256-hash", "street-address", "subject", "subject-alt-name", "subject-config", "subject-description", "subject-key-id", "subject-mode", "tbs-certificate-digest", "time-stamping", "update-time", "uris", "x509-config", "x509-description"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3961,6 +3995,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "encryption-spec.cloud-kms-key" => Some((
+                    "encryptionSpec.cloudKmsKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "issuance-policy.allowed-issuance-modes.allow-config-based-issuance" => Some((
                     "issuancePolicy.allowedIssuanceModes.allowConfigBasedIssuance",
                     JsonTypeInfo {
@@ -3972,6 +4013,13 @@ where
                     "issuancePolicy.allowedIssuanceModes.allowCsrBasedIssuance",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "issuance-policy.backdate-duration" => Some((
+                    "issuancePolicy.backdateDuration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -4298,12 +4346,14 @@ where
                             "allow-subject-alt-names-passthrough",
                             "allow-subject-passthrough",
                             "allowed-issuance-modes",
+                            "backdate-duration",
                             "base-key-usage",
                             "baseline-values",
                             "ca-options",
                             "cel-expression",
                             "cert-sign",
                             "client-auth",
+                            "cloud-kms-key",
                             "code-signing",
                             "content-commitment",
                             "critical",
@@ -4315,6 +4365,7 @@ where
                             "email-protection",
                             "encipher-only",
                             "encoding-format",
+                            "encryption-spec",
                             "excluded-dns-names",
                             "excluded-email-addresses",
                             "excluded-ip-ranges",
@@ -4985,6 +5036,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "encryption-spec.cloud-kms-key" => Some((
+                    "encryptionSpec.cloudKmsKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "issuance-policy.allowed-issuance-modes.allow-config-based-issuance" => Some((
                     "issuancePolicy.allowedIssuanceModes.allowConfigBasedIssuance",
                     JsonTypeInfo {
@@ -4996,6 +5054,13 @@ where
                     "issuancePolicy.allowedIssuanceModes.allowCsrBasedIssuance",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "issuance-policy.backdate-duration" => Some((
+                    "issuancePolicy.backdateDuration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -5322,12 +5387,14 @@ where
                             "allow-subject-alt-names-passthrough",
                             "allow-subject-passthrough",
                             "allowed-issuance-modes",
+                            "backdate-duration",
                             "base-key-usage",
                             "baseline-values",
                             "ca-options",
                             "cel-expression",
                             "cert-sign",
                             "client-auth",
+                            "cloud-kms-key",
                             "code-signing",
                             "content-commitment",
                             "critical",
@@ -5339,6 +5406,7 @@ where
                             "email-protection",
                             "encipher-only",
                             "encoding-format",
+                            "encryption-spec",
                             "excluded-dns-names",
                             "excluded-email-addresses",
                             "excluded-ip-ranges",
@@ -7465,6 +7533,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -7482,7 +7553,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -7837,6 +7912,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -7867,7 +7949,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -8102,7 +8193,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/privateca1", config_dir))
         .build()
@@ -8247,7 +8340,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name for this CertificateRevocationList in the format `projects/*/locations/*/caPools/*certificateAuthorities/*/ certificateRevocationLists/*`."##),
+                     Some(r##"Identifier. The resource name for this CertificateRevocationList in the format `projects/*/locations/*/caPools/*certificateAuthorities/*/ certificateRevocationLists/*`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8477,7 +8570,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name for this CertificateAuthority in the format `projects/*/locations/*/caPools/*/certificateAuthorities/*`."##),
+                     Some(r##"Identifier. The resource name for this CertificateAuthority in the format `projects/*/locations/*/caPools/*/certificateAuthorities/*`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8592,7 +8685,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name for this Certificate in the format `projects/*/locations/*/caPools/*/certificates/*`."##),
+                     Some(r##"Identifier. The resource name for this Certificate in the format `projects/*/locations/*/caPools/*/certificates/*`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8772,7 +8865,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name for this CaPool in the format `projects/*/locations/*/caPools/*`."##),
+                     Some(r##"Identifier. The resource name for this CaPool in the format `projects/*/locations/*/caPools/*`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8952,7 +9045,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name for this CertificateTemplate in the format `projects/*/locations/*/certificateTemplates/*`."##),
+                     Some(r##"Identifier. The resource name for this CertificateTemplate in the format `projects/*/locations/*/certificateTemplates/*`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -9062,7 +9155,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_privateca1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -9151,7 +9244,7 @@ async fn main() {
 
     let mut app = App::new("privateca1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240605")
+           .version("7.0.0+20251022")
            .about("The Certificate Authority Service API is a highly-available, scalable service that enables you to simplify and automate the management of private certificate authorities (CAs) while staying in control of your private keys. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_privateca1_cli")
            .arg(Arg::with_name("url")
@@ -9216,7 +9309,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

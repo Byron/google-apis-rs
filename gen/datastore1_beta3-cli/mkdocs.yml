@@ -1,4 +1,4 @@
-site_name: datastore v6.0.0+20240617
+site_name: datastore v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-datastore1_beta3-cli
 site_description: A complete library to interact with datastore (protocol v1beta3)
 

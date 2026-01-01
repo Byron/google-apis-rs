@@ -1,4 +1,4 @@
-site_name: Tag Manager v6.0.0+20240619
+site_name: Tag Manager v7.0.0+20251210
 site_url: http://byron.github.io/google-apis-rs/google-tagmanager2-cli
 site_description: A complete library to interact with Tag Manager (protocol v2)
 
@@ -41,6 +41,7 @@ nav:
     - 'Containers Workspaces Built In Variables Delete': 'accounts_containers-workspaces-built-in-variables-delete.md'
     - 'Containers Workspaces Built In Variables List': 'accounts_containers-workspaces-built-in-variables-list.md'
     - 'Containers Workspaces Built In Variables Revert': 'accounts_containers-workspaces-built-in-variables-revert.md'
+    - 'Containers Workspaces Bulk Update': 'accounts_containers-workspaces-bulk-update.md'
     - 'Containers Workspaces Clients Create': 'accounts_containers-workspaces-clients-create.md'
     - 'Containers Workspaces Clients Delete': 'accounts_containers-workspaces-clients-delete.md'
     - 'Containers Workspaces Clients Get': 'accounts_containers-workspaces-clients-get.md'
@@ -78,6 +79,7 @@ nav:
     - 'Containers Workspaces Templates Create': 'accounts_containers-workspaces-templates-create.md'
     - 'Containers Workspaces Templates Delete': 'accounts_containers-workspaces-templates-delete.md'
     - 'Containers Workspaces Templates Get': 'accounts_containers-workspaces-templates-get.md'
+    - 'Containers Workspaces Templates Import From Gallery': 'accounts_containers-workspaces-templates-import-from-gallery.md'
     - 'Containers Workspaces Templates List': 'accounts_containers-workspaces-templates-list.md'
     - 'Containers Workspaces Templates Revert': 'accounts_containers-workspaces-templates-revert.md'
     - 'Containers Workspaces Templates Update': 'accounts_containers-workspaces-templates-update.md'

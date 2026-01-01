@@ -101,6 +101,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "file-system-protocol" => Some((
+                    "fileSystemProtocol",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "kms-key" => Some((
                     "kmsKey",
                     JsonTypeInfo {
@@ -186,6 +193,7 @@ where
                             "create-time",
                             "description",
                             "download-bytes",
+                            "file-system-protocol",
                             "kms-key",
                             "labels",
                             "name",
@@ -620,6 +628,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "file-system-protocol" => Some((
+                    "fileSystemProtocol",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "kms-key" => Some((
                     "kmsKey",
                     JsonTypeInfo {
@@ -705,6 +720,7 @@ where
                             "create-time",
                             "description",
                             "download-bytes",
+                            "file-system-protocol",
                             "kms-key",
                             "labels",
                             "name",
@@ -932,6 +948,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "capacity-step-size-gb" => Some((
+                    "capacityStepSizeGb",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -939,8 +962,57 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "custom-performance-supported" => Some((
+                    "customPerformanceSupported",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deletion-protection-enabled" => Some((
+                    "deletionProtectionEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deletion-protection-reason" => Some((
+                    "deletionProtectionReason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "description" => Some((
                     "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "directory-services.ldap.domain" => Some((
+                    "directoryServices.ldap.domain",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "directory-services.ldap.groups-ou" => Some((
+                    "directoryServices.ldap.groupsOu",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "directory-services.ldap.servers" => Some((
+                    "directoryServices.ldap.servers",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "directory-services.ldap.users-ou" => Some((
+                    "directoryServices.ldap.usersOu",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -967,8 +1039,78 @@ where
                         ctype: ComplexType::Map,
                     },
                 )),
+                "max-capacity-gb" => Some((
+                    "maxCapacityGb",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "min-capacity-gb" => Some((
+                    "minCapacityGb",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-config.fixed-iops.max-iops" => Some((
+                    "performanceConfig.fixedIops.maxIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-config.iops-per-tb.max-iops-per-tb" => Some((
+                    "performanceConfig.iopsPerTb.maxIopsPerTb",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-iops" => Some((
+                    "performanceLimits.maxIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-read-iops" => Some((
+                    "performanceLimits.maxReadIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-read-throughput-bps" => Some((
+                    "performanceLimits.maxReadThroughputBps",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-write-iops" => Some((
+                    "performanceLimits.maxWriteIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-write-throughput-bps" => Some((
+                    "performanceLimits.maxWriteThroughputBps",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "protocol" => Some((
+                    "protocol",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1034,21 +1176,44 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "capacity-step-size-gb",
                             "create-time",
+                            "custom-performance-supported",
+                            "deletion-protection-enabled",
+                            "deletion-protection-reason",
                             "description",
+                            "directory-services",
+                            "domain",
                             "etag",
+                            "fixed-iops",
+                            "groups-ou",
+                            "iops-per-tb",
                             "kms-key-name",
                             "labels",
+                            "ldap",
+                            "max-capacity-gb",
+                            "max-iops",
+                            "max-iops-per-tb",
+                            "max-read-iops",
+                            "max-read-throughput-bps",
+                            "max-write-iops",
+                            "max-write-throughput-bps",
+                            "min-capacity-gb",
                             "name",
+                            "performance-config",
+                            "performance-limits",
+                            "protocol",
                             "replication",
                             "role",
                             "satisfies-pzi",
                             "satisfies-pzs",
+                            "servers",
                             "state",
                             "status-message",
                             "suspension-reasons",
                             "tags",
                             "tier",
+                            "users-ou",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -1452,6 +1617,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "capacity-step-size-gb" => Some((
+                    "capacityStepSizeGb",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -1459,8 +1631,57 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "custom-performance-supported" => Some((
+                    "customPerformanceSupported",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deletion-protection-enabled" => Some((
+                    "deletionProtectionEnabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "deletion-protection-reason" => Some((
+                    "deletionProtectionReason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "description" => Some((
                     "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "directory-services.ldap.domain" => Some((
+                    "directoryServices.ldap.domain",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "directory-services.ldap.groups-ou" => Some((
+                    "directoryServices.ldap.groupsOu",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "directory-services.ldap.servers" => Some((
+                    "directoryServices.ldap.servers",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "directory-services.ldap.users-ou" => Some((
+                    "directoryServices.ldap.usersOu",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1487,8 +1708,78 @@ where
                         ctype: ComplexType::Map,
                     },
                 )),
+                "max-capacity-gb" => Some((
+                    "maxCapacityGb",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "min-capacity-gb" => Some((
+                    "minCapacityGb",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-config.fixed-iops.max-iops" => Some((
+                    "performanceConfig.fixedIops.maxIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-config.iops-per-tb.max-iops-per-tb" => Some((
+                    "performanceConfig.iopsPerTb.maxIopsPerTb",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-iops" => Some((
+                    "performanceLimits.maxIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-read-iops" => Some((
+                    "performanceLimits.maxReadIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-read-throughput-bps" => Some((
+                    "performanceLimits.maxReadThroughputBps",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-write-iops" => Some((
+                    "performanceLimits.maxWriteIops",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "performance-limits.max-write-throughput-bps" => Some((
+                    "performanceLimits.maxWriteThroughputBps",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "protocol" => Some((
+                    "protocol",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1554,21 +1845,44 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "capacity-step-size-gb",
                             "create-time",
+                            "custom-performance-supported",
+                            "deletion-protection-enabled",
+                            "deletion-protection-reason",
                             "description",
+                            "directory-services",
+                            "domain",
                             "etag",
+                            "fixed-iops",
+                            "groups-ou",
+                            "iops-per-tb",
                             "kms-key-name",
                             "labels",
+                            "ldap",
+                            "max-capacity-gb",
+                            "max-iops",
+                            "max-iops-per-tb",
+                            "max-read-iops",
+                            "max-read-throughput-bps",
+                            "max-write-iops",
+                            "max-write-throughput-bps",
+                            "min-capacity-gb",
                             "name",
+                            "performance-config",
+                            "performance-limits",
+                            "protocol",
                             "replication",
                             "role",
                             "satisfies-pzi",
                             "satisfies-pzs",
+                            "servers",
                             "state",
                             "status-message",
                             "suspension-reasons",
                             "tags",
                             "tier",
+                            "users-ou",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -1673,7 +1987,7 @@ where
         }
     }
 
-    async fn _projects_locations_instances_promote_replica(
+    async fn _projects_locations_instances_pause_replica(
         &self,
         opt: &ArgMatches<'n>,
         dry_run: bool,
@@ -1706,6 +2020,140 @@ where
             {
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::PauseReplicaRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_instances_pause_replica(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_instances_promote_replica(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "peer-instance" => Some((
+                    "peerInstance",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["peer-instance"]);
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -1873,6 +2321,133 @@ where
             .hub
             .projects()
             .locations_instances_restore(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_instances_resume_replica(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::ResumeReplicaRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_instances_resume_replica(request, opt.value_of("name").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -2450,6 +3025,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2484,9 +3066,15 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["filter", "order-by", "page-size", "page-token"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "filter",
+                                        "order-by",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -2757,17 +3345,11 @@ where
                             .unwrap_or(-0),
                     );
                 }
-                "include-unrevealed-locations" => {
-                    call = call.include_unrevealed_locations(
-                        value
-                            .map(|v| {
-                                arg_from_str(v, err, "include-unrevealed-locations", "boolean")
-                            })
-                            .unwrap_or(false),
-                    );
-                }
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
+                }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
                 }
                 _ => {
                     let mut found = false;
@@ -2787,14 +3369,9 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    [
-                                        "filter",
-                                        "include-unrevealed-locations",
-                                        "page-size",
-                                        "page-token",
-                                    ]
-                                    .iter()
-                                    .map(|v| *v),
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
                                 );
                                 v
                             }));
@@ -3150,6 +3727,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -3180,7 +3764,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -3289,6 +3882,11 @@ where
                         ._projects_locations_instances_patch(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-instances-pause-replica", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_instances_pause_replica(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("locations-instances-promote-replica", Some(opt)) => {
                     call_result = self
                         ._projects_locations_instances_promote_replica(opt, dry_run, &mut err)
@@ -3297,6 +3895,11 @@ where
                 ("locations-instances-restore", Some(opt)) => {
                     call_result = self
                         ._projects_locations_instances_restore(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-instances-resume-replica", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_instances_resume_replica(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-instances-revert", Some(opt)) => {
@@ -3398,7 +4001,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/file1", config_dir))
         .build()
@@ -3451,7 +4056,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-backups-create', 'locations-backups-delete', 'locations-backups-get', 'locations-backups-list', 'locations-backups-patch', 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-get', 'locations-instances-list', 'locations-instances-patch', 'locations-instances-promote-replica', 'locations-instances-restore', 'locations-instances-revert', 'locations-instances-snapshots-create', 'locations-instances-snapshots-delete', 'locations-instances-snapshots-get', 'locations-instances-snapshots-list', 'locations-instances-snapshots-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-backups-create', 'locations-backups-delete', 'locations-backups-get', 'locations-backups-list', 'locations-backups-patch', 'locations-get', 'locations-instances-create', 'locations-instances-delete', 'locations-instances-get', 'locations-instances-list', 'locations-instances-patch', 'locations-instances-pause-replica', 'locations-instances-promote-replica', 'locations-instances-restore', 'locations-instances-resume-replica', 'locations-instances-revert', 'locations-instances-snapshots-create', 'locations-instances-snapshots-delete', 'locations-instances-snapshots-get', 'locations-instances-snapshots-list', 'locations-instances-snapshots-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
             ("locations-backups-create",
                     Some(r##"Creates a backup."##),
                     "Details at http://byron.github.io/google-apis-rs/google_file1_cli/projects_locations-backups-create",
@@ -3692,8 +4297,33 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-instances-pause-replica",
+                    Some(r##"Pause the standby instance (replica). WARNING: This operation makes the standby instance's NFS filesystem writable. Any data written to the standby instance while paused will be lost when the replica is resumed or promoted."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_file1_cli/projects_locations-instances-pause-replica",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the instance, in the format `projects/{project_id}/locations/{location_id}/instances/{instance_id}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-instances-promote-replica",
-                    Some(r##"Promote an standby instance (replica)."##),
+                    Some(r##"Promote the standby instance (replica)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_file1_cli/projects_locations-instances-promote-replica",
                   vec![
                     (Some(r##"name"##),
@@ -3724,6 +4354,31 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. The resource name of the instance, in the format `projects/{project_number}/locations/{location_id}/instances/{instance_id}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-instances-resume-replica",
+                    Some(r##"Resume the standby instance (replica). WARNING: Any data written to the standby instance while paused will be lost when the replica is resumed."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_file1_cli/projects_locations-instances-resume-replica",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the instance, in the format `projects/{project_id}/locations/{location_id}/instances/{instance_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -3898,7 +4553,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_file1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -3987,7 +4642,7 @@ async fn main() {
 
     let mut app = App::new("file1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240608")
+           .version("7.0.0+20251204")
            .about("The Cloud Filestore API is used for creating and managing cloud file servers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_file1_cli")
            .arg(Arg::with_name("url")
@@ -4052,7 +4707,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

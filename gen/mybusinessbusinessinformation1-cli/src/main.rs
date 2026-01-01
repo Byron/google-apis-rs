@@ -199,6 +199,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "metadata.is-particularly-personal-place" => Some((
+                    "metadata.isParticularlyPersonalPlace",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "metadata.maps-uri" => Some((
                     "metadata.mapsUri",
                     JsonTypeInfo {
@@ -442,6 +449,7 @@ where
                             "has-google-updated",
                             "has-pending-edits",
                             "has-voice-of-merchant",
+                            "is-particularly-personal-place",
                             "labels",
                             "language-code",
                             "latitude",
@@ -1282,6 +1290,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "location.metadata.is-particularly-personal-place" => Some((
+                    "location.metadata.isParticularlyPersonalPlace",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "location.metadata.maps-uri" => Some((
                     "location.metadata.mapsUri",
                     JsonTypeInfo {
@@ -1539,6 +1554,7 @@ where
                             "has-google-updated",
                             "has-pending-edits",
                             "has-voice-of-merchant",
+                            "is-particularly-personal-place",
                             "labels",
                             "language-code",
                             "latitude",
@@ -2193,6 +2209,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "metadata.is-particularly-personal-place" => Some((
+                    "metadata.isParticularlyPersonalPlace",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "metadata.maps-uri" => Some((
                     "metadata.mapsUri",
                     JsonTypeInfo {
@@ -2436,6 +2459,7 @@ where
                             "has-google-updated",
                             "has-pending-edits",
                             "has-voice-of-merchant",
+                            "is-particularly-personal-place",
                             "labels",
                             "language-code",
                             "latitude",
@@ -2850,7 +2874,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/mybusinessbusinessinformation1", config_dir))
         .build()
@@ -3214,7 +3240,7 @@ async fn main() {
 
     let mut app = App::new("mybusinessbusinessinformation1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251210")
            .about("The My Business Business Information API provides an interface for managing business information. Note - If you have a quota of 0 after enabling the API, please request for GBP API access.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusinessbusinessinformation1_cli")
            .arg(Arg::with_name("folder")
@@ -3274,7 +3300,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -1,4 +1,4 @@
-site_name: Clouderrorreporting v6.0.0+20240621
+site_name: Clouderrorreporting v7.0.0+20251205
 site_url: http://byron.github.io/google-apis-rs/google-clouderrorreporting1_beta1-cli
 site_description: A complete library to interact with Clouderrorreporting (protocol v1beta1)
 
@@ -16,6 +16,11 @@ nav:
     - 'Group Stats List': 'projects_group-stats-list.md'
     - 'Groups Get': 'projects_groups-get.md'
     - 'Groups Update': 'projects_groups-update.md'
+    - 'Locations Delete Events': 'projects_locations-delete-events.md'
+    - 'Locations Events List': 'projects_locations-events-list.md'
+    - 'Locations Group Stats List': 'projects_locations-group-stats-list.md'
+    - 'Locations Groups Get': 'projects_locations-groups-get.md'
+    - 'Locations Groups Update': 'projects_locations-groups-update.md'
 
 theme: readthedocs
 

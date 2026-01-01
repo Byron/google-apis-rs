@@ -228,6 +228,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "enterprise-type" => Some((
+                    "enterpriseType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "google-authentication-settings.google-authentication-required" => Some((
                     "googleAuthenticationSettings.googleAuthenticationRequired",
                     JsonTypeInfo {
@@ -244,6 +251,20 @@ where
                 )),
                 "logo.url" => Some((
                     "logo.url",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-google-domain-type" => Some((
+                    "managedGoogleDomainType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-google-play-accounts-enterprise-type" => Some((
+                    "managedGooglePlayAccountsEnterpriseType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -282,12 +303,15 @@ where
                             "data-protection-officer-phone",
                             "enabled-notification-types",
                             "enterprise-display-name",
+                            "enterprise-type",
                             "eu-representative-email",
                             "eu-representative-name",
                             "eu-representative-phone",
                             "google-authentication-required",
                             "google-authentication-settings",
                             "logo",
+                            "managed-google-domain-type",
+                            "managed-google-play-accounts-enterprise-type",
                             "name",
                             "primary-color",
                             "pubsub-topic",
@@ -697,6 +721,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "add-esim-params.activation-code" => Some((
+                    "addEsimParams.activationCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "add-esim-params.activation-state" => Some((
+                    "addEsimParams.activationState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "clear-apps-data-params.package-names" => Some((
                     "clearAppsDataParams.packageNames",
                     JsonTypeInfo {
@@ -725,8 +763,71 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "esim-status.esim-info.icc-id" => Some((
+                    "esimStatus.esimInfo.iccId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "esim-status.internal-error-details.error-code" => Some((
+                    "esimStatus.internalErrorDetails.errorCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "esim-status.internal-error-details.error-code-detail" => Some((
+                    "esimStatus.internalErrorDetails.errorCodeDetail",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "esim-status.internal-error-details.operation-code" => Some((
+                    "esimStatus.internalErrorDetails.operationCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "esim-status.internal-error-details.operation-code-detail" => Some((
+                    "esimStatus.internalErrorDetails.operationCodeDetail",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "esim-status.status" => Some((
+                    "esimStatus.status",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "new-password" => Some((
                     "newPassword",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "remove-esim-params.icc-id" => Some((
+                    "removeEsimParams.iccId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "request-device-info-params.device-info" => Some((
+                    "requestDeviceInfoParams.deviceInfo",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "request-device-info-status.status" => Some((
+                    "requestDeviceInfoStatus.status",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -830,15 +931,45 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "wipe-params.wipe-data-flags" => Some((
+                    "wipeParams.wipeDataFlags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "wipe-params.wipe-reason.default-message" => Some((
+                    "wipeParams.wipeReason.defaultMessage",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "wipe-params.wipe-reason.localized-messages" => Some((
+                    "wipeParams.wipeReason.localizedMessages",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "activation-code",
+                            "activation-state",
+                            "add-esim-params",
                             "clear-apps-data-params",
                             "create-time",
                             "default-message",
+                            "device-info",
                             "duration",
                             "error-code",
+                            "error-code-detail",
+                            "esim-info",
+                            "esim-status",
+                            "icc-id",
+                            "internal-error-details",
                             "localized-messages",
                             "lost-email-address",
                             "lost-message",
@@ -846,7 +977,12 @@ where
                             "lost-phone-number",
                             "lost-street-address",
                             "new-password",
+                            "operation-code",
+                            "operation-code-detail",
                             "package-names",
+                            "remove-esim-params",
+                            "request-device-info-params",
+                            "request-device-info-status",
                             "reset-password-flags",
                             "start-lost-mode-params",
                             "start-lost-mode-status",
@@ -854,6 +990,9 @@ where
                             "stop-lost-mode-status",
                             "type",
                             "user-name",
+                            "wipe-data-flags",
+                            "wipe-params",
+                            "wipe-reason",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -1222,6 +1361,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -1252,7 +1398,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1360,6 +1515,13 @@ where
                 )),
                 "common-criteria-mode-info.common-criteria-mode-status" => Some((
                     "commonCriteriaModeInfo.commonCriteriaModeStatus",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "common-criteria-mode-info.policy-signature-verification-status" => Some((
+                    "commonCriteriaModeInfo.policySignatureVerificationStatus",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1852,6 +2014,7 @@ where
                             "ownership",
                             "policy-compliant",
                             "policy-name",
+                            "policy-signature-verification-status",
                             "previous-device-names",
                             "previous-dpc",
                             "primary-language-code",
@@ -2397,6 +2560,149 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _enterprises_generate_enterprise_upgrade_url(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "admin-email" => Some((
+                    "adminEmail",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allowed-domains" => Some((
+                    "allowedDomains",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["admin-email", "allowed-domains"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GenerateEnterpriseUpgradeUrlRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .enterprises()
+            .generate_enterprise_upgrade_url(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -3116,6 +3422,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "enterprise-type" => Some((
+                    "enterpriseType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "google-authentication-settings.google-authentication-required" => Some((
                     "googleAuthenticationSettings.googleAuthenticationRequired",
                     JsonTypeInfo {
@@ -3132,6 +3445,20 @@ where
                 )),
                 "logo.url" => Some((
                     "logo.url",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-google-domain-type" => Some((
+                    "managedGoogleDomainType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "managed-google-play-accounts-enterprise-type" => Some((
+                    "managedGooglePlayAccountsEnterpriseType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -3170,12 +3497,15 @@ where
                             "data-protection-officer-phone",
                             "enabled-notification-types",
                             "enterprise-display-name",
+                            "enterprise-type",
                             "eu-representative-email",
                             "eu-representative-name",
                             "eu-representative-phone",
                             "google-authentication-required",
                             "google-authentication-settings",
                             "logo",
+                            "managed-google-domain-type",
+                            "managed-google-play-accounts-enterprise-type",
                             "name",
                             "primary-color",
                             "pubsub-topic",
@@ -3539,6 +3869,134 @@ where
         }
     }
 
+    async fn _enterprises_policies_modify_policy_applications(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::ModifyPolicyApplicationsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .enterprises()
+            .policies_modify_policy_applications(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _enterprises_policies_patch(
         &self,
         opt: &ArgMatches<'n>,
@@ -3574,6 +4032,7 @@ where
                     "add-user-disabled" => Some(("addUserDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "adjust-volume-disabled" => Some(("adjustVolumeDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-security-overrides.common-criteria-mode" => Some(("advancedSecurityOverrides.commonCriteriaMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-security-overrides.content-protection-policy" => Some(("advancedSecurityOverrides.contentProtectionPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-security-overrides.developer-settings" => Some(("advancedSecurityOverrides.developerSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-security-overrides.google-play-protect-verify-apps" => Some(("advancedSecurityOverrides.googlePlayProtectVerifyApps", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-security-overrides.mte-policy" => Some(("advancedSecurityOverrides.mtePolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3583,6 +4042,8 @@ where
                     "always-on-vpn-package.package-name" => Some(("alwaysOnVpnPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "android-device-policy-tracks" => Some(("androidDevicePolicyTracks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "app-auto-update-policy" => Some(("appAutoUpdatePolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-functions" => Some(("appFunctions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "assist-content-policy" => Some(("assistContentPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auto-date-and-time-zone" => Some(("autoDateAndTimeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auto-time-required" => Some(("autoTimeRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "block-applications-enabled" => Some(("blockApplicationsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3595,6 +4056,7 @@ where
                     "create-windows-disabled" => Some(("createWindowsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "credential-provider-policy-default" => Some(("credentialProviderPolicyDefault", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "credentials-config-disabled" => Some(("credentialsConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cross-profile-policies.cross-profile-app-functions" => Some(("crossProfilePolicies.crossProfileAppFunctions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cross-profile-policies.cross-profile-copy-paste" => Some(("crossProfilePolicies.crossProfileCopyPaste", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cross-profile-policies.cross-profile-data-sharing" => Some(("crossProfilePolicies.crossProfileDataSharing", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cross-profile-policies.exemptions-to-show-work-contacts-in-personal-profile.package-names" => Some(("crossProfilePolicies.exemptionsToShowWorkContactsInPersonalProfile.packageNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3603,7 +4065,10 @@ where
                     "data-roaming-disabled" => Some(("dataRoamingDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "debugging-features-allowed" => Some(("debuggingFeaturesAllowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "default-permission-policy" => Some(("defaultPermissionPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-connectivity-management.apn-policy.override-apns" => Some(("deviceConnectivityManagement.apnPolicy.overrideApns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-connectivity-management.bluetooth-sharing" => Some(("deviceConnectivityManagement.bluetoothSharing", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-connectivity-management.configure-wifi" => Some(("deviceConnectivityManagement.configureWifi", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-connectivity-management.preferential-network-service-settings.default-preferential-network-id" => Some(("deviceConnectivityManagement.preferentialNetworkServiceSettings.defaultPreferentialNetworkId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-connectivity-management.tethering-settings" => Some(("deviceConnectivityManagement.tetheringSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-connectivity-management.usb-data-access" => Some(("deviceConnectivityManagement.usbDataAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-connectivity-management.wifi-direct-settings" => Some(("deviceConnectivityManagement.wifiDirectSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3621,6 +4086,7 @@ where
                     "display-settings.screen-timeout-settings.screen-timeout-mode" => Some(("displaySettings.screenTimeoutSettings.screenTimeoutMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "encryption-policy" => Some(("encryptionPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ensure-verify-apps-enabled" => Some(("ensureVerifyAppsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "enterprise-display-name-visibility" => Some(("enterpriseDisplayNameVisibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "factory-reset-disabled" => Some(("factoryResetDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "frp-admin-emails" => Some(("frpAdminEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "fun-disabled" => Some(("funDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3665,9 +4131,11 @@ where
                     "permitted-accessibility-services.package-names" => Some(("permittedAccessibilityServices.packageNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "permitted-input-methods.package-names" => Some(("permittedInputMethods.packageNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "personal-usage-policies.account-types-with-management-disabled" => Some(("personalUsagePolicies.accountTypesWithManagementDisabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "personal-usage-policies.bluetooth-sharing" => Some(("personalUsagePolicies.bluetoothSharing", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "personal-usage-policies.camera-disabled" => Some(("personalUsagePolicies.cameraDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "personal-usage-policies.max-days-with-work-off" => Some(("personalUsagePolicies.maxDaysWithWorkOff", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "personal-usage-policies.personal-play-store-mode" => Some(("personalUsagePolicies.personalPlayStoreMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "personal-usage-policies.private-space-policy" => Some(("personalUsagePolicies.privateSpacePolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "personal-usage-policies.screen-capture-disabled" => Some(("personalUsagePolicies.screenCaptureDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "play-store-mode" => Some(("playStoreMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "preferential-network-service" => Some(("preferentialNetworkService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3691,6 +4159,7 @@ where
                     "status-reporting-settings.application-reporting-settings.include-removed-apps" => Some(("statusReportingSettings.applicationReportingSettings.includeRemovedApps", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.application-reports-enabled" => Some(("statusReportingSettings.applicationReportsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.common-criteria-mode-enabled" => Some(("statusReportingSettings.commonCriteriaModeEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status-reporting-settings.default-application-info-reporting-enabled" => Some(("statusReportingSettings.defaultApplicationInfoReportingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.device-settings-enabled" => Some(("statusReportingSettings.deviceSettingsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.display-info-enabled" => Some(("statusReportingSettings.displayInfoEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.hardware-status-enabled" => Some(("statusReportingSettings.hardwareStatusEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3714,8 +4183,11 @@ where
                     "vpn-config-disabled" => Some(("vpnConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "wifi-config-disabled" => Some(("wifiConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "wifi-configs-lockdown-enabled" => Some(("wifiConfigsLockdownEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "wipe-data-flags" => Some(("wipeDataFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "work-account-setup-config.authentication-type" => Some(("workAccountSetupConfig.authenticationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "work-account-setup-config.required-account-email" => Some(("workAccountSetupConfig.requiredAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-types-with-management-disabled", "add-user-disabled", "adjust-volume-disabled", "advanced-security-overrides", "airplane-mode-state", "always-on-vpn-package", "android-device-policy-tracks", "app-auto-update-policy", "application-reporting-settings", "application-reports-enabled", "auto-date-and-time-zone", "auto-time-required", "block-applications-enabled", "bluetooth-config-disabled", "bluetooth-contact-sharing-disabled", "bluetooth-disabled", "camera-access", "camera-disabled", "cell-broadcasts-config-disabled", "cellular-two-g-state", "common-criteria-mode", "common-criteria-mode-enabled", "configure-wifi", "create-windows-disabled", "credential-provider-policy-default", "credentials-config-disabled", "cross-profile-copy-paste", "cross-profile-data-sharing", "cross-profile-policies", "data-roaming-disabled", "debugging-features-allowed", "default-message", "default-permission-policy", "developer-settings", "device-connectivity-management", "device-owner-lock-screen-info", "device-radio-state", "device-settings", "device-settings-enabled", "display-info-enabled", "display-settings", "enabled-log-types", "encryption-policy", "end-minutes", "ensure-verify-apps-enabled", "excluded-hosts", "exemptions-to-show-work-contacts-in-personal-profile", "factory-reset-disabled", "frp-admin-emails", "fun-disabled", "google-play-protect-verify-apps", "hardware-status-enabled", "host", "include-removed-apps", "install-apps-disabled", "install-unknown-sources-allowed", "keyguard-disabled", "keyguard-disabled-features", "kiosk-custom-launcher-enabled", "kiosk-customization", "localized-messages", "location-mode", "lockdown-enabled", "long-support-message", "max-days-with-work-off", "maximum-failed-passwords-for-wipe", "maximum-time-to-lock", "memory-info-enabled", "microphone-access", "minimum-api-level", "minimum-wifi-security-level", "mobile-networks-config-disabled", "modify-accounts-disabled", "mount-physical-media-disabled", "mte-policy", "name", "network-escape-hatch-enabled", "network-info-enabled", "network-reset-disabled", "outgoing-beam-disabled", "outgoing-calls-disabled", "pac-uri", "package-name", "package-names", "password-expiration-timeout", "password-history-length", "password-minimum-length", "password-minimum-letters", "password-minimum-lower-case", "password-minimum-non-letter", "password-minimum-numeric", "password-minimum-symbols", "password-minimum-upper-case", "password-quality", "password-requirements", "password-scope", "permitted-accessibility-services", "permitted-input-methods", "personal-apps-that-can-read-work-notifications", "personal-play-store-mode", "personal-usage-policies", "play-store-mode", "port", "power-button-actions", "power-management-events-enabled", "preferential-network-service", "printing-policy", "private-key-selection-enabled", "recommended-global-proxy", "remove-user-disabled", "require-password-unlock", "safe-boot-disabled", "screen-brightness", "screen-brightness-mode", "screen-brightness-settings", "screen-capture-disabled", "screen-timeout", "screen-timeout-mode", "screen-timeout-settings", "set-user-icon-disabled", "set-wallpaper-disabled", "share-location-disabled", "short-support-message", "show-work-contacts-in-personal-profile", "skip-first-use-hints-enabled", "sms-disabled", "software-info-enabled", "start-minutes", "status-bar", "status-bar-disabled", "status-reporting-settings", "stay-on-plugged-modes", "system-error-warnings", "system-navigation", "system-properties-enabled", "system-update", "tethering-config-disabled", "tethering-settings", "type", "ultra-wideband-state", "unified-lock-settings", "uninstall-apps-disabled", "unmute-microphone-disabled", "untrusted-apps-policy", "upload-on-cellular-allowed", "usage-log", "usb-data-access", "usb-file-transfer-disabled", "usb-mass-storage-enabled", "version", "vpn-config-disabled", "wifi-config-disabled", "wifi-configs-lockdown-enabled", "wifi-direct-settings", "wifi-ssid-policy", "wifi-ssid-policy-type", "wifi-state", "work-profile-widgets-default"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-types-with-management-disabled", "add-user-disabled", "adjust-volume-disabled", "advanced-security-overrides", "airplane-mode-state", "always-on-vpn-package", "android-device-policy-tracks", "apn-policy", "app-auto-update-policy", "app-functions", "application-reporting-settings", "application-reports-enabled", "assist-content-policy", "authentication-type", "auto-date-and-time-zone", "auto-time-required", "block-applications-enabled", "bluetooth-config-disabled", "bluetooth-contact-sharing-disabled", "bluetooth-disabled", "bluetooth-sharing", "camera-access", "camera-disabled", "cell-broadcasts-config-disabled", "cellular-two-g-state", "common-criteria-mode", "common-criteria-mode-enabled", "configure-wifi", "content-protection-policy", "create-windows-disabled", "credential-provider-policy-default", "credentials-config-disabled", "cross-profile-app-functions", "cross-profile-copy-paste", "cross-profile-data-sharing", "cross-profile-policies", "data-roaming-disabled", "debugging-features-allowed", "default-application-info-reporting-enabled", "default-message", "default-permission-policy", "default-preferential-network-id", "developer-settings", "device-connectivity-management", "device-owner-lock-screen-info", "device-radio-state", "device-settings", "device-settings-enabled", "display-info-enabled", "display-settings", "enabled-log-types", "encryption-policy", "end-minutes", "ensure-verify-apps-enabled", "enterprise-display-name-visibility", "excluded-hosts", "exemptions-to-show-work-contacts-in-personal-profile", "factory-reset-disabled", "frp-admin-emails", "fun-disabled", "google-play-protect-verify-apps", "hardware-status-enabled", "host", "include-removed-apps", "install-apps-disabled", "install-unknown-sources-allowed", "keyguard-disabled", "keyguard-disabled-features", "kiosk-custom-launcher-enabled", "kiosk-customization", "localized-messages", "location-mode", "lockdown-enabled", "long-support-message", "max-days-with-work-off", "maximum-failed-passwords-for-wipe", "maximum-time-to-lock", "memory-info-enabled", "microphone-access", "minimum-api-level", "minimum-wifi-security-level", "mobile-networks-config-disabled", "modify-accounts-disabled", "mount-physical-media-disabled", "mte-policy", "name", "network-escape-hatch-enabled", "network-info-enabled", "network-reset-disabled", "outgoing-beam-disabled", "outgoing-calls-disabled", "override-apns", "pac-uri", "package-name", "package-names", "password-expiration-timeout", "password-history-length", "password-minimum-length", "password-minimum-letters", "password-minimum-lower-case", "password-minimum-non-letter", "password-minimum-numeric", "password-minimum-symbols", "password-minimum-upper-case", "password-quality", "password-requirements", "password-scope", "permitted-accessibility-services", "permitted-input-methods", "personal-apps-that-can-read-work-notifications", "personal-play-store-mode", "personal-usage-policies", "play-store-mode", "port", "power-button-actions", "power-management-events-enabled", "preferential-network-service", "preferential-network-service-settings", "printing-policy", "private-key-selection-enabled", "private-space-policy", "recommended-global-proxy", "remove-user-disabled", "require-password-unlock", "required-account-email", "safe-boot-disabled", "screen-brightness", "screen-brightness-mode", "screen-brightness-settings", "screen-capture-disabled", "screen-timeout", "screen-timeout-mode", "screen-timeout-settings", "set-user-icon-disabled", "set-wallpaper-disabled", "share-location-disabled", "short-support-message", "show-work-contacts-in-personal-profile", "skip-first-use-hints-enabled", "sms-disabled", "software-info-enabled", "start-minutes", "status-bar", "status-bar-disabled", "status-reporting-settings", "stay-on-plugged-modes", "system-error-warnings", "system-navigation", "system-properties-enabled", "system-update", "tethering-config-disabled", "tethering-settings", "type", "ultra-wideband-state", "unified-lock-settings", "uninstall-apps-disabled", "unmute-microphone-disabled", "untrusted-apps-policy", "upload-on-cellular-allowed", "usage-log", "usb-data-access", "usb-file-transfer-disabled", "usb-mass-storage-enabled", "version", "vpn-config-disabled", "wifi-config-disabled", "wifi-configs-lockdown-enabled", "wifi-direct-settings", "wifi-ssid-policy", "wifi-ssid-policy-type", "wifi-state", "wipe-data-flags", "work-account-setup-config", "work-profile-widgets-default"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3768,6 +4240,141 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _enterprises_policies_remove_policy_applications(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "package-names" => Some((
+                    "packageNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["package-names"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::RemovePolicyApplicationsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .enterprises()
+            .policies_remove_policy_applications(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -4679,6 +5286,9 @@ where
                 "callback-url" => {
                     call = call.callback_url(value.unwrap_or(""));
                 }
+                "allowed-domains" => {
+                    call = call.add_allowed_domains(value.unwrap_or(""));
+                }
                 "admin-email" => {
                     call = call.admin_email(value.unwrap_or(""));
                 }
@@ -4700,9 +5310,14 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["admin-email", "callback-url", "project-id"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "admin-email",
+                                        "allowed-domains",
+                                        "callback-url",
+                                        "project-id",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -4826,6 +5441,11 @@ where
                         ._enterprises_enrollment_tokens_list(opt, dry_run, &mut err)
                         .await;
                 }
+                ("generate-enterprise-upgrade-url", Some(opt)) => {
+                    call_result = self
+                        ._enterprises_generate_enterprise_upgrade_url(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("get", Some(opt)) => {
                     call_result = self._enterprises_get(opt, dry_run, &mut err).await;
                 }
@@ -4863,9 +5483,19 @@ where
                         ._enterprises_policies_list(opt, dry_run, &mut err)
                         .await;
                 }
+                ("policies-modify-policy-applications", Some(opt)) => {
+                    call_result = self
+                        ._enterprises_policies_modify_policy_applications(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("policies-patch", Some(opt)) => {
                     call_result = self
                         ._enterprises_policies_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("policies-remove-policy-applications", Some(opt)) => {
+                    call_result = self
+                        ._enterprises_policies_remove_policy_applications(opt, dry_run, &mut err)
                         .await;
                 }
                 ("web-apps-create", Some(opt)) => {
@@ -4963,7 +5593,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/androidmanagement1", config_dir))
         .build()
@@ -5016,7 +5648,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("enterprises", "methods: 'applications-get', 'create', 'delete', 'devices-delete', 'devices-get', 'devices-issue-command', 'devices-list', 'devices-operations-cancel', 'devices-operations-get', 'devices-operations-list', 'devices-patch', 'enrollment-tokens-create', 'enrollment-tokens-delete', 'enrollment-tokens-get', 'enrollment-tokens-list', 'get', 'list', 'migration-tokens-create', 'migration-tokens-get', 'migration-tokens-list', 'patch', 'policies-delete', 'policies-get', 'policies-list', 'policies-patch', 'web-apps-create', 'web-apps-delete', 'web-apps-get', 'web-apps-list', 'web-apps-patch' and 'web-tokens-create'", vec![
+        ("enterprises", "methods: 'applications-get', 'create', 'delete', 'devices-delete', 'devices-get', 'devices-issue-command', 'devices-list', 'devices-operations-cancel', 'devices-operations-get', 'devices-operations-list', 'devices-patch', 'enrollment-tokens-create', 'enrollment-tokens-delete', 'enrollment-tokens-get', 'enrollment-tokens-list', 'generate-enterprise-upgrade-url', 'get', 'list', 'migration-tokens-create', 'migration-tokens-get', 'migration-tokens-list', 'patch', 'policies-delete', 'policies-get', 'policies-list', 'policies-modify-policy-applications', 'policies-patch', 'policies-remove-policy-applications', 'web-apps-create', 'web-apps-delete', 'web-apps-get', 'web-apps-list', 'web-apps-patch' and 'web-tokens-create'", vec![
             ("applications-get",
                     Some(r##"Gets info about an application."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_applications-get",
@@ -5078,7 +5710,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("devices-delete",
-                    Some(r##"Deletes a device. This operation wipes the device. Deleted devices do not show up in enterprises.devices.list calls and a 404 is returned from enterprises.devices.get."##),
+                    Some(r##"Deletes a device. This operation attempts to wipe the device but this is not guaranteed to succeed if the device is offline for an extended period. Deleted devices do not show up in enterprises.devices.list calls and a 404 is returned from enterprises.devices.get."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_devices-delete",
                   vec![
                     (Some(r##"name"##),
@@ -5248,7 +5880,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("enrollment-tokens-create",
-                    Some(r##"Creates an enrollment token for a given enterprise. It's up to the caller's responsibility to manage the lifecycle of newly created tokens and deleting them when they're not intended to be used anymore. Once an enrollment token has been created, it's not possible to retrieve the token's content anymore using AM API. It is recommended for EMMs to securely store the token if it's intended to be reused."##),
+                    Some(r##"Creates an enrollment token for a given enterprise. It's up to the caller's responsibility to manage the lifecycle of newly created tokens and deleting them when they're not intended to be used anymore."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_enrollment-tokens-create",
                   vec![
                     (Some(r##"parent"##),
@@ -5321,6 +5953,31 @@ async fn main() {
                      Some(r##"Required. The name of the enterprise in the form enterprises/{enterpriseId}."##),
                      Some(true),
                      Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("generate-enterprise-upgrade-url",
+                    Some(r##"Generates an enterprise upgrade URL to upgrade an existing managed Google Play Accounts enterprise to a managed Google domain. See the guide (https://developers.google.com/android/management/upgrade-an-enterprise) for more details."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_generate-enterprise-upgrade-url",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the enterprise to be upgraded in the form enterprises/{enterpriseId}."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -5517,6 +6174,31 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("policies-modify-policy-applications",
+                    Some(r##"Updates or creates applications in a policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_policies-modify-policy-applications",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the Policy containing the ApplicationPolicy objects to be updated, in the form enterprises/{enterpriseId}/policies/{policyId}."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("policies-patch",
                     Some(r##"Updates or creates a policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_policies-patch",
@@ -5524,6 +6206,31 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("policies-remove-policy-applications",
+                    Some(r##"Removes applications in a policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_policies-remove-policy-applications",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the policy containing the ApplicationPolicy objects to be removed, in the form enterprises/{enterpriseId}/policies/{policyId}."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -5593,7 +6300,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the web app in the form enterprises/{enterpriseId}/webApp/{packageName}."##),
+                     Some(r##"The name of the web app in the form enterprises/{enterpriseId}/webApps/{packageName}."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -5721,7 +6428,7 @@ async fn main() {
 
     let mut app = App::new("androidmanagement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240626")
+           .version("7.0.0+20251216")
            .about("The Android Management API provides remote enterprise management of Android devices and apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli")
            .arg(Arg::with_name("url")
@@ -5786,7 +6493,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

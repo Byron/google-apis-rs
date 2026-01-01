@@ -3390,6 +3390,8 @@ where
                     "creative-serving-decision.china-policy-compliance.status" => Some(("creativeServingDecision.chinaPolicyCompliance.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-serving-decision.deals-policy-compliance.status" => Some(("creativeServingDecision.dealsPolicyCompliance.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-serving-decision.detected-attributes" => Some(("creativeServingDecision.detectedAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "creative-serving-decision.detected-categories" => Some(("creativeServingDecision.detectedCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "creative-serving-decision.detected-categories-taxonomy" => Some(("creativeServingDecision.detectedCategoriesTaxonomy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-serving-decision.detected-click-through-urls" => Some(("creativeServingDecision.detectedClickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creative-serving-decision.detected-domains" => Some(("creativeServingDecision.detectedDomains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creative-serving-decision.detected-languages" => Some(("creativeServingDecision.detectedLanguages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3440,7 +3442,7 @@ where
                     "video.video-url" => Some(("video.videoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video.video-vast-xml" => Some(("video.videoVastXml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "ad-technology-providers", "advertiser-name", "agency-id", "api-update-time", "app-icon", "body", "call-to-action", "china-policy-compliance", "click-link-url", "click-tracking-url", "creative-format", "creative-id", "creative-serving-decision", "deal-ids", "deals-policy-compliance", "declared-attributes", "declared-click-through-urls", "declared-restricted-categories", "declared-vendor-ids", "detected-attributes", "detected-click-through-urls", "detected-domains", "detected-gvl-ids", "detected-languages", "detected-product-categories", "detected-provider-ids", "detected-sensitive-categories", "detected-vendor-ids", "duration", "headline", "height", "html", "image", "impression-tracking-urls", "is-valid-vast", "is-vpaid", "last-status-update", "logo", "name", "native", "network-policy-compliance", "platform-policy-compliance", "price-display-text", "render-url", "restricted-categories", "russia-policy-compliance", "skip-offset", "snippet", "star-rating", "status", "unidentified-provider-domains", "url", "vast-version", "version", "video", "video-metadata", "video-url", "video-vast-xml", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "ad-technology-providers", "advertiser-name", "agency-id", "api-update-time", "app-icon", "body", "call-to-action", "china-policy-compliance", "click-link-url", "click-tracking-url", "creative-format", "creative-id", "creative-serving-decision", "deal-ids", "deals-policy-compliance", "declared-attributes", "declared-click-through-urls", "declared-restricted-categories", "declared-vendor-ids", "detected-attributes", "detected-categories", "detected-categories-taxonomy", "detected-click-through-urls", "detected-domains", "detected-gvl-ids", "detected-languages", "detected-product-categories", "detected-provider-ids", "detected-sensitive-categories", "detected-vendor-ids", "duration", "headline", "height", "html", "image", "impression-tracking-urls", "is-valid-vast", "is-vpaid", "last-status-update", "logo", "name", "native", "network-policy-compliance", "platform-policy-compliance", "price-display-text", "render-url", "restricted-categories", "russia-policy-compliance", "skip-offset", "snippet", "star-rating", "status", "unidentified-provider-domains", "url", "vast-version", "version", "video", "video-metadata", "video-url", "video-vast-xml", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3762,6 +3764,8 @@ where
                     "creative-serving-decision.china-policy-compliance.status" => Some(("creativeServingDecision.chinaPolicyCompliance.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-serving-decision.deals-policy-compliance.status" => Some(("creativeServingDecision.dealsPolicyCompliance.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-serving-decision.detected-attributes" => Some(("creativeServingDecision.detectedAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "creative-serving-decision.detected-categories" => Some(("creativeServingDecision.detectedCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "creative-serving-decision.detected-categories-taxonomy" => Some(("creativeServingDecision.detectedCategoriesTaxonomy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-serving-decision.detected-click-through-urls" => Some(("creativeServingDecision.detectedClickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creative-serving-decision.detected-domains" => Some(("creativeServingDecision.detectedDomains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "creative-serving-decision.detected-languages" => Some(("creativeServingDecision.detectedLanguages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3812,7 +3816,7 @@ where
                     "video.video-url" => Some(("video.videoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video.video-vast-xml" => Some(("video.videoVastXml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "ad-technology-providers", "advertiser-name", "agency-id", "api-update-time", "app-icon", "body", "call-to-action", "china-policy-compliance", "click-link-url", "click-tracking-url", "creative-format", "creative-id", "creative-serving-decision", "deal-ids", "deals-policy-compliance", "declared-attributes", "declared-click-through-urls", "declared-restricted-categories", "declared-vendor-ids", "detected-attributes", "detected-click-through-urls", "detected-domains", "detected-gvl-ids", "detected-languages", "detected-product-categories", "detected-provider-ids", "detected-sensitive-categories", "detected-vendor-ids", "duration", "headline", "height", "html", "image", "impression-tracking-urls", "is-valid-vast", "is-vpaid", "last-status-update", "logo", "name", "native", "network-policy-compliance", "platform-policy-compliance", "price-display-text", "render-url", "restricted-categories", "russia-policy-compliance", "skip-offset", "snippet", "star-rating", "status", "unidentified-provider-domains", "url", "vast-version", "version", "video", "video-metadata", "video-url", "video-vast-xml", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "ad-technology-providers", "advertiser-name", "agency-id", "api-update-time", "app-icon", "body", "call-to-action", "china-policy-compliance", "click-link-url", "click-tracking-url", "creative-format", "creative-id", "creative-serving-decision", "deal-ids", "deals-policy-compliance", "declared-attributes", "declared-click-through-urls", "declared-restricted-categories", "declared-vendor-ids", "detected-attributes", "detected-categories", "detected-categories-taxonomy", "detected-click-through-urls", "detected-domains", "detected-gvl-ids", "detected-languages", "detected-product-categories", "detected-provider-ids", "detected-sensitive-categories", "detected-vendor-ids", "duration", "headline", "height", "html", "image", "impression-tracking-urls", "is-valid-vast", "is-vpaid", "last-status-update", "logo", "name", "native", "network-policy-compliance", "platform-policy-compliance", "price-display-text", "render-url", "restricted-categories", "russia-policy-compliance", "skip-offset", "snippet", "star-rating", "status", "unidentified-provider-domains", "url", "vast-version", "version", "video", "video-metadata", "video-url", "video-vast-xml", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5355,7 +5359,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/realtimebidding1", config_dir))
         .build()
@@ -6266,8 +6272,8 @@ async fn main() {
 
     let mut app = App::new("realtimebidding1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
-           .about("Allows external bidders to manage their RTB integration with Google. This includes managing bidder endpoints, QPS quotas, configuring what ad inventory to receive via pretargeting, submitting creatives for verification, and accessing creative metadata such as approval status.")
+           .version("7.0.0+20251211")
+           .about("Allows external bidders to manage their RTB integration with Google. This includes managing bidder endpoints, QPS quotas, configuring what ad inventory to receive with pretargeting, submitting creatives for verification, and accessing creative metadata such as approval status.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_realtimebidding1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -6331,7 +6337,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

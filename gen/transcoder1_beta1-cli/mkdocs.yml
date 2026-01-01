@@ -1,4 +1,4 @@
-site_name: Transcoder v6.0.0+20210323
+site_name: Transcoder v7.0.0+20210323
 site_url: http://byron.github.io/google-apis-rs/google-transcoder1_beta1-cli
 site_description: A complete library to interact with Transcoder (protocol v1beta1)
 

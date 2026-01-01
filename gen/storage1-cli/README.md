@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storage* API at revision *20240621*. The CLI is at version *7.0.0*.
+This documentation was generated from the *storage* API at revision *20251218*. The CLI is at version *7.0.0*.
 
 ```bash
 storage1 [options]
@@ -52,10 +52,13 @@ storage1 [options]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 lock-retention-policy <bucket> <if-metageneration-match> [-p <v>]... [-o <out>]
+                operations-advance-relocate-bucket <bucket> <operation-id> (-r <kv>)... [-p <v>]...
                 operations-cancel <bucket> <operation-id> [-p <v>]...
                 operations-get <bucket> <operation-id> [-p <v>]... [-o <out>]
                 operations-list <bucket> [-p <v>]... [-o <out>]
                 patch <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                relocate <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                restore <bucket> <generation> [-p <v>]... [-o <out>]
                 set-iam-policy <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <bucket> <permissions>... [-p <v>]... [-o <out>]
                 update <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -103,6 +106,7 @@ storage1 [options]
                 get-iam-policy <bucket> <object> [-p <v>]... [-o <out>]
                 insert <bucket> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 list <bucket> [-p <v>]... [-o <out>]
+                move <bucket> <source-object> <destination-object> [-p <v>]... [-o <out>]
                 patch <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
                 restore <bucket> <object> <generation> [-p <v>]... [-o <out>]
                 rewrite <source-bucket> <source-object> <destination-bucket> <destination-object> (-r <kv>)... [-p <v>]... [-o <out>]

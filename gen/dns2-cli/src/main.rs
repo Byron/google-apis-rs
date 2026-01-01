@@ -2535,6 +2535,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "dns64-config.kind" => Some((
+                    "dns64Config.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "dns64-config.scope.all-queries" => Some((
+                    "dns64Config.scope.allQueries",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "dns64-config.scope.kind" => Some((
+                    "dns64Config.scope.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "enable-inbound-forwarding" => Some((
                     "enableInboundForwarding",
                     JsonTypeInfo {
@@ -2574,13 +2595,16 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "all-queries",
                             "alternative-name-server-config",
                             "description",
+                            "dns64-config",
                             "enable-inbound-forwarding",
                             "enable-logging",
                             "id",
                             "kind",
                             "name",
+                            "scope",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -2975,6 +2999,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "dns64-config.kind" => Some((
+                    "dns64Config.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "dns64-config.scope.all-queries" => Some((
+                    "dns64Config.scope.allQueries",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "dns64-config.scope.kind" => Some((
+                    "dns64Config.scope.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "enable-inbound-forwarding" => Some((
                     "enableInboundForwarding",
                     JsonTypeInfo {
@@ -3014,13 +3059,16 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "all-queries",
                             "alternative-name-server-config",
                             "description",
+                            "dns64-config",
                             "enable-inbound-forwarding",
                             "enable-logging",
                             "id",
                             "kind",
                             "name",
+                            "scope",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -3168,6 +3216,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "dns64-config.kind" => Some((
+                    "dns64Config.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "dns64-config.scope.all-queries" => Some((
+                    "dns64Config.scope.allQueries",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "dns64-config.scope.kind" => Some((
+                    "dns64Config.scope.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "enable-inbound-forwarding" => Some((
                     "enableInboundForwarding",
                     JsonTypeInfo {
@@ -3207,13 +3276,16 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "all-queries",
                             "alternative-name-server-config",
                             "description",
+                            "dns64-config",
                             "enable-inbound-forwarding",
                             "enable-logging",
                             "id",
                             "kind",
                             "name",
+                            "scope",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -3460,6 +3532,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "routing-policy.health-check" => Some((
+                    "routingPolicy.healthCheck",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "routing-policy.kind" => Some((
                     "routingPolicy.kind",
                     JsonTypeInfo {
@@ -3486,6 +3565,13 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "routing-policy.primary-backup.primary-targets.external-endpoints" => Some((
+                    "routingPolicy.primaryBackup.primaryTargets.externalEndpoints",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
                     },
                 )),
                 "routing-policy.primary-backup.trickle-traffic" => Some((
@@ -3536,10 +3622,13 @@ where
                         &vec![
                             "backup-geo-targets",
                             "enable-fencing",
+                            "external-endpoints",
                             "geo",
+                            "health-check",
                             "kind",
                             "name",
                             "primary-backup",
+                            "primary-targets",
                             "routing-policy",
                             "rrdatas",
                             "signature-rrdatas",
@@ -3971,6 +4060,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "routing-policy.health-check" => Some((
+                    "routingPolicy.healthCheck",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "routing-policy.kind" => Some((
                     "routingPolicy.kind",
                     JsonTypeInfo {
@@ -3997,6 +4093,13 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "routing-policy.primary-backup.primary-targets.external-endpoints" => Some((
+                    "routingPolicy.primaryBackup.primaryTargets.externalEndpoints",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
                     },
                 )),
                 "routing-policy.primary-backup.trickle-traffic" => Some((
@@ -4047,10 +4150,13 @@ where
                         &vec![
                             "backup-geo-targets",
                             "enable-fencing",
+                            "external-endpoints",
                             "geo",
+                            "health-check",
                             "kind",
                             "name",
                             "primary-backup",
+                            "primary-targets",
                             "routing-policy",
                             "rrdatas",
                             "signature-rrdatas",
@@ -5950,7 +6056,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/dns2", config_dir))
         .build()
@@ -6498,7 +6606,7 @@ async fn main() {
             ]),
             ("policies", "methods: 'create', 'delete', 'get', 'list', 'patch' and 'update'", vec![
             ("create",
-                    Some(r##"Creates a new Policy."##),
+                    Some(r##"Creates a new policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns2_cli/policies_create",
                   vec![
                     (Some(r##"project"##),
@@ -6528,7 +6636,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("delete",
-                    Some(r##"Deletes a previously created Policy. Fails if the policy is still being referenced by a network."##),
+                    Some(r##"Deletes a previously created policy. Fails if the policy is still being referenced by a network."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns2_cli/policies_delete",
                   vec![
                     (Some(r##"project"##),
@@ -6553,7 +6661,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Fetches the representation of an existing Policy."##),
+                    Some(r##"Fetches the representation of an existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns2_cli/policies_get",
                   vec![
                     (Some(r##"project"##),
@@ -6583,7 +6691,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Enumerates all Policies associated with a project."##),
+                    Some(r##"Enumerates all policies associated with a project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns2_cli/policies_list",
                   vec![
                     (Some(r##"project"##),
@@ -6608,7 +6716,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Applies a partial update to an existing Policy."##),
+                    Some(r##"Applies a partial update to an existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns2_cli/policies_patch",
                   vec![
                     (Some(r##"project"##),
@@ -6643,7 +6751,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates an existing Policy."##),
+                    Some(r##"Updates an existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dns2_cli/policies_update",
                   vec![
                     (Some(r##"project"##),
@@ -7290,7 +7398,7 @@ async fn main() {
 
     let mut app = App::new("dns2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240616")
+           .version("7.0.0+20251211")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dns2_cli")
            .arg(Arg::with_name("url")
@@ -7355,7 +7463,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

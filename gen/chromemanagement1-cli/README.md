@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Chrome Management* API can be found at the
-[official documentation site](http://developers.google.com/chrome/management/).
+[official documentation site](https://developers.google.com/chrome/management/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Chrome Management* API at revision *20240624*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Chrome Management* API at revision *20251217*. The CLI is at version *7.0.0*.
 
 ```bash
 chromemanagement1 [options]
@@ -36,12 +36,27 @@ chromemanagement1 [options]
                 apps-fetch-devices-requesting-extension <customer> [-p <v>]... [-o <out>]
                 apps-fetch-users-requesting-extension <customer> [-p <v>]... [-o <out>]
                 apps-web-get <name> [-p <v>]... [-o <out>]
+                certificate-provisioning-processes-claim <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                certificate-provisioning-processes-get <name> [-p <v>]... [-o <out>]
+                certificate-provisioning-processes-operations-get <name> [-p <v>]... [-o <out>]
+                certificate-provisioning-processes-set-failure <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                certificate-provisioning-processes-sign-data <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                certificate-provisioning-processes-upload-certificate <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                profiles-commands-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                profiles-commands-get <name> [-p <v>]... [-o <out>]
+                profiles-commands-list <parent> [-p <v>]... [-o <out>]
+                profiles-delete <name> [-p <v>]... [-o <out>]
+                profiles-get <name> [-p <v>]... [-o <out>]
+                profiles-list <parent> [-p <v>]... [-o <out>]
+                reports-count-active-devices <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-browsers-needing-attention <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-crash-events <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-devices-reaching-auto-expiration-date <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-devices-that-need-attention <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-hardware-fleet-devices <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-versions <customer> [-p <v>]... [-o <out>]
+                reports-count-devices-per-boot-type <customer> [-p <v>]... [-o <out>]
+                reports-count-devices-per-release-channel <customer> [-p <v>]... [-o <out>]
                 reports-count-installed-apps <customer> [-p <v>]... [-o <out>]
                 reports-count-print-jobs-by-printer <customer> [-p <v>]... [-o <out>]
                 reports-count-print-jobs-by-user <customer> [-p <v>]... [-o <out>]
@@ -55,6 +70,11 @@ chromemanagement1 [options]
                 telemetry-notification-configs-list <parent> [-p <v>]... [-o <out>]
                 telemetry-users-get <name> [-p <v>]... [-o <out>]
                 telemetry-users-list <parent> [-p <v>]... [-o <out>]
+                third-party-profile-users-move <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        operations
+                cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                list <name> [-p <v>]... [-o <out>]
   chromemanagement1 --help
 
 Configuration:

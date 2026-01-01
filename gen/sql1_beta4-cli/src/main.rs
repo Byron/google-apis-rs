@@ -48,10 +48,11 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
         let mut call = self.hub.backup_runs().delete(
             opt.value_of("project").unwrap_or(""),
             opt.value_of("instance").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+            id,
         );
         for parg in opt
             .values_of("v")
@@ -130,10 +131,11 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let id: i64 = arg_from_str(&opt.value_of("id").unwrap_or(""), err, "<id>", "int64");
         let mut call = self.hub.backup_runs().get(
             opt.value_of("project").unwrap_or(""),
             opt.value_of("instance").unwrap_or(""),
-            opt.value_of("id").unwrap_or(""),
+            id,
         );
         for parg in opt
             .values_of("v")
@@ -8254,7 +8256,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/sql1-beta4", config_dir))
         .build()
@@ -9654,7 +9658,7 @@ async fn main() {
 
     let mut app = App::new("sql1-beta4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20200331")
+           .version("7.0.0+20200331")
            .about("API for Cloud SQL database instance management")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sql1_beta4_cli")
            .arg(Arg::with_name("url")
@@ -9719,7 +9723,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

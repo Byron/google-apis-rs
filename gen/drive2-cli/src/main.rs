@@ -3723,6 +3723,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "capabilities.can-disable-inherited-permissions" => Some((
+                    "capabilities.canDisableInheritedPermissions",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "capabilities.can-download" => Some((
                     "capabilities.canDownload",
                     JsonTypeInfo {
@@ -3732,6 +3739,13 @@ where
                 )),
                 "capabilities.can-edit" => Some((
                     "capabilities.canEdit",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "capabilities.can-enable-inherited-permissions" => Some((
+                    "capabilities.canEnableInheritedPermissions",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
@@ -4248,6 +4262,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "inherited-permissions-disabled" => Some((
+                    "inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "is-app-authorized" => Some((
                     "isAppAuthorized",
                     JsonTypeInfo {
@@ -4717,6 +4738,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "user-permission.inherited-permissions-disabled" => Some((
+                    "userPermission.inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "user-permission.kind" => Some((
                     "userPermission.kind",
                     JsonTypeInfo {
@@ -4859,8 +4887,10 @@ where
                             "can-copy",
                             "can-delete",
                             "can-delete-children",
+                            "can-disable-inherited-permissions",
                             "can-download",
                             "can-edit",
+                            "can-enable-inherited-permissions",
                             "can-list-children",
                             "can-modify-content",
                             "can-modify-content-restriction",
@@ -4929,6 +4959,7 @@ where
                             "image",
                             "image-media-metadata",
                             "indexable-text",
+                            "inherited-permissions-disabled",
                             "is-app-authorized",
                             "is-authenticated-user",
                             "iso-speed",
@@ -5817,6 +5848,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "capabilities.can-disable-inherited-permissions" => Some((
+                    "capabilities.canDisableInheritedPermissions",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "capabilities.can-download" => Some((
                     "capabilities.canDownload",
                     JsonTypeInfo {
@@ -5826,6 +5864,13 @@ where
                 )),
                 "capabilities.can-edit" => Some((
                     "capabilities.canEdit",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "capabilities.can-enable-inherited-permissions" => Some((
+                    "capabilities.canEnableInheritedPermissions",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
@@ -6342,6 +6387,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "inherited-permissions-disabled" => Some((
+                    "inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "is-app-authorized" => Some((
                     "isAppAuthorized",
                     JsonTypeInfo {
@@ -6811,6 +6863,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "user-permission.inherited-permissions-disabled" => Some((
+                    "userPermission.inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "user-permission.kind" => Some((
                     "userPermission.kind",
                     JsonTypeInfo {
@@ -6953,8 +7012,10 @@ where
                             "can-copy",
                             "can-delete",
                             "can-delete-children",
+                            "can-disable-inherited-permissions",
                             "can-download",
                             "can-edit",
+                            "can-enable-inherited-permissions",
                             "can-list-children",
                             "can-modify-content",
                             "can-modify-content-restriction",
@@ -7023,6 +7084,7 @@ where
                             "image",
                             "image-media-metadata",
                             "indexable-text",
+                            "inherited-permissions-disabled",
                             "is-app-authorized",
                             "is-authenticated-user",
                             "iso-speed",
@@ -7824,6 +7886,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "capabilities.can-disable-inherited-permissions" => Some((
+                    "capabilities.canDisableInheritedPermissions",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "capabilities.can-download" => Some((
                     "capabilities.canDownload",
                     JsonTypeInfo {
@@ -7833,6 +7902,13 @@ where
                 )),
                 "capabilities.can-edit" => Some((
                     "capabilities.canEdit",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "capabilities.can-enable-inherited-permissions" => Some((
+                    "capabilities.canEnableInheritedPermissions",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
@@ -8349,6 +8425,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "inherited-permissions-disabled" => Some((
+                    "inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "is-app-authorized" => Some((
                     "isAppAuthorized",
                     JsonTypeInfo {
@@ -8818,6 +8901,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "user-permission.inherited-permissions-disabled" => Some((
+                    "userPermission.inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "user-permission.kind" => Some((
                     "userPermission.kind",
                     JsonTypeInfo {
@@ -8960,8 +9050,10 @@ where
                             "can-copy",
                             "can-delete",
                             "can-delete-children",
+                            "can-disable-inherited-permissions",
                             "can-download",
                             "can-edit",
+                            "can-enable-inherited-permissions",
                             "can-list-children",
                             "can-modify-content",
                             "can-modify-content-restriction",
@@ -9030,6 +9122,7 @@ where
                             "image",
                             "image-media-metadata",
                             "indexable-text",
+                            "inherited-permissions-disabled",
                             "is-app-authorized",
                             "is-authenticated-user",
                             "iso-speed",
@@ -9791,6 +9884,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "capabilities.can-disable-inherited-permissions" => Some((
+                    "capabilities.canDisableInheritedPermissions",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "capabilities.can-download" => Some((
                     "capabilities.canDownload",
                     JsonTypeInfo {
@@ -9800,6 +9900,13 @@ where
                 )),
                 "capabilities.can-edit" => Some((
                     "capabilities.canEdit",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "capabilities.can-enable-inherited-permissions" => Some((
+                    "capabilities.canEnableInheritedPermissions",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
@@ -10316,6 +10423,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "inherited-permissions-disabled" => Some((
+                    "inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "is-app-authorized" => Some((
                     "isAppAuthorized",
                     JsonTypeInfo {
@@ -10785,6 +10899,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "user-permission.inherited-permissions-disabled" => Some((
+                    "userPermission.inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "user-permission.kind" => Some((
                     "userPermission.kind",
                     JsonTypeInfo {
@@ -10927,8 +11048,10 @@ where
                             "can-copy",
                             "can-delete",
                             "can-delete-children",
+                            "can-disable-inherited-permissions",
                             "can-download",
                             "can-edit",
+                            "can-enable-inherited-permissions",
                             "can-list-children",
                             "can-modify-content",
                             "can-modify-content-restriction",
@@ -10997,6 +11120,7 @@ where
                             "image",
                             "image-media-metadata",
                             "indexable-text",
+                            "inherited-permissions-disabled",
                             "is-app-authorized",
                             "is-authenticated-user",
                             "iso-speed",
@@ -12035,6 +12159,13 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "enforce-expansive-access" => {
+                    call = call.enforce_expansive_access(
+                        value
+                            .map(|v| arg_from_str(v, err, "enforce-expansive-access", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -12054,6 +12185,7 @@ where
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
                                     [
+                                        "enforce-expansive-access",
                                         "supports-all-drives",
                                         "supports-team-drives",
                                         "use-domain-admin-access",
@@ -12370,6 +12502,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "inherited-permissions-disabled" => Some((
+                    "inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "kind" => Some((
                     "kind",
                     JsonTypeInfo {
@@ -12452,6 +12591,7 @@ where
                             "etag",
                             "expiration-date",
                             "id",
+                            "inherited-permissions-disabled",
                             "kind",
                             "name",
                             "pending-owner",
@@ -12537,6 +12677,13 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "enforce-expansive-access" => {
+                    call = call.enforce_expansive_access(
+                        value
+                            .map(|v| arg_from_str(v, err, "enforce-expansive-access", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "email-message" => {
                     call = call.email_message(value.unwrap_or(""));
                 }
@@ -12560,6 +12707,7 @@ where
                                 v.extend(
                                     [
                                         "email-message",
+                                        "enforce-expansive-access",
                                         "enforce-single-parent",
                                         "move-to-new-owners-root",
                                         "send-notification-emails",
@@ -12830,6 +12978,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "inherited-permissions-disabled" => Some((
+                    "inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "kind" => Some((
                     "kind",
                     JsonTypeInfo {
@@ -12912,6 +13067,7 @@ where
                             "etag",
                             "expiration-date",
                             "id",
+                            "inherited-permissions-disabled",
                             "kind",
                             "name",
                             "pending-owner",
@@ -12991,6 +13147,13 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "enforce-expansive-access" => {
+                    call = call.enforce_expansive_access(
+                        value
+                            .map(|v| arg_from_str(v, err, "enforce-expansive-access", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -13010,6 +13173,7 @@ where
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
                                     [
+                                        "enforce-expansive-access",
                                         "remove-expiration",
                                         "supports-all-drives",
                                         "supports-team-drives",
@@ -13152,6 +13316,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "inherited-permissions-disabled" => Some((
+                    "inheritedPermissionsDisabled",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "kind" => Some((
                     "kind",
                     JsonTypeInfo {
@@ -13234,6 +13405,7 @@ where
                             "etag",
                             "expiration-date",
                             "id",
+                            "inherited-permissions-disabled",
                             "kind",
                             "name",
                             "pending-owner",
@@ -13313,6 +13485,13 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "enforce-expansive-access" => {
+                    call = call.enforce_expansive_access(
+                        value
+                            .map(|v| arg_from_str(v, err, "enforce-expansive-access", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -13332,6 +13511,7 @@ where
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
                                     [
+                                        "enforce-expansive-access",
                                         "remove-expiration",
                                         "supports-all-drives",
                                         "supports-team-drives",
@@ -16975,7 +17155,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/drive2", config_dir))
         .build()
@@ -17498,7 +17680,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##" Lists the user's shared drives. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for shared drives](/drive/api/guides/search-shareddrives) guide."##),
+                    Some(r##" Lists the user's shared drives. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for shared drives](/workspace/drive/api/guides/search-shareddrives) guide."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/drives_list",
                   vec![
                     (Some(r##"v"##),
@@ -17650,7 +17832,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##" Gets a file's metadata or content by ID. If you provide the URL parameter `alt=media`, then the response includes the file contents in the response body. Downloading content with `alt=media` only works if the file is stored in Drive. To download Google Docs, Sheets, and Slides use [`files.export`](/drive/api/reference/rest/v2/files/export) instead. For more information, see [Download & export files](/drive/api/guides/manage-downloads)."##),
+                    Some(r##" Gets a file's metadata or content by ID. If you provide the URL parameter `alt=media`, then the response includes the file contents in the response body. Downloading content with `alt=media` only works if the file is stored in Drive. To download Google Docs, Sheets, and Slides use [`files.export`](/workspace/drive/api/reference/rest/v2/files/export) instead. For more information, see [Download & export files](/workspace/drive/api/guides/manage-downloads)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_get",
                   vec![
                     (Some(r##"file-id"##),
@@ -17670,7 +17852,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##" Inserts a new file. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:*`*/*` Note: Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see [Upload file data](/drive/api/guides/manage-uploads). Apps creating shortcuts with `files.insert` must specify the MIME type `application/vnd.google-apps.shortcut`. Apps should specify a file extension in the `title` property when inserting files with the API. For example, an operation to insert a JPEG file should specify something like `"title": "cat.jpg"` in the metadata. Subsequent `GET` requests include the read-only `fileExtension` property populated with the extension originally specified in the `title` property. When a Google Drive user requests to download a file, or when the file is downloaded through the sync client, Drive builds a full filename (with extension) based on the title. In cases where the extension is missing, Drive attempts to determine the extension based on the file's MIME type."##),
+                    Some(r##" Inserts a new file. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:*`*/*` Note: Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see [Upload file data](/workspace/drive/api/guides/manage-uploads). Apps creating shortcuts with `files.insert` must specify the MIME type `application/vnd.google-apps.shortcut`. Apps should specify a file extension in the `title` property when inserting files with the API. For example, an operation to insert a JPEG file should specify something like `"title": "cat.jpg"` in the metadata. Subsequent `GET` requests include the read-only `fileExtension` property populated with the extension originally specified in the `title` property. When a Google Drive user requests to download a file, or when the file is downloaded through the sync client, Drive builds a full filename (with extension) based on the title. In cases where the extension is missing, Drive attempts to determine the extension based on the file's MIME type."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -17695,7 +17877,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##" Lists the user's files. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for files & folders](/drive/api/guides/search-files) guide. *Note:* This method returns *all* files by default, including trashed files. If you don't want trashed files to appear in the list, use the `trashed=false` query parameter to remove trashed files from the results."##),
+                    Some(r##" Lists the user's files. For more information, see [Search for files and folders](/workspace/drive/api/guides/search-files). This method accepts the `q` parameter, which is a search query combining one or more search terms. This method returns *all* files by default, including trashed files. If you don't want trashed files to appear in the list, use the `trashed=false` query parameter to remove trashed files from the results."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_list",
                   vec![
                     (Some(r##"v"##),
@@ -17840,7 +18022,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##" Updates a file's metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might be changed automatically, such as `modifiedDate`. This method supports patch semantics. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:*`*/*` Note: Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see [Upload file data](/drive/api/guides/manage-uploads)."##),
+                    Some(r##" Updates a file's metadata, content, or both. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might be changed automatically, such as `modifiedDate`. This method supports patch semantics. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:* `*/*` (Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information, see [Google Workspace and Google Drive supported MIME types](/workspace/drive/api/guides/mime-types).) For more information on uploading files, see [Upload file data](/workspace/drive/api/guides/manage-uploads)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_update",
                   vec![
                     (Some(r##"file-id"##),
@@ -18540,7 +18722,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists a file's revisions."##),
+                    Some(r##"Lists a file's revisions. **Important:** The list of revisions returned by this method might be incomplete for files with a large revision history, including frequently edited Google Docs, Sheets, and Slides. Older revisions might be omitted from the response, meaning the first revision returned may not be the oldest existing revision. The revision history visible in the Workspace editor user interface might be more complete than the list returned by the API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_list",
                   vec![
                     (Some(r##"file-id"##),
@@ -18726,7 +18908,7 @@ async fn main() {
 
     let mut app = App::new("drive2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251218")
            .about("The Google Drive API allows clients to access resources from Google Drive.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive2_cli")
            .arg(Arg::with_name("url")
@@ -18804,7 +18986,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

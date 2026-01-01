@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Tag Manager* API at revision *20240619*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Tag Manager* API at revision *20251210*. The CLI is at version *7.0.0*.
 
 ```bash
 tagmanager2 [options]
@@ -61,6 +61,7 @@ tagmanager2 [options]
                 containers-workspaces-built-in-variables-delete <path> [-p <v>]...
                 containers-workspaces-built-in-variables-list <parent> [-p <v>]... [-o <out>]
                 containers-workspaces-built-in-variables-revert <path> [-p <v>]... [-o <out>]
+                containers-workspaces-bulk-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-clients-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-clients-delete <path> [-p <v>]...
                 containers-workspaces-clients-get <path> [-p <v>]... [-o <out>]
@@ -98,6 +99,7 @@ tagmanager2 [options]
                 containers-workspaces-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-templates-delete <path> [-p <v>]...
                 containers-workspaces-templates-get <path> [-p <v>]... [-o <out>]
+                containers-workspaces-templates-import-from-gallery <parent> [-p <v>]... [-o <out>]
                 containers-workspaces-templates-list <parent> [-p <v>]... [-o <out>]
                 containers-workspaces-templates-revert <path> [-p <v>]... [-o <out>]
                 containers-workspaces-templates-update <path> (-r <kv>)... [-p <v>]... [-o <out>]

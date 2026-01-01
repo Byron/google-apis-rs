@@ -1747,9 +1747,16 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 _ => {
                     let suggestion =
-                        FieldCursor::did_you_mean(key, &vec!["labels", "subscription"]);
+                        FieldCursor::did_you_mean(key, &vec!["labels", "subscription", "tags"]);
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -2931,6 +2938,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-storage-config.max-messages" => Some((
+                    "cloudStorageConfig.maxMessages",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "cloud-storage-config.service-account-email" => Some((
                     "cloudStorageConfig.serviceAccountEmail",
                     JsonTypeInfo {
@@ -3078,6 +3092,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "topic" => Some((
                     "topic",
                     JsonTypeInfo {
@@ -3120,6 +3141,7 @@ where
                             "max-bytes",
                             "max-delivery-attempts",
                             "max-duration",
+                            "max-messages",
                             "maximum-backoff",
                             "message-retention-duration",
                             "minimum-backoff",
@@ -3134,6 +3156,7 @@ where
                             "state",
                             "subscription",
                             "table",
+                            "tags",
                             "topic",
                             "topic-message-retention-duration",
                             "ttl",
@@ -4137,6 +4160,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "subscription.cloud-storage-config.max-messages" => Some((
+                    "subscription.cloudStorageConfig.maxMessages",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "subscription.cloud-storage-config.service-account-email" => Some((
                     "subscription.cloudStorageConfig.serviceAccountEmail",
                     JsonTypeInfo {
@@ -4284,6 +4314,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "subscription.tags" => Some((
+                    "subscription.tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "subscription.topic" => Some((
                     "subscription.topic",
                     JsonTypeInfo {
@@ -4333,6 +4370,7 @@ where
                             "max-bytes",
                             "max-delivery-attempts",
                             "max-duration",
+                            "max-messages",
                             "maximum-backoff",
                             "message-retention-duration",
                             "minimum-backoff",
@@ -4347,6 +4385,7 @@ where
                             "state",
                             "subscription",
                             "table",
+                            "tags",
                             "topic",
                             "topic-message-retention-duration",
                             "ttl",
@@ -5077,6 +5116,183 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "ingestion-data-source-settings.aws-msk.aws-role-arn" => Some((
+                    "ingestionDataSourceSettings.awsMsk.awsRoleArn",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.aws-msk.cluster-arn" => Some((
+                    "ingestionDataSourceSettings.awsMsk.clusterArn",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.aws-msk.gcp-service-account" => Some((
+                    "ingestionDataSourceSettings.awsMsk.gcpServiceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.aws-msk.state" => Some((
+                    "ingestionDataSourceSettings.awsMsk.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.aws-msk.topic" => Some((
+                    "ingestionDataSourceSettings.awsMsk.topic",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.azure-event-hubs.client-id" => Some((
+                    "ingestionDataSourceSettings.azureEventHubs.clientId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.azure-event-hubs.event-hub" => Some((
+                    "ingestionDataSourceSettings.azureEventHubs.eventHub",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.azure-event-hubs.gcp-service-account" => Some((
+                    "ingestionDataSourceSettings.azureEventHubs.gcpServiceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.azure-event-hubs.namespace" => Some((
+                    "ingestionDataSourceSettings.azureEventHubs.namespace",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.azure-event-hubs.resource-group" => Some((
+                    "ingestionDataSourceSettings.azureEventHubs.resourceGroup",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.azure-event-hubs.state" => Some((
+                    "ingestionDataSourceSettings.azureEventHubs.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.azure-event-hubs.subscription-id" => Some((
+                    "ingestionDataSourceSettings.azureEventHubs.subscriptionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.azure-event-hubs.tenant-id" => Some((
+                    "ingestionDataSourceSettings.azureEventHubs.tenantId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.cloud-storage.bucket" => Some((
+                    "ingestionDataSourceSettings.cloudStorage.bucket",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.cloud-storage.match-glob" => Some((
+                    "ingestionDataSourceSettings.cloudStorage.matchGlob",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.cloud-storage.minimum-object-create-time" => {
+                    Some((
+                        "ingestionDataSourceSettings.cloudStorage.minimumObjectCreateTime",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "ingestion-data-source-settings.cloud-storage.state" => Some((
+                    "ingestionDataSourceSettings.cloudStorage.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.cloud-storage.text-format.delimiter" => Some((
+                    "ingestionDataSourceSettings.cloudStorage.textFormat.delimiter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.confluent-cloud.bootstrap-server" => Some((
+                    "ingestionDataSourceSettings.confluentCloud.bootstrapServer",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.confluent-cloud.cluster-id" => Some((
+                    "ingestionDataSourceSettings.confluentCloud.clusterId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.confluent-cloud.gcp-service-account" => Some((
+                    "ingestionDataSourceSettings.confluentCloud.gcpServiceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.confluent-cloud.identity-pool-id" => Some((
+                    "ingestionDataSourceSettings.confluentCloud.identityPoolId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.confluent-cloud.state" => Some((
+                    "ingestionDataSourceSettings.confluentCloud.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.confluent-cloud.topic" => Some((
+                    "ingestionDataSourceSettings.confluentCloud.topic",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ingestion-data-source-settings.platform-logs-settings.severity" => Some((
+                    "ingestionDataSourceSettings.platformLogsSettings.severity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "kms-key-name" => Some((
                     "kmsKeyName",
                     JsonTypeInfo {
@@ -5161,30 +5377,60 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
                             "allowed-persistence-regions",
                             "aws-kinesis",
+                            "aws-msk",
                             "aws-role-arn",
+                            "azure-event-hubs",
+                            "bootstrap-server",
+                            "bucket",
+                            "client-id",
+                            "cloud-storage",
+                            "cluster-arn",
+                            "cluster-id",
+                            "confluent-cloud",
                             "consumer-arn",
+                            "delimiter",
                             "encoding",
                             "enforce-in-transit",
+                            "event-hub",
                             "first-revision-id",
                             "gcp-service-account",
+                            "identity-pool-id",
                             "ingestion-data-source-settings",
                             "kms-key-name",
                             "labels",
                             "last-revision-id",
+                            "match-glob",
                             "message-retention-duration",
                             "message-storage-policy",
+                            "minimum-object-create-time",
                             "name",
+                            "namespace",
+                            "platform-logs-settings",
+                            "resource-group",
                             "satisfies-pzs",
                             "schema",
                             "schema-settings",
+                            "severity",
                             "state",
                             "stream-arn",
+                            "subscription-id",
+                            "tags",
+                            "tenant-id",
+                            "text-format",
+                            "topic",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -5692,6 +5938,189 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "topic.ingestion-data-source-settings.aws-msk.aws-role-arn" => Some((
+                    "topic.ingestionDataSourceSettings.awsMsk.awsRoleArn",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.aws-msk.cluster-arn" => Some((
+                    "topic.ingestionDataSourceSettings.awsMsk.clusterArn",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.aws-msk.gcp-service-account" => Some((
+                    "topic.ingestionDataSourceSettings.awsMsk.gcpServiceAccount",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.aws-msk.state" => Some((
+                    "topic.ingestionDataSourceSettings.awsMsk.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.aws-msk.topic" => Some((
+                    "topic.ingestionDataSourceSettings.awsMsk.topic",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.azure-event-hubs.client-id" => Some((
+                    "topic.ingestionDataSourceSettings.azureEventHubs.clientId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.azure-event-hubs.event-hub" => Some((
+                    "topic.ingestionDataSourceSettings.azureEventHubs.eventHub",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.azure-event-hubs.gcp-service-account" => {
+                    Some((
+                        "topic.ingestionDataSourceSettings.azureEventHubs.gcpServiceAccount",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "topic.ingestion-data-source-settings.azure-event-hubs.namespace" => Some((
+                    "topic.ingestionDataSourceSettings.azureEventHubs.namespace",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.azure-event-hubs.resource-group" => Some((
+                    "topic.ingestionDataSourceSettings.azureEventHubs.resourceGroup",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.azure-event-hubs.state" => Some((
+                    "topic.ingestionDataSourceSettings.azureEventHubs.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.azure-event-hubs.subscription-id" => Some((
+                    "topic.ingestionDataSourceSettings.azureEventHubs.subscriptionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.azure-event-hubs.tenant-id" => Some((
+                    "topic.ingestionDataSourceSettings.azureEventHubs.tenantId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.cloud-storage.bucket" => Some((
+                    "topic.ingestionDataSourceSettings.cloudStorage.bucket",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.cloud-storage.match-glob" => Some((
+                    "topic.ingestionDataSourceSettings.cloudStorage.matchGlob",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.cloud-storage.minimum-object-create-time" => {
+                    Some((
+                        "topic.ingestionDataSourceSettings.cloudStorage.minimumObjectCreateTime",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "topic.ingestion-data-source-settings.cloud-storage.state" => Some((
+                    "topic.ingestionDataSourceSettings.cloudStorage.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.cloud-storage.text-format.delimiter" => {
+                    Some((
+                        "topic.ingestionDataSourceSettings.cloudStorage.textFormat.delimiter",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "topic.ingestion-data-source-settings.confluent-cloud.bootstrap-server" => Some((
+                    "topic.ingestionDataSourceSettings.confluentCloud.bootstrapServer",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.confluent-cloud.cluster-id" => Some((
+                    "topic.ingestionDataSourceSettings.confluentCloud.clusterId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.confluent-cloud.gcp-service-account" => {
+                    Some((
+                        "topic.ingestionDataSourceSettings.confluentCloud.gcpServiceAccount",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "topic.ingestion-data-source-settings.confluent-cloud.identity-pool-id" => Some((
+                    "topic.ingestionDataSourceSettings.confluentCloud.identityPoolId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.confluent-cloud.state" => Some((
+                    "topic.ingestionDataSourceSettings.confluentCloud.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.confluent-cloud.topic" => Some((
+                    "topic.ingestionDataSourceSettings.confluentCloud.topic",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "topic.ingestion-data-source-settings.platform-logs-settings.severity" => Some((
+                    "topic.ingestionDataSourceSettings.platformLogsSettings.severity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "topic.kms-key-name" => Some((
                     "topic.kmsKeyName",
                     JsonTypeInfo {
@@ -5776,6 +6205,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "topic.tags" => Some((
+                    "topic.tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 "update-mask" => Some((
                     "updateMask",
                     JsonTypeInfo {
@@ -5789,24 +6225,46 @@ where
                         &vec![
                             "allowed-persistence-regions",
                             "aws-kinesis",
+                            "aws-msk",
                             "aws-role-arn",
+                            "azure-event-hubs",
+                            "bootstrap-server",
+                            "bucket",
+                            "client-id",
+                            "cloud-storage",
+                            "cluster-arn",
+                            "cluster-id",
+                            "confluent-cloud",
                             "consumer-arn",
+                            "delimiter",
                             "encoding",
                             "enforce-in-transit",
+                            "event-hub",
                             "first-revision-id",
                             "gcp-service-account",
+                            "identity-pool-id",
                             "ingestion-data-source-settings",
                             "kms-key-name",
                             "labels",
                             "last-revision-id",
+                            "match-glob",
                             "message-retention-duration",
                             "message-storage-policy",
+                            "minimum-object-create-time",
                             "name",
+                            "namespace",
+                            "platform-logs-settings",
+                            "resource-group",
                             "satisfies-pzs",
                             "schema",
                             "schema-settings",
+                            "severity",
                             "state",
                             "stream-arn",
+                            "subscription-id",
+                            "tags",
+                            "tenant-id",
+                            "text-format",
                             "topic",
                             "update-mask",
                         ],
@@ -6750,7 +7208,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/pubsub1", config_dir))
         .build()
@@ -7105,7 +7565,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. User-provided name for this snapshot. If the name is not provided in the request, the server will assign a random name for this snapshot on the same project as the subscription. Note that for REST API requests, you must specify a name. See the [resource name rules](https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names). Format is `projects/{project}/snapshots/{snap}`."##),
+                     Some(r##"Required. Identifier. User-provided name for this snapshot. If the name is not provided in the request, the server will assign a random name for this snapshot on the same project as the subscription. Note that for REST API requests, you must specify a name. See the [resource name rules](https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names). Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7130,7 +7590,7 @@ async fn main() {
                   vec![
                     (Some(r##"snapshot"##),
                      None,
-                     Some(r##"Required. The name of the snapshot to delete. Format is `projects/{project}/snapshots/{snap}`."##),
+                     Some(r##"Required. Identifier. The name of the snapshot to delete. Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7150,7 +7610,7 @@ async fn main() {
                   vec![
                     (Some(r##"snapshot"##),
                      None,
-                     Some(r##"Required. The name of the snapshot to get. Format is `projects/{project}/snapshots/{snap}`."##),
+                     Some(r##"Required. Identifier. The name of the snapshot to get. Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7190,7 +7650,7 @@ async fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Required. The name of the project in which to list snapshots. Format is `projects/{project-id}`."##),
+                     Some(r##"Required. Identifier. The name of the project in which to list snapshots. Format is `projects/{project-id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7310,7 +7770,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the subscription. It must have the format `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
+                     Some(r##"Required. Identifier. The name of the subscription. It must have the format `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7335,7 +7795,7 @@ async fn main() {
                   vec![
                     (Some(r##"subscription"##),
                      None,
-                     Some(r##"Required. The subscription to delete. Format is `projects/{project}/subscriptions/{sub}`."##),
+                     Some(r##"Required. Identifier. The subscription to delete. Format is `projects/{project}/subscriptions/{sub}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7375,7 +7835,7 @@ async fn main() {
                   vec![
                     (Some(r##"subscription"##),
                      None,
-                     Some(r##"Required. The name of the subscription to get. Format is `projects/{project}/subscriptions/{sub}`."##),
+                     Some(r##"Required. Identifier. The name of the subscription to get. Format is `projects/{project}/subscriptions/{sub}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7415,7 +7875,7 @@ async fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Required. The name of the project in which to list subscriptions. Format is `projects/{project-id}`."##),
+                     Some(r##"Required. Identifier. The name of the project in which to list subscriptions. Format is `projects/{project-id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7485,7 +7945,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the subscription. It must have the format `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
+                     Some(r##"Required. Identifier. The name of the subscription. It must have the format `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7610,7 +8070,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the topic. It must have the format `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
+                     Some(r##"Required. Identifier. The name of the topic. It must have the format `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7635,7 +8095,7 @@ async fn main() {
                   vec![
                     (Some(r##"topic"##),
                      None,
-                     Some(r##"Required. Name of the topic to delete. Format is `projects/{project}/topics/{topic}`."##),
+                     Some(r##"Required. Identifier. Name of the topic to delete. Format is `projects/{project}/topics/{topic}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7655,7 +8115,7 @@ async fn main() {
                   vec![
                     (Some(r##"topic"##),
                      None,
-                     Some(r##"Required. The name of the topic to get. Format is `projects/{project}/topics/{topic}`."##),
+                     Some(r##"Required. Identifier. The name of the topic to get. Format is `projects/{project}/topics/{topic}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7695,7 +8155,7 @@ async fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"Required. The name of the project in which to list topics. Format is `projects/{project-id}`."##),
+                     Some(r##"Required. Identifier. The name of the project in which to list topics. Format is `projects/{project-id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -7715,7 +8175,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the topic. It must have the format `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
+                     Some(r##"Required. Identifier. The name of the topic. It must have the format `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7740,7 +8200,7 @@ async fn main() {
                   vec![
                     (Some(r##"topic"##),
                      None,
-                     Some(r##"Required. The messages in the request will be published on this topic. Format is `projects/{project}/topics/{topic}`."##),
+                     Some(r##"Required. Identifier. The messages in the request will be published on this topic. Format is `projects/{project}/topics/{topic}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -7854,7 +8314,7 @@ async fn main() {
 
     let mut app = App::new("pubsub1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251212")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_cli")
            .arg(Arg::with_name("url")
@@ -7919,7 +8379,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

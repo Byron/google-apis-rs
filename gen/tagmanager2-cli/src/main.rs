@@ -1991,6 +1991,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "tag-id" => {
+                    call = call.tag_id(value.unwrap_or(""));
+                }
                 "destination-id" => {
                     call = call.destination_id(value.unwrap_or(""));
                 }
@@ -2011,7 +2014,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["destination-id"].iter().map(|v| *v));
+                                v.extend(["destination-id", "tag-id"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -3957,6 +3960,133 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["type"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_containers_workspaces_bulk_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::ProposedChange = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .accounts()
+            .containers_workspaces_bulk_update(request, opt.value_of("path").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -7333,6 +7463,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "custom-template.gallery-reference.gallery-template-id" => Some((
+                    "customTemplate.galleryReference.galleryTemplateId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "custom-template.gallery-reference.host" => Some((
                     "customTemplate.galleryReference.host",
                     JsonTypeInfo {
@@ -7363,6 +7500,13 @@ where
                 )),
                 "custom-template.gallery-reference.signature" => Some((
                     "customTemplate.galleryReference.signature",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "custom-template.gallery-reference.template-developer-id" => Some((
+                    "customTemplate.galleryReference.templateDeveloperId",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -7543,13 +7687,6 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "tag.blocking-rule-id" => Some((
-                    "tag.blockingRuleId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
                 "tag.blocking-trigger-id" => Some((
                     "tag.blockingTriggerId",
                     JsonTypeInfo {
@@ -7604,13 +7741,6 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
-                    },
-                )),
-                "tag.firing-rule-id" => Some((
-                    "tag.firingRuleId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
                     },
                 )),
                 "tag.firing-trigger-id" => Some((
@@ -8717,7 +8847,6 @@ where
                         key,
                         &vec![
                             "account-id",
-                            "blocking-rule-id",
                             "blocking-trigger-id",
                             "boundary",
                             "built-in-variable",
@@ -8742,12 +8871,12 @@ where
                             "enabling-trigger-id",
                             "event-name",
                             "fingerprint",
-                            "firing-rule-id",
                             "firing-trigger-id",
                             "folder",
                             "folder-id",
                             "format-value",
                             "gallery-reference",
+                            "gallery-template-id",
                             "gtag-config",
                             "gtag-config-id",
                             "horizontal-scroll-percentage-list",
@@ -8779,6 +8908,7 @@ where
                             "tag-id",
                             "tag-manager-url",
                             "template-data",
+                            "template-developer-id",
                             "template-id",
                             "total-time-min-milliseconds",
                             "transformation",
@@ -9005,13 +9135,6 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "blocking-rule-id" => Some((
-                    "blockingRuleId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
                 "blocking-trigger-id" => Some((
                     "blockingTriggerId",
                     JsonTypeInfo {
@@ -9066,13 +9189,6 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
-                    },
-                )),
-                "firing-rule-id" => Some((
-                    "firingRuleId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
                     },
                 )),
                 "firing-trigger-id" => Some((
@@ -9241,14 +9357,12 @@ where
                         key,
                         &vec![
                             "account-id",
-                            "blocking-rule-id",
                             "blocking-trigger-id",
                             "consent-settings",
                             "consent-status",
                             "consent-type",
                             "container-id",
                             "fingerprint",
-                            "firing-rule-id",
                             "firing-trigger-id",
                             "is-weak-reference",
                             "key",
@@ -9719,13 +9833,6 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "blocking-rule-id" => Some((
-                    "blockingRuleId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
                 "blocking-trigger-id" => Some((
                     "blockingTriggerId",
                     JsonTypeInfo {
@@ -9780,13 +9887,6 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
-                    },
-                )),
-                "firing-rule-id" => Some((
-                    "firingRuleId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
                     },
                 )),
                 "firing-trigger-id" => Some((
@@ -9955,14 +10055,12 @@ where
                         key,
                         &vec![
                             "account-id",
-                            "blocking-rule-id",
                             "blocking-trigger-id",
                             "consent-settings",
                             "consent-status",
                             "consent-type",
                             "container-id",
                             "fingerprint",
-                            "firing-rule-id",
                             "firing-trigger-id",
                             "is-weak-reference",
                             "key",
@@ -10135,6 +10233,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "gallery-reference.gallery-template-id" => Some((
+                    "galleryReference.galleryTemplateId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "gallery-reference.host" => Some((
                     "galleryReference.host",
                     JsonTypeInfo {
@@ -10165,6 +10270,13 @@ where
                 )),
                 "gallery-reference.signature" => Some((
                     "galleryReference.signature",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "gallery-reference.template-developer-id" => Some((
+                    "galleryReference.templateDeveloperId",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -10227,6 +10339,7 @@ where
                             "container-id",
                             "fingerprint",
                             "gallery-reference",
+                            "gallery-template-id",
                             "host",
                             "is-modified",
                             "name",
@@ -10236,6 +10349,7 @@ where
                             "signature",
                             "tag-manager-url",
                             "template-data",
+                            "template-developer-id",
                             "template-id",
                             "version",
                             "workspace-id",
@@ -10435,6 +10549,115 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_containers_workspaces_templates_import_from_gallery(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .accounts()
+            .containers_workspaces_templates_import_from_gallery(
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "gallery-sha" => {
+                    call = call.gallery_sha(value.unwrap_or(""));
+                }
+                "gallery-repository" => {
+                    call = call.gallery_repository(value.unwrap_or(""));
+                }
+                "gallery-owner" => {
+                    call = call.gallery_owner(value.unwrap_or(""));
+                }
+                "acknowledge-permissions" => {
+                    call = call.acknowledge_permissions(
+                        value
+                            .map(|v| arg_from_str(v, err, "acknowledge-permissions", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "acknowledge-permissions",
+                                        "gallery-owner",
+                                        "gallery-repository",
+                                        "gallery-sha",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -10703,6 +10926,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "gallery-reference.gallery-template-id" => Some((
+                    "galleryReference.galleryTemplateId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "gallery-reference.host" => Some((
                     "galleryReference.host",
                     JsonTypeInfo {
@@ -10733,6 +10963,13 @@ where
                 )),
                 "gallery-reference.signature" => Some((
                     "galleryReference.signature",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "gallery-reference.template-developer-id" => Some((
+                    "galleryReference.templateDeveloperId",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -10795,6 +11032,7 @@ where
                             "container-id",
                             "fingerprint",
                             "gallery-reference",
+                            "gallery-template-id",
                             "host",
                             "is-modified",
                             "name",
@@ -10804,6 +11042,7 @@ where
                             "signature",
                             "tag-manager-url",
                             "template-data",
+                            "template-developer-id",
                             "template-id",
                             "version",
                             "workspace-id",
@@ -16570,6 +16809,11 @@ where
                         )
                         .await;
                 }
+                ("containers-workspaces-bulk-update", Some(opt)) => {
+                    call_result = self
+                        ._accounts_containers_workspaces_bulk_update(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("containers-workspaces-clients-create", Some(opt)) => {
                     call_result = self
                         ._accounts_containers_workspaces_clients_create(opt, dry_run, &mut err)
@@ -16755,6 +16999,13 @@ where
                 ("containers-workspaces-templates-get", Some(opt)) => {
                     call_result = self
                         ._accounts_containers_workspaces_templates_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("containers-workspaces-templates-import-from-gallery", Some(opt)) => {
+                    call_result = self
+                        ._accounts_containers_workspaces_templates_import_from_gallery(
+                            opt, dry_run, &mut err,
+                        )
                         .await;
                 }
                 ("containers-workspaces-templates-list", Some(opt)) => {
@@ -16987,7 +17238,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/tagmanager2", config_dir))
         .build()
@@ -17040,14 +17293,14 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("accounts", "methods: 'containers-combine', 'containers-create', 'containers-delete', 'containers-destinations-get', 'containers-destinations-link', 'containers-destinations-list', 'containers-environments-create', 'containers-environments-delete', 'containers-environments-get', 'containers-environments-list', 'containers-environments-reauthorize', 'containers-environments-update', 'containers-get', 'containers-list', 'containers-lookup', 'containers-move-tag-id', 'containers-snippet', 'containers-update', 'containers-version-headers-latest', 'containers-version-headers-list', 'containers-versions-delete', 'containers-versions-get', 'containers-versions-live', 'containers-versions-publish', 'containers-versions-set-latest', 'containers-versions-undelete', 'containers-versions-update', 'containers-workspaces-built-in-variables-create', 'containers-workspaces-built-in-variables-delete', 'containers-workspaces-built-in-variables-list', 'containers-workspaces-built-in-variables-revert', 'containers-workspaces-clients-create', 'containers-workspaces-clients-delete', 'containers-workspaces-clients-get', 'containers-workspaces-clients-list', 'containers-workspaces-clients-revert', 'containers-workspaces-clients-update', 'containers-workspaces-create', 'containers-workspaces-create-version', 'containers-workspaces-delete', 'containers-workspaces-folders-create', 'containers-workspaces-folders-delete', 'containers-workspaces-folders-entities', 'containers-workspaces-folders-get', 'containers-workspaces-folders-list', 'containers-workspaces-folders-move-entities-to-folder', 'containers-workspaces-folders-revert', 'containers-workspaces-folders-update', 'containers-workspaces-get', 'containers-workspaces-get-status', 'containers-workspaces-gtag-config-create', 'containers-workspaces-gtag-config-delete', 'containers-workspaces-gtag-config-get', 'containers-workspaces-gtag-config-list', 'containers-workspaces-gtag-config-update', 'containers-workspaces-list', 'containers-workspaces-quick-preview', 'containers-workspaces-resolve-conflict', 'containers-workspaces-sync', 'containers-workspaces-tags-create', 'containers-workspaces-tags-delete', 'containers-workspaces-tags-get', 'containers-workspaces-tags-list', 'containers-workspaces-tags-revert', 'containers-workspaces-tags-update', 'containers-workspaces-templates-create', 'containers-workspaces-templates-delete', 'containers-workspaces-templates-get', 'containers-workspaces-templates-list', 'containers-workspaces-templates-revert', 'containers-workspaces-templates-update', 'containers-workspaces-transformations-create', 'containers-workspaces-transformations-delete', 'containers-workspaces-transformations-get', 'containers-workspaces-transformations-list', 'containers-workspaces-transformations-revert', 'containers-workspaces-transformations-update', 'containers-workspaces-triggers-create', 'containers-workspaces-triggers-delete', 'containers-workspaces-triggers-get', 'containers-workspaces-triggers-list', 'containers-workspaces-triggers-revert', 'containers-workspaces-triggers-update', 'containers-workspaces-update', 'containers-workspaces-variables-create', 'containers-workspaces-variables-delete', 'containers-workspaces-variables-get', 'containers-workspaces-variables-list', 'containers-workspaces-variables-revert', 'containers-workspaces-variables-update', 'containers-workspaces-zones-create', 'containers-workspaces-zones-delete', 'containers-workspaces-zones-get', 'containers-workspaces-zones-list', 'containers-workspaces-zones-revert', 'containers-workspaces-zones-update', 'get', 'list', 'update', 'user-permissions-create', 'user-permissions-delete', 'user-permissions-get', 'user-permissions-list' and 'user-permissions-update'", vec![
+        ("accounts", "methods: 'containers-combine', 'containers-create', 'containers-delete', 'containers-destinations-get', 'containers-destinations-link', 'containers-destinations-list', 'containers-environments-create', 'containers-environments-delete', 'containers-environments-get', 'containers-environments-list', 'containers-environments-reauthorize', 'containers-environments-update', 'containers-get', 'containers-list', 'containers-lookup', 'containers-move-tag-id', 'containers-snippet', 'containers-update', 'containers-version-headers-latest', 'containers-version-headers-list', 'containers-versions-delete', 'containers-versions-get', 'containers-versions-live', 'containers-versions-publish', 'containers-versions-set-latest', 'containers-versions-undelete', 'containers-versions-update', 'containers-workspaces-built-in-variables-create', 'containers-workspaces-built-in-variables-delete', 'containers-workspaces-built-in-variables-list', 'containers-workspaces-built-in-variables-revert', 'containers-workspaces-bulk-update', 'containers-workspaces-clients-create', 'containers-workspaces-clients-delete', 'containers-workspaces-clients-get', 'containers-workspaces-clients-list', 'containers-workspaces-clients-revert', 'containers-workspaces-clients-update', 'containers-workspaces-create', 'containers-workspaces-create-version', 'containers-workspaces-delete', 'containers-workspaces-folders-create', 'containers-workspaces-folders-delete', 'containers-workspaces-folders-entities', 'containers-workspaces-folders-get', 'containers-workspaces-folders-list', 'containers-workspaces-folders-move-entities-to-folder', 'containers-workspaces-folders-revert', 'containers-workspaces-folders-update', 'containers-workspaces-get', 'containers-workspaces-get-status', 'containers-workspaces-gtag-config-create', 'containers-workspaces-gtag-config-delete', 'containers-workspaces-gtag-config-get', 'containers-workspaces-gtag-config-list', 'containers-workspaces-gtag-config-update', 'containers-workspaces-list', 'containers-workspaces-quick-preview', 'containers-workspaces-resolve-conflict', 'containers-workspaces-sync', 'containers-workspaces-tags-create', 'containers-workspaces-tags-delete', 'containers-workspaces-tags-get', 'containers-workspaces-tags-list', 'containers-workspaces-tags-revert', 'containers-workspaces-tags-update', 'containers-workspaces-templates-create', 'containers-workspaces-templates-delete', 'containers-workspaces-templates-get', 'containers-workspaces-templates-import-from-gallery', 'containers-workspaces-templates-list', 'containers-workspaces-templates-revert', 'containers-workspaces-templates-update', 'containers-workspaces-transformations-create', 'containers-workspaces-transformations-delete', 'containers-workspaces-transformations-get', 'containers-workspaces-transformations-list', 'containers-workspaces-transformations-revert', 'containers-workspaces-transformations-update', 'containers-workspaces-triggers-create', 'containers-workspaces-triggers-delete', 'containers-workspaces-triggers-get', 'containers-workspaces-triggers-list', 'containers-workspaces-triggers-revert', 'containers-workspaces-triggers-update', 'containers-workspaces-update', 'containers-workspaces-variables-create', 'containers-workspaces-variables-delete', 'containers-workspaces-variables-get', 'containers-workspaces-variables-list', 'containers-workspaces-variables-revert', 'containers-workspaces-variables-update', 'containers-workspaces-zones-create', 'containers-workspaces-zones-delete', 'containers-workspaces-zones-get', 'containers-workspaces-zones-list', 'containers-workspaces-zones-revert', 'containers-workspaces-zones-update', 'get', 'list', 'update', 'user-permissions-create', 'user-permissions-delete', 'user-permissions-get', 'user-permissions-list' and 'user-permissions-update'", vec![
             ("containers-combine",
                     Some(r##"Combines Containers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-combine",
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17067,7 +17320,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Account's API relative path. Example: accounts/{account_id}."##),
+                     Some(r##"GTM Account's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17092,7 +17345,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17107,7 +17360,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"Google Tag Destination's API relative path. Example: accounts/{account_id}/containers/{container_id}/destinations/{destination_link_id}"##),
+                     Some(r##"Google Tag Destination's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17127,7 +17380,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM parent Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17147,7 +17400,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM parent Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17167,7 +17420,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17192,7 +17445,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
+                     Some(r##"GTM Environment's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17207,7 +17460,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
+                     Some(r##"GTM Environment's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17227,7 +17480,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17247,7 +17500,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
+                     Some(r##"GTM Environment's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17272,7 +17525,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
+                     Some(r##"GTM Environment's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17297,7 +17550,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17317,7 +17570,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Account's API relative path. Example: accounts/{account_id}."##),
+                     Some(r##"GTM Account's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17332,7 +17585,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("containers-lookup",
-                    Some(r##"Looks up a Container by destination ID."##),
+                    Some(r##"Looks up a Container by destination ID or tag ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-lookup",
                   vec![
                     (Some(r##"v"##),
@@ -17352,7 +17605,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17372,7 +17625,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"Container snippet's API relative path. Example: accounts/{account_id}/containers/{container_id}:snippet"##),
+                     Some(r##"Container snippet's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17392,7 +17645,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17417,7 +17670,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17437,7 +17690,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17457,7 +17710,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17472,7 +17725,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17492,7 +17745,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17512,7 +17765,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17532,7 +17785,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17552,7 +17805,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17572,7 +17825,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}"##),
+                     Some(r##"GTM ContainerVersion's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17597,7 +17850,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17617,7 +17870,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables"##),
+                     Some(r##"GTM BuiltInVariable's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17632,7 +17885,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17652,9 +17905,34 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables"##),
+                     Some(r##"GTM BuiltInVariable's API relative path."##),
                      Some(true),
                      Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-bulk-update",
+                    Some(r##"Applies multiple entity changes to a workspace in one call. When creating new entities, their entity IDs must be unique and in correct format. That is, they must start with "new_" and followed by number, e.g. "new_1", "new_2". Example body snippet to create myNewTag under myNewFolder is: ``` "changes": [ { "folder": { "folderId": "new_1", "name": "myNewFolder", ... }, "changeStatus": "added" }, { "tag": { "tagId": "new_2", "name": "myNewTag", "parentFolderId": "new_1", ... }, "changeStatus": "added" } ] ```"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-bulk-update",
+                  vec![
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"GTM Workspace's API relative path."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -17672,7 +17950,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17697,7 +17975,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}"##),
+                     Some(r##"GTM Client's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17712,7 +17990,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}"##),
+                     Some(r##"GTM Client's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17732,7 +18010,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17752,7 +18030,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}"##),
+                     Some(r##"GTM Client's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17772,7 +18050,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}"##),
+                     Some(r##"GTM Client's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17797,7 +18075,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM parent Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17822,7 +18100,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17847,7 +18125,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17862,7 +18140,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17887,7 +18165,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17902,7 +18180,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17922,7 +18200,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17942,7 +18220,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -17962,7 +18240,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -17982,7 +18260,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18002,7 +18280,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}"##),
+                     Some(r##"GTM Folder's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18027,7 +18305,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18047,7 +18325,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18067,7 +18345,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18092,7 +18370,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"Google tag config's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/gtag_config/{gtag_config_id}"##),
+                     Some(r##"Google tag config's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18107,7 +18385,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"Google tag config's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/gtag_config/{gtag_config_id}"##),
+                     Some(r##"Google tag config's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18127,7 +18405,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18147,7 +18425,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"Google tag config's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/gtag_config/{gtag_config_id}"##),
+                     Some(r##"Google tag config's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18172,7 +18450,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
+                     Some(r##"GTM parent Container's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18192,7 +18470,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18212,7 +18490,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18232,7 +18510,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18252,7 +18530,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18277,7 +18555,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
+                     Some(r##"GTM Tag's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18292,7 +18570,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
+                     Some(r##"GTM Tag's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18312,7 +18590,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18332,7 +18610,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
+                     Some(r##"GTM Tag's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18352,7 +18630,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}"##),
+                     Some(r##"GTM Tag's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18377,7 +18655,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18402,7 +18680,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
+                     Some(r##"GTM Custom Template's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18417,7 +18695,27 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
+                     Some(r##"GTM Custom Template's API relative path."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-templates-import-from-gallery",
+                    Some(r##"Imports a GTM Custom Template from Gallery."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-templates-import-from-gallery",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18437,7 +18735,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18457,7 +18755,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
+                     Some(r##"GTM Custom Template's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18477,7 +18775,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
+                     Some(r##"GTM Custom Template's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18502,7 +18800,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18527,7 +18825,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}"##),
+                     Some(r##"GTM Transformation's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18542,7 +18840,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}"##),
+                     Some(r##"GTM Transformation's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18562,7 +18860,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18582,7 +18880,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}"##),
+                     Some(r##"GTM Transformation's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18602,7 +18900,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}"##),
+                     Some(r##"GTM Transformation's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18627,7 +18925,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18652,7 +18950,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
+                     Some(r##"GTM Trigger's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18667,7 +18965,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
+                     Some(r##"GTM Trigger's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18687,7 +18985,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18707,7 +19005,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
+                     Some(r##"GTM Trigger's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18727,7 +19025,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}"##),
+                     Some(r##"GTM Trigger's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18752,7 +19050,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18777,7 +19075,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18802,7 +19100,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
+                     Some(r##"GTM Variable's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18817,7 +19115,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
+                     Some(r##"GTM Variable's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18837,7 +19135,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18857,7 +19155,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
+                     Some(r##"GTM Variable's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18877,7 +19175,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
+                     Some(r##"GTM Variable's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18902,7 +19200,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -18927,7 +19225,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(r##"GTM Zone's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18942,7 +19240,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(r##"GTM Zone's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18962,7 +19260,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(r##"GTM Workspace's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -18982,7 +19280,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(r##"GTM Zone's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19002,7 +19300,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(r##"GTM Zone's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -19027,7 +19325,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Account's API relative path. Example: accounts/{account_id}"##),
+                     Some(r##"GTM Account's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19062,7 +19360,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM Account's API relative path. Example: accounts/{account_id}"##),
+                     Some(r##"GTM Account's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -19087,7 +19385,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Account's API relative path. Example: accounts/{account_id}"##),
+                     Some(r##"GTM Account's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -19112,7 +19410,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}"##),
+                     Some(r##"GTM UserPermission's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19127,7 +19425,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}"##),
+                     Some(r##"GTM UserPermission's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19147,7 +19445,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"GTM Account's API relative path. Example: accounts/{account_id}"##),
+                     Some(r##"GTM Account's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -19167,7 +19465,7 @@ async fn main() {
                   vec![
                     (Some(r##"path"##),
                      None,
-                     Some(r##"GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}"##),
+                     Some(r##"GTM UserPermission's API relative path."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -19191,7 +19489,7 @@ async fn main() {
 
     let mut app = App::new("tagmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240619")
+           .version("7.0.0+20251210")
            .about("This API allows clients to access and modify container and tag configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tagmanager2_cli")
            .arg(Arg::with_name("url")
@@ -19256,7 +19554,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

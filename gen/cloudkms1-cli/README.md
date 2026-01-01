@@ -25,14 +25,20 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud KMS* API at revision *20240621*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud KMS* API at revision *20251203*. The CLI is at version *7.0.0*.
 
 ```bash
 cloudkms1 [options]
         folders
                 get-autokey-config <name> [-p <v>]... [-o <out>]
+                get-kaj-policy-config <name> [-p <v>]... [-o <out>]
                 update-autokey-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                update-kaj-policy-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        organizations
+                get-kaj-policy-config <name> [-p <v>]... [-o <out>]
+                update-kaj-policy-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                get-kaj-policy-config <name> [-p <v>]... [-o <out>]
                 locations-ekm-config-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-ekm-config-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-ekm-config-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -55,6 +61,7 @@ cloudkms1 [options]
                 locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-key-rings-crypto-keys-crypto-key-versions-decapsulate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-destroy <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-get <name> [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-get-public-key <name> [-p <v>]... [-o <out>]
@@ -90,6 +97,9 @@ cloudkms1 [options]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-update-ekm-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 show-effective-autokey-config <parent> [-p <v>]... [-o <out>]
+                show-effective-key-access-justifications-enrollment-config <project> [-p <v>]... [-o <out>]
+                show-effective-key-access-justifications-policy-config <project> [-p <v>]... [-o <out>]
+                update-kaj-policy-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudkms1 --help
 
 Configuration:

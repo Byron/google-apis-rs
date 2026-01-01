@@ -196,6 +196,15 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 "delete-policy" => {
                     call = call.delete_policy(value.unwrap_or(""));
                 }
@@ -216,7 +225,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["delete-policy"].iter().map(|v| *v));
+                                v.extend(
+                                    ["delete-policy", "header-bypass-billing-filter"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -281,6 +294,15 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -298,6 +320,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["header-bypass-billing-filter"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -371,6 +394,15 @@ where
                             .unwrap_or(-0),
                     );
                 }
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -388,7 +420,14 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["options-requested-policy-version"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "header-bypass-billing-filter",
+                                        "options-requested-policy-version",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -536,6 +575,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "operation.firewall-policy-rule-operation-metadata.allocated-priority" => Some((
+                    "operation.firewallPolicyRuleOperationMetadata.allocatedPriority",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "operation.http-error-message" => Some((
                     "operation.httpErrorMessage",
                     JsonTypeInfo {
@@ -559,6 +605,13 @@ where
                 )),
                 "operation.insert-time" => Some((
                     "operation.insertTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation.instances-bulk-insert-operation-metadata.machine-type" => Some((
+                    "operation.instancesBulkInsertOperationMetadata.machineType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -611,6 +664,27 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation.self-link-with-id" => Some((
+                    "operation.selfLinkWithId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation.set-autoscaler-link-operation-metadata.zonal-igm-ids" => Some((
+                    "operation.setAutoscalerLinkOperationMetadata.zonalIgmIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "operation.set-autoscaler-link-operation-metadata.zone-to-igm-ids" => Some((
+                    "operation.setAutoscalerLinkOperationMetadata.zoneToIgmIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
                     },
                 )),
                 "operation.set-common-instance-metadata-operation-metadata.client-operation-id" => {
@@ -710,6 +784,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allocated-priority",
                             "client-operation-id",
                             "config",
                             "content",
@@ -717,11 +792,14 @@ where
                             "description",
                             "end-time",
                             "fingerprint",
+                            "firewall-policy-rule-operation-metadata",
                             "http-error-message",
                             "http-error-status-code",
                             "id",
                             "insert-time",
+                            "instances-bulk-insert-operation-metadata",
                             "kind",
+                            "machine-type",
                             "manifest",
                             "name",
                             "operation",
@@ -730,6 +808,8 @@ where
                             "progress",
                             "region",
                             "self-link",
+                            "self-link-with-id",
+                            "set-autoscaler-link-operation-metadata",
                             "set-common-instance-metadata-operation-metadata",
                             "start-time",
                             "status",
@@ -740,7 +820,9 @@ where
                             "update",
                             "update-time",
                             "user",
+                            "zonal-igm-ids",
                             "zone",
+                            "zone-to-igm-ids",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -781,6 +863,15 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 "create-policy" => {
                     call = call.create_policy(value.unwrap_or(""));
                 }
@@ -801,7 +892,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["create-policy", "preview"].iter().map(|v| *v));
+                                v.extend(
+                                    ["create-policy", "header-bypass-billing-filter", "preview"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1051,6 +1146,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "operation.firewall-policy-rule-operation-metadata.allocated-priority" => Some((
+                    "operation.firewallPolicyRuleOperationMetadata.allocatedPriority",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "operation.http-error-message" => Some((
                     "operation.httpErrorMessage",
                     JsonTypeInfo {
@@ -1074,6 +1176,13 @@ where
                 )),
                 "operation.insert-time" => Some((
                     "operation.insertTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation.instances-bulk-insert-operation-metadata.machine-type" => Some((
+                    "operation.instancesBulkInsertOperationMetadata.machineType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1126,6 +1235,27 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation.self-link-with-id" => Some((
+                    "operation.selfLinkWithId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation.set-autoscaler-link-operation-metadata.zonal-igm-ids" => Some((
+                    "operation.setAutoscalerLinkOperationMetadata.zonalIgmIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "operation.set-autoscaler-link-operation-metadata.zone-to-igm-ids" => Some((
+                    "operation.setAutoscalerLinkOperationMetadata.zoneToIgmIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
                     },
                 )),
                 "operation.set-common-instance-metadata-operation-metadata.client-operation-id" => {
@@ -1225,6 +1355,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allocated-priority",
                             "client-operation-id",
                             "config",
                             "content",
@@ -1232,11 +1363,14 @@ where
                             "description",
                             "end-time",
                             "fingerprint",
+                            "firewall-policy-rule-operation-metadata",
                             "http-error-message",
                             "http-error-status-code",
                             "id",
                             "insert-time",
+                            "instances-bulk-insert-operation-metadata",
                             "kind",
+                            "machine-type",
                             "manifest",
                             "name",
                             "operation",
@@ -1245,6 +1379,8 @@ where
                             "progress",
                             "region",
                             "self-link",
+                            "self-link-with-id",
+                            "set-autoscaler-link-operation-metadata",
                             "set-common-instance-metadata-operation-metadata",
                             "start-time",
                             "status",
@@ -1255,7 +1391,9 @@ where
                             "update",
                             "update-time",
                             "user",
+                            "zonal-igm-ids",
                             "zone",
+                            "zone-to-igm-ids",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -1297,6 +1435,15 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 "delete-policy" => {
                     call = call.delete_policy(value.unwrap_or(""));
                 }
@@ -1321,9 +1468,14 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["create-policy", "delete-policy", "preview"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "create-policy",
+                                        "delete-policy",
+                                        "header-bypass-billing-filter",
+                                        "preview",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -1423,9 +1575,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "update-mask" => Some((
+                    "updateMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion =
-                        FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["etag", "policy", "update-mask", "version"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -1731,6 +1892,15 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1748,6 +1918,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["header-bypass-billing-filter"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -1895,6 +2066,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "operation.firewall-policy-rule-operation-metadata.allocated-priority" => Some((
+                    "operation.firewallPolicyRuleOperationMetadata.allocatedPriority",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "operation.http-error-message" => Some((
                     "operation.httpErrorMessage",
                     JsonTypeInfo {
@@ -1918,6 +2096,13 @@ where
                 )),
                 "operation.insert-time" => Some((
                     "operation.insertTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation.instances-bulk-insert-operation-metadata.machine-type" => Some((
+                    "operation.instancesBulkInsertOperationMetadata.machineType",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -1970,6 +2155,27 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation.self-link-with-id" => Some((
+                    "operation.selfLinkWithId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation.set-autoscaler-link-operation-metadata.zonal-igm-ids" => Some((
+                    "operation.setAutoscalerLinkOperationMetadata.zonalIgmIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "operation.set-autoscaler-link-operation-metadata.zone-to-igm-ids" => Some((
+                    "operation.setAutoscalerLinkOperationMetadata.zoneToIgmIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
                     },
                 )),
                 "operation.set-common-instance-metadata-operation-metadata.client-operation-id" => {
@@ -2069,6 +2275,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "allocated-priority",
                             "client-operation-id",
                             "config",
                             "content",
@@ -2076,11 +2283,14 @@ where
                             "description",
                             "end-time",
                             "fingerprint",
+                            "firewall-policy-rule-operation-metadata",
                             "http-error-message",
                             "http-error-status-code",
                             "id",
                             "insert-time",
+                            "instances-bulk-insert-operation-metadata",
                             "kind",
+                            "machine-type",
                             "manifest",
                             "name",
                             "operation",
@@ -2089,6 +2299,8 @@ where
                             "progress",
                             "region",
                             "self-link",
+                            "self-link-with-id",
+                            "set-autoscaler-link-operation-metadata",
                             "set-common-instance-metadata-operation-metadata",
                             "start-time",
                             "status",
@@ -2099,7 +2311,9 @@ where
                             "update",
                             "update-time",
                             "user",
+                            "zonal-igm-ids",
                             "zone",
+                            "zone-to-igm-ids",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -2141,6 +2355,15 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 "delete-policy" => {
                     call = call.delete_policy(value.unwrap_or(""));
                 }
@@ -2165,9 +2388,14 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["create-policy", "delete-policy", "preview"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "create-policy",
+                                        "delete-policy",
+                                        "header-bypass-billing-filter",
+                                        "preview",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -2234,6 +2462,15 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2251,6 +2488,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["header-bypass-billing-filter"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -2417,6 +2655,15 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2434,6 +2681,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["header-bypass-billing-filter"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -2601,6 +2849,15 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "header-bypass-billing-filter" => {
+                    call = call.header_bypass_billing_filter(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "header-bypass-billing-filter", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2618,6 +2875,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["header-bypass-billing-filter"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -3010,7 +3268,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/deploymentmanager2", config_dir))
         .build()
@@ -3552,7 +3812,7 @@ async fn main() {
 
     let mut app = App::new("deploymentmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240404")
+           .version("7.0.0+20251205")
            .about("The Google Cloud Deployment Manager v2 API provides services for configuring, deploying, and viewing Google Cloud services and APIs via templates which specify deployments of Cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli")
            .arg(Arg::with_name("url")
@@ -3617,7 +3877,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

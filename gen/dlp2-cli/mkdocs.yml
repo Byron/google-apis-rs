@@ -1,4 +1,4 @@
-site_name: DLP v6.0.0+20240616
+site_name: DLP v7.0.0+20251213
 site_url: http://byron.github.io/google-apis-rs/google-dlp2-cli
 site_description: A complete library to interact with DLP (protocol v2)
 
@@ -29,6 +29,7 @@ nav:
     - 'Locations Connections Create': 'organizations_locations-connections-create.md'
     - 'Locations Connections Delete': 'organizations_locations-connections-delete.md'
     - 'Locations Connections Get': 'organizations_locations-connections-get.md'
+    - 'Locations Connections List': 'organizations_locations-connections-list.md'
     - 'Locations Connections Patch': 'organizations_locations-connections-patch.md'
     - 'Locations Connections Search': 'organizations_locations-connections-search.md'
     - 'Locations Deidentify Templates Create': 'organizations_locations-deidentify-templates-create.md'
@@ -42,6 +43,10 @@ nav:
     - 'Locations Discovery Configs List': 'organizations_locations-discovery-configs-list.md'
     - 'Locations Discovery Configs Patch': 'organizations_locations-discovery-configs-patch.md'
     - 'Locations Dlp Jobs List': 'organizations_locations-dlp-jobs-list.md'
+    - 'Locations File Store Data Profiles Delete': 'organizations_locations-file-store-data-profiles-delete.md'
+    - 'Locations File Store Data Profiles Get': 'organizations_locations-file-store-data-profiles-get.md'
+    - 'Locations File Store Data Profiles List': 'organizations_locations-file-store-data-profiles-list.md'
+    - 'Locations Info Types List': 'organizations_locations-info-types-list.md'
     - 'Locations Inspect Templates Create': 'organizations_locations-inspect-templates-create.md'
     - 'Locations Inspect Templates Delete': 'organizations_locations-inspect-templates-delete.md'
     - 'Locations Inspect Templates Get': 'organizations_locations-inspect-templates-get.md'
@@ -121,7 +126,11 @@ nav:
     - 'Locations Dlp Jobs Get': 'projects_locations-dlp-jobs-get.md'
     - 'Locations Dlp Jobs Hybrid Inspect': 'projects_locations-dlp-jobs-hybrid-inspect.md'
     - 'Locations Dlp Jobs List': 'projects_locations-dlp-jobs-list.md'
+    - 'Locations File Store Data Profiles Delete': 'projects_locations-file-store-data-profiles-delete.md'
+    - 'Locations File Store Data Profiles Get': 'projects_locations-file-store-data-profiles-get.md'
+    - 'Locations File Store Data Profiles List': 'projects_locations-file-store-data-profiles-list.md'
     - 'Locations Image Redact': 'projects_locations-image-redact.md'
+    - 'Locations Info Types List': 'projects_locations-info-types-list.md'
     - 'Locations Inspect Templates Create': 'projects_locations-inspect-templates-create.md'
     - 'Locations Inspect Templates Delete': 'projects_locations-inspect-templates-delete.md'
     - 'Locations Inspect Templates Get': 'projects_locations-inspect-templates-get.md'

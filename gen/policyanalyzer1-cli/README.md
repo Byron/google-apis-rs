@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Policy Analyzer* API at revision *20240623*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Policy Analyzer* API at revision *20251207*. The CLI is at version *7.0.0*.
 
 ```bash
 policyanalyzer1 [options]

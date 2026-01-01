@@ -73,6 +73,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "message.android.bandwidth-constrained-ok" => Some((
+                    "message.android.bandwidthConstrainedOk",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "message.android.collapse-key" => Some((
                     "message.android.collapseKey",
                     JsonTypeInfo {
@@ -339,6 +346,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "message.android.restricted-satellite-ok" => Some((
+                    "message.android.restrictedSatelliteOk",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "message.android.ttl" => Some((
                     "message.android.ttl",
                     JsonTypeInfo {
@@ -365,6 +379,13 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Map,
+                    },
+                )),
+                "message.apns.live-activity-token" => Some((
+                    "message.apns.liveActivityToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "message.condition" => Some((
@@ -473,6 +494,7 @@ where
                             "analytics-label",
                             "android",
                             "apns",
+                            "bandwidth-constrained-ok",
                             "blue",
                             "body",
                             "body-loc-args",
@@ -498,6 +520,7 @@ where
                             "light-on-duration",
                             "light-settings",
                             "link",
+                            "live-activity-token",
                             "local-only",
                             "message",
                             "name",
@@ -508,6 +531,7 @@ where
                             "proxy",
                             "red",
                             "restricted-package-name",
+                            "restricted-satellite-ok",
                             "sound",
                             "sticky",
                             "tag",
@@ -676,7 +700,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/fcm1", config_dir))
         .build()
@@ -736,7 +762,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. It contains the Firebase project id (i.e. the unique identifier for your Firebase project), in the format of `projects/{project_id}`. For legacy support, the numeric project number with no padding is also supported in the format of `projects/{project_number}`."##),
+                     Some(r##"Required. It contains the Firebase project id (i.e. the unique identifier for your Firebase project), in the format of `projects/{project_id}`. The numeric project number with no padding is also supported in the format of `projects/{project_number}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -760,8 +786,8 @@ async fn main() {
 
     let mut app = App::new("fcm1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240621")
-           .about("FCM send API that provides a cross-platform messaging solution to reliably deliver messages at no cost.")
+           .version("7.0.0+20251212")
+           .about("FCM send API that provides a cross-platform messaging solution to reliably deliver messages.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fcm1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -825,7 +851,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

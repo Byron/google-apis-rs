@@ -458,97 +458,6 @@ where
         }
     }
 
-    async fn _projects_locations_endpoints_get_iam_policy(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .projects()
-            .locations_endpoints_get_iam_policy(opt.value_of("resource").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "options-requested-policy-version" => {
-                    call = call.options_requested_policy_version(
-                        value
-                            .map(|v| {
-                                arg_from_str(v, err, "options-requested-policy-version", "int32")
-                            })
-                            .unwrap_or(-0),
-                    );
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["options-requested-policy-version"].iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _projects_locations_endpoints_list(
         &self,
         opt: &ArgMatches<'n>,
@@ -905,295 +814,6 @@ where
         }
     }
 
-    async fn _projects_locations_endpoints_set_iam_policy(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut field_cursor = FieldCursor::default();
-        let mut object = serde_json::value::Value::Object(Default::default());
-
-        for kvarg in opt
-            .values_of("kv")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "policy.etag" => Some((
-                    "policy.etag",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "policy.version" => Some((
-                    "policy.version",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-mask" => Some((
-                    "updateMask",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec!["etag", "policy", "update-mask", "version"],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(
-                    &mut object,
-                    value.unwrap(),
-                    type_info,
-                    err,
-                    &temp_cursor,
-                );
-            }
-        }
-        let mut request: api::SetIamPolicyRequest = serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .projects()
-            .locations_endpoints_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _projects_locations_endpoints_test_iam_permissions(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut field_cursor = FieldCursor::default();
-        let mut object = serde_json::value::Value::Object(Default::default());
-
-        for kvarg in opt
-            .values_of("kv")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "permissions" => Some((
-                    "permissions",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(
-                    &mut object,
-                    value.unwrap(),
-                    type_info,
-                    err,
-                    &temp_cursor,
-                );
-            }
-        }
-        let mut request: api::TestIamPermissionsRequest =
-            serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .projects()
-            .locations_endpoints_test_iam_permissions(
-                request,
-                opt.value_of("resource").unwrap_or(""),
-            );
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _projects_locations_get(
         &self,
         opt: &ArgMatches<'n>,
@@ -1306,6 +926,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1323,7 +946,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1678,6 +1305,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -1708,7 +1342,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1779,11 +1422,6 @@ where
                         ._projects_locations_endpoints_get(opt, dry_run, &mut err)
                         .await;
                 }
-                ("locations-endpoints-get-iam-policy", Some(opt)) => {
-                    call_result = self
-                        ._projects_locations_endpoints_get_iam_policy(opt, dry_run, &mut err)
-                        .await;
-                }
                 ("locations-endpoints-list", Some(opt)) => {
                     call_result = self
                         ._projects_locations_endpoints_list(opt, dry_run, &mut err)
@@ -1792,16 +1430,6 @@ where
                 ("locations-endpoints-patch", Some(opt)) => {
                     call_result = self
                         ._projects_locations_endpoints_patch(opt, dry_run, &mut err)
-                        .await;
-                }
-                ("locations-endpoints-set-iam-policy", Some(opt)) => {
-                    call_result = self
-                        ._projects_locations_endpoints_set_iam_policy(opt, dry_run, &mut err)
-                        .await;
-                }
-                ("locations-endpoints-test-iam-permissions", Some(opt)) => {
-                    call_result = self
-                        ._projects_locations_endpoints_test_iam_permissions(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-get", Some(opt)) => {
@@ -1876,7 +1504,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/ids1", config_dir))
         .build()
@@ -1929,7 +1559,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-endpoints-create', 'locations-endpoints-delete', 'locations-endpoints-get', 'locations-endpoints-get-iam-policy', 'locations-endpoints-list', 'locations-endpoints-patch', 'locations-endpoints-set-iam-policy', 'locations-endpoints-test-iam-permissions', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-endpoints-create', 'locations-endpoints-delete', 'locations-endpoints-get', 'locations-endpoints-list', 'locations-endpoints-patch', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
             ("locations-endpoints-create",
                     Some(r##"Creates a new Endpoint in a given project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ids1_cli/projects_locations-endpoints-create",
@@ -1995,26 +1625,6 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-endpoints-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_ids1_cli/projects_locations-endpoints-get-iam-policy",
-                  vec![
-                    (Some(r##"resource"##),
-                     None,
-                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("locations-endpoints-list",
                     Some(r##"Lists Endpoints in a given project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ids1_cli/projects_locations-endpoints-list",
@@ -2042,56 +1652,6 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Output only. The name of the endpoint."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-endpoints-set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_ids1_cli/projects_locations-endpoints-set-iam-policy",
-                  vec![
-                    (Some(r##"resource"##),
-                     None,
-                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-endpoints-test-iam-permissions",
-                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error. Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_ids1_cli/projects_locations-endpoints-test-iam-permissions",
-                  vec![
-                    (Some(r##"resource"##),
-                     None,
-                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -2151,7 +1711,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_ids1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -2240,7 +1800,7 @@ async fn main() {
 
     let mut app = App::new("ids1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240613")
+           .version("7.0.0+20251201")
            .about("Cloud IDS (Cloud Intrusion Detection System) detects malware, spyware, command-and-control attacks, and other network-based threats. Its security efficacy is industry leading, built with Palo Alto Networks technologies. When you use this product, your organization name and consumption levels will be shared with Palo Alto Networks.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_ids1_cli")
            .arg(Arg::with_name("url")
@@ -2305,7 +1865,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

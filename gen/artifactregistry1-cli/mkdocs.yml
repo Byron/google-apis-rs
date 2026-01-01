@@ -1,4 +1,4 @@
-site_name: Artifact Registry v6.0.0+20240608
+site_name: Artifact Registry v7.0.0+20251209
 site_url: http://byron.github.io/google-apis-rs/google-artifactregistry1-cli
 site_description: A complete library to interact with Artifact Registry (protocol v1)
 
@@ -17,14 +17,21 @@ nav:
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Repositories Apt Artifacts Import': 'projects_locations-repositories-apt-artifacts-import.md'
     - 'Locations Repositories Apt Artifacts Upload': 'projects_locations-repositories-apt-artifacts-upload.md'
+    - 'Locations Repositories Attachments Create': 'projects_locations-repositories-attachments-create.md'
+    - 'Locations Repositories Attachments Delete': 'projects_locations-repositories-attachments-delete.md'
+    - 'Locations Repositories Attachments Get': 'projects_locations-repositories-attachments-get.md'
+    - 'Locations Repositories Attachments List': 'projects_locations-repositories-attachments-list.md'
     - 'Locations Repositories Create': 'projects_locations-repositories-create.md'
     - 'Locations Repositories Delete': 'projects_locations-repositories-delete.md'
     - 'Locations Repositories Docker Images Get': 'projects_locations-repositories-docker-images-get.md'
     - 'Locations Repositories Docker Images List': 'projects_locations-repositories-docker-images-list.md'
+    - 'Locations Repositories Export Artifact': 'projects_locations-repositories-export-artifact.md'
     - 'Locations Repositories Files Delete': 'projects_locations-repositories-files-delete.md'
     - 'Locations Repositories Files Download': 'projects_locations-repositories-files-download.md'
     - 'Locations Repositories Files Get': 'projects_locations-repositories-files-get.md'
     - 'Locations Repositories Files List': 'projects_locations-repositories-files-list.md'
+    - 'Locations Repositories Files Patch': 'projects_locations-repositories-files-patch.md'
+    - 'Locations Repositories Files Upload': 'projects_locations-repositories-files-upload.md'
     - 'Locations Repositories Generic Artifacts Upload': 'projects_locations-repositories-generic-artifacts-upload.md'
     - 'Locations Repositories Get': 'projects_locations-repositories-get.md'
     - 'Locations Repositories Get Iam Policy': 'projects_locations-repositories-get-iam-policy.md'
@@ -50,9 +57,15 @@ nav:
     - 'Locations Repositories Packages Versions Delete': 'projects_locations-repositories-packages-versions-delete.md'
     - 'Locations Repositories Packages Versions Get': 'projects_locations-repositories-packages-versions-get.md'
     - 'Locations Repositories Packages Versions List': 'projects_locations-repositories-packages-versions-list.md'
+    - 'Locations Repositories Packages Versions Patch': 'projects_locations-repositories-packages-versions-patch.md'
     - 'Locations Repositories Patch': 'projects_locations-repositories-patch.md'
     - 'Locations Repositories Python Packages Get': 'projects_locations-repositories-python-packages-get.md'
     - 'Locations Repositories Python Packages List': 'projects_locations-repositories-python-packages-list.md'
+    - 'Locations Repositories Rules Create': 'projects_locations-repositories-rules-create.md'
+    - 'Locations Repositories Rules Delete': 'projects_locations-repositories-rules-delete.md'
+    - 'Locations Repositories Rules Get': 'projects_locations-repositories-rules-get.md'
+    - 'Locations Repositories Rules List': 'projects_locations-repositories-rules-list.md'
+    - 'Locations Repositories Rules Patch': 'projects_locations-repositories-rules-patch.md'
     - 'Locations Repositories Set Iam Policy': 'projects_locations-repositories-set-iam-policy.md'
     - 'Locations Repositories Test Iam Permissions': 'projects_locations-repositories-test-iam-permissions.md'
     - 'Locations Repositories Yum Artifacts Import': 'projects_locations-repositories-yum-artifacts-import.md'

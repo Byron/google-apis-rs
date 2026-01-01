@@ -1,4 +1,4 @@
-site_name: Cloud Redis v6.0.0+20240613
+site_name: Cloud Redis v7.0.0+20251104
 site_url: http://byron.github.io/google-apis-rs/google-redis1-cli
 site_description: A complete library to interact with Cloud Redis (protocol v1)
 
@@ -10,12 +10,20 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
+    - 'Locations Backup Collections Backups Delete': 'projects_locations-backup-collections-backups-delete.md'
+    - 'Locations Backup Collections Backups Export': 'projects_locations-backup-collections-backups-export.md'
+    - 'Locations Backup Collections Backups Get': 'projects_locations-backup-collections-backups-get.md'
+    - 'Locations Backup Collections Backups List': 'projects_locations-backup-collections-backups-list.md'
+    - 'Locations Backup Collections Get': 'projects_locations-backup-collections-get.md'
+    - 'Locations Backup Collections List': 'projects_locations-backup-collections-list.md'
+    - 'Locations Clusters Backup': 'projects_locations-clusters-backup.md'
     - 'Locations Clusters Create': 'projects_locations-clusters-create.md'
     - 'Locations Clusters Delete': 'projects_locations-clusters-delete.md'
     - 'Locations Clusters Get': 'projects_locations-clusters-get.md'
     - 'Locations Clusters Get Certificate Authority': 'projects_locations-clusters-get-certificate-authority.md'
     - 'Locations Clusters List': 'projects_locations-clusters-list.md'
     - 'Locations Clusters Patch': 'projects_locations-clusters-patch.md'
+    - 'Locations Clusters Reschedule Cluster Maintenance': 'projects_locations-clusters-reschedule-cluster-maintenance.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations Instances Create': 'projects_locations-instances-create.md'
     - 'Locations Instances Delete': 'projects_locations-instances-delete.md'

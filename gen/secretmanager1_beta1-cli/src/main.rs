@@ -154,6 +154,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -171,7 +174,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -405,9 +412,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 _ => {
-                    let suggestion =
-                        FieldCursor::did_you_mean(key, &vec!["create-time", "labels", "name"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["create-time", "labels", "name", "tags"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -903,9 +919,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
                 _ => {
-                    let suggestion =
-                        FieldCursor::did_you_mean(key, &vec!["create-time", "labels", "name"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["create-time", "labels", "name", "tags"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -2058,7 +2083,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/secretmanager1-beta1", config_dir))
         .build()
@@ -2497,7 +2524,7 @@ async fn main() {
 
     let mut app = App::new("secretmanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240621")
+           .version("7.0.0+20251209")
            .about("Stores sensitive data such as API keys, passwords, and certificates. Provides convenience while improving security. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_secretmanager1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -2562,7 +2589,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

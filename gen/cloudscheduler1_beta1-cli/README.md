@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Scheduler* API at revision *20240615*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Scheduler* API at revision *20251212*. The CLI is at version *7.0.0*.
 
 ```bash
 cloudscheduler1-beta1 [options]
@@ -40,6 +40,10 @@ cloudscheduler1-beta1 [options]
                 locations-jobs-resume <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-jobs-run <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
+                locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-operations-delete <name> [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-operations-list <name> [-p <v>]... [-o <out>]
   cloudscheduler1-beta1 --help
 
 Configuration:

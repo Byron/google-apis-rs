@@ -1,4 +1,4 @@
-site_name: Firestore v6.0.0+20240617
+site_name: Firestore v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-firestore1_beta1-cli
 site_description: A complete library to interact with Firestore (protocol v1beta1)
 
@@ -16,6 +16,7 @@ nav:
     - 'Databases Documents Commit': 'projects_databases-documents-commit.md'
     - 'Databases Documents Create Document': 'projects_databases-documents-create-document.md'
     - 'Databases Documents Delete': 'projects_databases-documents-delete.md'
+    - 'Databases Documents Execute Pipeline': 'projects_databases-documents-execute-pipeline.md'
     - 'Databases Documents Get': 'projects_databases-documents-get.md'
     - 'Databases Documents List': 'projects_databases-documents-list.md'
     - 'Databases Documents List Collection Ids': 'projects_databases-documents-list-collection-ids.md'

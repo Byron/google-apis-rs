@@ -1,4 +1,4 @@
-site_name: Cloud Identity v6.0.0+20240625
+site_name: Cloud Identity v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-cloudidentity1-cli
 site_description: A complete library to interact with Cloud Identity (protocol v1)
 
@@ -54,6 +54,12 @@ nav:
     - 'Patch': 'groups_patch.md'
     - 'Search': 'groups_search.md'
     - 'Update Security Settings': 'groups_update-security-settings.md'
+- 'Inbound Oidc Sso Profiles':
+    - 'Create': 'inbound-oidc-sso-profiles_create.md'
+    - 'Delete': 'inbound-oidc-sso-profiles_delete.md'
+    - 'Get': 'inbound-oidc-sso-profiles_get.md'
+    - 'List': 'inbound-oidc-sso-profiles_list.md'
+    - 'Patch': 'inbound-oidc-sso-profiles_patch.md'
 - 'Inbound Saml Sso Profiles':
     - 'Create': 'inbound-saml-sso-profiles_create.md'
     - 'Delete': 'inbound-saml-sso-profiles_delete.md'
@@ -70,6 +76,9 @@ nav:
     - 'Get': 'inbound-sso-assignments_get.md'
     - 'List': 'inbound-sso-assignments_list.md'
     - 'Patch': 'inbound-sso-assignments_patch.md'
+- 'Policies':
+    - 'Get': 'policies_get.md'
+    - 'List': 'policies_list.md'
 
 theme: readthedocs
 

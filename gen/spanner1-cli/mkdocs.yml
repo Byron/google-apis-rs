@@ -1,4 +1,4 @@
-site_name: Spanner v6.0.0+20240618
+site_name: Spanner v7.0.0+20251205
 site_url: http://byron.github.io/google-apis-rs/google-spanner1-cli
 site_description: A complete library to interact with Spanner (protocol v1)
 
@@ -40,6 +40,15 @@ nav:
     - 'Instances Backups Test Iam Permissions': 'projects_instances-backups-test-iam-permissions.md'
     - 'Instances Create': 'projects_instances-create.md'
     - 'Instances Database Operations List': 'projects_instances-database-operations-list.md'
+    - 'Instances Databases Add Split Points': 'projects_instances-databases-add-split-points.md'
+    - 'Instances Databases Backup Schedules Create': 'projects_instances-databases-backup-schedules-create.md'
+    - 'Instances Databases Backup Schedules Delete': 'projects_instances-databases-backup-schedules-delete.md'
+    - 'Instances Databases Backup Schedules Get': 'projects_instances-databases-backup-schedules-get.md'
+    - 'Instances Databases Backup Schedules Get Iam Policy': 'projects_instances-databases-backup-schedules-get-iam-policy.md'
+    - 'Instances Databases Backup Schedules List': 'projects_instances-databases-backup-schedules-list.md'
+    - 'Instances Databases Backup Schedules Patch': 'projects_instances-databases-backup-schedules-patch.md'
+    - 'Instances Databases Backup Schedules Set Iam Policy': 'projects_instances-databases-backup-schedules-set-iam-policy.md'
+    - 'Instances Databases Backup Schedules Test Iam Permissions': 'projects_instances-databases-backup-schedules-test-iam-permissions.md'
     - 'Instances Databases Changequorum': 'projects_instances-databases-changequorum.md'
     - 'Instances Databases Create': 'projects_instances-databases-create.md'
     - 'Instances Databases Database Roles List': 'projects_instances-databases-database-roles-list.md'
@@ -56,6 +65,8 @@ nav:
     - 'Instances Databases Operations List': 'projects_instances-databases-operations-list.md'
     - 'Instances Databases Patch': 'projects_instances-databases-patch.md'
     - 'Instances Databases Restore': 'projects_instances-databases-restore.md'
+    - 'Instances Databases Sessions Adapt Message': 'projects_instances-databases-sessions-adapt-message.md'
+    - 'Instances Databases Sessions Adapter': 'projects_instances-databases-sessions-adapter.md'
     - 'Instances Databases Sessions Batch Create': 'projects_instances-databases-sessions-batch-create.md'
     - 'Instances Databases Sessions Batch Write': 'projects_instances-databases-sessions-batch-write.md'
     - 'Instances Databases Sessions Begin Transaction': 'projects_instances-databases-sessions-begin-transaction.md'

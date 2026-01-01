@@ -2771,6 +2771,7 @@ where
                     "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "relevance-threshold" => Some(("relevanceThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.allow-missing-ids" => Some(("requestMetadata.allowMissingIds", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "request-metadata.device-info.device-type" => Some(("requestMetadata.deviceInfo.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.device-info.id" => Some(("requestMetadata.deviceInfo.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2779,7 +2780,7 @@ where
                     "request-metadata.user-id" => Some(("requestMetadata.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-mode" => Some(("searchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "allow-missing-ids", "commute-filter", "commute-method", "companies", "company-display-names", "compensation-filter", "currency-code", "custom-attribute-filter", "custom-ranking-info", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "excluded-jobs", "hours", "id", "importance-level", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "keyword-match-mode", "language-codes", "latitude", "longitude", "max-compensation", "max-page-size", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-token", "publish-time-range", "query", "query-language-code", "range", "ranking-expression", "request-metadata", "road-traffic", "search-mode", "seconds", "session-id", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "allow-missing-ids", "commute-filter", "commute-method", "companies", "company-display-names", "compensation-filter", "currency-code", "custom-attribute-filter", "custom-ranking-info", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "excluded-jobs", "hours", "id", "importance-level", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "keyword-match-mode", "language-codes", "latitude", "longitude", "max-compensation", "max-page-size", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-token", "publish-time-range", "query", "query-language-code", "range", "ranking-expression", "relevance-threshold", "request-metadata", "road-traffic", "search-mode", "seconds", "session-id", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2943,6 +2944,7 @@ where
                     "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "relevance-threshold" => Some(("relevanceThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.allow-missing-ids" => Some(("requestMetadata.allowMissingIds", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "request-metadata.device-info.device-type" => Some(("requestMetadata.deviceInfo.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-metadata.device-info.id" => Some(("requestMetadata.deviceInfo.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2951,7 +2953,7 @@ where
                     "request-metadata.user-id" => Some(("requestMetadata.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-mode" => Some(("searchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "allow-missing-ids", "commute-filter", "commute-method", "companies", "company-display-names", "compensation-filter", "currency-code", "custom-attribute-filter", "custom-ranking-info", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "excluded-jobs", "hours", "id", "importance-level", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "keyword-match-mode", "language-codes", "latitude", "longitude", "max-compensation", "max-page-size", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-token", "publish-time-range", "query", "query-language-code", "range", "ranking-expression", "request-metadata", "road-traffic", "search-mode", "seconds", "session-id", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-imprecise-addresses", "allow-missing-ids", "commute-filter", "commute-method", "companies", "company-display-names", "compensation-filter", "currency-code", "custom-attribute-filter", "custom-ranking-info", "departure-time", "device-info", "device-type", "disable-keyword-match", "disable-spell-check", "diversification-level", "domain", "employment-types", "enable-broadening", "end-time", "excluded-jobs", "hours", "id", "importance-level", "include-jobs-with-unspecified-compensation-range", "job-categories", "job-query", "job-view", "keyword-match-mode", "language-codes", "latitude", "longitude", "max-compensation", "max-page-size", "min-compensation", "minutes", "nanos", "offset", "order-by", "page-token", "publish-time-range", "query", "query-language-code", "range", "ranking-expression", "relevance-threshold", "request-metadata", "road-traffic", "search-mode", "seconds", "session-id", "start-coordinates", "start-time", "travel-duration", "type", "units", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3441,7 +3443,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/jobs4", config_dir))
         .build()
@@ -4020,7 +4024,7 @@ async fn main() {
 
     let mut app = App::new("jobs4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240620")
+           .version("7.0.0+20251014")
            .about("Cloud Talent Solution provides the capability to create, read, update, and delete job postings, as well as search jobs based on keywords and filters. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_jobs4_cli")
            .arg(Arg::with_name("url")
@@ -4085,7 +4089,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

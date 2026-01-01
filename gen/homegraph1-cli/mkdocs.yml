@@ -1,0 +1,22 @@
+site_name: Home Graph Service v7.0.0+20251218
+site_url: http://byron.github.io/google-apis-rs/google-homegraph1-cli
+site_description: A complete library to interact with Home Graph Service (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/homegraph1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Agent Users':
+    - 'Delete': 'agent-users_delete.md'
+- 'Devices':
+    - 'Query': 'devices_query.md'
+    - 'Report State And Notification': 'devices_report-state-and-notification.md'
+    - 'Request Sync': 'devices_request-sync.md'
+    - 'Sync': 'devices_sync.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Display Video* API at revision *20240620*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Display Video* API at revision *20251204*. The CLI is at version *7.0.0*.
 
 ```bash
 displayvideo1 [options]
@@ -34,14 +34,11 @@ displayvideo1 [options]
                 audit <advertiser-id> [-p <v>]... [-o <out>]
                 bulk-edit-advertiser-assigned-targeting-options <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 bulk-list-advertiser-assigned-targeting-options <advertiser-id> [-p <v>]... [-o <out>]
-                campaigns-bulk-list-campaign-assigned-targeting-options <advertiser-id> <campaign-id> [-p <v>]... [-o <out>]
                 campaigns-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 campaigns-delete <advertiser-id> <campaign-id> [-p <v>]... [-o <out>]
                 campaigns-get <advertiser-id> <campaign-id> [-p <v>]... [-o <out>]
                 campaigns-list <advertiser-id> [-p <v>]... [-o <out>]
                 campaigns-patch <advertiser-id> <campaign-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                campaigns-targeting-types-assigned-targeting-options-get <advertiser-id> <campaign-id> <targeting-type> <assigned-targeting-option-id> [-p <v>]... [-o <out>]
-                campaigns-targeting-types-assigned-targeting-options-list <advertiser-id> <campaign-id> <targeting-type> [-p <v>]... [-o <out>]
                 channels-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 channels-get <advertiser-id> <channel-id> [-p <v>]... [-o <out>]
                 channels-list <advertiser-id> [-p <v>]... [-o <out>]
@@ -59,21 +56,17 @@ displayvideo1 [options]
                 creatives-patch <advertiser-id> <creative-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <advertiser-id> [-p <v>]... [-o <out>]
                 get <advertiser-id> [-p <v>]... [-o <out>]
-                insertion-orders-bulk-list-insertion-order-assigned-targeting-options <advertiser-id> <insertion-order-id> [-p <v>]... [-o <out>]
                 insertion-orders-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 insertion-orders-delete <advertiser-id> <insertion-order-id> [-p <v>]... [-o <out>]
                 insertion-orders-get <advertiser-id> <insertion-order-id> [-p <v>]... [-o <out>]
                 insertion-orders-list <advertiser-id> [-p <v>]... [-o <out>]
                 insertion-orders-patch <advertiser-id> <insertion-order-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                insertion-orders-targeting-types-assigned-targeting-options-get <advertiser-id> <insertion-order-id> <targeting-type> <assigned-targeting-option-id> [-p <v>]... [-o <out>]
-                insertion-orders-targeting-types-assigned-targeting-options-list <advertiser-id> <insertion-order-id> <targeting-type> [-p <v>]... [-o <out>]
                 invoices-list <advertiser-id> [-p <v>]... [-o <out>]
                 invoices-lookup-invoice-currency <advertiser-id> [-p <v>]... [-o <out>]
                 line-items-bulk-edit-line-item-assigned-targeting-options <advertiser-id> <line-item-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 line-items-bulk-list-line-item-assigned-targeting-options <advertiser-id> <line-item-id> [-p <v>]... [-o <out>]
                 line-items-create <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 line-items-delete <advertiser-id> <line-item-id> [-p <v>]... [-o <out>]
-                line-items-generate-default <advertiser-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 line-items-get <advertiser-id> <line-item-id> [-p <v>]... [-o <out>]
                 line-items-list <advertiser-id> [-p <v>]... [-o <out>]
                 line-items-patch <advertiser-id> <line-item-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -126,12 +119,6 @@ displayvideo1 [options]
         custom-lists
                 get <custom-list-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
-        first-and-third-party-audiences
-                create (-r <kv>)... [-p <v>]... [-o <out>]
-                edit-customer-match-members <first-and-third-party-audience-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                get <first-and-third-party-audience-id> [-p <v>]... [-o <out>]
-                list [-p <v>]... [-o <out>]
-                patch <first-and-third-party-audience-id> (-r <kv>)... [-p <v>]... [-o <out>]
         floodlight-groups
                 get <floodlight-group-id> [-p <v>]... [-o <out>]
                 patch <floodlight-group-id> (-r <kv>)... [-p <v>]... [-o <out>]

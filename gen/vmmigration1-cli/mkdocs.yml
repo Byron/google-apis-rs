@@ -1,4 +1,4 @@
-site_name: VM Migration Service v6.0.0+20240613
+site_name: VM Migration Service v7.0.0+20251204
 site_url: http://byron.github.io/google-apis-rs/google-vmmigration1-cli
 site_description: A complete library to interact with VM Migration Service (protocol v1)
 
@@ -37,7 +37,15 @@ nav:
     - 'Locations Sources Datacenter Connectors List': 'projects_locations-sources-datacenter-connectors-list.md'
     - 'Locations Sources Datacenter Connectors Upgrade Appliance': 'projects_locations-sources-datacenter-connectors-upgrade-appliance.md'
     - 'Locations Sources Delete': 'projects_locations-sources-delete.md'
+    - 'Locations Sources Disk Migration Jobs Cancel': 'projects_locations-sources-disk-migration-jobs-cancel.md'
+    - 'Locations Sources Disk Migration Jobs Create': 'projects_locations-sources-disk-migration-jobs-create.md'
+    - 'Locations Sources Disk Migration Jobs Delete': 'projects_locations-sources-disk-migration-jobs-delete.md'
+    - 'Locations Sources Disk Migration Jobs Get': 'projects_locations-sources-disk-migration-jobs-get.md'
+    - 'Locations Sources Disk Migration Jobs List': 'projects_locations-sources-disk-migration-jobs-list.md'
+    - 'Locations Sources Disk Migration Jobs Patch': 'projects_locations-sources-disk-migration-jobs-patch.md'
+    - 'Locations Sources Disk Migration Jobs Run': 'projects_locations-sources-disk-migration-jobs-run.md'
     - 'Locations Sources Fetch Inventory': 'projects_locations-sources-fetch-inventory.md'
+    - 'Locations Sources Fetch Storage Inventory': 'projects_locations-sources-fetch-storage-inventory.md'
     - 'Locations Sources Get': 'projects_locations-sources-get.md'
     - 'Locations Sources List': 'projects_locations-sources-list.md'
     - 'Locations Sources Migrating Vms Clone Jobs Cancel': 'projects_locations-sources-migrating-vms-clone-jobs-cancel.md'
@@ -50,6 +58,7 @@ nav:
     - 'Locations Sources Migrating Vms Cutover Jobs Get': 'projects_locations-sources-migrating-vms-cutover-jobs-get.md'
     - 'Locations Sources Migrating Vms Cutover Jobs List': 'projects_locations-sources-migrating-vms-cutover-jobs-list.md'
     - 'Locations Sources Migrating Vms Delete': 'projects_locations-sources-migrating-vms-delete.md'
+    - 'Locations Sources Migrating Vms Extend Migration': 'projects_locations-sources-migrating-vms-extend-migration.md'
     - 'Locations Sources Migrating Vms Finalize Migration': 'projects_locations-sources-migrating-vms-finalize-migration.md'
     - 'Locations Sources Migrating Vms Get': 'projects_locations-sources-migrating-vms-get.md'
     - 'Locations Sources Migrating Vms List': 'projects_locations-sources-migrating-vms-list.md'

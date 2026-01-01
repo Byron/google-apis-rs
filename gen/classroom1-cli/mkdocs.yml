@@ -1,4 +1,4 @@
-site_name: classroom v6.0.0+20240617
+site_name: classroom v7.0.0+20251217
 site_url: http://byron.github.io/google-apis-rs/google-classroom1-cli
 site_description: A complete library to interact with classroom (protocol v1)
 
@@ -39,6 +39,11 @@ nav:
     - 'Course Work List': 'courses_course-work-list.md'
     - 'Course Work Modify Assignees': 'courses_course-work-modify-assignees.md'
     - 'Course Work Patch': 'courses_course-work-patch.md'
+    - 'Course Work Rubrics Create': 'courses_course-work-rubrics-create.md'
+    - 'Course Work Rubrics Delete': 'courses_course-work-rubrics-delete.md'
+    - 'Course Work Rubrics Get': 'courses_course-work-rubrics-get.md'
+    - 'Course Work Rubrics List': 'courses_course-work-rubrics-list.md'
+    - 'Course Work Rubrics Patch': 'courses_course-work-rubrics-patch.md'
     - 'Course Work Student Submissions Get': 'courses_course-work-student-submissions-get.md'
     - 'Course Work Student Submissions List': 'courses_course-work-student-submissions-list.md'
     - 'Course Work Student Submissions Modify Attachments': 'courses_course-work-student-submissions-modify-attachments.md'
@@ -46,6 +51,7 @@ nav:
     - 'Course Work Student Submissions Reclaim': 'courses_course-work-student-submissions-reclaim.md'
     - 'Course Work Student Submissions Return': 'courses_course-work-student-submissions-return.md'
     - 'Course Work Student Submissions Turn In': 'courses_course-work-student-submissions-turn-in.md'
+    - 'Course Work Update Rubric': 'courses_course-work-update-rubric.md'
     - 'Course Work Materials Add On Attachments Create': 'courses_course-work-materials-add-on-attachments-create.md'
     - 'Course Work Materials Add On Attachments Delete': 'courses_course-work-materials-add-on-attachments-delete.md'
     - 'Course Work Materials Add On Attachments Get': 'courses_course-work-materials-add-on-attachments-get.md'
@@ -60,6 +66,7 @@ nav:
     - 'Create': 'courses_create.md'
     - 'Delete': 'courses_delete.md'
     - 'Get': 'courses_get.md'
+    - 'Get Grading Period Settings': 'courses_get-grading-period-settings.md'
     - 'List': 'courses_list.md'
     - 'Patch': 'courses_patch.md'
     - 'Posts Add On Attachments Create': 'courses_posts-add-on-attachments-create.md'
@@ -84,6 +91,7 @@ nav:
     - 'Topics List': 'courses_topics-list.md'
     - 'Topics Patch': 'courses_topics-patch.md'
     - 'Update': 'courses_update.md'
+    - 'Update Grading Period Settings': 'courses_update-grading-period-settings.md'
 - 'Invitations':
     - 'Accept': 'invitations_accept.md'
     - 'Create': 'invitations_create.md'

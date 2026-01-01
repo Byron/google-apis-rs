@@ -1,4 +1,4 @@
-site_name: Keep v6.0.0+20240618
+site_name: Keep v7.0.0+20251215
 site_url: http://byron.github.io/google-apis-rs/google-keep1-cli
 site_description: A complete library to interact with Keep (protocol v1)
 

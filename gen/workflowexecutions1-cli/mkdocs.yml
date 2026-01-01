@@ -1,4 +1,4 @@
-site_name: Workflow Executions v6.0.0+20240617
+site_name: Workflow Executions v7.0.0+20251202
 site_url: http://byron.github.io/google-apis-rs/google-workflowexecutions1-cli
 site_description: A complete library to interact with Workflow Executions (protocol v1)
 
@@ -13,6 +13,7 @@ nav:
     - 'Locations Workflows Executions Callbacks List': 'projects_locations-workflows-executions-callbacks-list.md'
     - 'Locations Workflows Executions Cancel': 'projects_locations-workflows-executions-cancel.md'
     - 'Locations Workflows Executions Create': 'projects_locations-workflows-executions-create.md'
+    - 'Locations Workflows Executions Delete Execution History': 'projects_locations-workflows-executions-delete-execution-history.md'
     - 'Locations Workflows Executions Export Data': 'projects_locations-workflows-executions-export-data.md'
     - 'Locations Workflows Executions Get': 'projects_locations-workflows-executions-get.md'
     - 'Locations Workflows Executions List': 'projects_locations-workflows-executions-list.md'

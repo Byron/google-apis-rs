@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *BigQuery Reservation* API at revision *20240611*. The CLI is at version *6.0.0*.
+This documentation was generated from the *BigQuery Reservation* API at revision *20251207*. The CLI is at version *7.0.0*.
 
 ```bash
 bigqueryreservation1 [options]
@@ -38,17 +38,27 @@ bigqueryreservation1 [options]
                 locations-capacity-commitments-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-capacity-commitments-split <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get-bi-reservation <name> [-p <v>]... [-o <out>]
+                locations-reservation-groups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-reservation-groups-delete <name> [-p <v>]... [-o <out>]
+                locations-reservation-groups-get <name> [-p <v>]... [-o <out>]
+                locations-reservation-groups-list <parent> [-p <v>]... [-o <out>]
                 locations-reservations-assignments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-reservations-assignments-delete <name> [-p <v>]... [-o <out>]
+                locations-reservations-assignments-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-reservations-assignments-list <parent> [-p <v>]... [-o <out>]
                 locations-reservations-assignments-move <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-reservations-assignments-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-reservations-assignments-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-reservations-assignments-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-reservations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-reservations-delete <name> [-p <v>]... [-o <out>]
                 locations-reservations-failover-reservation <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-reservations-get <name> [-p <v>]... [-o <out>]
+                locations-reservations-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-reservations-list <parent> [-p <v>]... [-o <out>]
                 locations-reservations-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-reservations-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-reservations-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-search-all-assignments <parent> [-p <v>]... [-o <out>]
                 locations-search-assignments <parent> [-p <v>]... [-o <out>]
                 locations-update-bi-reservation <name> (-r <kv>)... [-p <v>]... [-o <out>]

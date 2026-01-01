@@ -1,4 +1,4 @@
-site_name: Android Publisher v6.0.0+20240626
+site_name: Android Publisher v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher3-cli
 site_description: A complete library to interact with Android Publisher (protocol v3)
 
@@ -16,10 +16,10 @@ nav:
     - 'Device Tier Configs List': 'applications_device-tier-configs-list.md'
 - 'Apprecovery':
     - 'Add Targeting': 'apprecovery_add-targeting.md'
-    - 'App Recoveries': 'apprecovery_app-recoveries.md'
     - 'Cancel': 'apprecovery_cancel.md'
     - 'Create': 'apprecovery_create.md'
     - 'Deploy': 'apprecovery_deploy.md'
+    - 'List': 'apprecovery_list.md'
 - 'Edits':
     - 'Apks Addexternallyhosted': 'edits_apks-addexternallyhosted.md'
     - 'Apks List': 'edits_apks-list.md'
@@ -84,6 +84,23 @@ nav:
     - 'Uploadbundle': 'internalappsharingartifacts_uploadbundle.md'
 - 'Monetization':
     - 'Convert Region Prices': 'monetization_convert-region-prices.md'
+    - 'Onetimeproducts Batch Delete': 'monetization_onetimeproducts-batch-delete.md'
+    - 'Onetimeproducts Batch Get': 'monetization_onetimeproducts-batch-get.md'
+    - 'Onetimeproducts Batch Update': 'monetization_onetimeproducts-batch-update.md'
+    - 'Onetimeproducts Delete': 'monetization_onetimeproducts-delete.md'
+    - 'Onetimeproducts Get': 'monetization_onetimeproducts-get.md'
+    - 'Onetimeproducts List': 'monetization_onetimeproducts-list.md'
+    - 'Onetimeproducts Patch': 'monetization_onetimeproducts-patch.md'
+    - 'Onetimeproducts Purchase Options Batch Delete': 'monetization_onetimeproducts-purchase-options-batch-delete.md'
+    - 'Onetimeproducts Purchase Options Batch Update States': 'monetization_onetimeproducts-purchase-options-batch-update-states.md'
+    - 'Onetimeproducts Purchase Options Offers Activate': 'monetization_onetimeproducts-purchase-options-offers-activate.md'
+    - 'Onetimeproducts Purchase Options Offers Batch Delete': 'monetization_onetimeproducts-purchase-options-offers-batch-delete.md'
+    - 'Onetimeproducts Purchase Options Offers Batch Get': 'monetization_onetimeproducts-purchase-options-offers-batch-get.md'
+    - 'Onetimeproducts Purchase Options Offers Batch Update': 'monetization_onetimeproducts-purchase-options-offers-batch-update.md'
+    - 'Onetimeproducts Purchase Options Offers Batch Update States': 'monetization_onetimeproducts-purchase-options-offers-batch-update-states.md'
+    - 'Onetimeproducts Purchase Options Offers Cancel': 'monetization_onetimeproducts-purchase-options-offers-cancel.md'
+    - 'Onetimeproducts Purchase Options Offers Deactivate': 'monetization_onetimeproducts-purchase-options-offers-deactivate.md'
+    - 'Onetimeproducts Purchase Options Offers List': 'monetization_onetimeproducts-purchase-options-offers-list.md'
     - 'Subscriptions Archive': 'monetization_subscriptions-archive.md'
     - 'Subscriptions Base Plans Activate': 'monetization_subscriptions-base-plans-activate.md'
     - 'Subscriptions Base Plans Batch Migrate Prices': 'monetization_subscriptions-base-plans-batch-migrate-prices.md'
@@ -109,17 +126,21 @@ nav:
     - 'Subscriptions List': 'monetization_subscriptions-list.md'
     - 'Subscriptions Patch': 'monetization_subscriptions-patch.md'
 - 'Orders':
+    - 'Batchget': 'orders_batchget.md'
+    - 'Get': 'orders_get.md'
     - 'Refund': 'orders_refund.md'
 - 'Purchases':
     - 'Products Acknowledge': 'purchases_products-acknowledge.md'
     - 'Products Consume': 'purchases_products-consume.md'
     - 'Products Get': 'purchases_products-get.md'
+    - 'Productsv2 Getproductpurchasev2': 'purchases_productsv2-getproductpurchasev2.md'
     - 'Subscriptions Acknowledge': 'purchases_subscriptions-acknowledge.md'
     - 'Subscriptions Cancel': 'purchases_subscriptions-cancel.md'
     - 'Subscriptions Defer': 'purchases_subscriptions-defer.md'
     - 'Subscriptions Get': 'purchases_subscriptions-get.md'
     - 'Subscriptions Refund': 'purchases_subscriptions-refund.md'
     - 'Subscriptions Revoke': 'purchases_subscriptions-revoke.md'
+    - 'Subscriptionsv2 Cancel': 'purchases_subscriptionsv2-cancel.md'
     - 'Subscriptionsv2 Get': 'purchases_subscriptionsv2-get.md'
     - 'Subscriptionsv2 Revoke': 'purchases_subscriptionsv2-revoke.md'
     - 'Voidedpurchases List': 'purchases_voidedpurchases-list.md'

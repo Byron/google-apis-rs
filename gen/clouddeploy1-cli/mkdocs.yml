@@ -1,4 +1,4 @@
-site_name: Cloud Deploy v6.0.0+20240619
+site_name: Cloud Deploy v7.0.0+20251203
 site_url: http://byron.github.io/google-apis-rs/google-clouddeploy1-cli
 site_description: A complete library to interact with Cloud Deploy (protocol v1)
 
@@ -49,6 +49,13 @@ nav:
     - 'Locations Delivery Pipelines Rollback Target': 'projects_locations-delivery-pipelines-rollback-target.md'
     - 'Locations Delivery Pipelines Set Iam Policy': 'projects_locations-delivery-pipelines-set-iam-policy.md'
     - 'Locations Delivery Pipelines Test Iam Permissions': 'projects_locations-delivery-pipelines-test-iam-permissions.md'
+    - 'Locations Deploy Policies Create': 'projects_locations-deploy-policies-create.md'
+    - 'Locations Deploy Policies Delete': 'projects_locations-deploy-policies-delete.md'
+    - 'Locations Deploy Policies Get': 'projects_locations-deploy-policies-get.md'
+    - 'Locations Deploy Policies Get Iam Policy': 'projects_locations-deploy-policies-get-iam-policy.md'
+    - 'Locations Deploy Policies List': 'projects_locations-deploy-policies-list.md'
+    - 'Locations Deploy Policies Patch': 'projects_locations-deploy-policies-patch.md'
+    - 'Locations Deploy Policies Set Iam Policy': 'projects_locations-deploy-policies-set-iam-policy.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations Get Config': 'projects_locations-get-config.md'
     - 'Locations List': 'projects_locations-list.md'

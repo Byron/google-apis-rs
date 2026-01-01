@@ -1,4 +1,4 @@
-site_name: Cloud Scheduler v6.0.0+20240615
+site_name: Cloud Scheduler v7.0.0+20251212
 site_url: http://byron.github.io/google-apis-rs/google-cloudscheduler1-cli
 site_description: A complete library to interact with Cloud Scheduler (protocol v1)
 
@@ -11,6 +11,7 @@ nav:
 - Home: 'index.md'
 - 'Projects':
     - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Get Cmek Config': 'projects_locations-get-cmek-config.md'
     - 'Locations Jobs Create': 'projects_locations-jobs-create.md'
     - 'Locations Jobs Delete': 'projects_locations-jobs-delete.md'
     - 'Locations Jobs Get': 'projects_locations-jobs-get.md'
@@ -20,6 +21,11 @@ nav:
     - 'Locations Jobs Resume': 'projects_locations-jobs-resume.md'
     - 'Locations Jobs Run': 'projects_locations-jobs-run.md'
     - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Update Cmek Config': 'projects_locations-update-cmek-config.md'
 
 theme: readthedocs
 

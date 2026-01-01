@@ -1,4 +1,4 @@
-site_name: Display Video v6.0.0+20240620
+site_name: Display Video v7.0.0+20251204
 site_url: http://byron.github.io/google-apis-rs/google-displayvideo1-cli
 site_description: A complete library to interact with Display Video (protocol v1)
 
@@ -14,14 +14,11 @@ nav:
     - 'Audit': 'advertisers_audit.md'
     - 'Bulk Edit Advertiser Assigned Targeting Options': 'advertisers_bulk-edit-advertiser-assigned-targeting-options.md'
     - 'Bulk List Advertiser Assigned Targeting Options': 'advertisers_bulk-list-advertiser-assigned-targeting-options.md'
-    - 'Campaigns Bulk List Campaign Assigned Targeting Options': 'advertisers_campaigns-bulk-list-campaign-assigned-targeting-options.md'
     - 'Campaigns Create': 'advertisers_campaigns-create.md'
     - 'Campaigns Delete': 'advertisers_campaigns-delete.md'
     - 'Campaigns Get': 'advertisers_campaigns-get.md'
     - 'Campaigns List': 'advertisers_campaigns-list.md'
     - 'Campaigns Patch': 'advertisers_campaigns-patch.md'
-    - 'Campaigns Targeting Types Assigned Targeting Options Get': 'advertisers_campaigns-targeting-types-assigned-targeting-options-get.md'
-    - 'Campaigns Targeting Types Assigned Targeting Options List': 'advertisers_campaigns-targeting-types-assigned-targeting-options-list.md'
     - 'Channels Create': 'advertisers_channels-create.md'
     - 'Channels Get': 'advertisers_channels-get.md'
     - 'Channels List': 'advertisers_channels-list.md'
@@ -39,21 +36,17 @@ nav:
     - 'Creatives Patch': 'advertisers_creatives-patch.md'
     - 'Delete': 'advertisers_delete.md'
     - 'Get': 'advertisers_get.md'
-    - 'Insertion Orders Bulk List Insertion Order Assigned Targeting Options': 'advertisers_insertion-orders-bulk-list-insertion-order-assigned-targeting-options.md'
     - 'Insertion Orders Create': 'advertisers_insertion-orders-create.md'
     - 'Insertion Orders Delete': 'advertisers_insertion-orders-delete.md'
     - 'Insertion Orders Get': 'advertisers_insertion-orders-get.md'
     - 'Insertion Orders List': 'advertisers_insertion-orders-list.md'
     - 'Insertion Orders Patch': 'advertisers_insertion-orders-patch.md'
-    - 'Insertion Orders Targeting Types Assigned Targeting Options Get': 'advertisers_insertion-orders-targeting-types-assigned-targeting-options-get.md'
-    - 'Insertion Orders Targeting Types Assigned Targeting Options List': 'advertisers_insertion-orders-targeting-types-assigned-targeting-options-list.md'
     - 'Invoices List': 'advertisers_invoices-list.md'
     - 'Invoices Lookup Invoice Currency': 'advertisers_invoices-lookup-invoice-currency.md'
     - 'Line Items Bulk Edit Line Item Assigned Targeting Options': 'advertisers_line-items-bulk-edit-line-item-assigned-targeting-options.md'
     - 'Line Items Bulk List Line Item Assigned Targeting Options': 'advertisers_line-items-bulk-list-line-item-assigned-targeting-options.md'
     - 'Line Items Create': 'advertisers_line-items-create.md'
     - 'Line Items Delete': 'advertisers_line-items-delete.md'
-    - 'Line Items Generate Default': 'advertisers_line-items-generate-default.md'
     - 'Line Items Get': 'advertisers_line-items-get.md'
     - 'Line Items List': 'advertisers_line-items-list.md'
     - 'Line Items Patch': 'advertisers_line-items-patch.md'
@@ -106,12 +99,6 @@ nav:
 - 'Custom Lists':
     - 'Get': 'custom-lists_get.md'
     - 'List': 'custom-lists_list.md'
-- 'First And Third Party Audiences':
-    - 'Create': 'first-and-third-party-audiences_create.md'
-    - 'Edit Customer Match Members': 'first-and-third-party-audiences_edit-customer-match-members.md'
-    - 'Get': 'first-and-third-party-audiences_get.md'
-    - 'List': 'first-and-third-party-audiences_list.md'
-    - 'Patch': 'first-and-third-party-audiences_patch.md'
 - 'Floodlight Groups':
     - 'Get': 'floodlight-groups_get.md'
     - 'Patch': 'floodlight-groups_patch.md'

@@ -1,4 +1,4 @@
-site_name: Authorized Buyers Marketplace v6.0.0+20240625
+site_name: Authorized Buyers Marketplace v7.0.0+20251211
 site_url: http://byron.github.io/google-apis-rs/google-authorizedbuyersmarketplace1-cli
 site_description: A complete library to interact with Authorized Buyers Marketplace (protocol v1)
 
@@ -12,6 +12,7 @@ nav:
 - 'Bidders':
     - 'Auction Packages List': 'bidders_auction-packages-list.md'
     - 'Finalized Deals List': 'bidders_finalized-deals-list.md'
+    - 'Finalized Deals Set Ready To Serve': 'bidders_finalized-deals-set-ready-to-serve.md'
 - 'Buyers':
     - 'Auction Packages Get': 'buyers_auction-packages-get.md'
     - 'Auction Packages List': 'buyers_auction-packages-list.md'

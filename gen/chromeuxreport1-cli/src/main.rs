@@ -73,6 +73,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "collection-period-count" => Some((
+                    "collectionPeriodCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "form-factor" => Some((
                     "formFactor",
                     JsonTypeInfo {
@@ -104,7 +111,13 @@ where
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["form-factor", "metrics", "origin", "url"],
+                        &vec![
+                            "collection-period-count",
+                            "form-factor",
+                            "metrics",
+                            "origin",
+                            "url",
+                        ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -410,7 +423,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/chromeuxreport1", config_dir))
         .build()
@@ -509,7 +524,7 @@ async fn main() {
 
     let mut app = App::new("chromeuxreport1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251229")
            .about("The Chrome UX Report API lets you view real user experience data for millions of websites. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_chromeuxreport1_cli")
            .arg(Arg::with_name("folder")
@@ -569,7 +584,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

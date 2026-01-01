@@ -170,11 +170,13 @@ where
                     "event-publish-config.topic" => Some(("eventPublishConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gcs-bucket" => Some(("gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "logging-config.instance-cloud-logging-disabled" => Some(("loggingConfig.instanceCloudLoggingDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-exclusion-window.end-time" => Some(("maintenancePolicy.maintenanceExclusionWindow.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-exclusion-window.start-time" => Some(("maintenancePolicy.maintenanceExclusionWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-window.recurring-time-window.recurrence" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-window.recurring-time-window.window.end-time" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.window.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-window.recurring-time-window.window.start-time" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.window.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitoring-config.enable-instance-v2-metrics" => Some(("monitoringConfig.enableInstanceV2Metrics", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.connection-type" => Some(("networkConfig.connectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.ip-allocation" => Some(("networkConfig.ipAllocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -186,11 +188,13 @@ where
                     "p4-service-account" => Some(("p4ServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "patch-revision" => Some(("patchRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-instance" => Some(("privateInstance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-endpoint" => Some(("serviceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "tenant-project-id" => Some(("tenantProjectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -198,7 +202,7 @@ where
                     "workforce-identity-service-endpoint" => Some(("workforceIdentityServiceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "end-time", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "maintenance-exclusion-window", "maintenance-policy", "maintenance-window", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "recurrence", "recurring-time-window", "satisfies-pzs", "service-account", "service-endpoint", "start-time", "state", "state-message", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "window", "workforce-identity-service-endpoint", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-instance-v2-metrics", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "end-time", "event-publish-config", "gcs-bucket", "instance-cloud-logging-disabled", "ip-allocation", "key-reference", "labels", "logging-config", "maintenance-exclusion-window", "maintenance-policy", "maintenance-window", "monitoring-config", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "recurrence", "recurring-time-window", "satisfies-pzi", "satisfies-pzs", "service-account", "service-endpoint", "start-time", "state", "state-message", "tags", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "window", "workforce-identity-service-endpoint", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -311,6 +315,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "force" => {
+                    call = call.force(
+                        value
+                            .map(|v| arg_from_str(v, err, "force", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -328,6 +339,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["force"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -1521,11 +1533,13 @@ where
                     "event-publish-config.topic" => Some(("eventPublishConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gcs-bucket" => Some(("gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "logging-config.instance-cloud-logging-disabled" => Some(("loggingConfig.instanceCloudLoggingDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-exclusion-window.end-time" => Some(("maintenancePolicy.maintenanceExclusionWindow.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-exclusion-window.start-time" => Some(("maintenancePolicy.maintenanceExclusionWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-window.recurring-time-window.recurrence" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-window.recurring-time-window.window.end-time" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.window.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maintenance-policy.maintenance-window.recurring-time-window.window.start-time" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.window.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monitoring-config.enable-instance-v2-metrics" => Some(("monitoringConfig.enableInstanceV2Metrics", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.connection-type" => Some(("networkConfig.connectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.ip-allocation" => Some(("networkConfig.ipAllocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1537,11 +1551,13 @@ where
                     "p4-service-account" => Some(("p4ServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "patch-revision" => Some(("patchRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-instance" => Some(("privateInstance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-endpoint" => Some(("serviceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "tenant-project-id" => Some(("tenantProjectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1549,7 +1565,7 @@ where
                     "workforce-identity-service-endpoint" => Some(("workforceIdentityServiceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "end-time", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "maintenance-exclusion-window", "maintenance-policy", "maintenance-window", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "recurrence", "recurring-time-window", "satisfies-pzs", "service-account", "service-endpoint", "start-time", "state", "state-message", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "window", "workforce-identity-service-endpoint", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-instance-v2-metrics", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "end-time", "event-publish-config", "gcs-bucket", "instance-cloud-logging-disabled", "ip-allocation", "key-reference", "labels", "logging-config", "maintenance-exclusion-window", "maintenance-policy", "maintenance-window", "monitoring-config", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "recurrence", "recurring-time-window", "satisfies-pzi", "satisfies-pzs", "service-account", "service-endpoint", "start-time", "state", "state-message", "tags", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "window", "workforce-identity-service-endpoint", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2224,6 +2240,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2241,7 +2260,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2596,6 +2619,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2626,7 +2656,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -3086,7 +3125,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/datafusion1-beta1", config_dir))
         .build()
@@ -3566,7 +3607,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -3700,7 +3741,7 @@ async fn main() {
 
     let mut app = App::new("datafusion1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251203")
            .about("Cloud Data Fusion is a fully-managed, cloud native, enterprise data integration service for quickly building and managing data pipelines. It provides a graphical interface to increase time efficiency and reduce complexity, and allows business users, developers, and data scientists to easily and reliably build scalable data integration solutions to cleanse, prepare, blend, transfer and transform data without having to wrestle with infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -3765,7 +3806,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

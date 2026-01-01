@@ -288,13 +288,14 @@ where
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-config.bucket" => Some(("storageConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-byoid-uri", "airflow-config-overrides", "airflow-metadata-retention-config", "airflow-uri", "bucket", "cloud-composer-connection-subnetwork", "cloud-composer-network-ipv4-cidr-block", "cloud-composer-network-ipv4-reserved-range", "cloud-data-lineage-integration", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "composer-internal-ipv4-cidr-block", "composer-network-attachment", "config", "connection-type", "count", "cpu", "create-time", "dag-gcs-prefix", "dag-processor", "data-retention-config", "database-config", "disk-size-gb", "enable-ip-masq-agent", "enable-private-builds-only", "enable-private-endpoint", "enable-private-environment", "enable-privately-used-public-ips", "enabled", "encryption-config", "end-time", "env-variables", "environment-size", "gke-cluster", "image-version", "ip-allocation-policy", "kms-key-name", "labels", "location", "machine-type", "maintenance-window", "master-authorized-networks-config", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "max-count", "memory-gb", "min-count", "name", "network", "networking-config", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "recovery-config", "recurrence", "resilience-mode", "retention-days", "retention-mode", "satisfies-pzs", "scheduled-snapshots-config", "scheduler", "scheduler-count", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "snapshot-creation-schedule", "snapshot-location", "software-config", "start-time", "state", "storage-config", "storage-gb", "storage-mode", "subnetwork", "tags", "task-logs-retention-config", "time-zone", "triggerer", "update-time", "use-ip-aliases", "uuid", "web-server", "web-server-config", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range", "web-server-plugins-mode", "worker", "workloads-config", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-byoid-uri", "airflow-config-overrides", "airflow-metadata-retention-config", "airflow-uri", "bucket", "cloud-composer-connection-subnetwork", "cloud-composer-network-ipv4-cidr-block", "cloud-composer-network-ipv4-reserved-range", "cloud-data-lineage-integration", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "composer-internal-ipv4-cidr-block", "composer-network-attachment", "config", "connection-type", "count", "cpu", "create-time", "dag-gcs-prefix", "dag-processor", "data-retention-config", "database-config", "disk-size-gb", "enable-ip-masq-agent", "enable-private-builds-only", "enable-private-endpoint", "enable-private-environment", "enable-privately-used-public-ips", "enabled", "encryption-config", "end-time", "env-variables", "environment-size", "gke-cluster", "image-version", "ip-allocation-policy", "kms-key-name", "labels", "location", "machine-type", "maintenance-window", "master-authorized-networks-config", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "max-count", "memory-gb", "min-count", "name", "network", "networking-config", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "recovery-config", "recurrence", "resilience-mode", "retention-days", "retention-mode", "satisfies-pzi", "satisfies-pzs", "scheduled-snapshots-config", "scheduler", "scheduler-count", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "snapshot-creation-schedule", "snapshot-location", "software-config", "start-time", "state", "storage-config", "storage-gb", "storage-mode", "subnetwork", "tags", "task-logs-retention-config", "time-zone", "triggerer", "update-time", "use-ip-aliases", "uuid", "web-server", "web-server-config", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range", "web-server-plugins-mode", "worker", "workloads-config", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1291,13 +1292,14 @@ where
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-config.bucket" => Some(("storageConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-byoid-uri", "airflow-config-overrides", "airflow-metadata-retention-config", "airflow-uri", "bucket", "cloud-composer-connection-subnetwork", "cloud-composer-network-ipv4-cidr-block", "cloud-composer-network-ipv4-reserved-range", "cloud-data-lineage-integration", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "composer-internal-ipv4-cidr-block", "composer-network-attachment", "config", "connection-type", "count", "cpu", "create-time", "dag-gcs-prefix", "dag-processor", "data-retention-config", "database-config", "disk-size-gb", "enable-ip-masq-agent", "enable-private-builds-only", "enable-private-endpoint", "enable-private-environment", "enable-privately-used-public-ips", "enabled", "encryption-config", "end-time", "env-variables", "environment-size", "gke-cluster", "image-version", "ip-allocation-policy", "kms-key-name", "labels", "location", "machine-type", "maintenance-window", "master-authorized-networks-config", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "max-count", "memory-gb", "min-count", "name", "network", "networking-config", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "recovery-config", "recurrence", "resilience-mode", "retention-days", "retention-mode", "satisfies-pzs", "scheduled-snapshots-config", "scheduler", "scheduler-count", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "snapshot-creation-schedule", "snapshot-location", "software-config", "start-time", "state", "storage-config", "storage-gb", "storage-mode", "subnetwork", "tags", "task-logs-retention-config", "time-zone", "triggerer", "update-time", "use-ip-aliases", "uuid", "web-server", "web-server-config", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range", "web-server-plugins-mode", "worker", "workloads-config", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airflow-byoid-uri", "airflow-config-overrides", "airflow-metadata-retention-config", "airflow-uri", "bucket", "cloud-composer-connection-subnetwork", "cloud-composer-network-ipv4-cidr-block", "cloud-composer-network-ipv4-reserved-range", "cloud-data-lineage-integration", "cloud-sql-ipv4-cidr-block", "cluster-ipv4-cidr-block", "cluster-secondary-range-name", "composer-internal-ipv4-cidr-block", "composer-network-attachment", "config", "connection-type", "count", "cpu", "create-time", "dag-gcs-prefix", "dag-processor", "data-retention-config", "database-config", "disk-size-gb", "enable-ip-masq-agent", "enable-private-builds-only", "enable-private-endpoint", "enable-private-environment", "enable-privately-used-public-ips", "enabled", "encryption-config", "end-time", "env-variables", "environment-size", "gke-cluster", "image-version", "ip-allocation-policy", "kms-key-name", "labels", "location", "machine-type", "maintenance-window", "master-authorized-networks-config", "master-ipv4-cidr-block", "master-ipv4-reserved-range", "max-count", "memory-gb", "min-count", "name", "network", "networking-config", "node-config", "node-count", "oauth-scopes", "private-cluster-config", "private-environment-config", "pypi-packages", "python-version", "recovery-config", "recurrence", "resilience-mode", "retention-days", "retention-mode", "satisfies-pzi", "satisfies-pzs", "scheduled-snapshots-config", "scheduler", "scheduler-count", "service-account", "services-ipv4-cidr-block", "services-secondary-range-name", "snapshot-creation-schedule", "snapshot-location", "software-config", "start-time", "state", "storage-config", "storage-gb", "storage-mode", "subnetwork", "tags", "task-logs-retention-config", "time-zone", "triggerer", "update-time", "use-ip-aliases", "uuid", "web-server", "web-server-config", "web-server-ipv4-cidr-block", "web-server-ipv4-reserved-range", "web-server-plugins-mode", "worker", "workloads-config", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1487,6 +1489,134 @@ where
                 request,
                 opt.value_of("environment").unwrap_or(""),
             );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_environments_restart_web_server(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::RestartWebServerRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_environments_restart_web_server(request, opt.value_of("name").unwrap_or(""));
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -3328,6 +3458,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -3358,7 +3495,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -3473,6 +3619,11 @@ where
                         ._projects_locations_environments_poll_airflow_command(
                             opt, dry_run, &mut err,
                         )
+                        .await;
+                }
+                ("locations-environments-restart-web-server", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_environments_restart_web_server(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-environments-save-snapshot", Some(opt)) => {
@@ -3628,7 +3779,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/composer1", config_dir))
         .build()
@@ -3681,7 +3834,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-environments-check-upgrade', 'locations-environments-create', 'locations-environments-database-failover', 'locations-environments-delete', 'locations-environments-execute-airflow-command', 'locations-environments-fetch-database-properties', 'locations-environments-get', 'locations-environments-list', 'locations-environments-load-snapshot', 'locations-environments-patch', 'locations-environments-poll-airflow-command', 'locations-environments-save-snapshot', 'locations-environments-stop-airflow-command', 'locations-environments-user-workloads-config-maps-create', 'locations-environments-user-workloads-config-maps-delete', 'locations-environments-user-workloads-config-maps-get', 'locations-environments-user-workloads-config-maps-list', 'locations-environments-user-workloads-config-maps-update', 'locations-environments-user-workloads-secrets-create', 'locations-environments-user-workloads-secrets-delete', 'locations-environments-user-workloads-secrets-get', 'locations-environments-user-workloads-secrets-list', 'locations-environments-user-workloads-secrets-update', 'locations-environments-workloads-list', 'locations-image-versions-list', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-environments-check-upgrade', 'locations-environments-create', 'locations-environments-database-failover', 'locations-environments-delete', 'locations-environments-execute-airflow-command', 'locations-environments-fetch-database-properties', 'locations-environments-get', 'locations-environments-list', 'locations-environments-load-snapshot', 'locations-environments-patch', 'locations-environments-poll-airflow-command', 'locations-environments-restart-web-server', 'locations-environments-save-snapshot', 'locations-environments-stop-airflow-command', 'locations-environments-user-workloads-config-maps-create', 'locations-environments-user-workloads-config-maps-delete', 'locations-environments-user-workloads-config-maps-get', 'locations-environments-user-workloads-config-maps-list', 'locations-environments-user-workloads-config-maps-update', 'locations-environments-user-workloads-secrets-create', 'locations-environments-user-workloads-secrets-delete', 'locations-environments-user-workloads-secrets-get', 'locations-environments-user-workloads-secrets-list', 'locations-environments-user-workloads-secrets-update', 'locations-environments-workloads-list', 'locations-image-versions-list', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
             ("locations-environments-check-upgrade",
                     Some(r##"Check if an upgrade operation on the environment will succeed. In case of problems detailed info can be found in the returned Operation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-check-upgrade",
@@ -3937,6 +4090,31 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-environments-restart-web-server",
+                    Some(r##"Restart Airflow web server."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-restart-web-server",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the environment to restart the web server for, in the form: "projects/{projectId}/locations/{locationId}/environments/{environmentId}""##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-environments-save-snapshot",
                     Some(r##"Creates a snapshots of a Cloud Composer environment. As a result of this operation, snapshot of environment's state is stored in a location specified in the SaveSnapshotRequest."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-save-snapshot",
@@ -3988,7 +4166,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-config-maps-create",
-                    Some(r##"Creates a user workloads ConfigMap. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Creates a user workloads ConfigMap. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-config-maps-create",
                   vec![
                     (Some(r##"parent"##),
@@ -4013,7 +4191,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-config-maps-delete",
-                    Some(r##"Deletes a user workloads ConfigMap. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Deletes a user workloads ConfigMap. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-config-maps-delete",
                   vec![
                     (Some(r##"name"##),
@@ -4033,7 +4211,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-config-maps-get",
-                    Some(r##"Gets an existing user workloads ConfigMap. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Gets an existing user workloads ConfigMap. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-config-maps-get",
                   vec![
                     (Some(r##"name"##),
@@ -4053,7 +4231,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-config-maps-list",
-                    Some(r##"Lists user workloads ConfigMaps. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Lists user workloads ConfigMaps. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-config-maps-list",
                   vec![
                     (Some(r##"parent"##),
@@ -4073,7 +4251,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-config-maps-update",
-                    Some(r##"Updates a user workloads ConfigMap. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Updates a user workloads ConfigMap. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-config-maps-update",
                   vec![
                     (Some(r##"name"##),
@@ -4098,7 +4276,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-secrets-create",
-                    Some(r##"Creates a user workloads Secret. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Creates a user workloads Secret. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-secrets-create",
                   vec![
                     (Some(r##"parent"##),
@@ -4123,7 +4301,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-secrets-delete",
-                    Some(r##"Deletes a user workloads Secret. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Deletes a user workloads Secret. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-secrets-delete",
                   vec![
                     (Some(r##"name"##),
@@ -4143,7 +4321,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-secrets-get",
-                    Some(r##"Gets an existing user workloads Secret. Values of the "data" field in the response are cleared. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Gets an existing user workloads Secret. Values of the "data" field in the response are cleared. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-secrets-get",
                   vec![
                     (Some(r##"name"##),
@@ -4163,7 +4341,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-secrets-list",
-                    Some(r##"Lists user workloads Secrets. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Lists user workloads Secrets. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-secrets-list",
                   vec![
                     (Some(r##"parent"##),
@@ -4183,7 +4361,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-user-workloads-secrets-update",
-                    Some(r##"Updates a user workloads Secret. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Updates a user workloads Secret. This method is supported for Cloud Composer environments in versions composer-3-airflow-*.*.*-build.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-user-workloads-secrets-update",
                   vec![
                     (Some(r##"name"##),
@@ -4208,7 +4386,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-environments-workloads-list",
-                    Some(r##"Lists workloads in a Cloud Composer environment. Workload is a unit that runs a single Composer component. This method is supported for Cloud Composer environments in versions composer-3.*.*-airflow-*.*.* and newer."##),
+                    Some(r##"Lists workloads in a Cloud Composer environment. Workload is a unit that runs a single Composer component. This method is supported for Cloud Composer environments in versions composer-2.*.*-airflow-*.*.* and newer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-workloads-list",
                   vec![
                     (Some(r##"parent"##),
@@ -4312,7 +4490,7 @@ async fn main() {
 
     let mut app = App::new("composer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251209")
            .about("Manages Apache Airflow environments on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_composer1_cli")
            .arg(Arg::with_name("url")
@@ -4377,7 +4555,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

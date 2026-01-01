@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Cloud Trace* API can be found at the
-[official documentation site](https://cloud.google.com/trace).
+[official documentation site](https://cloud.google.com/trace/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Trace* API at revision *20240621*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Trace* API at revision *20251212*. The CLI is at version *7.0.0*.
 
 ```bash
 cloudtrace2 [options]

@@ -1044,7 +1044,7 @@ where
             &opt.value_of("metadata-id").unwrap_or(""),
             err,
             "<metadata-id>",
-            "integer",
+            "int32",
         );
         let mut call = self
             .hub
@@ -1277,6 +1277,15 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "exclude-tables-in-banded-ranges" => {
+                    call = call.exclude_tables_in_banded_ranges(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "exclude-tables-in-banded-ranges", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1294,7 +1303,15 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["include-grid-data", "ranges"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "exclude-tables-in-banded-ranges",
+                                        "include-grid-data",
+                                        "ranges",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1372,6 +1389,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "exclude-tables-in-banded-ranges" => Some((
+                    "excludeTablesInBandedRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "include-grid-data" => Some((
                     "includeGridData",
                     JsonTypeInfo {
@@ -1380,7 +1404,10 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["include-grid-data"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["exclude-tables-in-banded-ranges", "include-grid-data"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -1541,7 +1568,7 @@ where
             &opt.value_of("sheet-id").unwrap_or(""),
             err,
             "<sheet-id>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.spreadsheets().sheets_copy_to(
             request,
@@ -3172,7 +3199,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/sheets4", config_dir))
         .build()
@@ -3322,7 +3351,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. To retrieve only subsets of spreadsheet data, use the ranges URL parameter. Ranges are specified using [A1 notation](/sheets/api/guides/concepts#cell). You can define a single cell (for example, `A1`) or multiple cells (for example, `A1:D5`). You can also get cells from other sheets within the same spreadsheet (for example, `Sheet2!A1:C4`) or retrieve multiple ranges at once (for example, `?ranges=A1:D5&ranges=Sheet2!A1:C4`). Limiting the range returns only the portions of the spreadsheet that intersect the requested ranges."##),
+                    Some(r##"Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/workspace/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. To retrieve only subsets of spreadsheet data, use the ranges URL parameter. Ranges are specified using [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell). You can define a single cell (for example, `A1`) or multiple cells (for example, `A1:D5`). You can also get cells from other sheets within the same spreadsheet (for example, `Sheet2!A1:C4`) or retrieve multiple ranges at once (for example, `?ranges=A1:D5&ranges=Sheet2!A1:C4`). Limiting the range returns only the portions of the spreadsheet that intersect the requested ranges."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sheets4_cli/spreadsheets_get",
                   vec![
                     (Some(r##"spreadsheet-id"##),
@@ -3342,7 +3371,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get-by-data-filter",
-                    Some(r##"Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. This method differs from GetSpreadsheet in that it allows selecting which subsets of spreadsheet data to return by specifying a dataFilters parameter. Multiple DataFilters can be specified. Specifying one or more data filters returns the portions of the spreadsheet that intersect ranges matched by any of the filters. By default, data within grids is not returned. You can include grid data one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want."##),
+                    Some(r##"Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. This method differs from GetSpreadsheet in that it allows selecting which subsets of spreadsheet data to return by specifying a dataFilters parameter. Multiple DataFilters can be specified. Specifying one or more data filters returns the portions of the spreadsheet that intersect ranges matched by any of the filters. By default, data within grids is not returned. You can include grid data one of 2 ways: * Specify a [field mask](https://developers.google.com/workspace/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sheets4_cli/spreadsheets_get-by-data-filter",
                   vec![
                     (Some(r##"spreadsheet-id"##),
@@ -3397,7 +3426,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("values-append",
-                    Some(r##"Appends values to a spreadsheet. The input range is used to search for existing data and find a "table" within that range. Values will be appended to the next row of the table, starting with the first column of the table. See the [guide](/sheets/api/guides/values#appending_values) and [sample code](/sheets/api/samples/writing#append_values) for specific details of how tables are detected and data is appended. The caller must specify the spreadsheet ID, range, and a valueInputOption. The `valueInputOption` only controls how the input data will be added to the sheet (column-wise or row-wise), it does not influence what cell the data starts being written to."##),
+                    Some(r##"Appends values to a spreadsheet. The input range is used to search for existing data and find a "table" within that range. Values will be appended to the next row of the table, starting with the first column of the table. See the [guide](https://developers.google.com/workspace/sheets/api/guides/values#appending_values) and [sample code](https://developers.google.com/workspace/sheets/api/samples/writing#append_values) for specific details of how tables are detected and data is appended. The caller must specify the spreadsheet ID, range, and a valueInputOption. The `valueInputOption` only controls how the input data will be added to the sheet (column-wise or row-wise), it does not influence what cell the data starts being written to."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sheets4_cli/spreadsheets_values-append",
                   vec![
                     (Some(r##"spreadsheet-id"##),
@@ -3407,7 +3436,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"range"##),
                      None,
-                     Some(r##"The [A1 notation](/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table."##),
+                     Some(r##"The [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -3582,7 +3611,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"range"##),
                      None,
-                     Some(r##"The [A1 notation or R1C1 notation](/sheets/api/guides/concepts#cell) of the values to clear."##),
+                     Some(r##"The [A1 notation or R1C1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the values to clear."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -3612,7 +3641,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"range"##),
                      None,
-                     Some(r##"The [A1 notation or R1C1 notation](/sheets/api/guides/concepts#cell) of the range to retrieve values from."##),
+                     Some(r##"The [A1 notation or R1C1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the range to retrieve values from."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -3637,7 +3666,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"range"##),
                      None,
-                     Some(r##"The [A1 notation](/sheets/api/guides/concepts#cell) of the values to update."##),
+                     Some(r##"The [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the values to update."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -3661,7 +3690,7 @@ async fn main() {
 
     let mut app = App::new("sheets4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240621")
+           .version("7.0.0+20251215")
            .about("Reads and writes Google Sheets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sheets4_cli")
            .arg(Arg::with_name("url")
@@ -3726,7 +3755,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

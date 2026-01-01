@@ -749,926 +749,134 @@ where
                 continue;
             }
 
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "creation-time" => Some((
-                    "creationTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "deletion-time" => Some((
-                    "deletionTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "description" => Some((
-                    "description",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "event-stream.event-stream-expiration-time" => Some((
-                    "eventStream.eventStreamExpirationTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "event-stream.event-stream-start-time" => Some((
-                    "eventStream.eventStreamStartTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "event-stream.name" => Some((
-                    "eventStream.name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "last-modification-time" => Some((
-                    "lastModificationTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "latest-operation-name" => Some((
-                    "latestOperationName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "logging-config.enable-onprem-gcs-transfer-logs" => Some((
-                    "loggingConfig.enableOnpremGcsTransferLogs",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "logging-config.log-action-states" => Some((
-                    "loggingConfig.logActionStates",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "logging-config.log-actions" => Some((
-                    "loggingConfig.logActions",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "notification-config.event-types" => Some((
-                    "notificationConfig.eventTypes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "notification-config.payload-format" => Some((
-                    "notificationConfig.payloadFormat",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "notification-config.pubsub-topic" => Some((
-                    "notificationConfig.pubsubTopic",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "project-id" => Some((
-                    "projectId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.gcs-data-sink.bucket-name" => Some((
-                    "replicationSpec.gcsDataSink.bucketName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.gcs-data-sink.managed-folder-transfer-enabled" => Some((
-                    "replicationSpec.gcsDataSink.managedFolderTransferEnabled",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.gcs-data-sink.path" => Some((
-                    "replicationSpec.gcsDataSink.path",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.gcs-data-source.bucket-name" => Some((
-                    "replicationSpec.gcsDataSource.bucketName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.gcs-data-source.managed-folder-transfer-enabled" => Some((
-                    "replicationSpec.gcsDataSource.managedFolderTransferEnabled",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.gcs-data-source.path" => Some((
-                    "replicationSpec.gcsDataSource.path",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.object-conditions.exclude-prefixes" => Some((
-                    "replicationSpec.objectConditions.excludePrefixes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "replication-spec.object-conditions.include-prefixes" => Some((
-                    "replicationSpec.objectConditions.includePrefixes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "replication-spec.object-conditions.last-modified-before" => Some((
-                    "replicationSpec.objectConditions.lastModifiedBefore",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.object-conditions.last-modified-since" => Some((
-                    "replicationSpec.objectConditions.lastModifiedSince",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.object-conditions.max-time-elapsed-since-last-modification" => {
-                    Some((
-                        "replicationSpec.objectConditions.maxTimeElapsedSinceLastModification",
-                        JsonTypeInfo {
-                            jtype: JsonType::String,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "replication-spec.object-conditions.min-time-elapsed-since-last-modification" => {
-                    Some((
-                        "replicationSpec.objectConditions.minTimeElapsedSinceLastModification",
-                        JsonTypeInfo {
-                            jtype: JsonType::String,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "replication-spec.transfer-options.delete-objects-from-source-after-transfer" => {
-                    Some((
-                        "replicationSpec.transferOptions.deleteObjectsFromSourceAfterTransfer",
-                        JsonTypeInfo {
-                            jtype: JsonType::Boolean,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "replication-spec.transfer-options.delete-objects-unique-in-sink" => Some((
-                    "replicationSpec.transferOptions.deleteObjectsUniqueInSink",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.metadata-options.acl" => Some((
-                    "replicationSpec.transferOptions.metadataOptions.acl",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.metadata-options.gid" => Some((
-                    "replicationSpec.transferOptions.metadataOptions.gid",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.metadata-options.kms-key" => Some((
-                    "replicationSpec.transferOptions.metadataOptions.kmsKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.metadata-options.mode" => Some((
-                    "replicationSpec.transferOptions.metadataOptions.mode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.metadata-options.storage-class" => Some((
-                    "replicationSpec.transferOptions.metadataOptions.storageClass",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.metadata-options.symlink" => Some((
-                    "replicationSpec.transferOptions.metadataOptions.symlink",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.metadata-options.temporary-hold" => Some((
-                    "replicationSpec.transferOptions.metadataOptions.temporaryHold",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.metadata-options.time-created" => Some((
-                    "replicationSpec.transferOptions.metadataOptions.timeCreated",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.metadata-options.uid" => Some((
-                    "replicationSpec.transferOptions.metadataOptions.uid",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "replication-spec.transfer-options.overwrite-objects-already-existing-in-sink" => {
-                    Some((
-                        "replicationSpec.transferOptions.overwriteObjectsAlreadyExistingInSink",
-                        JsonTypeInfo {
-                            jtype: JsonType::Boolean,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "replication-spec.transfer-options.overwrite-when" => Some((
-                    "replicationSpec.transferOptions.overwriteWhen",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.end-time-of-day.hours" => Some((
-                    "schedule.endTimeOfDay.hours",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.end-time-of-day.minutes" => Some((
-                    "schedule.endTimeOfDay.minutes",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.end-time-of-day.nanos" => Some((
-                    "schedule.endTimeOfDay.nanos",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.end-time-of-day.seconds" => Some((
-                    "schedule.endTimeOfDay.seconds",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.repeat-interval" => Some((
-                    "schedule.repeatInterval",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.schedule-end-date.day" => Some((
-                    "schedule.scheduleEndDate.day",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.schedule-end-date.month" => Some((
-                    "schedule.scheduleEndDate.month",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.schedule-end-date.year" => Some((
-                    "schedule.scheduleEndDate.year",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.schedule-start-date.day" => Some((
-                    "schedule.scheduleStartDate.day",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.schedule-start-date.month" => Some((
-                    "schedule.scheduleStartDate.month",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.schedule-start-date.year" => Some((
-                    "schedule.scheduleStartDate.year",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.start-time-of-day.hours" => Some((
-                    "schedule.startTimeOfDay.hours",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.start-time-of-day.minutes" => Some((
-                    "schedule.startTimeOfDay.minutes",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.start-time-of-day.nanos" => Some((
-                    "schedule.startTimeOfDay.nanos",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "schedule.start-time-of-day.seconds" => Some((
-                    "schedule.startTimeOfDay.seconds",
-                    JsonTypeInfo {
-                        jtype: JsonType::Int,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "status" => Some((
-                    "status",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-compatible-data-source.bucket-name" => Some((
-                    "transferSpec.awsS3CompatibleDataSource.bucketName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-compatible-data-source.endpoint" => Some((
-                    "transferSpec.awsS3CompatibleDataSource.endpoint",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-compatible-data-source.path" => Some((
-                    "transferSpec.awsS3CompatibleDataSource.path",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-compatible-data-source.region" => Some((
-                    "transferSpec.awsS3CompatibleDataSource.region",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-compatible-data-source.s3-metadata.auth-method" => Some((
-                    "transferSpec.awsS3CompatibleDataSource.s3Metadata.authMethod",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-compatible-data-source.s3-metadata.list-api" => Some((
-                    "transferSpec.awsS3CompatibleDataSource.s3Metadata.listApi",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-compatible-data-source.s3-metadata.protocol" => Some((
-                    "transferSpec.awsS3CompatibleDataSource.s3Metadata.protocol",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-compatible-data-source.s3-metadata.request-model" => Some((
-                    "transferSpec.awsS3CompatibleDataSource.s3Metadata.requestModel",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-data-source.aws-access-key.access-key-id" => Some((
-                    "transferSpec.awsS3DataSource.awsAccessKey.accessKeyId",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-data-source.aws-access-key.secret-access-key" => Some((
-                    "transferSpec.awsS3DataSource.awsAccessKey.secretAccessKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-data-source.bucket-name" => Some((
-                    "transferSpec.awsS3DataSource.bucketName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-data-source.cloudfront-domain" => Some((
-                    "transferSpec.awsS3DataSource.cloudfrontDomain",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-data-source.credentials-secret" => Some((
-                    "transferSpec.awsS3DataSource.credentialsSecret",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-data-source.managed-private-network" => Some((
-                    "transferSpec.awsS3DataSource.managedPrivateNetwork",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-data-source.path" => Some((
-                    "transferSpec.awsS3DataSource.path",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.aws-s3-data-source.role-arn" => Some((
-                    "transferSpec.awsS3DataSource.roleArn",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.azure-blob-storage-data-source.azure-credentials.sas-token" => {
-                    Some((
-                        "transferSpec.azureBlobStorageDataSource.azureCredentials.sasToken",
-                        JsonTypeInfo {
-                            jtype: JsonType::String,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "transfer-spec.azure-blob-storage-data-source.container" => Some((
-                    "transferSpec.azureBlobStorageDataSource.container",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.azure-blob-storage-data-source.credentials-secret" => Some((
-                    "transferSpec.azureBlobStorageDataSource.credentialsSecret",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.azure-blob-storage-data-source.path" => Some((
-                    "transferSpec.azureBlobStorageDataSource.path",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.azure-blob-storage-data-source.storage-account" => Some((
-                    "transferSpec.azureBlobStorageDataSource.storageAccount",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.gcs-data-sink.bucket-name" => Some((
-                    "transferSpec.gcsDataSink.bucketName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.gcs-data-sink.managed-folder-transfer-enabled" => Some((
-                    "transferSpec.gcsDataSink.managedFolderTransferEnabled",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.gcs-data-sink.path" => Some((
-                    "transferSpec.gcsDataSink.path",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.gcs-data-source.bucket-name" => Some((
-                    "transferSpec.gcsDataSource.bucketName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.gcs-data-source.managed-folder-transfer-enabled" => Some((
-                    "transferSpec.gcsDataSource.managedFolderTransferEnabled",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.gcs-data-source.path" => Some((
-                    "transferSpec.gcsDataSource.path",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.gcs-intermediate-data-location.bucket-name" => Some((
-                    "transferSpec.gcsIntermediateDataLocation.bucketName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.gcs-intermediate-data-location.managed-folder-transfer-enabled" => {
-                    Some((
-                        "transferSpec.gcsIntermediateDataLocation.managedFolderTransferEnabled",
-                        JsonTypeInfo {
-                            jtype: JsonType::Boolean,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "transfer-spec.gcs-intermediate-data-location.path" => Some((
-                    "transferSpec.gcsIntermediateDataLocation.path",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.hdfs-data-source.path" => Some((
-                    "transferSpec.hdfsDataSource.path",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.http-data-source.list-url" => Some((
-                    "transferSpec.httpDataSource.listUrl",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.object-conditions.exclude-prefixes" => Some((
-                    "transferSpec.objectConditions.excludePrefixes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "transfer-spec.object-conditions.include-prefixes" => Some((
-                    "transferSpec.objectConditions.includePrefixes",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Vec,
-                    },
-                )),
-                "transfer-spec.object-conditions.last-modified-before" => Some((
-                    "transferSpec.objectConditions.lastModifiedBefore",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.object-conditions.last-modified-since" => Some((
-                    "transferSpec.objectConditions.lastModifiedSince",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.object-conditions.max-time-elapsed-since-last-modification" => {
-                    Some((
-                        "transferSpec.objectConditions.maxTimeElapsedSinceLastModification",
-                        JsonTypeInfo {
-                            jtype: JsonType::String,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "transfer-spec.object-conditions.min-time-elapsed-since-last-modification" => {
-                    Some((
-                        "transferSpec.objectConditions.minTimeElapsedSinceLastModification",
-                        JsonTypeInfo {
-                            jtype: JsonType::String,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "transfer-spec.posix-data-sink.root-directory" => Some((
-                    "transferSpec.posixDataSink.rootDirectory",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.posix-data-source.root-directory" => Some((
-                    "transferSpec.posixDataSource.rootDirectory",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.sink-agent-pool-name" => Some((
-                    "transferSpec.sinkAgentPoolName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.source-agent-pool-name" => Some((
-                    "transferSpec.sourceAgentPoolName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-manifest.location" => Some((
-                    "transferSpec.transferManifest.location",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.delete-objects-from-source-after-transfer" => {
-                    Some((
-                        "transferSpec.transferOptions.deleteObjectsFromSourceAfterTransfer",
-                        JsonTypeInfo {
-                            jtype: JsonType::Boolean,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "transfer-spec.transfer-options.delete-objects-unique-in-sink" => Some((
-                    "transferSpec.transferOptions.deleteObjectsUniqueInSink",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.metadata-options.acl" => Some((
-                    "transferSpec.transferOptions.metadataOptions.acl",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.metadata-options.gid" => Some((
-                    "transferSpec.transferOptions.metadataOptions.gid",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.metadata-options.kms-key" => Some((
-                    "transferSpec.transferOptions.metadataOptions.kmsKey",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.metadata-options.mode" => Some((
-                    "transferSpec.transferOptions.metadataOptions.mode",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.metadata-options.storage-class" => Some((
-                    "transferSpec.transferOptions.metadataOptions.storageClass",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.metadata-options.symlink" => Some((
-                    "transferSpec.transferOptions.metadataOptions.symlink",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.metadata-options.temporary-hold" => Some((
-                    "transferSpec.transferOptions.metadataOptions.temporaryHold",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.metadata-options.time-created" => Some((
-                    "transferSpec.transferOptions.metadataOptions.timeCreated",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.metadata-options.uid" => Some((
-                    "transferSpec.transferOptions.metadataOptions.uid",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "transfer-spec.transfer-options.overwrite-objects-already-existing-in-sink" => {
-                    Some((
-                        "transferSpec.transferOptions.overwriteObjectsAlreadyExistingInSink",
-                        JsonTypeInfo {
-                            jtype: JsonType::Boolean,
-                            ctype: ComplexType::Pod,
-                        },
-                    ))
-                }
-                "transfer-spec.transfer-options.overwrite-when" => Some((
-                    "transferSpec.transferOptions.overwriteWhen",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "access-key-id",
-                            "acl",
-                            "auth-method",
-                            "aws-access-key",
-                            "aws-s3-compatible-data-source",
-                            "aws-s3-data-source",
-                            "azure-blob-storage-data-source",
-                            "azure-credentials",
-                            "bucket-name",
-                            "cloudfront-domain",
-                            "container",
-                            "creation-time",
-                            "credentials-secret",
-                            "day",
-                            "delete-objects-from-source-after-transfer",
-                            "delete-objects-unique-in-sink",
-                            "deletion-time",
-                            "description",
-                            "enable-onprem-gcs-transfer-logs",
-                            "end-time-of-day",
-                            "endpoint",
-                            "event-stream",
-                            "event-stream-expiration-time",
-                            "event-stream-start-time",
-                            "event-types",
-                            "exclude-prefixes",
-                            "gcs-data-sink",
-                            "gcs-data-source",
-                            "gcs-intermediate-data-location",
-                            "gid",
-                            "hdfs-data-source",
-                            "hours",
-                            "http-data-source",
-                            "include-prefixes",
-                            "kms-key",
-                            "last-modification-time",
-                            "last-modified-before",
-                            "last-modified-since",
-                            "latest-operation-name",
-                            "list-api",
-                            "list-url",
-                            "location",
-                            "log-action-states",
-                            "log-actions",
-                            "logging-config",
-                            "managed-folder-transfer-enabled",
-                            "managed-private-network",
-                            "max-time-elapsed-since-last-modification",
-                            "metadata-options",
-                            "min-time-elapsed-since-last-modification",
-                            "minutes",
-                            "mode",
-                            "month",
-                            "name",
-                            "nanos",
-                            "notification-config",
-                            "object-conditions",
-                            "overwrite-objects-already-existing-in-sink",
-                            "overwrite-when",
-                            "path",
-                            "payload-format",
-                            "posix-data-sink",
-                            "posix-data-source",
-                            "project-id",
-                            "protocol",
-                            "pubsub-topic",
-                            "region",
-                            "repeat-interval",
-                            "replication-spec",
-                            "request-model",
-                            "role-arn",
-                            "root-directory",
-                            "s3-metadata",
-                            "sas-token",
-                            "schedule",
-                            "schedule-end-date",
-                            "schedule-start-date",
-                            "seconds",
-                            "secret-access-key",
-                            "sink-agent-pool-name",
-                            "source-agent-pool-name",
-                            "start-time-of-day",
-                            "status",
-                            "storage-account",
-                            "storage-class",
-                            "symlink",
-                            "temporary-hold",
-                            "time-created",
-                            "transfer-manifest",
-                            "transfer-options",
-                            "transfer-spec",
-                            "uid",
-                            "year",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deletion-time" => Some(("deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-stream.event-stream-expiration-time" => Some(("eventStream.eventStreamExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-stream.event-stream-start-time" => Some(("eventStream.eventStreamStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-stream.name" => Some(("eventStream.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-modification-time" => Some(("lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-operation-name" => Some(("latestOperationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "logging-config.enable-onprem-gcs-transfer-logs" => Some(("loggingConfig.enableOnpremGcsTransferLogs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "logging-config.log-action-states" => Some(("loggingConfig.logActionStates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "logging-config.log-actions" => Some(("loggingConfig.logActions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-config.event-types" => Some(("notificationConfig.eventTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "notification-config.payload-format" => Some(("notificationConfig.payloadFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification-config.pubsub-topic" => Some(("notificationConfig.pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.gcs-data-sink.bucket-name" => Some(("replicationSpec.gcsDataSink.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.gcs-data-sink.managed-folder-transfer-enabled" => Some(("replicationSpec.gcsDataSink.managedFolderTransferEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replication-spec.gcs-data-sink.path" => Some(("replicationSpec.gcsDataSink.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.gcs-data-source.bucket-name" => Some(("replicationSpec.gcsDataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.gcs-data-source.managed-folder-transfer-enabled" => Some(("replicationSpec.gcsDataSource.managedFolderTransferEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replication-spec.gcs-data-source.path" => Some(("replicationSpec.gcsDataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.object-conditions.exclude-prefixes" => Some(("replicationSpec.objectConditions.excludePrefixes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "replication-spec.object-conditions.include-prefixes" => Some(("replicationSpec.objectConditions.includePrefixes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "replication-spec.object-conditions.last-modified-before" => Some(("replicationSpec.objectConditions.lastModifiedBefore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.object-conditions.last-modified-since" => Some(("replicationSpec.objectConditions.lastModifiedSince", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.object-conditions.match-glob" => Some(("replicationSpec.objectConditions.matchGlob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.object-conditions.max-time-elapsed-since-last-modification" => Some(("replicationSpec.objectConditions.maxTimeElapsedSinceLastModification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.object-conditions.min-time-elapsed-since-last-modification" => Some(("replicationSpec.objectConditions.minTimeElapsedSinceLastModification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.delete-objects-from-source-after-transfer" => Some(("replicationSpec.transferOptions.deleteObjectsFromSourceAfterTransfer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.delete-objects-unique-in-sink" => Some(("replicationSpec.transferOptions.deleteObjectsUniqueInSink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.metadata-options.acl" => Some(("replicationSpec.transferOptions.metadataOptions.acl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.metadata-options.gid" => Some(("replicationSpec.transferOptions.metadataOptions.gid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.metadata-options.kms-key" => Some(("replicationSpec.transferOptions.metadataOptions.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.metadata-options.mode" => Some(("replicationSpec.transferOptions.metadataOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.metadata-options.storage-class" => Some(("replicationSpec.transferOptions.metadataOptions.storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.metadata-options.symlink" => Some(("replicationSpec.transferOptions.metadataOptions.symlink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.metadata-options.temporary-hold" => Some(("replicationSpec.transferOptions.metadataOptions.temporaryHold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.metadata-options.time-created" => Some(("replicationSpec.transferOptions.metadataOptions.timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.metadata-options.uid" => Some(("replicationSpec.transferOptions.metadataOptions.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.overwrite-objects-already-existing-in-sink" => Some(("replicationSpec.transferOptions.overwriteObjectsAlreadyExistingInSink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replication-spec.transfer-options.overwrite-when" => Some(("replicationSpec.transferOptions.overwriteWhen", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule.end-time-of-day.hours" => Some(("schedule.endTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.end-time-of-day.minutes" => Some(("schedule.endTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.end-time-of-day.nanos" => Some(("schedule.endTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.end-time-of-day.seconds" => Some(("schedule.endTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.repeat-interval" => Some(("schedule.repeatInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule.schedule-end-date.day" => Some(("schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.schedule-end-date.month" => Some(("schedule.scheduleEndDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.schedule-end-date.year" => Some(("schedule.scheduleEndDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.schedule-start-date.day" => Some(("schedule.scheduleStartDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.schedule-start-date.month" => Some(("schedule.scheduleStartDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.schedule-start-date.year" => Some(("schedule.scheduleStartDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.hours" => Some(("schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.minutes" => Some(("schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.nanos" => Some(("schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.seconds" => Some(("schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.bucket-name" => Some(("transferSpec.awsS3CompatibleDataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.endpoint" => Some(("transferSpec.awsS3CompatibleDataSource.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.path" => Some(("transferSpec.awsS3CompatibleDataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.region" => Some(("transferSpec.awsS3CompatibleDataSource.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.s3-metadata.auth-method" => Some(("transferSpec.awsS3CompatibleDataSource.s3Metadata.authMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.s3-metadata.list-api" => Some(("transferSpec.awsS3CompatibleDataSource.s3Metadata.listApi", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.s3-metadata.protocol" => Some(("transferSpec.awsS3CompatibleDataSource.s3Metadata.protocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-compatible-data-source.s3-metadata.request-model" => Some(("transferSpec.awsS3CompatibleDataSource.s3Metadata.requestModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-data-source.aws-access-key.access-key-id" => Some(("transferSpec.awsS3DataSource.awsAccessKey.accessKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-data-source.aws-access-key.secret-access-key" => Some(("transferSpec.awsS3DataSource.awsAccessKey.secretAccessKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-data-source.bucket-name" => Some(("transferSpec.awsS3DataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-data-source.cloudfront-domain" => Some(("transferSpec.awsS3DataSource.cloudfrontDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-data-source.credentials-secret" => Some(("transferSpec.awsS3DataSource.credentialsSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-data-source.managed-private-network" => Some(("transferSpec.awsS3DataSource.managedPrivateNetwork", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-data-source.path" => Some(("transferSpec.awsS3DataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-data-source.private-network-service" => Some(("transferSpec.awsS3DataSource.privateNetworkService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.aws-s3-data-source.role-arn" => Some(("transferSpec.awsS3DataSource.roleArn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.azure-blob-storage-data-source.azure-credentials.sas-token" => Some(("transferSpec.azureBlobStorageDataSource.azureCredentials.sasToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.azure-blob-storage-data-source.container" => Some(("transferSpec.azureBlobStorageDataSource.container", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.azure-blob-storage-data-source.credentials-secret" => Some(("transferSpec.azureBlobStorageDataSource.credentialsSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.azure-blob-storage-data-source.federated-identity-config.client-id" => Some(("transferSpec.azureBlobStorageDataSource.federatedIdentityConfig.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.azure-blob-storage-data-source.federated-identity-config.tenant-id" => Some(("transferSpec.azureBlobStorageDataSource.federatedIdentityConfig.tenantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.azure-blob-storage-data-source.path" => Some(("transferSpec.azureBlobStorageDataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.azure-blob-storage-data-source.private-network-service" => Some(("transferSpec.azureBlobStorageDataSource.privateNetworkService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.azure-blob-storage-data-source.storage-account" => Some(("transferSpec.azureBlobStorageDataSource.storageAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.gcs-data-sink.bucket-name" => Some(("transferSpec.gcsDataSink.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.gcs-data-sink.managed-folder-transfer-enabled" => Some(("transferSpec.gcsDataSink.managedFolderTransferEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-spec.gcs-data-sink.path" => Some(("transferSpec.gcsDataSink.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.gcs-data-source.bucket-name" => Some(("transferSpec.gcsDataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.gcs-data-source.managed-folder-transfer-enabled" => Some(("transferSpec.gcsDataSource.managedFolderTransferEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-spec.gcs-data-source.path" => Some(("transferSpec.gcsDataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.gcs-intermediate-data-location.bucket-name" => Some(("transferSpec.gcsIntermediateDataLocation.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.gcs-intermediate-data-location.managed-folder-transfer-enabled" => Some(("transferSpec.gcsIntermediateDataLocation.managedFolderTransferEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-spec.gcs-intermediate-data-location.path" => Some(("transferSpec.gcsIntermediateDataLocation.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.hdfs-data-source.path" => Some(("transferSpec.hdfsDataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.http-data-source.list-url" => Some(("transferSpec.httpDataSource.listUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.object-conditions.exclude-prefixes" => Some(("transferSpec.objectConditions.excludePrefixes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "transfer-spec.object-conditions.include-prefixes" => Some(("transferSpec.objectConditions.includePrefixes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "transfer-spec.object-conditions.last-modified-before" => Some(("transferSpec.objectConditions.lastModifiedBefore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.object-conditions.last-modified-since" => Some(("transferSpec.objectConditions.lastModifiedSince", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.object-conditions.match-glob" => Some(("transferSpec.objectConditions.matchGlob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.object-conditions.max-time-elapsed-since-last-modification" => Some(("transferSpec.objectConditions.maxTimeElapsedSinceLastModification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.object-conditions.min-time-elapsed-since-last-modification" => Some(("transferSpec.objectConditions.minTimeElapsedSinceLastModification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.posix-data-sink.root-directory" => Some(("transferSpec.posixDataSink.rootDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.posix-data-source.root-directory" => Some(("transferSpec.posixDataSource.rootDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.sink-agent-pool-name" => Some(("transferSpec.sinkAgentPoolName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.source-agent-pool-name" => Some(("transferSpec.sourceAgentPoolName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-manifest.location" => Some(("transferSpec.transferManifest.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.delete-objects-from-source-after-transfer" => Some(("transferSpec.transferOptions.deleteObjectsFromSourceAfterTransfer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.delete-objects-unique-in-sink" => Some(("transferSpec.transferOptions.deleteObjectsUniqueInSink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.metadata-options.acl" => Some(("transferSpec.transferOptions.metadataOptions.acl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.metadata-options.gid" => Some(("transferSpec.transferOptions.metadataOptions.gid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.metadata-options.kms-key" => Some(("transferSpec.transferOptions.metadataOptions.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.metadata-options.mode" => Some(("transferSpec.transferOptions.metadataOptions.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.metadata-options.storage-class" => Some(("transferSpec.transferOptions.metadataOptions.storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.metadata-options.symlink" => Some(("transferSpec.transferOptions.metadataOptions.symlink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.metadata-options.temporary-hold" => Some(("transferSpec.transferOptions.metadataOptions.temporaryHold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.metadata-options.time-created" => Some(("transferSpec.transferOptions.metadataOptions.timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.metadata-options.uid" => Some(("transferSpec.transferOptions.metadataOptions.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.overwrite-objects-already-existing-in-sink" => Some(("transferSpec.transferOptions.overwriteObjectsAlreadyExistingInSink", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-spec.transfer-options.overwrite-when" => Some(("transferSpec.transferOptions.overwriteWhen", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "acl", "auth-method", "aws-access-key", "aws-s3-compatible-data-source", "aws-s3-data-source", "azure-blob-storage-data-source", "azure-credentials", "bucket-name", "client-id", "cloudfront-domain", "container", "creation-time", "credentials-secret", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "enable-onprem-gcs-transfer-logs", "end-time-of-day", "endpoint", "event-stream", "event-stream-expiration-time", "event-stream-start-time", "event-types", "exclude-prefixes", "federated-identity-config", "gcs-data-sink", "gcs-data-source", "gcs-intermediate-data-location", "gid", "hdfs-data-source", "hours", "http-data-source", "include-prefixes", "kms-key", "last-modification-time", "last-modified-before", "last-modified-since", "latest-operation-name", "list-api", "list-url", "location", "log-action-states", "log-actions", "logging-config", "managed-folder-transfer-enabled", "managed-private-network", "match-glob", "max-time-elapsed-since-last-modification", "metadata-options", "min-time-elapsed-since-last-modification", "minutes", "mode", "month", "name", "nanos", "notification-config", "object-conditions", "overwrite-objects-already-existing-in-sink", "overwrite-when", "path", "payload-format", "posix-data-sink", "posix-data-source", "private-network-service", "project-id", "protocol", "pubsub-topic", "region", "repeat-interval", "replication-spec", "request-model", "role-arn", "root-directory", "s3-metadata", "sas-token", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "service-account", "sink-agent-pool-name", "source-agent-pool-name", "start-time-of-day", "status", "storage-account", "storage-class", "symlink", "temporary-hold", "tenant-id", "time-created", "transfer-manifest", "transfer-options", "transfer-spec", "uid", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
             if let Some((field_cursor_str, type_info)) = type_info {
                 FieldCursor::from(field_cursor_str).set_json_value(
                     &mut object,
@@ -2064,6 +1272,7 @@ where
                     "transfer-job.replication-spec.object-conditions.include-prefixes" => Some(("transferJob.replicationSpec.objectConditions.includePrefixes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "transfer-job.replication-spec.object-conditions.last-modified-before" => Some(("transferJob.replicationSpec.objectConditions.lastModifiedBefore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.replication-spec.object-conditions.last-modified-since" => Some(("transferJob.replicationSpec.objectConditions.lastModifiedSince", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.replication-spec.object-conditions.match-glob" => Some(("transferJob.replicationSpec.objectConditions.matchGlob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.replication-spec.object-conditions.max-time-elapsed-since-last-modification" => Some(("transferJob.replicationSpec.objectConditions.maxTimeElapsedSinceLastModification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.replication-spec.object-conditions.min-time-elapsed-since-last-modification" => Some(("transferJob.replicationSpec.objectConditions.minTimeElapsedSinceLastModification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.replication-spec.transfer-options.delete-objects-from-source-after-transfer" => Some(("transferJob.replicationSpec.transferOptions.deleteObjectsFromSourceAfterTransfer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2094,6 +1303,7 @@ where
                     "transfer-job.schedule.start-time-of-day.minutes" => Some(("transferJob.schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.start-time-of-day.nanos" => Some(("transferJob.schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.start-time-of-day.seconds" => Some(("transferJob.schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.service-account" => Some(("transferJob.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.status" => Some(("transferJob.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.aws-s3-compatible-data-source.bucket-name" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.aws-s3-compatible-data-source.endpoint" => Some(("transferJob.transferSpec.awsS3CompatibleDataSource.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2110,11 +1320,15 @@ where
                     "transfer-job.transfer-spec.aws-s3-data-source.credentials-secret" => Some(("transferJob.transferSpec.awsS3DataSource.credentialsSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.aws-s3-data-source.managed-private-network" => Some(("transferJob.transferSpec.awsS3DataSource.managedPrivateNetwork", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.aws-s3-data-source.path" => Some(("transferJob.transferSpec.awsS3DataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.aws-s3-data-source.private-network-service" => Some(("transferJob.transferSpec.awsS3DataSource.privateNetworkService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.aws-s3-data-source.role-arn" => Some(("transferJob.transferSpec.awsS3DataSource.roleArn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.azure-blob-storage-data-source.azure-credentials.sas-token" => Some(("transferJob.transferSpec.azureBlobStorageDataSource.azureCredentials.sasToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.azure-blob-storage-data-source.container" => Some(("transferJob.transferSpec.azureBlobStorageDataSource.container", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.azure-blob-storage-data-source.credentials-secret" => Some(("transferJob.transferSpec.azureBlobStorageDataSource.credentialsSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.azure-blob-storage-data-source.federated-identity-config.client-id" => Some(("transferJob.transferSpec.azureBlobStorageDataSource.federatedIdentityConfig.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.azure-blob-storage-data-source.federated-identity-config.tenant-id" => Some(("transferJob.transferSpec.azureBlobStorageDataSource.federatedIdentityConfig.tenantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.azure-blob-storage-data-source.path" => Some(("transferJob.transferSpec.azureBlobStorageDataSource.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.azure-blob-storage-data-source.private-network-service" => Some(("transferJob.transferSpec.azureBlobStorageDataSource.privateNetworkService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.azure-blob-storage-data-source.storage-account" => Some(("transferJob.transferSpec.azureBlobStorageDataSource.storageAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.gcs-data-sink.bucket-name" => Some(("transferJob.transferSpec.gcsDataSink.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.gcs-data-sink.managed-folder-transfer-enabled" => Some(("transferJob.transferSpec.gcsDataSink.managedFolderTransferEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2131,6 +1345,7 @@ where
                     "transfer-job.transfer-spec.object-conditions.include-prefixes" => Some(("transferJob.transferSpec.objectConditions.includePrefixes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "transfer-job.transfer-spec.object-conditions.last-modified-before" => Some(("transferJob.transferSpec.objectConditions.lastModifiedBefore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.object-conditions.last-modified-since" => Some(("transferJob.transferSpec.objectConditions.lastModifiedSince", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.transfer-spec.object-conditions.match-glob" => Some(("transferJob.transferSpec.objectConditions.matchGlob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.object-conditions.max-time-elapsed-since-last-modification" => Some(("transferJob.transferSpec.objectConditions.maxTimeElapsedSinceLastModification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.object-conditions.min-time-elapsed-since-last-modification" => Some(("transferJob.transferSpec.objectConditions.minTimeElapsedSinceLastModification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.transfer-spec.posix-data-sink.root-directory" => Some(("transferJob.transferSpec.posixDataSink.rootDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2153,7 +1368,7 @@ where
                     "transfer-job.transfer-spec.transfer-options.overwrite-when" => Some(("transferJob.transferSpec.transferOptions.overwriteWhen", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-transfer-job-field-mask" => Some(("updateTransferJobFieldMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "acl", "auth-method", "aws-access-key", "aws-s3-compatible-data-source", "aws-s3-data-source", "azure-blob-storage-data-source", "azure-credentials", "bucket-name", "cloudfront-domain", "container", "creation-time", "credentials-secret", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "enable-onprem-gcs-transfer-logs", "end-time-of-day", "endpoint", "event-stream", "event-stream-expiration-time", "event-stream-start-time", "event-types", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "gcs-intermediate-data-location", "gid", "hdfs-data-source", "hours", "http-data-source", "include-prefixes", "kms-key", "last-modification-time", "last-modified-before", "last-modified-since", "latest-operation-name", "list-api", "list-url", "location", "log-action-states", "log-actions", "logging-config", "managed-folder-transfer-enabled", "managed-private-network", "max-time-elapsed-since-last-modification", "metadata-options", "min-time-elapsed-since-last-modification", "minutes", "mode", "month", "name", "nanos", "notification-config", "object-conditions", "overwrite-objects-already-existing-in-sink", "overwrite-when", "path", "payload-format", "posix-data-sink", "posix-data-source", "project-id", "protocol", "pubsub-topic", "region", "repeat-interval", "replication-spec", "request-model", "role-arn", "root-directory", "s3-metadata", "sas-token", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "sink-agent-pool-name", "source-agent-pool-name", "start-time-of-day", "status", "storage-account", "storage-class", "symlink", "temporary-hold", "time-created", "transfer-job", "transfer-manifest", "transfer-options", "transfer-spec", "uid", "update-transfer-job-field-mask", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "acl", "auth-method", "aws-access-key", "aws-s3-compatible-data-source", "aws-s3-data-source", "azure-blob-storage-data-source", "azure-credentials", "bucket-name", "client-id", "cloudfront-domain", "container", "creation-time", "credentials-secret", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "enable-onprem-gcs-transfer-logs", "end-time-of-day", "endpoint", "event-stream", "event-stream-expiration-time", "event-stream-start-time", "event-types", "exclude-prefixes", "federated-identity-config", "gcs-data-sink", "gcs-data-source", "gcs-intermediate-data-location", "gid", "hdfs-data-source", "hours", "http-data-source", "include-prefixes", "kms-key", "last-modification-time", "last-modified-before", "last-modified-since", "latest-operation-name", "list-api", "list-url", "location", "log-action-states", "log-actions", "logging-config", "managed-folder-transfer-enabled", "managed-private-network", "match-glob", "max-time-elapsed-since-last-modification", "metadata-options", "min-time-elapsed-since-last-modification", "minutes", "mode", "month", "name", "nanos", "notification-config", "object-conditions", "overwrite-objects-already-existing-in-sink", "overwrite-when", "path", "payload-format", "posix-data-sink", "posix-data-source", "private-network-service", "project-id", "protocol", "pubsub-topic", "region", "repeat-interval", "replication-spec", "request-model", "role-arn", "root-directory", "s3-metadata", "sas-token", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "service-account", "sink-agent-pool-name", "source-agent-pool-name", "start-time-of-day", "status", "storage-account", "storage-class", "symlink", "temporary-hold", "tenant-id", "time-created", "transfer-job", "transfer-manifest", "transfer-options", "transfer-spec", "uid", "update-transfer-job-field-mask", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2607,6 +1822,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2634,7 +1856,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["page-size", "page-token", "return-partial-success"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -3082,7 +2308,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/storagetransfer1", config_dir))
         .build()
@@ -3346,7 +2574,7 @@ async fn main() {
                   vec![
                     (Some(r##"filter"##),
                      None,
-                     Some(r##"Required. A list of query parameters specified as JSON text in the form of: `{"projectId":"my_project_id", "jobNames":["jobid1","jobid2",...], "jobStatuses":["status1","status2",...]}` Since `jobNames` and `jobStatuses` support multiple values, their values must be specified with array notation. `projectId` is required. `jobNames` and `jobStatuses` are optional. The valid values for `jobStatuses` are case-insensitive: ENABLED, DISABLED, and DELETED."##),
+                     Some(r##"Required. A list of query parameters specified as JSON text in the form of: ``` { "projectId":"my_project_id", "jobNames":["jobid1","jobid2",...], "jobStatuses":["status1","status2",...], "dataBackend":"QUERY_REPLICATION_CONFIGS", "sourceBucket":"source-bucket-name", "sinkBucket":"sink-bucket-name", } ``` The JSON formatting in the example is for display only; provide the query parameters without spaces or line breaks. * `projectId` is required. * Since `jobNames` and `jobStatuses` support multiple values, their values must be specified with array notation. `jobNames` and `jobStatuses` are optional. Valid values are case-insensitive: * ENABLED * DISABLED * DELETED * Specify `"dataBackend":"QUERY_REPLICATION_CONFIGS"` to return a list of cross-bucket replication jobs. * Limit the results to jobs from a particular bucket with `sourceBucket` and/or to a particular bucket with `sinkBucket`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -3537,7 +2765,7 @@ async fn main() {
 
     let mut app = App::new("storagetransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240622")
+           .version("7.0.0+20251128")
            .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli")
            .arg(Arg::with_name("url")
@@ -3602,7 +2830,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

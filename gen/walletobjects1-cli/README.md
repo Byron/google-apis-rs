@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Walletobjects* API at revision *20240626*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Walletobjects* API at revision *20251211*. The CLI is at version *7.0.0*.
 
 ```bash
 walletobjects1 [options]
@@ -145,6 +145,8 @@ walletobjects1 [options]
                 list [-p <v>]... [-o <out>]
                 patch <resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        walletobjects
+                v1-private-content-set-pass-update-notice (-r <kv>)... [-p <v>]... [-o <out>]
   walletobjects1 --help
 
 Configuration:

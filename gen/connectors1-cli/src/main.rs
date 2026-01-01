@@ -586,6 +586,7 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "async-operations-enabled" => Some(("asyncOperationsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "auth-config.auth-key" => Some(("authConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.auth-type" => Some(("authConfig.authType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-auth-code-flow.auth-code" => Some(("authConfig.oauth2AuthCodeFlow.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -596,6 +597,9 @@ where
                     "auth-config.oauth2-auth-code-flow.pkce-verifier" => Some(("authConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-auth-code-flow.redirect-uri" => Some(("authConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-auth-code-flow.scopes" => Some(("authConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "auth-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("authConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("authConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("authConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "auth-config.oauth2-client-credentials.client-id" => Some(("authConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-client-credentials.client-secret.secret-version" => Some(("authConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("authConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -608,24 +612,53 @@ where
                     "auth-config.ssh-public-key.username" => Some(("authConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.user-password.password.secret-version" => Some(("authConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.user-password.username" => Some(("authConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-override-enabled" => Some(("authOverrideEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "billing-config.billing-category" => Some(("billingConfig.billingCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-revision" => Some(("connectionRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version" => Some(("connectorVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.connection-ratelimit-window-seconds" => Some(("connectorVersionInfraConfig.connectionRatelimitWindowSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.deployment-model" => Some(("connectorVersionInfraConfig.deploymentModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connector-version-infra-config.deployment-model-migration-state" => Some(("connectorVersionInfraConfig.deploymentModelMigrationState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.hpa-config.cpu-utilization-threshold" => Some(("connectorVersionInfraConfig.hpaConfig.cpuUtilizationThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.hpa-config.memory-utilization-threshold" => Some(("connectorVersionInfraConfig.hpaConfig.memoryUtilizationThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.internalclient-ratelimit-threshold" => Some(("connectorVersionInfraConfig.internalclientRatelimitThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connector-version-infra-config.max-instance-request-concurrency" => Some(("connectorVersionInfraConfig.maxInstanceRequestConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.ratelimit-threshold" => Some(("connectorVersionInfraConfig.ratelimitThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.resource-limits.cpu" => Some(("connectorVersionInfraConfig.resourceLimits.cpu", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.resource-limits.memory" => Some(("connectorVersionInfraConfig.resourceLimits.memory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.resource-requests.cpu" => Some(("connectorVersionInfraConfig.resourceRequests.cpu", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.resource-requests.memory" => Some(("connectorVersionInfraConfig.resourceRequests.memory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.shared-deployment" => Some(("connectorVersionInfraConfig.sharedDeployment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connector-version-infra-config.tls-migration-state" => Some(("connectorVersionInfraConfig.tlsMigrationState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-launch-stage" => Some(("connectorVersionLaunchStage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "envoy-image-location" => Some(("envoyImageLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.auth-key" => Some(("euaOauthAuthConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.auth-type" => Some(("euaOauthAuthConfig.authType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.auth-code" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.auth-uri" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.authUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.client-id" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.client-secret.secret-version" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.enable-pkce" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.enablePkce", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.pkce-verifier" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.redirect-uri" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.scopes" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "eua-oauth-auth-config.oauth2-client-credentials.client-id" => Some(("euaOauthAuthConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-client-credentials.client-secret.secret-version" => Some(("euaOauthAuthConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("euaOauthAuthConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-jwt-bearer.jwt-claims.audience" => Some(("euaOauthAuthConfig.oauth2JwtBearer.jwtClaims.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-jwt-bearer.jwt-claims.issuer" => Some(("euaOauthAuthConfig.oauth2JwtBearer.jwtClaims.issuer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-jwt-bearer.jwt-claims.subject" => Some(("euaOauthAuthConfig.oauth2JwtBearer.jwtClaims.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.ssh-public-key.cert-type" => Some(("euaOauthAuthConfig.sshPublicKey.certType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.ssh-public-key.ssh-client-cert.secret-version" => Some(("euaOauthAuthConfig.sshPublicKey.sshClientCert.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.ssh-public-key.ssh-client-cert-pass.secret-version" => Some(("euaOauthAuthConfig.sshPublicKey.sshClientCertPass.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.ssh-public-key.username" => Some(("euaOauthAuthConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.user-password.password.secret-version" => Some(("euaOauthAuthConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.user-password.username" => Some(("euaOauthAuthConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.auth-key" => Some(("eventingConfig.authConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.auth-type" => Some(("eventingConfig.authConfig.authType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-auth-code-flow.auth-code" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlow.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -636,6 +669,9 @@ where
                     "eventing-config.auth-config.oauth2-auth-code-flow.pkce-verifier" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-auth-code-flow.redirect-uri" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-auth-code-flow.scopes" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "eventing-config.auth-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.auth-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.auth-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "eventing-config.auth-config.oauth2-client-credentials.client-id" => Some(("eventingConfig.authConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-client-credentials.client-secret.secret-version" => Some(("eventingConfig.authConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("eventingConfig.authConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -650,6 +686,7 @@ where
                     "eventing-config.auth-config.user-password.username" => Some(("eventingConfig.authConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.dead-letter-config.project-id" => Some(("eventingConfig.deadLetterConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.dead-letter-config.topic" => Some(("eventingConfig.deadLetterConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.enrichment-config.append-acl" => Some(("eventingConfig.enrichmentConfig.appendAcl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "eventing-config.enrichment-enabled" => Some(("eventingConfig.enrichmentEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "eventing-config.events-listener-ingress-endpoint" => Some(("eventingConfig.eventsListenerIngressEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.auth-key" => Some(("eventingConfig.listenerAuthConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -662,6 +699,9 @@ where
                     "eventing-config.listener-auth-config.oauth2-auth-code-flow.pkce-verifier" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.oauth2-auth-code-flow.redirect-uri" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.oauth2-auth-code-flow.scopes" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "eventing-config.listener-auth-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.listener-auth-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.listener-auth-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "eventing-config.listener-auth-config.oauth2-client-credentials.client-id" => Some(("eventingConfig.listenerAuthConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.oauth2-client-credentials.client-secret.secret-version" => Some(("eventingConfig.listenerAuthConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("eventingConfig.listenerAuthConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -674,9 +714,19 @@ where
                     "eventing-config.listener-auth-config.ssh-public-key.username" => Some(("eventingConfig.listenerAuthConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.user-password.password.secret-version" => Some(("eventingConfig.listenerAuthConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.user-password.username" => Some(("eventingConfig.listenerAuthConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.private-connectivity-allowlisted-projects" => Some(("eventingConfig.privateConnectivityAllowlistedProjects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "eventing-config.private-connectivity-enabled" => Some(("eventingConfig.privateConnectivityEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "eventing-config.proxy-destination-config.key" => Some(("eventingConfig.proxyDestinationConfig.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.registration-destination-config.key" => Some(("eventingConfig.registrationDestinationConfig.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.client-cert-type" => Some(("eventingConfig.sslConfig.clientCertType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.client-certificate.secret-version" => Some(("eventingConfig.sslConfig.clientCertificate.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.client-private-key.secret-version" => Some(("eventingConfig.sslConfig.clientPrivateKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.client-private-key-pass.secret-version" => Some(("eventingConfig.sslConfig.clientPrivateKeyPass.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.private-server-certificate.secret-version" => Some(("eventingConfig.sslConfig.privateServerCertificate.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.server-cert-type" => Some(("eventingConfig.sslConfig.serverCertType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.trust-model" => Some(("eventingConfig.sslConfig.trustModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.type" => Some(("eventingConfig.sslConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.use-ssl" => Some(("eventingConfig.sslConfig.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "eventing-enablement-type" => Some(("eventingEnablementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.events-listener-endpoint" => Some(("eventingRuntimeData.eventsListenerEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.events-listener-psc-sa" => Some(("eventingRuntimeData.eventsListenerPscSa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -687,6 +737,8 @@ where
                     "eventing-runtime-data.webhook-data.name" => Some(("eventingRuntimeData.webhookData.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.webhook-data.next-refresh-time" => Some(("eventingRuntimeData.webhookData.nextRefreshTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.webhook-data.update-time" => Some(("eventingRuntimeData.webhookData.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fallback-on-admin-credentials" => Some(("fallbackOnAdminCredentials", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image-location" => Some(("imageLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-trusted-tester" => Some(("isTrustedTester", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -713,9 +765,10 @@ where
                     "status.status" => Some(("status.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-type" => Some(("subscriptionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "tls-service-directory" => Some(("tlsServiceDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audience", "auth-code", "auth-config", "auth-key", "auth-type", "auth-uri", "billing-category", "billing-config", "cert-type", "client-cert-type", "client-certificate", "client-id", "client-key", "client-private-key", "client-private-key-pass", "client-secret", "connection-ratelimit-window-seconds", "connection-revision", "connector-version", "connector-version-infra-config", "connector-version-launch-stage", "cpu", "cpu-utilization-threshold", "create-time", "dead-letter-config", "deployment-model", "description", "enable-pkce", "enabled", "enrichment-enabled", "envoy-image-location", "eventing-config", "eventing-enablement-type", "eventing-runtime-data", "events-listener-endpoint", "events-listener-ingress-endpoint", "events-listener-psc-sa", "hpa-config", "id", "image-location", "internalclient-ratelimit-threshold", "is-trusted-tester", "issuer", "jwt-claims", "key", "labels", "level", "listener-auth-config", "lock-config", "locked", "log-config", "max-node-count", "memory", "memory-utilization-threshold", "min-node-count", "name", "next-refresh-time", "node-config", "oauth2-auth-code-flow", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "private-connectivity-enabled", "private-server-certificate", "project-id", "proxy-destination-config", "ratelimit-threshold", "reason", "redirect-uri", "registration-destination-config", "resource-limits", "resource-requests", "scopes", "secret-version", "server-cert-type", "service-account", "service-directory", "shared-deployment", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "ssl-config", "state", "status", "subject", "subscription-type", "suspended", "topic", "trust-model", "type", "update-time", "use-ssl", "user-password", "username", "webhook-data"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["append-acl", "async-operations-enabled", "audience", "auth-code", "auth-config", "auth-key", "auth-override-enabled", "auth-type", "auth-uri", "billing-category", "billing-config", "cert-type", "client-cert-type", "client-certificate", "client-id", "client-key", "client-private-key", "client-private-key-pass", "client-secret", "connection-ratelimit-window-seconds", "connection-revision", "connector-version", "connector-version-infra-config", "connector-version-launch-stage", "cpu", "cpu-utilization-threshold", "create-time", "dead-letter-config", "deployment-model", "deployment-model-migration-state", "description", "enable-pkce", "enabled", "enrichment-config", "enrichment-enabled", "envoy-image-location", "eua-oauth-auth-config", "eventing-config", "eventing-enablement-type", "eventing-runtime-data", "events-listener-endpoint", "events-listener-ingress-endpoint", "events-listener-psc-sa", "fallback-on-admin-credentials", "host", "hpa-config", "id", "image-location", "internalclient-ratelimit-threshold", "is-trusted-tester", "issuer", "jwt-claims", "key", "labels", "level", "listener-auth-config", "lock-config", "locked", "log-config", "max-instance-request-concurrency", "max-node-count", "memory", "memory-utilization-threshold", "min-node-count", "name", "next-refresh-time", "node-config", "oauth2-auth-code-flow", "oauth2-auth-code-flow-google-managed", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "private-connectivity-allowlisted-projects", "private-connectivity-enabled", "private-server-certificate", "project-id", "proxy-destination-config", "ratelimit-threshold", "reason", "redirect-uri", "registration-destination-config", "resource-limits", "resource-requests", "scopes", "secret-version", "server-cert-type", "service-account", "service-directory", "shared-deployment", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "ssl-config", "state", "status", "subject", "subscription-type", "suspended", "tls-migration-state", "tls-service-directory", "topic", "trust-model", "type", "update-time", "use-ssl", "user-password", "username", "webhook-data"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -828,6 +881,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "force" => {
+                    call = call.force(
+                        value
+                            .map(|v| arg_from_str(v, err, "force", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -845,6 +905,653 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["force"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_connections_end_user_authentications_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.auth-key" => Some(("endUserAuthenticationConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.auth-type" => Some(("endUserAuthenticationConfig.authType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.auth-code" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.auth-uri" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.authUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.client-id" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.client-secret.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.clientSecret.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.client-secret.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.enable-pkce" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.enablePkce", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.access-token.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.accessToken.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.access-token.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.accessToken.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.create-time" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.expiry" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.expiry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.refresh-token.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.refreshToken.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.refresh-token.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.refreshToken.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.pkce-verifier" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.redirect-uri" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.scopes" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.access-token.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.accessToken.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.access-token.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.accessToken.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.create-time" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.expiry" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.expiry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.refresh-token.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.refreshToken.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.refresh-token.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.refreshToken.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "end-user-authentication-config.oauth2-client-credentials.client-id" => Some(("endUserAuthenticationConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-client-credentials.client-secret.secret-value" => Some(("endUserAuthenticationConfig.oauth2ClientCredentials.clientSecret.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-client-credentials.client-secret.secret-version" => Some(("endUserAuthenticationConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.client-key.secret-value" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.clientKey.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.jwt-claims.audience" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.jwtClaims.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.jwt-claims.issuer" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.jwtClaims.issuer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.jwt-claims.subject" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.jwtClaims.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.cert-type" => Some(("endUserAuthenticationConfig.sshPublicKey.certType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.ssh-client-cert.secret-value" => Some(("endUserAuthenticationConfig.sshPublicKey.sshClientCert.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.ssh-client-cert.secret-version" => Some(("endUserAuthenticationConfig.sshPublicKey.sshClientCert.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.ssh-client-cert-pass.secret-value" => Some(("endUserAuthenticationConfig.sshPublicKey.sshClientCertPass.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.ssh-client-cert-pass.secret-version" => Some(("endUserAuthenticationConfig.sshPublicKey.sshClientCertPass.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.username" => Some(("endUserAuthenticationConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.user-password.password.secret-value" => Some(("endUserAuthenticationConfig.userPassword.password.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.user-password.password.secret-version" => Some(("endUserAuthenticationConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.user-password.username" => Some(("endUserAuthenticationConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notify-endpoint-destination.endpoint.endpoint-uri" => Some(("notifyEndpointDestination.endpoint.endpointUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notify-endpoint-destination.service-account" => Some(("notifyEndpointDestination.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notify-endpoint-destination.type" => Some(("notifyEndpointDestination.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "roles" => Some(("roles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "status.description" => Some(("status.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-token", "audience", "auth-code", "auth-key", "auth-type", "auth-uri", "cert-type", "client-id", "client-key", "client-secret", "create-time", "description", "enable-pkce", "end-user-authentication-config", "endpoint", "endpoint-uri", "expiry", "issuer", "jwt-claims", "labels", "name", "notify-endpoint-destination", "oauth2-auth-code-flow", "oauth2-auth-code-flow-google-managed", "oauth2-client-credentials", "oauth2-jwt-bearer", "oauth-token-data", "password", "pkce-verifier", "redirect-uri", "refresh-token", "roles", "scopes", "secret-value", "secret-version", "service-account", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "state", "status", "subject", "type", "update-time", "user-id", "user-password", "username"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::EndUserAuthentication =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_connections_end_user_authentications_create(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "end-user-authentication-id" => {
+                    call = call.end_user_authentication_id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["end-user-authentication-id"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_connections_end_user_authentications_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_connections_end_user_authentications_delete(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_connections_end_user_authentications_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_connections_end_user_authentications_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["view"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_connections_end_user_authentications_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_connections_end_user_authentications_list(
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "order-by", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_connections_end_user_authentications_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.auth-key" => Some(("endUserAuthenticationConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.auth-type" => Some(("endUserAuthenticationConfig.authType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.auth-code" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.auth-uri" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.authUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.client-id" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.client-secret.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.clientSecret.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.client-secret.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.enable-pkce" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.enablePkce", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.access-token.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.accessToken.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.access-token.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.accessToken.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.create-time" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.expiry" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.expiry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.refresh-token.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.refreshToken.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.oauth-token-data.refresh-token.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.oauthTokenData.refreshToken.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.pkce-verifier" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.redirect-uri" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow.scopes" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.access-token.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.accessToken.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.access-token.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.accessToken.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.create-time" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.expiry" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.expiry", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.refresh-token.secret-value" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.refreshToken.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.oauth-token-data.refresh-token.secret-version" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.oauthTokenData.refreshToken.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("endUserAuthenticationConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "end-user-authentication-config.oauth2-client-credentials.client-id" => Some(("endUserAuthenticationConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-client-credentials.client-secret.secret-value" => Some(("endUserAuthenticationConfig.oauth2ClientCredentials.clientSecret.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-client-credentials.client-secret.secret-version" => Some(("endUserAuthenticationConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.client-key.secret-value" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.clientKey.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.jwt-claims.audience" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.jwtClaims.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.jwt-claims.issuer" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.jwtClaims.issuer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.oauth2-jwt-bearer.jwt-claims.subject" => Some(("endUserAuthenticationConfig.oauth2JwtBearer.jwtClaims.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.cert-type" => Some(("endUserAuthenticationConfig.sshPublicKey.certType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.ssh-client-cert.secret-value" => Some(("endUserAuthenticationConfig.sshPublicKey.sshClientCert.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.ssh-client-cert.secret-version" => Some(("endUserAuthenticationConfig.sshPublicKey.sshClientCert.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.ssh-client-cert-pass.secret-value" => Some(("endUserAuthenticationConfig.sshPublicKey.sshClientCertPass.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.ssh-client-cert-pass.secret-version" => Some(("endUserAuthenticationConfig.sshPublicKey.sshClientCertPass.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.ssh-public-key.username" => Some(("endUserAuthenticationConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.user-password.password.secret-value" => Some(("endUserAuthenticationConfig.userPassword.password.secretValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.user-password.password.secret-version" => Some(("endUserAuthenticationConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-user-authentication-config.user-password.username" => Some(("endUserAuthenticationConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notify-endpoint-destination.endpoint.endpoint-uri" => Some(("notifyEndpointDestination.endpoint.endpointUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notify-endpoint-destination.service-account" => Some(("notifyEndpointDestination.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notify-endpoint-destination.type" => Some(("notifyEndpointDestination.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "roles" => Some(("roles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "status.description" => Some(("status.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-token", "audience", "auth-code", "auth-key", "auth-type", "auth-uri", "cert-type", "client-id", "client-key", "client-secret", "create-time", "description", "enable-pkce", "end-user-authentication-config", "endpoint", "endpoint-uri", "expiry", "issuer", "jwt-claims", "labels", "name", "notify-endpoint-destination", "oauth2-auth-code-flow", "oauth2-auth-code-flow-google-managed", "oauth2-client-credentials", "oauth2-jwt-bearer", "oauth-token-data", "password", "pkce-verifier", "redirect-uri", "refresh-token", "roles", "scopes", "secret-value", "secret-version", "service-account", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "state", "status", "subject", "type", "update-time", "user-id", "user-password", "username"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::EndUserAuthentication =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_connections_end_user_authentications_patch(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -936,6 +1643,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "destinations.pubsub.attributes" => Some((
+                    "destinations.pubsub.attributes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "destinations.pubsub.project-id" => Some((
+                    "destinations.pubsub.projectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "destinations.pubsub.topic-id" => Some((
+                    "destinations.pubsub.topicId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "destinations.service-account" => Some((
                     "destinations.serviceAccount",
                     JsonTypeInfo {
@@ -1017,6 +1745,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "attributes",
                             "create-time",
                             "description",
                             "destinations",
@@ -1025,11 +1754,14 @@ where
                             "event-type-id",
                             "jms",
                             "name",
+                            "project-id",
+                            "pubsub",
                             "service-account",
                             "state",
                             "status",
                             "subscriber",
                             "subscriber-link",
+                            "topic-id",
                             "type",
                             "update-time",
                         ],
@@ -1444,6 +2176,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "destinations.pubsub.attributes" => Some((
+                    "destinations.pubsub.attributes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "destinations.pubsub.project-id" => Some((
+                    "destinations.pubsub.projectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "destinations.pubsub.topic-id" => Some((
+                    "destinations.pubsub.topicId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "destinations.service-account" => Some((
                     "destinations.serviceAccount",
                     JsonTypeInfo {
@@ -1525,6 +2278,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "attributes",
                             "create-time",
                             "description",
                             "destinations",
@@ -1533,11 +2287,14 @@ where
                             "event-type-id",
                             "jms",
                             "name",
+                            "project-id",
+                            "pubsub",
                             "service-account",
                             "state",
                             "status",
                             "subscriber",
                             "subscriber-link",
+                            "topic-id",
                             "type",
                             "update-time",
                         ],
@@ -2300,6 +3057,7 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "async-operations-enabled" => Some(("asyncOperationsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "auth-config.auth-key" => Some(("authConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.auth-type" => Some(("authConfig.authType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-auth-code-flow.auth-code" => Some(("authConfig.oauth2AuthCodeFlow.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2310,6 +3068,9 @@ where
                     "auth-config.oauth2-auth-code-flow.pkce-verifier" => Some(("authConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-auth-code-flow.redirect-uri" => Some(("authConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-auth-code-flow.scopes" => Some(("authConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "auth-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("authConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("authConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("authConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "auth-config.oauth2-client-credentials.client-id" => Some(("authConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-client-credentials.client-secret.secret-version" => Some(("authConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("authConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2322,24 +3083,53 @@ where
                     "auth-config.ssh-public-key.username" => Some(("authConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.user-password.password.secret-version" => Some(("authConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.user-password.username" => Some(("authConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "auth-override-enabled" => Some(("authOverrideEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "billing-config.billing-category" => Some(("billingConfig.billingCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-revision" => Some(("connectionRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version" => Some(("connectorVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.connection-ratelimit-window-seconds" => Some(("connectorVersionInfraConfig.connectionRatelimitWindowSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.deployment-model" => Some(("connectorVersionInfraConfig.deploymentModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connector-version-infra-config.deployment-model-migration-state" => Some(("connectorVersionInfraConfig.deploymentModelMigrationState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.hpa-config.cpu-utilization-threshold" => Some(("connectorVersionInfraConfig.hpaConfig.cpuUtilizationThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.hpa-config.memory-utilization-threshold" => Some(("connectorVersionInfraConfig.hpaConfig.memoryUtilizationThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.internalclient-ratelimit-threshold" => Some(("connectorVersionInfraConfig.internalclientRatelimitThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connector-version-infra-config.max-instance-request-concurrency" => Some(("connectorVersionInfraConfig.maxInstanceRequestConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.ratelimit-threshold" => Some(("connectorVersionInfraConfig.ratelimitThreshold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.resource-limits.cpu" => Some(("connectorVersionInfraConfig.resourceLimits.cpu", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.resource-limits.memory" => Some(("connectorVersionInfraConfig.resourceLimits.memory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.resource-requests.cpu" => Some(("connectorVersionInfraConfig.resourceRequests.cpu", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.resource-requests.memory" => Some(("connectorVersionInfraConfig.resourceRequests.memory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.shared-deployment" => Some(("connectorVersionInfraConfig.sharedDeployment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connector-version-infra-config.tls-migration-state" => Some(("connectorVersionInfraConfig.tlsMigrationState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-launch-stage" => Some(("connectorVersionLaunchStage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "envoy-image-location" => Some(("envoyImageLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.auth-key" => Some(("euaOauthAuthConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.auth-type" => Some(("euaOauthAuthConfig.authType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.auth-code" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.auth-uri" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.authUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.client-id" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.client-secret.secret-version" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.enable-pkce" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.enablePkce", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.pkce-verifier" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.redirect-uri" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow.scopes" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("euaOauthAuthConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "eua-oauth-auth-config.oauth2-client-credentials.client-id" => Some(("euaOauthAuthConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-client-credentials.client-secret.secret-version" => Some(("euaOauthAuthConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("euaOauthAuthConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-jwt-bearer.jwt-claims.audience" => Some(("euaOauthAuthConfig.oauth2JwtBearer.jwtClaims.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-jwt-bearer.jwt-claims.issuer" => Some(("euaOauthAuthConfig.oauth2JwtBearer.jwtClaims.issuer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.oauth2-jwt-bearer.jwt-claims.subject" => Some(("euaOauthAuthConfig.oauth2JwtBearer.jwtClaims.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.ssh-public-key.cert-type" => Some(("euaOauthAuthConfig.sshPublicKey.certType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.ssh-public-key.ssh-client-cert.secret-version" => Some(("euaOauthAuthConfig.sshPublicKey.sshClientCert.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.ssh-public-key.ssh-client-cert-pass.secret-version" => Some(("euaOauthAuthConfig.sshPublicKey.sshClientCertPass.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.ssh-public-key.username" => Some(("euaOauthAuthConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.user-password.password.secret-version" => Some(("euaOauthAuthConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eua-oauth-auth-config.user-password.username" => Some(("euaOauthAuthConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.auth-key" => Some(("eventingConfig.authConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.auth-type" => Some(("eventingConfig.authConfig.authType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-auth-code-flow.auth-code" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlow.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2350,6 +3140,9 @@ where
                     "eventing-config.auth-config.oauth2-auth-code-flow.pkce-verifier" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-auth-code-flow.redirect-uri" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-auth-code-flow.scopes" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "eventing-config.auth-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.auth-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.auth-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("eventingConfig.authConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "eventing-config.auth-config.oauth2-client-credentials.client-id" => Some(("eventingConfig.authConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-client-credentials.client-secret.secret-version" => Some(("eventingConfig.authConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.auth-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("eventingConfig.authConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2364,6 +3157,7 @@ where
                     "eventing-config.auth-config.user-password.username" => Some(("eventingConfig.authConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.dead-letter-config.project-id" => Some(("eventingConfig.deadLetterConfig.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.dead-letter-config.topic" => Some(("eventingConfig.deadLetterConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.enrichment-config.append-acl" => Some(("eventingConfig.enrichmentConfig.appendAcl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "eventing-config.enrichment-enabled" => Some(("eventingConfig.enrichmentEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "eventing-config.events-listener-ingress-endpoint" => Some(("eventingConfig.eventsListenerIngressEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.auth-key" => Some(("eventingConfig.listenerAuthConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2376,6 +3170,9 @@ where
                     "eventing-config.listener-auth-config.oauth2-auth-code-flow.pkce-verifier" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.oauth2-auth-code-flow.redirect-uri" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.oauth2-auth-code-flow.scopes" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "eventing-config.listener-auth-config.oauth2-auth-code-flow-google-managed.auth-code" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlowGoogleManaged.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.listener-auth-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.listener-auth-config.oauth2-auth-code-flow-google-managed.scopes" => Some(("eventingConfig.listenerAuthConfig.oauth2AuthCodeFlowGoogleManaged.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "eventing-config.listener-auth-config.oauth2-client-credentials.client-id" => Some(("eventingConfig.listenerAuthConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.oauth2-client-credentials.client-secret.secret-version" => Some(("eventingConfig.listenerAuthConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("eventingConfig.listenerAuthConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2388,9 +3185,19 @@ where
                     "eventing-config.listener-auth-config.ssh-public-key.username" => Some(("eventingConfig.listenerAuthConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.user-password.password.secret-version" => Some(("eventingConfig.listenerAuthConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.listener-auth-config.user-password.username" => Some(("eventingConfig.listenerAuthConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.private-connectivity-allowlisted-projects" => Some(("eventingConfig.privateConnectivityAllowlistedProjects", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "eventing-config.private-connectivity-enabled" => Some(("eventingConfig.privateConnectivityEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "eventing-config.proxy-destination-config.key" => Some(("eventingConfig.proxyDestinationConfig.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-config.registration-destination-config.key" => Some(("eventingConfig.registrationDestinationConfig.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.client-cert-type" => Some(("eventingConfig.sslConfig.clientCertType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.client-certificate.secret-version" => Some(("eventingConfig.sslConfig.clientCertificate.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.client-private-key.secret-version" => Some(("eventingConfig.sslConfig.clientPrivateKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.client-private-key-pass.secret-version" => Some(("eventingConfig.sslConfig.clientPrivateKeyPass.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.private-server-certificate.secret-version" => Some(("eventingConfig.sslConfig.privateServerCertificate.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.server-cert-type" => Some(("eventingConfig.sslConfig.serverCertType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.trust-model" => Some(("eventingConfig.sslConfig.trustModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.type" => Some(("eventingConfig.sslConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-config.ssl-config.use-ssl" => Some(("eventingConfig.sslConfig.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "eventing-enablement-type" => Some(("eventingEnablementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.events-listener-endpoint" => Some(("eventingRuntimeData.eventsListenerEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.events-listener-psc-sa" => Some(("eventingRuntimeData.eventsListenerPscSa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2401,6 +3208,8 @@ where
                     "eventing-runtime-data.webhook-data.name" => Some(("eventingRuntimeData.webhookData.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.webhook-data.next-refresh-time" => Some(("eventingRuntimeData.webhookData.nextRefreshTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.webhook-data.update-time" => Some(("eventingRuntimeData.webhookData.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fallback-on-admin-credentials" => Some(("fallbackOnAdminCredentials", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image-location" => Some(("imageLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-trusted-tester" => Some(("isTrustedTester", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -2427,9 +3236,10 @@ where
                     "status.status" => Some(("status.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-type" => Some(("subscriptionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "tls-service-directory" => Some(("tlsServiceDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audience", "auth-code", "auth-config", "auth-key", "auth-type", "auth-uri", "billing-category", "billing-config", "cert-type", "client-cert-type", "client-certificate", "client-id", "client-key", "client-private-key", "client-private-key-pass", "client-secret", "connection-ratelimit-window-seconds", "connection-revision", "connector-version", "connector-version-infra-config", "connector-version-launch-stage", "cpu", "cpu-utilization-threshold", "create-time", "dead-letter-config", "deployment-model", "description", "enable-pkce", "enabled", "enrichment-enabled", "envoy-image-location", "eventing-config", "eventing-enablement-type", "eventing-runtime-data", "events-listener-endpoint", "events-listener-ingress-endpoint", "events-listener-psc-sa", "hpa-config", "id", "image-location", "internalclient-ratelimit-threshold", "is-trusted-tester", "issuer", "jwt-claims", "key", "labels", "level", "listener-auth-config", "lock-config", "locked", "log-config", "max-node-count", "memory", "memory-utilization-threshold", "min-node-count", "name", "next-refresh-time", "node-config", "oauth2-auth-code-flow", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "private-connectivity-enabled", "private-server-certificate", "project-id", "proxy-destination-config", "ratelimit-threshold", "reason", "redirect-uri", "registration-destination-config", "resource-limits", "resource-requests", "scopes", "secret-version", "server-cert-type", "service-account", "service-directory", "shared-deployment", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "ssl-config", "state", "status", "subject", "subscription-type", "suspended", "topic", "trust-model", "type", "update-time", "use-ssl", "user-password", "username", "webhook-data"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["append-acl", "async-operations-enabled", "audience", "auth-code", "auth-config", "auth-key", "auth-override-enabled", "auth-type", "auth-uri", "billing-category", "billing-config", "cert-type", "client-cert-type", "client-certificate", "client-id", "client-key", "client-private-key", "client-private-key-pass", "client-secret", "connection-ratelimit-window-seconds", "connection-revision", "connector-version", "connector-version-infra-config", "connector-version-launch-stage", "cpu", "cpu-utilization-threshold", "create-time", "dead-letter-config", "deployment-model", "deployment-model-migration-state", "description", "enable-pkce", "enabled", "enrichment-config", "enrichment-enabled", "envoy-image-location", "eua-oauth-auth-config", "eventing-config", "eventing-enablement-type", "eventing-runtime-data", "events-listener-endpoint", "events-listener-ingress-endpoint", "events-listener-psc-sa", "fallback-on-admin-credentials", "host", "hpa-config", "id", "image-location", "internalclient-ratelimit-threshold", "is-trusted-tester", "issuer", "jwt-claims", "key", "labels", "level", "listener-auth-config", "lock-config", "locked", "log-config", "max-instance-request-concurrency", "max-node-count", "memory", "memory-utilization-threshold", "min-node-count", "name", "next-refresh-time", "node-config", "oauth2-auth-code-flow", "oauth2-auth-code-flow-google-managed", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "private-connectivity-allowlisted-projects", "private-connectivity-enabled", "private-server-certificate", "project-id", "proxy-destination-config", "ratelimit-threshold", "reason", "redirect-uri", "registration-destination-config", "resource-limits", "resource-requests", "scopes", "secret-version", "server-cert-type", "service-account", "service-directory", "shared-deployment", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "ssl-config", "state", "status", "subject", "subscription-type", "suspended", "tls-migration-state", "tls-service-directory", "topic", "trust-model", "type", "update-time", "use-ssl", "user-password", "username", "webhook-data"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2676,6 +3486,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "schema-as-string" => {
+                    call = call.schema_as_string(
+                        value
+                            .map(|v| arg_from_str(v, err, "schema-as-string", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -2706,7 +3523,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "page-size", "page-token", "schema-as-string"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -3448,6 +4269,409 @@ where
         }
     }
 
+    async fn _projects_locations_custom_connectors_custom_connector_versions_publish(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "partner-metadata.accept-gcp-tos" => Some((
+                    "partnerMetadata.acceptGcpTos",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.additional-comments" => Some((
+                    "partnerMetadata.additionalComments",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.confirm-partner-requirements" => Some((
+                    "partnerMetadata.confirmPartnerRequirements",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.demo-uri" => Some((
+                    "partnerMetadata.demoUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.has-dynamic-spec-uri" => Some((
+                    "partnerMetadata.hasDynamicSpecUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.integration-templates" => Some((
+                    "partnerMetadata.integrationTemplates",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.local-spec-path" => Some((
+                    "partnerMetadata.localSpecPath",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.marketplace-product" => Some((
+                    "partnerMetadata.marketplaceProduct",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.marketplace-product-id" => Some((
+                    "partnerMetadata.marketplaceProductId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.marketplace-product-project-id" => Some((
+                    "partnerMetadata.marketplaceProductProjectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.marketplace-product-uri" => Some((
+                    "partnerMetadata.marketplaceProductUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.partner" => Some((
+                    "partnerMetadata.partner",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.partner-connector-display-name" => Some((
+                    "partnerMetadata.partnerConnectorDisplayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.publish-request-time" => Some((
+                    "partnerMetadata.publishRequestTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.target-application" => Some((
+                    "partnerMetadata.targetApplication",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.target-customer-segment" => Some((
+                    "partnerMetadata.targetCustomerSegment",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.use-cases" => Some((
+                    "partnerMetadata.useCases",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "accept-gcp-tos",
+                            "additional-comments",
+                            "confirm-partner-requirements",
+                            "demo-uri",
+                            "has-dynamic-spec-uri",
+                            "integration-templates",
+                            "local-spec-path",
+                            "marketplace-product",
+                            "marketplace-product-id",
+                            "marketplace-product-project-id",
+                            "marketplace-product-uri",
+                            "partner",
+                            "partner-connector-display-name",
+                            "partner-metadata",
+                            "publish-request-time",
+                            "target-application",
+                            "target-customer-segment",
+                            "use-cases",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::PublishCustomConnectorVersionRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_custom_connectors_custom_connector_versions_publish(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_custom_connectors_custom_connector_versions_withdraw(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::WithdrawCustomConnectorVersionRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_custom_connectors_custom_connector_versions_withdraw(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_custom_connectors_validate_custom_connector_spec(
         &self,
         opt: &ArgMatches<'n>,
@@ -3683,6 +4907,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "state" => Some((
+                    "state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -3701,6 +4932,7 @@ where
                             "labels",
                             "name",
                             "service-attachment",
+                            "state",
                             "update-time",
                         ],
                     );
@@ -3901,6 +5133,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3918,6 +5153,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["view"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -3982,6 +5218,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -4016,7 +5255,7 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["filter", "order-by", "page-size", "page-token"]
+                                    ["filter", "order-by", "page-size", "page-token", "view"]
                                         .iter()
                                         .map(|v| *v),
                                 );
@@ -4146,6 +5385,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "state" => Some((
+                    "state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -4164,6 +5410,7 @@ where
                             "labels",
                             "name",
                             "service-attachment",
+                            "state",
                             "update-time",
                         ],
                     );
@@ -4557,6 +5804,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "all-marketplace-versions" => Some((
+                    "allMarketplaceVersions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -4606,6 +5860,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "published-marketplace-versions" => Some((
+                    "publishedMarketplaceVersions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -4619,6 +5880,7 @@ where
                         &vec![
                             "active-connector-versions",
                             "all-connector-versions",
+                            "all-marketplace-versions",
                             "create-time",
                             "custom-connector-type",
                             "description",
@@ -4626,6 +5888,7 @@ where
                             "labels",
                             "logo",
                             "name",
+                            "published-marketplace-versions",
                             "update-time",
                         ],
                     );
@@ -4761,6 +6024,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "async-operations-support" => Some((
+                    "asyncOperationsSupport",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "auth-config.auth-key" => Some((
                     "authConfig.authKey",
                     JsonTypeInfo {
@@ -4826,6 +6096,27 @@ where
                 )),
                 "auth-config.oauth2-auth-code-flow.scopes" => Some((
                     "authConfig.oauth2AuthCodeFlow.scopes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "auth-config.oauth2-auth-code-flow-google-managed.auth-code" => Some((
+                    "authConfig.oauth2AuthCodeFlowGoogleManaged.authCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auth-config.oauth2-auth-code-flow-google-managed.redirect-uri" => Some((
+                    "authConfig.oauth2AuthCodeFlowGoogleManaged.redirectUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auth-config.oauth2-auth-code-flow-google-managed.scopes" => Some((
+                    "authConfig.oauth2AuthCodeFlowGoogleManaged.scopes",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
@@ -4915,6 +6206,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "auth-override-support" => Some((
+                    "authOverrideSupport",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -4938,6 +6236,153 @@ where
                 )),
                 "name" => Some((
                     "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.accept-gcp-tos" => Some((
+                    "partnerMetadata.acceptGcpTos",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.additional-comments" => Some((
+                    "partnerMetadata.additionalComments",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.confirm-partner-requirements" => Some((
+                    "partnerMetadata.confirmPartnerRequirements",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.demo-uri" => Some((
+                    "partnerMetadata.demoUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.has-dynamic-spec-uri" => Some((
+                    "partnerMetadata.hasDynamicSpecUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.integration-templates" => Some((
+                    "partnerMetadata.integrationTemplates",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.local-spec-path" => Some((
+                    "partnerMetadata.localSpecPath",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.marketplace-product" => Some((
+                    "partnerMetadata.marketplaceProduct",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.marketplace-product-id" => Some((
+                    "partnerMetadata.marketplaceProductId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.marketplace-product-project-id" => Some((
+                    "partnerMetadata.marketplaceProductProjectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.marketplace-product-uri" => Some((
+                    "partnerMetadata.marketplaceProductUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.partner" => Some((
+                    "partnerMetadata.partner",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.partner-connector-display-name" => Some((
+                    "partnerMetadata.partnerConnectorDisplayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.publish-request-time" => Some((
+                    "partnerMetadata.publishRequestTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.target-application" => Some((
+                    "partnerMetadata.targetApplication",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.target-customer-segment" => Some((
+                    "partnerMetadata.targetCustomerSegment",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "partner-metadata.use-cases" => Some((
+                    "partnerMetadata.useCases",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "publish-status.publish-state" => Some((
+                    "publishStatus.publishState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "publish-status.publish-time" => Some((
+                    "publishStatus.publishTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "publish-status.published-as" => Some((
+                    "publishStatus.publishedAs",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "publish-status.published-source" => Some((
+                    "publishStatus.publishedSource",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -4982,28 +6427,51 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "accept-gcp-tos",
+                            "additional-comments",
+                            "async-operations-support",
                             "audience",
                             "auth-code",
                             "auth-config",
                             "auth-key",
+                            "auth-override-support",
                             "auth-type",
                             "auth-uri",
                             "cert-type",
                             "client-id",
                             "client-key",
                             "client-secret",
+                            "confirm-partner-requirements",
                             "create-time",
+                            "demo-uri",
                             "enable-backend-destination-config",
                             "enable-pkce",
+                            "has-dynamic-spec-uri",
+                            "integration-templates",
                             "issuer",
                             "jwt-claims",
                             "labels",
+                            "local-spec-path",
+                            "marketplace-product",
+                            "marketplace-product-id",
+                            "marketplace-product-project-id",
+                            "marketplace-product-uri",
                             "name",
                             "oauth2-auth-code-flow",
+                            "oauth2-auth-code-flow-google-managed",
                             "oauth2-client-credentials",
                             "oauth2-jwt-bearer",
+                            "partner",
+                            "partner-connector-display-name",
+                            "partner-metadata",
                             "password",
                             "pkce-verifier",
+                            "publish-request-time",
+                            "publish-state",
+                            "publish-status",
+                            "publish-time",
+                            "published-as",
+                            "published-source",
                             "redirect-uri",
                             "scopes",
                             "secret-version",
@@ -5015,7 +6483,10 @@ where
                             "ssh-public-key",
                             "state",
                             "subject",
+                            "target-application",
+                            "target-customer-segment",
                             "update-time",
+                            "use-cases",
                             "user-password",
                             "username",
                         ],
@@ -5609,6 +7080,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "all-marketplace-versions" => Some((
+                    "allMarketplaceVersions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -5658,6 +7136,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "published-marketplace-versions" => Some((
+                    "publishedMarketplaceVersions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -5671,6 +7156,7 @@ where
                         &vec![
                             "active-connector-versions",
                             "all-connector-versions",
+                            "all-marketplace-versions",
                             "create-time",
                             "custom-connector-type",
                             "description",
@@ -5678,6 +7164,7 @@ where
                             "labels",
                             "logo",
                             "name",
+                            "published-marketplace-versions",
                             "update-time",
                         ],
                     );
@@ -6243,6 +7730,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -6277,9 +7771,15 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["filter", "order-by", "page-size", "page-token"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "filter",
+                                        "order-by",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -6727,6 +8227,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -6744,7 +8247,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -7099,6 +8606,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -7129,7 +8643,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -7483,6 +9006,93 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_providers_connectors_versions_fetch_auth_schema(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_providers_connectors_versions_fetch_auth_schema(
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["view"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -8504,6 +10114,41 @@ where
                         ._projects_locations_connections_delete(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-connections-end-user-authentications-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_connections_end_user_authentications_create(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-connections-end-user-authentications-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_connections_end_user_authentications_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-connections-end-user-authentications-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_connections_end_user_authentications_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-connections-end-user-authentications-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_connections_end_user_authentications_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-connections-end-user-authentications-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_connections_end_user_authentications_patch(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-connections-event-subscriptions-create", Some(opt)) => {
                     call_result = self
                         ._projects_locations_connections_event_subscriptions_create(
@@ -8624,6 +10269,20 @@ where
                 ("locations-custom-connectors-custom-connector-versions-deprecate", Some(opt)) => {
                     call_result = self
                         ._projects_locations_custom_connectors_custom_connector_versions_deprecate(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-custom-connectors-custom-connector-versions-publish", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_custom_connectors_custom_connector_versions_publish(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-custom-connectors-custom-connector-versions-withdraw", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_custom_connectors_custom_connector_versions_withdraw(
                             opt, dry_run, &mut err,
                         )
                         .await;
@@ -8799,6 +10458,13 @@ where
                         )
                         .await;
                 }
+                ("locations-providers-connectors-versions-fetch-auth-schema", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_providers_connectors_versions_fetch_auth_schema(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-providers-connectors-versions-get", Some(opt)) => {
                     call_result = self
                         ._projects_locations_providers_connectors_versions_get(
@@ -8889,7 +10555,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/connectors1", config_dir))
         .build()
@@ -8942,7 +10610,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-connections-connection-schema-metadata-get-action', 'locations-connections-connection-schema-metadata-get-entity-type', 'locations-connections-connection-schema-metadata-list-actions', 'locations-connections-connection-schema-metadata-list-entity-types', 'locations-connections-connection-schema-metadata-refresh', 'locations-connections-create', 'locations-connections-delete', 'locations-connections-event-subscriptions-create', 'locations-connections-event-subscriptions-delete', 'locations-connections-event-subscriptions-get', 'locations-connections-event-subscriptions-list', 'locations-connections-event-subscriptions-patch', 'locations-connections-event-subscriptions-retry', 'locations-connections-get', 'locations-connections-get-connection-schema-metadata', 'locations-connections-get-iam-policy', 'locations-connections-list', 'locations-connections-listen-event', 'locations-connections-patch', 'locations-connections-repair-eventing', 'locations-connections-runtime-action-schemas-list', 'locations-connections-runtime-entity-schemas-list', 'locations-connections-search', 'locations-connections-set-iam-policy', 'locations-connections-test-iam-permissions', 'locations-custom-connectors-custom-connector-versions-delete', 'locations-custom-connectors-custom-connector-versions-deprecate', 'locations-custom-connectors-validate-custom-connector-spec', 'locations-endpoint-attachments-create', 'locations-endpoint-attachments-delete', 'locations-endpoint-attachments-get', 'locations-endpoint-attachments-list', 'locations-endpoint-attachments-patch', 'locations-get', 'locations-get-regional-settings', 'locations-get-runtime-config', 'locations-global-custom-connectors-create', 'locations-global-custom-connectors-custom-connector-versions-create', 'locations-global-custom-connectors-custom-connector-versions-get', 'locations-global-custom-connectors-custom-connector-versions-list', 'locations-global-custom-connectors-delete', 'locations-global-custom-connectors-get', 'locations-global-custom-connectors-list', 'locations-global-custom-connectors-patch', 'locations-global-get-settings', 'locations-global-managed-zones-create', 'locations-global-managed-zones-delete', 'locations-global-managed-zones-get', 'locations-global-managed-zones-list', 'locations-global-managed-zones-patch', 'locations-global-update-settings', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-providers-connectors-get', 'locations-providers-connectors-list', 'locations-providers-connectors-versions-eventtypes-get', 'locations-providers-connectors-versions-eventtypes-list', 'locations-providers-connectors-versions-get', 'locations-providers-connectors-versions-list', 'locations-providers-get', 'locations-providers-get-iam-policy', 'locations-providers-list', 'locations-providers-set-iam-policy', 'locations-providers-test-iam-permissions' and 'locations-update-regional-settings'", vec![
+        ("projects", "methods: 'locations-connections-connection-schema-metadata-get-action', 'locations-connections-connection-schema-metadata-get-entity-type', 'locations-connections-connection-schema-metadata-list-actions', 'locations-connections-connection-schema-metadata-list-entity-types', 'locations-connections-connection-schema-metadata-refresh', 'locations-connections-create', 'locations-connections-delete', 'locations-connections-end-user-authentications-create', 'locations-connections-end-user-authentications-delete', 'locations-connections-end-user-authentications-get', 'locations-connections-end-user-authentications-list', 'locations-connections-end-user-authentications-patch', 'locations-connections-event-subscriptions-create', 'locations-connections-event-subscriptions-delete', 'locations-connections-event-subscriptions-get', 'locations-connections-event-subscriptions-list', 'locations-connections-event-subscriptions-patch', 'locations-connections-event-subscriptions-retry', 'locations-connections-get', 'locations-connections-get-connection-schema-metadata', 'locations-connections-get-iam-policy', 'locations-connections-list', 'locations-connections-listen-event', 'locations-connections-patch', 'locations-connections-repair-eventing', 'locations-connections-runtime-action-schemas-list', 'locations-connections-runtime-entity-schemas-list', 'locations-connections-search', 'locations-connections-set-iam-policy', 'locations-connections-test-iam-permissions', 'locations-custom-connectors-custom-connector-versions-delete', 'locations-custom-connectors-custom-connector-versions-deprecate', 'locations-custom-connectors-custom-connector-versions-publish', 'locations-custom-connectors-custom-connector-versions-withdraw', 'locations-custom-connectors-validate-custom-connector-spec', 'locations-endpoint-attachments-create', 'locations-endpoint-attachments-delete', 'locations-endpoint-attachments-get', 'locations-endpoint-attachments-list', 'locations-endpoint-attachments-patch', 'locations-get', 'locations-get-regional-settings', 'locations-get-runtime-config', 'locations-global-custom-connectors-create', 'locations-global-custom-connectors-custom-connector-versions-create', 'locations-global-custom-connectors-custom-connector-versions-get', 'locations-global-custom-connectors-custom-connector-versions-list', 'locations-global-custom-connectors-delete', 'locations-global-custom-connectors-get', 'locations-global-custom-connectors-list', 'locations-global-custom-connectors-patch', 'locations-global-get-settings', 'locations-global-managed-zones-create', 'locations-global-managed-zones-delete', 'locations-global-managed-zones-get', 'locations-global-managed-zones-list', 'locations-global-managed-zones-patch', 'locations-global-update-settings', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-providers-connectors-get', 'locations-providers-connectors-list', 'locations-providers-connectors-versions-eventtypes-get', 'locations-providers-connectors-versions-eventtypes-list', 'locations-providers-connectors-versions-fetch-auth-schema', 'locations-providers-connectors-versions-get', 'locations-providers-connectors-versions-list', 'locations-providers-get', 'locations-providers-get-iam-policy', 'locations-providers-list', 'locations-providers-set-iam-policy', 'locations-providers-test-iam-permissions' and 'locations-update-regional-settings'", vec![
             ("locations-connections-connection-schema-metadata-get-action",
                     Some(r##"Get action."##),
                     "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-connection-schema-metadata-get-action",
@@ -9093,6 +10761,116 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-connections-end-user-authentications-create",
+                    Some(r##"Creates a new EndUserAuthentication in a given project,location and connection."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-end-user-authentications-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Parent resource of the EndUserAuthentication, of the form: `projects/*/locations/*/connections/*`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-connections-end-user-authentications-delete",
+                    Some(r##"Deletes a single EndUserAuthentication."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-end-user-authentications-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the form: `projects/*/locations/*/connections/*/endUserAuthentication/*`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-connections-end-user-authentications-get",
+                    Some(r##"Gets details of a single EndUserAuthentication."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-end-user-authentications-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the form: `projects/*/locations/*/connections/*/EndUserAuthentications/*`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-connections-end-user-authentications-list",
+                    Some(r##"List EndUserAuthentications in a given project,location and connection."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-end-user-authentications-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Parent resource of the EndUserAuthentication, of the form: `projects/*/locations/*/connections/*`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-connections-end-user-authentications-patch",
+                    Some(r##"Updates the parameters of a single EndUserAuthentication."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-end-user-authentications-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Identifier. Resource name of the EndUserAuthentication. Format: projects/{project}/locations/{location}/connections/{connection}/endUserAuthentications/{end_user_authentication}"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-connections-event-subscriptions-create",
                     Some(r##"Creates a new EventSubscription in a given project,location and connection."##),
                     "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-event-subscriptions-create",
@@ -9184,7 +10962,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the EventSubscription. Format: projects/{project}/locations/{location}/connections/{connection}/eventSubscriptions/{event_subscription}"##),
+                     Some(r##"Required. Identifier. Resource name of the EventSubscription. Format: projects/{project}/locations/{location}/connections/{connection}/eventSubscriptions/{event_subscription}"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -9516,6 +11294,56 @@ async fn main() {
             ("locations-custom-connectors-custom-connector-versions-deprecate",
                     Some(r##"Deprecates a single CustomConnectorVersion."##),
                     "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-custom-connectors-custom-connector-versions-deprecate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the form: `projects/{project}/locations/{location}/customConnectors/{custom_connector}/customConnectorVersions/{custom_connector_version}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-connectors-custom-connector-versions-publish",
+                    Some(r##"Publish request for the CustomConnectorVersion. Once approved, the CustomConnectorVersion will be published as PartnerConnector."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-custom-connectors-custom-connector-versions-publish",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the form: `projects/{project}/locations/{location}/customConnectors/{custom_connector}/customConnectorVersions/{custom_connector_version}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-connectors-custom-connector-versions-withdraw",
+                    Some(r##"Withdraw the publish request for the CustomConnectorVersion. This can only be used before the CustomConnectorVersion is published."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-custom-connectors-custom-connector-versions-withdraw",
                   vec![
                     (Some(r##"name"##),
                      None,
@@ -10084,7 +11912,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -10248,6 +12076,26 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-providers-connectors-versions-fetch-auth-schema",
+                    Some(r##"fetch and return the list of auth config variables required to override the connection backend auth."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-providers-connectors-versions-fetch-auth-schema",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Parent resource of the Connector Version, of the form: `projects/*/locations/*/providers/*/connectors/*/versions/*`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-providers-connectors-versions-get",
                     Some(r##"Gets details of a single connector version."##),
                     "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-providers-connectors-versions-get",
@@ -10274,7 +12122,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Parent resource of the connectors, of the form: `projects/*/locations/*/providers/*/connectors/*` Only global location is supported for ConnectorVersion resource."##),
+                     None,
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -10428,7 +12276,7 @@ async fn main() {
 
     let mut app = App::new("connectors1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240619")
+           .version("7.0.0+20250930")
            .about("Enables users to create and manage connections to Google Cloud services and third-party business applications using the Connectors interface.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_connectors1_cli")
            .arg(Arg::with_name("url")
@@ -10493,7 +12341,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

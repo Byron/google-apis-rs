@@ -349,6 +349,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "execution-history-level" => Some((
+                    "executionHistoryLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "labels" => Some((
                     "labels",
                     JsonTypeInfo {
@@ -418,6 +425,7 @@ where
                             "duration",
                             "end-time",
                             "error",
+                            "execution-history-level",
                             "labels",
                             "name",
                             "payload",
@@ -452,6 +460,137 @@ where
             .hub
             .projects()
             .locations_workflows_executions_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_workflows_executions_delete_execution_history(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::DeleteExecutionHistoryRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_workflows_executions_delete_execution_history(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -812,6 +951,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -829,6 +971,7 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["view"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -893,6 +1036,9 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "view" => {
+                    call = call.view(value.unwrap_or(""));
+                }
                 "skip" => {
                     call = call.skip(
                         value
@@ -934,9 +1080,16 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["filter", "order-by", "page-size", "page-token", "skip"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "filter",
+                                        "order-by",
+                                        "page-size",
+                                        "page-token",
+                                        "skip",
+                                        "view",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -1210,6 +1363,13 @@ where
                         ._projects_locations_workflows_executions_create(opt, dry_run, &mut err)
                         .await;
                 }
+                ("locations-workflows-executions-delete-execution-history", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_workflows_executions_delete_execution_history(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("locations-workflows-executions-export-data", Some(opt)) => {
                     call_result = self
                         ._projects_locations_workflows_executions_export_data(
@@ -1294,7 +1454,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/workflowexecutions1", config_dir))
         .build()
@@ -1347,7 +1509,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-workflows-executions-callbacks-list', 'locations-workflows-executions-cancel', 'locations-workflows-executions-create', 'locations-workflows-executions-export-data', 'locations-workflows-executions-get', 'locations-workflows-executions-list', 'locations-workflows-executions-step-entries-get', 'locations-workflows-executions-step-entries-list' and 'locations-workflows-trigger-pubsub-execution'", vec![
+        ("projects", "methods: 'locations-workflows-executions-callbacks-list', 'locations-workflows-executions-cancel', 'locations-workflows-executions-create', 'locations-workflows-executions-delete-execution-history', 'locations-workflows-executions-export-data', 'locations-workflows-executions-get', 'locations-workflows-executions-list', 'locations-workflows-executions-step-entries-get', 'locations-workflows-executions-step-entries-list' and 'locations-workflows-trigger-pubsub-execution'", vec![
             ("locations-workflows-executions-callbacks-list",
                     Some(r##"Returns a list of active callbacks that belong to the execution with the given name. The returned callbacks are ordered by callback ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-executions-callbacks-list",
@@ -1400,6 +1562,31 @@ async fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Required. Name of the workflow for which an execution should be created. Format: projects/{project}/locations/{location}/workflows/{workflow} The latest revision of the workflow will be used."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflows-executions-delete-execution-history",
+                    Some(r##"Deletes all step entries for an execution."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-executions-delete-execution-history",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the execution for which step entries should be deleted. Format: projects/{project}/locations/{location}/workflows/{workflow}/executions/{execution}"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -1504,7 +1691,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the workflow execution to list entries for. Format: projects/{project}/locations/{location}/workflows/{workflow}/executions/{execution}/stepEntries/"##),
+                     Some(r##"Required. Name of the workflow execution to list entries for. Format: projects/{project}/locations/{location}/workflows/{workflow}/executions/{execution}"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -1548,7 +1735,7 @@ async fn main() {
 
     let mut app = App::new("workflowexecutions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251202")
            .about("Execute workflows created with Workflows API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli")
            .arg(Arg::with_name("url")
@@ -1613,7 +1800,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -1,4 +1,4 @@
-site_name: Cloudchannel v6.0.0+20240625
+site_name: Cloudchannel v7.0.0+20251216
 site_url: http://byron.github.io/google-apis-rs/google-cloudchannel1-cli
 site_description: A complete library to interact with Cloudchannel (protocol v1)
 
@@ -66,6 +66,10 @@ nav:
     - 'Sku Groups Billable Skus List': 'accounts_sku-groups-billable-skus-list.md'
     - 'Sku Groups List': 'accounts_sku-groups-list.md'
     - 'Unregister': 'accounts_unregister.md'
+- 'Integrators':
+    - 'List Subscribers': 'integrators_list-subscribers.md'
+    - 'Register Subscriber': 'integrators_register-subscriber.md'
+    - 'Unregister Subscriber': 'integrators_unregister-subscriber.md'
 - 'Operations':
     - 'Cancel': 'operations_cancel.md'
     - 'Delete': 'operations_delete.md'

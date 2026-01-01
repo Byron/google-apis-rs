@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Data Catalog* API at revision *20240624*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Data Catalog* API at revision *20251210*. The CLI is at version *7.0.0*.
 
 ```bash
 datacatalog1 [options]
@@ -33,6 +33,10 @@ datacatalog1 [options]
                 search (-r <kv>)... [-p <v>]... [-o <out>]
         entries
                 lookup [-p <v>]... [-o <out>]
+        organizations
+                locations-retrieve-config <name> [-p <v>]... [-o <out>]
+                locations-retrieve-effective-config <name> [-p <v>]... [-o <out>]
+                locations-set-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 locations-entry-groups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-entry-groups-delete <name> [-p <v>]... [-o <out>]
@@ -67,6 +71,8 @@ datacatalog1 [options]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-retrieve-effective-config <name> [-p <v>]... [-o <out>]
+                locations-set-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-tag-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-tag-templates-delete <name> [-p <v>]... [-o <out>]
                 locations-tag-templates-fields-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]

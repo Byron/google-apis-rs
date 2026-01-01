@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v6.0.0+20240617
+site_name: Cloud Resource Manager v7.0.0+20251103
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager3-cli
 site_description: A complete library to interact with Cloud Resource Manager (protocol v3)
 
@@ -12,6 +12,8 @@ nav:
 - 'Effective Tags':
     - 'List': 'effective-tags_list.md'
 - 'Folders':
+    - 'Capabilities Get': 'folders_capabilities-get.md'
+    - 'Capabilities Patch': 'folders_capabilities-patch.md'
     - 'Create': 'folders_create.md'
     - 'Delete': 'folders_delete.md'
     - 'Get': 'folders_get.md'
@@ -28,6 +30,10 @@ nav:
     - 'Delete': 'liens_delete.md'
     - 'Get': 'liens_get.md'
     - 'List': 'liens_list.md'
+- 'Locations':
+    - 'Effective Tag Binding Collections Get': 'locations_effective-tag-binding-collections-get.md'
+    - 'Tag Binding Collections Get': 'locations_tag-binding-collections-get.md'
+    - 'Tag Binding Collections Patch': 'locations_tag-binding-collections-patch.md'
 - 'Operations':
     - 'Get': 'operations_get.md'
 - 'Organizations':

@@ -3280,11 +3280,35 @@ where
                 match &temp_cursor.to_string()[..] {
                     "abandoned" => Some(("abandoned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "condition.docker-version-supported-condition.maintenance-mode-time" => Some(("condition.dockerVersionSupportedCondition.maintenanceModeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.docker-version-supported-condition.status" => Some(("condition.dockerVersionSupportedCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "condition.docker-version-supported-condition.support-expiration-time" => Some(("condition.dockerVersionSupportedCondition.supportExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.docker-version-supported-condition.tool-version-support-state" => Some(("condition.dockerVersionSupportedCondition.toolVersionSupportState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.helm-version-supported-condition.maintenance-mode-time" => Some(("condition.helmVersionSupportedCondition.maintenanceModeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.helm-version-supported-condition.status" => Some(("condition.helmVersionSupportedCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "condition.helm-version-supported-condition.support-expiration-time" => Some(("condition.helmVersionSupportedCondition.supportExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.helm-version-supported-condition.tool-version-support-state" => Some(("condition.helmVersionSupportedCondition.toolVersionSupportState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.kpt-version-supported-condition.maintenance-mode-time" => Some(("condition.kptVersionSupportedCondition.maintenanceModeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.kpt-version-supported-condition.status" => Some(("condition.kptVersionSupportedCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "condition.kpt-version-supported-condition.support-expiration-time" => Some(("condition.kptVersionSupportedCondition.supportExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.kpt-version-supported-condition.tool-version-support-state" => Some(("condition.kptVersionSupportedCondition.toolVersionSupportState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.kubectl-version-supported-condition.maintenance-mode-time" => Some(("condition.kubectlVersionSupportedCondition.maintenanceModeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.kubectl-version-supported-condition.status" => Some(("condition.kubectlVersionSupportedCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "condition.kubectl-version-supported-condition.support-expiration-time" => Some(("condition.kubectlVersionSupportedCondition.supportExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.kubectl-version-supported-condition.tool-version-support-state" => Some(("condition.kubectlVersionSupportedCondition.toolVersionSupportState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.kustomize-version-supported-condition.maintenance-mode-time" => Some(("condition.kustomizeVersionSupportedCondition.maintenanceModeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.kustomize-version-supported-condition.status" => Some(("condition.kustomizeVersionSupportedCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "condition.kustomize-version-supported-condition.support-expiration-time" => Some(("condition.kustomizeVersionSupportedCondition.supportExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.kustomize-version-supported-condition.tool-version-support-state" => Some(("condition.kustomizeVersionSupportedCondition.toolVersionSupportState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition.release-ready-condition.status" => Some(("condition.releaseReadyCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "condition.skaffold-supported-condition.maintenance-mode-time" => Some(("condition.skaffoldSupportedCondition.maintenanceModeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition.skaffold-supported-condition.skaffold-support-state" => Some(("condition.skaffoldSupportedCondition.skaffoldSupportState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition.skaffold-supported-condition.status" => Some(("condition.skaffoldSupportedCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "condition.skaffold-supported-condition.support-expiration-time" => Some(("condition.skaffoldSupportedCondition.supportExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.skaffold-version-supported-condition.maintenance-mode-time" => Some(("condition.skaffoldVersionSupportedCondition.maintenanceModeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.skaffold-version-supported-condition.status" => Some(("condition.skaffoldVersionSupportedCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "condition.skaffold-version-supported-condition.support-expiration-time" => Some(("condition.skaffoldVersionSupportedCondition.supportExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.skaffold-version-supported-condition.tool-version-support-state" => Some(("condition.skaffoldVersionSupportedCondition.toolVersionSupportState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.annotations" => Some(("deliveryPipelineSnapshot.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "delivery-pipeline-snapshot.condition.pipeline-ready-condition.status" => Some(("deliveryPipelineSnapshot.condition.pipelineReadyCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3313,9 +3337,15 @@ where
                     "skaffold-config-path" => Some(("skaffoldConfigPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skaffold-config-uri" => Some(("skaffoldConfigUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skaffold-version" => Some(("skaffoldVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tool-versions.docker" => Some(("toolVersions.docker", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tool-versions.helm" => Some(("toolVersions.helm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tool-versions.kpt" => Some(("toolVersions.kpt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tool-versions.kubectl" => Some(("toolVersions.kubectl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tool-versions.kustomize" => Some(("toolVersions.kustomize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tool-versions.skaffold" => Some(("toolVersions.skaffold", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abandoned", "annotations", "condition", "create-time", "delivery-pipeline-snapshot", "deploy-parameters", "description", "error-details", "etag", "labels", "maintenance-mode-time", "missing-targets", "name", "pipeline-ready-condition", "release-ready-condition", "render-end-time", "render-start-time", "render-state", "skaffold-config-path", "skaffold-config-uri", "skaffold-support-state", "skaffold-supported-condition", "skaffold-version", "status", "support-expiration-time", "suspended", "targets-present-condition", "targets-type-condition", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abandoned", "annotations", "condition", "create-time", "delivery-pipeline-snapshot", "deploy-parameters", "description", "docker", "docker-version-supported-condition", "error-details", "etag", "helm", "helm-version-supported-condition", "kpt", "kpt-version-supported-condition", "kubectl", "kubectl-version-supported-condition", "kustomize", "kustomize-version-supported-condition", "labels", "maintenance-mode-time", "missing-targets", "name", "pipeline-ready-condition", "release-ready-condition", "render-end-time", "render-start-time", "render-state", "skaffold", "skaffold-config-path", "skaffold-config-uri", "skaffold-support-state", "skaffold-supported-condition", "skaffold-version", "skaffold-version-supported-condition", "status", "support-expiration-time", "suspended", "targets-present-condition", "targets-type-condition", "tool-version-support-state", "tool-versions", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3359,6 +3389,9 @@ where
                 "release-id" => {
                     call = call.release_id(value.unwrap_or(""));
                 }
+                "override-deploy-policy" => {
+                    call = call.add_override_deploy_policy(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3377,9 +3410,14 @@ where
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
-                                    ["release-id", "request-id", "validate-only"]
-                                        .iter()
-                                        .map(|v| *v),
+                                    [
+                                        "override-deploy-policy",
+                                        "release-id",
+                                        "request-id",
+                                        "validate-only",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
                                 );
                                 v
                             }));
@@ -3641,6 +3679,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "override-deploy-policy" => Some((
+                    "overrideDeployPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "phase-id" => Some((
                     "phaseId",
                     JsonTypeInfo {
@@ -3649,7 +3694,8 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["phase-id"]);
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["override-deploy-policy", "phase-id"]);
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -3786,8 +3832,16 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "override-deploy-policy" => Some((
+                    "overrideDeployPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["approved"]);
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["approved", "override-deploy-policy"]);
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -3917,8 +3971,16 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "override-deploy-policy" => Some((
+                    "overrideDeployPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["override-deploy-policy"]);
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -4047,6 +4109,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "active-repair-automation-run" => Some((
+                    "activeRepairAutomationRun",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "annotations" => Some((
                     "annotations",
                     JsonTypeInfo {
@@ -4247,6 +4316,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "active-repair-automation-run",
                             "advance-automation-runs",
                             "annotations",
                             "approval-state",
@@ -4331,6 +4401,9 @@ where
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 }
+                "override-deploy-policy" => {
+                    call = call.add_override_deploy_policy(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4350,6 +4423,7 @@ where
                                 v.extend(self.gp.iter().map(|v| *v));
                                 v.extend(
                                     [
+                                        "override-deploy-policy",
                                         "request-id",
                                         "rollout-id",
                                         "starting-phase-id",
@@ -4523,6 +4597,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "override-deploy-policy" => Some((
+                    "overrideDeployPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "phase-id" => Some((
                     "phaseId",
                     JsonTypeInfo {
@@ -4531,7 +4612,10 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["job-id", "phase-id"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["job-id", "override-deploy-policy", "phase-id"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -4847,8 +4931,16 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "override-deploy-policy" => Some((
+                    "overrideDeployPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["override-deploy-policy"]);
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -5089,6 +5181,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "override-deploy-policy" => Some((
+                    "overrideDeployPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "phase-id" => Some((
                     "phaseId",
                     JsonTypeInfo {
@@ -5097,7 +5196,10 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["job-id", "phase-id"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["job-id", "override-deploy-policy", "phase-id"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -5226,8 +5328,22 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "override-deploy-policy" => Some((
+                    "overrideDeployPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "release-id" => Some((
                     "releaseId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rollback-config.rollout.active-repair-automation-run" => Some((
+                    "rollbackConfig.rollout.activeRepairAutomationRun",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -5468,6 +5584,7 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "active-repair-automation-run",
                             "advance-automation-runs",
                             "annotations",
                             "approval-state",
@@ -5489,6 +5606,7 @@ where
                             "labels",
                             "metadata",
                             "name",
+                            "override-deploy-policy",
                             "promote-automation-run",
                             "release-id",
                             "repair-automation-runs",
@@ -5899,6 +6017,998 @@ where
         }
     }
 
+    async fn _projects_locations_deploy_policies_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "annotations" => Some((
+                    "annotations",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "description" => Some((
+                    "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suspended" => Some((
+                    "suspended",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uid" => Some((
+                    "uid",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "annotations",
+                            "create-time",
+                            "description",
+                            "etag",
+                            "labels",
+                            "name",
+                            "suspended",
+                            "uid",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::DeployPolicy = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_deploy_policies_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "validate-only" => {
+                    call = call.validate_only(
+                        value
+                            .map(|v| arg_from_str(v, err, "validate-only", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                }
+                "deploy-policy-id" => {
+                    call = call.deploy_policy_id(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["deploy-policy-id", "request-id", "validate-only"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_deploy_policies_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_deploy_policies_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "validate-only" => {
+                    call = call.validate_only(
+                        value
+                            .map(|v| arg_from_str(v, err, "validate-only", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                }
+                "etag" => {
+                    call = call.etag(value.unwrap_or(""));
+                }
+                "allow-missing" => {
+                    call = call.allow_missing(
+                        value
+                            .map(|v| arg_from_str(v, err, "allow-missing", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["allow-missing", "etag", "request-id", "validate-only"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_deploy_policies_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_deploy_policies_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_deploy_policies_get_iam_policy(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_deploy_policies_get_iam_policy(opt.value_of("resource").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "options-requested-policy-version", "int32")
+                            })
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["options-requested-policy-version"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_deploy_policies_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_deploy_policies_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "order-by", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_deploy_policies_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "annotations" => Some((
+                    "annotations",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "description" => Some((
+                    "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suspended" => Some((
+                    "suspended",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uid" => Some((
+                    "uid",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "annotations",
+                            "create-time",
+                            "description",
+                            "etag",
+                            "labels",
+                            "name",
+                            "suspended",
+                            "uid",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::DeployPolicy = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_deploy_policies_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "validate-only" => {
+                    call = call.validate_only(
+                        value
+                            .map(|v| arg_from_str(v, err, "validate-only", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                }
+                "allow-missing" => {
+                    call = call.allow_missing(
+                        value
+                            .map(|v| arg_from_str(v, err, "allow-missing", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "allow-missing",
+                                        "request-id",
+                                        "update-mask",
+                                        "validate-only",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_deploy_policies_set_iam_policy(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "policy.etag" => Some((
+                    "policy.etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "policy.version" => Some((
+                    "policy.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-mask" => Some((
+                    "updateMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["etag", "policy", "update-mask", "version"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_deploy_policies_set_iam_policy(
+                request,
+                opt.value_of("resource").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_get(
         &self,
         opt: &ArgMatches<'n>,
@@ -6092,6 +7202,9 @@ where
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 }
+                "extra-location-types" => {
+                    call = call.add_extra_location_types(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -6109,7 +7222,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    ["extra-location-types", "filter", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -6464,6 +7581,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -6494,7 +7618,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -6628,6 +7761,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "gke.dns-endpoint" => Some((
+                    "gke.dnsEndpoint",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "gke.internal-ip" => Some((
                     "gke.internalIp",
                     JsonTypeInfo {
@@ -6710,6 +7850,7 @@ where
                             "custom-target-type",
                             "deploy-parameters",
                             "description",
+                            "dns-endpoint",
                             "etag",
                             "gke",
                             "internal-ip",
@@ -7306,6 +8447,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "gke.dns-endpoint" => Some((
+                    "gke.dnsEndpoint",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "gke.internal-ip" => Some((
                     "gke.internalIp",
                     JsonTypeInfo {
@@ -7388,6 +8536,7 @@ where
                             "custom-target-type",
                             "deploy-parameters",
                             "description",
+                            "dns-endpoint",
                             "etag",
                             "gke",
                             "internal-ip",
@@ -8078,6 +9227,41 @@ where
                         )
                         .await;
                 }
+                ("locations-deploy-policies-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_deploy_policies_create(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-deploy-policies-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_deploy_policies_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-deploy-policies-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_deploy_policies_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-deploy-policies-get-iam-policy", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_deploy_policies_get_iam_policy(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-deploy-policies-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_deploy_policies_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-deploy-policies-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_deploy_policies_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-deploy-policies-set-iam-policy", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_deploy_policies_set_iam_policy(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("locations-get", Some(opt)) => {
                     call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
                 }
@@ -8195,7 +9379,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/clouddeploy1", config_dir))
         .build()
@@ -8248,14 +9434,14 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-custom-target-types-create', 'locations-custom-target-types-delete', 'locations-custom-target-types-get', 'locations-custom-target-types-get-iam-policy', 'locations-custom-target-types-list', 'locations-custom-target-types-patch', 'locations-custom-target-types-set-iam-policy', 'locations-delivery-pipelines-automation-runs-cancel', 'locations-delivery-pipelines-automation-runs-get', 'locations-delivery-pipelines-automation-runs-list', 'locations-delivery-pipelines-automations-create', 'locations-delivery-pipelines-automations-delete', 'locations-delivery-pipelines-automations-get', 'locations-delivery-pipelines-automations-list', 'locations-delivery-pipelines-automations-patch', 'locations-delivery-pipelines-create', 'locations-delivery-pipelines-delete', 'locations-delivery-pipelines-get', 'locations-delivery-pipelines-get-iam-policy', 'locations-delivery-pipelines-list', 'locations-delivery-pipelines-patch', 'locations-delivery-pipelines-releases-abandon', 'locations-delivery-pipelines-releases-create', 'locations-delivery-pipelines-releases-get', 'locations-delivery-pipelines-releases-list', 'locations-delivery-pipelines-releases-rollouts-advance', 'locations-delivery-pipelines-releases-rollouts-approve', 'locations-delivery-pipelines-releases-rollouts-cancel', 'locations-delivery-pipelines-releases-rollouts-create', 'locations-delivery-pipelines-releases-rollouts-get', 'locations-delivery-pipelines-releases-rollouts-ignore-job', 'locations-delivery-pipelines-releases-rollouts-job-runs-get', 'locations-delivery-pipelines-releases-rollouts-job-runs-list', 'locations-delivery-pipelines-releases-rollouts-job-runs-terminate', 'locations-delivery-pipelines-releases-rollouts-list', 'locations-delivery-pipelines-releases-rollouts-retry-job', 'locations-delivery-pipelines-rollback-target', 'locations-delivery-pipelines-set-iam-policy', 'locations-delivery-pipelines-test-iam-permissions', 'locations-get', 'locations-get-config', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-targets-create', 'locations-targets-delete', 'locations-targets-get', 'locations-targets-get-iam-policy', 'locations-targets-list', 'locations-targets-patch', 'locations-targets-set-iam-policy' and 'locations-targets-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-custom-target-types-create', 'locations-custom-target-types-delete', 'locations-custom-target-types-get', 'locations-custom-target-types-get-iam-policy', 'locations-custom-target-types-list', 'locations-custom-target-types-patch', 'locations-custom-target-types-set-iam-policy', 'locations-delivery-pipelines-automation-runs-cancel', 'locations-delivery-pipelines-automation-runs-get', 'locations-delivery-pipelines-automation-runs-list', 'locations-delivery-pipelines-automations-create', 'locations-delivery-pipelines-automations-delete', 'locations-delivery-pipelines-automations-get', 'locations-delivery-pipelines-automations-list', 'locations-delivery-pipelines-automations-patch', 'locations-delivery-pipelines-create', 'locations-delivery-pipelines-delete', 'locations-delivery-pipelines-get', 'locations-delivery-pipelines-get-iam-policy', 'locations-delivery-pipelines-list', 'locations-delivery-pipelines-patch', 'locations-delivery-pipelines-releases-abandon', 'locations-delivery-pipelines-releases-create', 'locations-delivery-pipelines-releases-get', 'locations-delivery-pipelines-releases-list', 'locations-delivery-pipelines-releases-rollouts-advance', 'locations-delivery-pipelines-releases-rollouts-approve', 'locations-delivery-pipelines-releases-rollouts-cancel', 'locations-delivery-pipelines-releases-rollouts-create', 'locations-delivery-pipelines-releases-rollouts-get', 'locations-delivery-pipelines-releases-rollouts-ignore-job', 'locations-delivery-pipelines-releases-rollouts-job-runs-get', 'locations-delivery-pipelines-releases-rollouts-job-runs-list', 'locations-delivery-pipelines-releases-rollouts-job-runs-terminate', 'locations-delivery-pipelines-releases-rollouts-list', 'locations-delivery-pipelines-releases-rollouts-retry-job', 'locations-delivery-pipelines-rollback-target', 'locations-delivery-pipelines-set-iam-policy', 'locations-delivery-pipelines-test-iam-permissions', 'locations-deploy-policies-create', 'locations-deploy-policies-delete', 'locations-deploy-policies-get', 'locations-deploy-policies-get-iam-policy', 'locations-deploy-policies-list', 'locations-deploy-policies-patch', 'locations-deploy-policies-set-iam-policy', 'locations-get', 'locations-get-config', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-targets-create', 'locations-targets-delete', 'locations-targets-get', 'locations-targets-get-iam-policy', 'locations-targets-list', 'locations-targets-patch', 'locations-targets-set-iam-policy' and 'locations-targets-test-iam-permissions'", vec![
             ("locations-custom-target-types-create",
                     Some(r##"Creates a new CustomTargetType in a given project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-custom-target-types-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `CustomTargetType` should be created. Format should be `projects/{project_id}/locations/{location_name}`."##),
+                     Some(r##"Required. The parent collection in which the `CustomTargetType` must be created. The format is `projects/{project_id}/locations/{location_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8360,7 +9546,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. Name of the `CustomTargetType`. Format is `projects/{project}/locations/{location}/customTargetTypes/{customTargetType}`. The `customTargetType` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
+                     Some(r##"Identifier. Name of the `CustomTargetType`. Format is `projects/{project}/locations/{location}/customTargetTypes/{customTargetType}`. The `customTargetType` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8475,7 +9661,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `Automation` should be created. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
+                     Some(r##"Required. The parent collection in which the `Automation` must be created. The format is `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8500,7 +9686,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the `Automation` to delete. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/automations/{automation_name}`."##),
+                     Some(r##"Required. The name of the `Automation` to delete. The format is `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/automations/{automation_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -8585,7 +9771,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `DeliveryPipeline` should be created. Format should be `projects/{project_id}/locations/{location_name}`."##),
+                     Some(r##"Required. The parent collection in which the `DeliveryPipeline` must be created. The format is `projects/{project_id}/locations/{location_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8610,7 +9796,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the `DeliveryPipeline` to delete. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
+                     Some(r##"Required. The name of the `DeliveryPipeline` to delete. The format is `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -8690,7 +9876,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. Name of the `DeliveryPipeline`. Format is `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}`. The `deliveryPipeline` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
+                     Some(r##"Identifier. Name of the `DeliveryPipeline`. Format is `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}`. The `deliveryPipeline` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8740,7 +9926,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `Release` should be created. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
+                     Some(r##"Required. The parent collection in which the `Release` is created. The format is `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8880,7 +10066,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `Rollout` should be created. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}`."##),
+                     Some(r##"Required. The parent collection in which the `Rollout` must be created. The format is `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -9060,7 +10246,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The `DeliveryPipeline` for which the rollback `Rollout` should be created. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
+                     Some(r##"Required. The `DeliveryPipeline` for which the rollback `Rollout` must be created. The format is `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -9111,6 +10297,161 @@ async fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-deploy-policies-create",
+                    Some(r##"Creates a new DeployPolicy in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-deploy-policies-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent collection in which the `DeployPolicy` must be created. The format is `projects/{project_id}/locations/{location_name}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-deploy-policies-delete",
+                    Some(r##"Deletes a single DeployPolicy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-deploy-policies-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the `DeployPolicy` to delete. The format is `projects/{project_id}/locations/{location_name}/deployPolicies/{deploy_policy_name}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-deploy-policies-get",
+                    Some(r##"Gets details of a single DeployPolicy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-deploy-policies-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the `DeployPolicy`. Format must be `projects/{project_id}/locations/{location_name}/deployPolicies/{deploy_policy_name}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-deploy-policies-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-deploy-policies-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-deploy-policies-list",
+                    Some(r##"Lists DeployPolicies in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-deploy-policies-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent, which owns this collection of deploy policies. Format must be `projects/{project_id}/locations/{location_name}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-deploy-policies-patch",
+                    Some(r##"Updates the parameters of a single DeployPolicy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-deploy-policies-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Output only. Name of the `DeployPolicy`. Format is `projects/{project}/locations/{location}/deployPolicies/{deployPolicy}`. The `deployPolicy` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-deploy-policies-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-deploy-policies-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -9190,7 +10531,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -9280,7 +10621,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `Target` should be created. Format should be `projects/{project_id}/locations/{location_name}`."##),
+                     Some(r##"Required. The parent collection in which the `Target` must be created. The format is `projects/{project_id}/locations/{location_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -9305,7 +10646,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the `Target` to delete. Format should be `projects/{project_id}/locations/{location_name}/targets/{target_name}`."##),
+                     Some(r##"Required. The name of the `Target` to delete. The format is `projects/{project_id}/locations/{location_name}/targets/{target_name}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -9385,7 +10726,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. Name of the `Target`. Format is `projects/{project}/locations/{location}/targets/{target}`. The `target` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
+                     Some(r##"Identifier. Name of the `Target`. Format is `projects/{project}/locations/{location}/targets/{target}`. The `target` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -9459,7 +10800,7 @@ async fn main() {
 
     let mut app = App::new("clouddeploy1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240619")
+           .version("7.0.0+20251203")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli")
            .arg(Arg::with_name("url")
@@ -9524,7 +10865,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

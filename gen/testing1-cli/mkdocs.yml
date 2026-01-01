@@ -1,4 +1,4 @@
-site_name: testing v6.0.0+20240621
+site_name: testing v7.0.0+20251217
 site_url: http://byron.github.io/google-apis-rs/google-testing1-cli
 site_description: A complete library to interact with testing (protocol v1)
 

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Shell* API at revision *20240624*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Shell* API at revision *20251215*. The CLI is at version *7.0.0*.
 
 ```bash
 cloudshell1 [options]
@@ -37,6 +37,7 @@ cloudshell1 [options]
         users
                 environments-add-public-key <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-authorize <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                environments-generate-access-token <environment> [-p <v>]... [-o <out>]
                 environments-get <name> [-p <v>]... [-o <out>]
                 environments-remove-public-key <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 environments-start <name> (-r <kv>)... [-p <v>]... [-o <out>]

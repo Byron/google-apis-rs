@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Monitoring* API at revision *20240623*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Monitoring* API at revision *20251215*. The CLI is at version *7.0.0*.
 
 ```bash
 monitoring3 [options]
@@ -39,6 +39,8 @@ monitoring3 [options]
                 alert-policies-get <name> [-p <v>]... [-o <out>]
                 alert-policies-list <name> [-p <v>]... [-o <out>]
                 alert-policies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                alerts-get <name> [-p <v>]... [-o <out>]
+                alerts-list <parent> [-p <v>]... [-o <out>]
                 collectd-time-series-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 groups-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 groups-delete <name> [-p <v>]... [-o <out>]

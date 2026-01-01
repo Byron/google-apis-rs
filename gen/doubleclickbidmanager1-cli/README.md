@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *DoubleClick Bid Manager* API at revision *20210323*. The CLI is at version *6.0.0*.
+This documentation was generated from the *DoubleClick Bid Manager* API at revision *20210323*. The CLI is at version *7.0.0*.
 
 ```bash
 doubleclickbidmanager1 [options]

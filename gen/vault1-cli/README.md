@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Vault* API can be found at the
-[official documentation site](https://developers.google.com/vault).
+[official documentation site](https://developers.google.com/workspace/vault).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Vault* API at revision *20240617*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Vault* API at revision *20251209*. The CLI is at version *7.0.0*.
 
 ```bash
 vault1 [options]

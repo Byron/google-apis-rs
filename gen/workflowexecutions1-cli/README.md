@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Workflow Executions* API at revision *20240617*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Workflow Executions* API at revision *20251202*. The CLI is at version *7.0.0*.
 
 ```bash
 workflowexecutions1 [options]
@@ -33,6 +33,7 @@ workflowexecutions1 [options]
                 locations-workflows-executions-callbacks-list <parent> [-p <v>]... [-o <out>]
                 locations-workflows-executions-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflows-executions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workflows-executions-delete-execution-history <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workflows-executions-export-data <name> [-p <v>]... [-o <out>]
                 locations-workflows-executions-get <name> [-p <v>]... [-o <out>]
                 locations-workflows-executions-list <parent> [-p <v>]... [-o <out>]

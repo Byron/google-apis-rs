@@ -1714,6 +1714,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -1744,7 +1751,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -2119,6 +2135,28 @@ where
                     "aggregation-query.nested-query.filter.property-filter.value.null-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aggregation-query.nested-query.filter.property-filter.value.string-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aggregation-query.nested-query.filter.property-filter.value.timestamp-value" => Some(("aggregationQuery.nestedQuery.filter.propertyFilter.value.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.distance-measure" => Some(("aggregationQuery.nestedQuery.findNearest.distanceMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.distance-result-property" => Some(("aggregationQuery.nestedQuery.findNearest.distanceResultProperty", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.distance-threshold" => Some(("aggregationQuery.nestedQuery.findNearest.distanceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.limit" => Some(("aggregationQuery.nestedQuery.findNearest.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.blob-value" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.blobValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.boolean-value" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.double-value" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.entity-value.key.partition-id.database-id" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.entityValue.key.partitionId.databaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.entity-value.key.partition-id.namespace-id" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.entityValue.key.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.entity-value.key.partition-id.project-id" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.entityValue.key.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.exclude-from-indexes" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.excludeFromIndexes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.geo-point-value.latitude" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.geo-point-value.longitude" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.integer-value" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.key-value.partition-id.database-id" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.keyValue.partitionId.databaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.key-value.partition-id.namespace-id" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.keyValue.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.key-value.partition-id.project-id" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.keyValue.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.meaning" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.meaning", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.null-value" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.string-value" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.query-vector.timestamp-value" => Some(("aggregationQuery.nestedQuery.findNearest.queryVector.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aggregation-query.nested-query.find-nearest.vector-property.name" => Some(("aggregationQuery.nestedQuery.findNearest.vectorProperty.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aggregation-query.nested-query.limit" => Some(("aggregationQuery.nestedQuery.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "aggregation-query.nested-query.offset" => Some(("aggregationQuery.nestedQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "aggregation-query.nested-query.start-cursor" => Some(("aggregationQuery.nestedQuery.startCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2135,7 +2173,7 @@ where
                     "read-options.read-time" => Some(("readOptions.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-query", "allow-literals", "analyze", "blob-value", "boolean-value", "composite-filter", "database-id", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "explain-options", "filter", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "nested-query", "new-transaction", "null-value", "offset", "op", "partition-id", "previous-transaction", "project-id", "property", "property-filter", "query-string", "read-consistency", "read-only", "read-options", "read-time", "read-write", "start-cursor", "string-value", "timestamp-value", "transaction", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-query", "allow-literals", "analyze", "blob-value", "boolean-value", "composite-filter", "database-id", "distance-measure", "distance-result-property", "distance-threshold", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "explain-options", "filter", "find-nearest", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "nested-query", "new-transaction", "null-value", "offset", "op", "partition-id", "previous-transaction", "project-id", "property", "property-filter", "query-string", "query-vector", "read-consistency", "read-only", "read-options", "read-time", "read-write", "start-cursor", "string-value", "timestamp-value", "transaction", "value", "vector-property"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2467,6 +2505,166 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "query.find-nearest.distance-measure" => Some((
+                    "query.findNearest.distanceMeasure",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.distance-result-property" => Some((
+                    "query.findNearest.distanceResultProperty",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.distance-threshold" => Some((
+                    "query.findNearest.distanceThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.limit" => Some((
+                    "query.findNearest.limit",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.blob-value" => Some((
+                    "query.findNearest.queryVector.blobValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.boolean-value" => Some((
+                    "query.findNearest.queryVector.booleanValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.double-value" => Some((
+                    "query.findNearest.queryVector.doubleValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.entity-value.key.partition-id.database-id" => {
+                    Some((
+                        "query.findNearest.queryVector.entityValue.key.partitionId.databaseId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "query.find-nearest.query-vector.entity-value.key.partition-id.namespace-id" => {
+                    Some((
+                        "query.findNearest.queryVector.entityValue.key.partitionId.namespaceId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "query.find-nearest.query-vector.entity-value.key.partition-id.project-id" => {
+                    Some((
+                        "query.findNearest.queryVector.entityValue.key.partitionId.projectId",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "query.find-nearest.query-vector.exclude-from-indexes" => Some((
+                    "query.findNearest.queryVector.excludeFromIndexes",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.geo-point-value.latitude" => Some((
+                    "query.findNearest.queryVector.geoPointValue.latitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.geo-point-value.longitude" => Some((
+                    "query.findNearest.queryVector.geoPointValue.longitude",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.integer-value" => Some((
+                    "query.findNearest.queryVector.integerValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.key-value.partition-id.database-id" => Some((
+                    "query.findNearest.queryVector.keyValue.partitionId.databaseId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.key-value.partition-id.namespace-id" => Some((
+                    "query.findNearest.queryVector.keyValue.partitionId.namespaceId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.key-value.partition-id.project-id" => Some((
+                    "query.findNearest.queryVector.keyValue.partitionId.projectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.meaning" => Some((
+                    "query.findNearest.queryVector.meaning",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.null-value" => Some((
+                    "query.findNearest.queryVector.nullValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.string-value" => Some((
+                    "query.findNearest.queryVector.stringValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.query-vector.timestamp-value" => Some((
+                    "query.findNearest.queryVector.timestampValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query.find-nearest.vector-property.name" => Some((
+                    "query.findNearest.vectorProperty.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "query.limit" => Some((
                     "query.limit",
                     JsonTypeInfo {
@@ -2533,12 +2731,16 @@ where
                             "boolean-value",
                             "composite-filter",
                             "database-id",
+                            "distance-measure",
+                            "distance-result-property",
+                            "distance-threshold",
                             "double-value",
                             "end-cursor",
                             "entity-value",
                             "exclude-from-indexes",
                             "explain-options",
                             "filter",
+                            "find-nearest",
                             "geo-point-value",
                             "gql-query",
                             "integer-value",
@@ -2563,6 +2765,7 @@ where
                             "property-mask",
                             "query",
                             "query-string",
+                            "query-vector",
                             "read-consistency",
                             "read-only",
                             "read-options",
@@ -2573,6 +2776,7 @@ where
                             "timestamp-value",
                             "transaction",
                             "value",
+                            "vector-property",
                         ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
@@ -2786,7 +2990,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/datastore1", config_dir))
         .build()
@@ -3086,7 +3292,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastore1_cli/projects_operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -3270,7 +3476,7 @@ async fn main() {
 
     let mut app = App::new("datastore1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251216")
            .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_cli")
            .arg(Arg::with_name("url")
@@ -3335,7 +3541,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

@@ -3014,7 +3014,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/photoslibrary1", config_dir))
         .build()
@@ -3069,12 +3071,12 @@ async fn main() {
     let arg_data = [
         ("albums", "methods: 'add-enrichment', 'batch-add-media-items', 'batch-remove-media-items', 'create', 'get', 'list', 'patch', 'share' and 'unshare'", vec![
             ("add-enrichment",
-                    Some(r##"Adds an enrichment at a specified position in a defined album."##),
+                    Some(r##"Adds an enrichment at a specified position in an app created created album."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_add-enrichment",
                   vec![
                     (Some(r##"album-id"##),
                      None,
-                     Some(r##"Required. Identifier of the album where the enrichment is to be added."##),
+                     Some(r##"Required. Identifier of the app created album where the enrichment is to be added."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -3094,7 +3096,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("batch-add-media-items",
-                    Some(r##"Adds one or more media items in a user's Google Photos library to an album. The media items and albums must have been created by the developer via the API. Media items are added to the end of the album. If multiple media items are given, they are added in the order specified in this call. Each album can contain up to 20,000 media items. Only media items that are in the user's library can be added to an album. For albums that are shared, the album must either be owned by the user or the user must have joined the album as a collaborator. Partial success is not supported. The entire request will fail if an invalid media item or album is specified."##),
+                    Some(r##"Adds one or more app created media items in a user's Google Photos library to an app created album. The media items and albums must have been created by the developer via the API. Media items are added to the end of the album. If multiple media items are given, they are added in the order specified in this call. Each album can contain up to 20,000 media items. Partial success is not supported. The entire request will fail if an invalid media item or album is specified."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_batch-add-media-items",
                   vec![
                     (Some(r##"album-id"##),
@@ -3119,7 +3121,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("batch-remove-media-items",
-                    Some(r##"Removes one or more media items from a specified album. The media items and the album must have been created by the developer via the API. For albums that are shared, this action is only supported for media items that were added to the album by this user, or for all media items if the album was created by this user. Partial success is not supported. The entire request will fail and no action will be performed on the album if an invalid media item or album is specified."##),
+                    Some(r##"Removes one or more app created media items from a specified app created album. The media items and the album must have been created by the developer via the API. Partial success is not supported. The entire request will fail and no action will be performed on the album if an invalid media item or album is specified."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_batch-remove-media-items",
                   vec![
                     (Some(r##"album-id"##),
@@ -3164,7 +3166,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the album based on the specified `albumId`. The `albumId` must be the ID of an album owned by the user or a shared album that the user has joined."##),
+                    Some(r##"Returns the app created album based on the specified `albumId`. The `albumId` must be the ID of an album created by your app."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_get",
                   vec![
                     (Some(r##"album-id"##),
@@ -3184,7 +3186,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists all albums shown to a user in the Albums tab of the Google Photos app."##),
+                    Some(r##"Lists all albums created by your app."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_list",
                   vec![
                     (Some(r##"v"##),
@@ -3199,7 +3201,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Update the album with the specified `id`. Only the `id`, `title` and `cover_photo_media_item_id` fields of the album are read. The album must have been created by the developer via the API and must be owned by the user."##),
+                    Some(r##"Update the app created album with the specified `id`. Only the `id`, `title` and `cover_photo_media_item_id` fields of the album are read. The album must have been created by the developer via the API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/albums_patch",
                   vec![
                     (Some(r##"id"##),
@@ -3276,7 +3278,7 @@ async fn main() {
             ]),
             ("media-items", "methods: 'batch-create', 'batch-get', 'get', 'list', 'patch' and 'search'", vec![
             ("batch-create",
-                    Some(r##"Creates one or more media items in a user's Google Photos library. This is the second step for creating a media item. For details regarding Step 1, uploading the raw bytes to a Google Server, see Uploading media. This call adds the media item to the library. If an album `id` is specified, the call adds the media item to the album too. Each album can contain up to 20,000 media items. By default, the media item will be added to the end of the library or album. If an album `id` and position are both defined, the media item is added to the album at the specified position. If the call contains multiple media items, they're added at the specified position. If you are creating a media item in a shared album where you are not the owner, you are not allowed to position the media item. Doing so will result in a `BAD REQUEST` error."##),
+                    Some(r##"Creates one or more media items in a user's Google Photos library. This is the second step for creating a media item. For details regarding Step 1, uploading the raw bytes to a Google Server, see Uploading media. This call adds the media item to the library. If an app created album `id` is specified, the call adds the media item to the album too. Each album can contain up to 20,000 media items. By default, the media item will be added to the end of the library or album. If an album `id` and position are both defined, the media item is added to the album at the specified position. If the call contains multiple media items, they're added at the specified position."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/media-items_batch-create",
                   vec![
                     (Some(r##"kv"##),
@@ -3296,7 +3298,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("batch-get",
-                    Some(r##"Returns the list of media items for the specified media item identifiers. Items are returned in the same order as the supplied identifiers."##),
+                    Some(r##"Returns the list of app created media items for the specified media item identifiers. Items are returned in the same order as the supplied identifiers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/media-items_batch-get",
                   vec![
                     (Some(r##"v"##),
@@ -3311,7 +3313,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Returns the media item for the specified media item identifier."##),
+                    Some(r##"Returns the app created media item for the specified media item identifier."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/media-items_get",
                   vec![
                     (Some(r##"media-item-id"##),
@@ -3331,7 +3333,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"List all media items from a user's Google Photos library."##),
+                    Some(r##"List all media items created by your app from a user's Google Photos library."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/media-items_list",
                   vec![
                     (Some(r##"v"##),
@@ -3346,7 +3348,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Update the media item with the specified `id`. Only the `id` and `description` fields of the media item are read. The media item must have been created by the developer via the API and must be owned by the user."##),
+                    Some(r##"Update the app created media item with the specified `id`. Only the `id` and `description` fields of the media item are read. The media item must have been created by the developer via the API."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/media-items_patch",
                   vec![
                     (Some(r##"id"##),
@@ -3371,7 +3373,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Searches for media items in a user's Google Photos library. If no filters are set, then all media items in the user's library are returned. If an album is set, all media items in the specified album are returned. If filters are specified, media items that match the filters from the user's library are listed. If you set both the album and the filters, the request results in an error."##),
+                    Some(r##"Searches for app created media items in a user's Google Photos library. Only media items and ablums created by your app are returned. If no filters are set, then all app created media items in the user's library are returned. If an app created album is set, all media items in the specified album are returned. If filters are specified, app created media items that match the filters from the user's library are listed. If you set both the album and the filters, the request results in an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/media-items_search",
                   vec![
                     (Some(r##"kv"##),
@@ -3393,7 +3395,7 @@ async fn main() {
             ]),
             ("shared-albums", "methods: 'get', 'join', 'leave' and 'list'", vec![
             ("get",
-                    Some(r##"Returns the album based on the specified `shareToken`."##),
+                    Some(r##"*Beginning March 31, 2025, this method will no longer work. Some or all of the scopes previously used for this method are being removed. Please see Photos APIs updates for more details.* Returns the album based on the specified `shareToken`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli/shared-albums_get",
                   vec![
                     (Some(r##"share-token"##),
@@ -3472,8 +3474,8 @@ async fn main() {
 
     let mut app = App::new("photoslibrary1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240626")
-           .about("Manage photos, videos, and albums in Google Photos ")
+           .version("7.0.0+20251221")
+           .about("Manage photos, videos, and albums created by your app in Google Photos ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_photoslibrary1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -3537,7 +3539,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

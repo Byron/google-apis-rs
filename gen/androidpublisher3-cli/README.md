@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20240626*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Android Publisher* API at revision *20251216*. The CLI is at version *7.0.0*.
 
 ```bash
 androidpublisher3 [options]
@@ -36,10 +36,10 @@ androidpublisher3 [options]
                 device-tier-configs-list <package-name> [-p <v>]... [-o <out>]
         apprecovery
                 add-targeting <package-name> <app-recovery-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                app-recoveries <package-name> [-p <v>]... [-o <out>]
                 cancel <package-name> <app-recovery-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 create <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 deploy <package-name> <app-recovery-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <package-name> [-p <v>]... [-o <out>]
         edits
                 apks-addexternallyhosted <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 apks-list <package-name> <edit-id> [-p <v>]... [-o <out>]
@@ -104,6 +104,23 @@ androidpublisher3 [options]
                 uploadbundle <package-name> (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
         monetization
                 convert-region-prices <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-batch-delete <package-name> (-r <kv>)... [-p <v>]...
+                onetimeproducts-batch-get <package-name> [-p <v>]... [-o <out>]
+                onetimeproducts-batch-update <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-delete <package-name> <product-id> [-p <v>]...
+                onetimeproducts-get <package-name> <product-id> [-p <v>]... [-o <out>]
+                onetimeproducts-list <package-name> [-p <v>]... [-o <out>]
+                onetimeproducts-patch <package-name> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-purchase-options-batch-delete <package-name> <product-id> (-r <kv>)... [-p <v>]...
+                onetimeproducts-purchase-options-batch-update-states <package-name> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-purchase-options-offers-activate <package-name> <product-id> <purchase-option-id> <offer-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-purchase-options-offers-batch-delete <package-name> <product-id> <purchase-option-id> (-r <kv>)... [-p <v>]...
+                onetimeproducts-purchase-options-offers-batch-get <package-name> <product-id> <purchase-option-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-purchase-options-offers-batch-update <package-name> <product-id> <purchase-option-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-purchase-options-offers-batch-update-states <package-name> <product-id> <purchase-option-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-purchase-options-offers-cancel <package-name> <product-id> <purchase-option-id> <offer-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-purchase-options-offers-deactivate <package-name> <product-id> <purchase-option-id> <offer-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                onetimeproducts-purchase-options-offers-list <package-name> <product-id> <purchase-option-id> [-p <v>]... [-o <out>]
                 subscriptions-archive <package-name> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-base-plans-activate <package-name> <product-id> <base-plan-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-base-plans-batch-migrate-prices <package-name> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -129,17 +146,21 @@ androidpublisher3 [options]
                 subscriptions-list <package-name> [-p <v>]... [-o <out>]
                 subscriptions-patch <package-name> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
         orders
+                batchget <package-name> [-p <v>]... [-o <out>]
+                get <package-name> <order-id> [-p <v>]... [-o <out>]
                 refund <package-name> <order-id> [-p <v>]...
         purchases
                 products-acknowledge <package-name> <product-id> <token> (-r <kv>)... [-p <v>]...
                 products-consume <package-name> <product-id> <token> [-p <v>]...
                 products-get <package-name> <product-id> <token> [-p <v>]... [-o <out>]
+                productsv2-getproductpurchasev2 <package-name> <token> [-p <v>]... [-o <out>]
                 subscriptions-acknowledge <package-name> <subscription-id> <token> (-r <kv>)... [-p <v>]...
                 subscriptions-cancel <package-name> <subscription-id> <token> [-p <v>]...
                 subscriptions-defer <package-name> <subscription-id> <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-get <package-name> <subscription-id> <token> [-p <v>]... [-o <out>]
                 subscriptions-refund <package-name> <subscription-id> <token> [-p <v>]...
                 subscriptions-revoke <package-name> <subscription-id> <token> [-p <v>]...
+                subscriptionsv2-cancel <package-name> <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptionsv2-get <package-name> <token> [-p <v>]... [-o <out>]
                 subscriptionsv2-revoke <package-name> <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 voidedpurchases-list <package-name> [-p <v>]... [-o <out>]

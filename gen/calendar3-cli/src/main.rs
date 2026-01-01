@@ -1256,6 +1256,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "auto-accept-invitations" => Some((
+                    "autoAcceptInvitations",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "background-color" => Some((
                     "backgroundColor",
                     JsonTypeInfo {
@@ -1275,6 +1282,13 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "data-owner" => Some((
+                    "dataOwner",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "deleted" => Some((
@@ -1374,9 +1388,11 @@ where
                         &vec![
                             "access-role",
                             "allowed-conference-solution-types",
+                            "auto-accept-invitations",
                             "background-color",
                             "color-id",
                             "conference-properties",
+                            "data-owner",
                             "deleted",
                             "description",
                             "etag",
@@ -1649,6 +1665,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "auto-accept-invitations" => Some((
+                    "autoAcceptInvitations",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "background-color" => Some((
                     "backgroundColor",
                     JsonTypeInfo {
@@ -1668,6 +1691,13 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "data-owner" => Some((
+                    "dataOwner",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "deleted" => Some((
@@ -1767,9 +1797,11 @@ where
                         &vec![
                             "access-role",
                             "allowed-conference-solution-types",
+                            "auto-accept-invitations",
                             "background-color",
                             "color-id",
                             "conference-properties",
+                            "data-owner",
                             "deleted",
                             "description",
                             "etag",
@@ -1925,6 +1957,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "auto-accept-invitations" => Some((
+                    "autoAcceptInvitations",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "background-color" => Some((
                     "backgroundColor",
                     JsonTypeInfo {
@@ -1944,6 +1983,13 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "data-owner" => Some((
+                    "dataOwner",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "deleted" => Some((
@@ -2043,9 +2089,11 @@ where
                         &vec![
                             "access-role",
                             "allowed-conference-solution-types",
+                            "auto-accept-invitations",
                             "background-color",
                             "color-id",
                             "conference-properties",
+                            "data-owner",
                             "deleted",
                             "description",
                             "etag",
@@ -2655,11 +2703,25 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "auto-accept-invitations" => Some((
+                    "autoAcceptInvitations",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "conference-properties.allowed-conference-solution-types" => Some((
                     "conferenceProperties.allowedConferenceSolutionTypes",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "data-owner" => Some((
+                    "dataOwner",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "description" => Some((
@@ -2716,7 +2778,9 @@ where
                         key,
                         &vec![
                             "allowed-conference-solution-types",
+                            "auto-accept-invitations",
                             "conference-properties",
+                            "data-owner",
                             "description",
                             "etag",
                             "id",
@@ -2848,11 +2912,25 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "auto-accept-invitations" => Some((
+                    "autoAcceptInvitations",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "conference-properties.allowed-conference-solution-types" => Some((
                     "conferenceProperties.allowedConferenceSolutionTypes",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "data-owner" => Some((
+                    "dataOwner",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "description" => Some((
@@ -2909,7 +2987,9 @@ where
                         key,
                         &vec![
                             "allowed-conference-solution-types",
+                            "auto-accept-invitations",
                             "conference-properties",
+                            "data-owner",
                             "description",
                             "etag",
                             "id",
@@ -3044,11 +3124,25 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "auto-accept-invitations" => Some((
+                    "autoAcceptInvitations",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "conference-properties.allowed-conference-solution-types" => Some((
                     "conferenceProperties.allowedConferenceSolutionTypes",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "data-owner" => Some((
+                    "dataOwner",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "description" => Some((
@@ -3105,7 +3199,9 @@ where
                         key,
                         &vec![
                             "allowed-conference-solution-types",
+                            "auto-accept-invitations",
                             "conference-properties",
+                            "data-owner",
                             "description",
                             "etag",
                             "id",
@@ -3703,6 +3799,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "birthday-properties.contact" => Some((
+                    "birthdayProperties.contact",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "birthday-properties.custom-type-name" => Some((
+                    "birthdayProperties.customTypeName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "birthday-properties.type" => Some((
+                    "birthdayProperties.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "color-id" => Some((
                     "colorId",
                     JsonTypeInfo {
@@ -4250,6 +4367,7 @@ where
                             "anyone-can-add-self",
                             "attendees-omitted",
                             "auto-decline-mode",
+                            "birthday-properties",
                             "building-id",
                             "chat-status",
                             "color-id",
@@ -4257,10 +4375,12 @@ where
                             "conference-id",
                             "conference-solution",
                             "conference-solution-key",
+                            "contact",
                             "create-request",
                             "created",
                             "creator",
                             "custom-location",
+                            "custom-type-name",
                             "date",
                             "date-time",
                             "decline-message",
@@ -4487,6 +4607,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "birthday-properties.contact" => Some((
+                    "birthdayProperties.contact",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "birthday-properties.custom-type-name" => Some((
+                    "birthdayProperties.customTypeName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "birthday-properties.type" => Some((
+                    "birthdayProperties.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "color-id" => Some((
                     "colorId",
                     JsonTypeInfo {
@@ -5034,6 +5175,7 @@ where
                             "anyone-can-add-self",
                             "attendees-omitted",
                             "auto-decline-mode",
+                            "birthday-properties",
                             "building-id",
                             "chat-status",
                             "color-id",
@@ -5041,10 +5183,12 @@ where
                             "conference-id",
                             "conference-solution",
                             "conference-solution-key",
+                            "contact",
                             "create-request",
                             "created",
                             "creator",
                             "custom-location",
+                            "custom-type-name",
                             "date",
                             "date-time",
                             "decline-message",
@@ -5729,6 +5873,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "birthday-properties.contact" => Some((
+                    "birthdayProperties.contact",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "birthday-properties.custom-type-name" => Some((
+                    "birthdayProperties.customTypeName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "birthday-properties.type" => Some((
+                    "birthdayProperties.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "color-id" => Some((
                     "colorId",
                     JsonTypeInfo {
@@ -6276,6 +6441,7 @@ where
                             "anyone-can-add-self",
                             "attendees-omitted",
                             "auto-decline-mode",
+                            "birthday-properties",
                             "building-id",
                             "chat-status",
                             "color-id",
@@ -6283,10 +6449,12 @@ where
                             "conference-id",
                             "conference-solution",
                             "conference-solution-key",
+                            "contact",
                             "create-request",
                             "created",
                             "creator",
                             "custom-location",
+                            "custom-type-name",
                             "date",
                             "date-time",
                             "decline-message",
@@ -6637,6 +6805,27 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "birthday-properties.contact" => Some((
+                    "birthdayProperties.contact",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "birthday-properties.custom-type-name" => Some((
+                    "birthdayProperties.customTypeName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "birthday-properties.type" => Some((
+                    "birthdayProperties.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "color-id" => Some((
                     "colorId",
                     JsonTypeInfo {
@@ -7184,6 +7373,7 @@ where
                             "anyone-can-add-self",
                             "attendees-omitted",
                             "auto-decline-mode",
+                            "birthday-properties",
                             "building-id",
                             "chat-status",
                             "color-id",
@@ -7191,10 +7381,12 @@ where
                             "conference-id",
                             "conference-solution",
                             "conference-solution-key",
+                            "contact",
                             "create-request",
                             "created",
                             "creator",
                             "custom-location",
+                            "custom-type-name",
                             "date",
                             "date-time",
                             "decline-message",
@@ -8519,7 +8711,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/calendar3", config_dir))
         .build()
@@ -8936,7 +9130,10 @@ async fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a secondary calendar."##),
+                    Some(r##"Creates a secondary calendar.
+        The authenticated user for the request is made the data owner of the new calendar.
+        
+        Note: We recommend to authenticate as the intended data owner of the calendar. You can use domain-wide delegation of authority to allow applications to act on behalf of a specific user. Don't use a service account for authentication. If you use a service account for authentication, the service account is the data owner, which can lead to unexpected behavior. For example, if a service account is the data owner, data ownership cannot be transferred."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendars_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -9183,7 +9380,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("move",
-                    Some(r##"Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime, workingLocation and fromGmail events cannot be moved."##),
+                    Some(r##"Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; birthday, focusTime, fromGmail, outOfOffice and workingLocation events cannot be moved."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_move",
                   vec![
                     (Some(r##"calendar-id"##),
@@ -9406,7 +9603,7 @@ async fn main() {
 
     let mut app = App::new("calendar3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240523")
+           .version("7.0.0+20251214")
            .about("Manipulates events and other calendar data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
            .arg(Arg::with_name("url")
@@ -9471,7 +9668,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

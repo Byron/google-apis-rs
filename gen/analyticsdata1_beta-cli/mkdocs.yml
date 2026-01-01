@@ -1,4 +1,4 @@
-site_name: AnalyticsData v6.0.0+20240625
+site_name: AnalyticsData v7.0.0+20251210
 site_url: http://byron.github.io/google-apis-rs/google-analyticsdata1_beta-cli
 site_description: A complete library to interact with AnalyticsData (protocol v1beta)
 

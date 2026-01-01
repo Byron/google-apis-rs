@@ -5843,7 +5843,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/datalabeling1-beta1", config_dir))
         .build()
@@ -6188,7 +6190,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("datasets-annotated-datasets-feedback-threads-get",
-                    Some(r##"Get a FeedbackThread object."##),
+                    Some(r##" Get a FeedbackThread object."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli/projects_datasets-annotated-datasets-feedback-threads-get",
                   vec![
                     (Some(r##"name"##),
@@ -6268,7 +6270,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("datasets-create",
-                    Some(r##"Creates dataset. If success return a Dataset resource."##),
+                    Some(r##" Creates dataset. If success return a Dataset resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli/projects_datasets-create",
                   vec![
                     (Some(r##"parent"##),
@@ -6378,7 +6380,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("datasets-evaluations-get",
-                    Some(r##"Gets an evaluation by resource name (to search, use projects.evaluations.search)."##),
+                    Some(r##" Gets an evaluation by resource name (to search, use projects.evaluations.search)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli/projects_datasets-evaluations-get",
                   vec![
                     (Some(r##"name"##),
@@ -6443,7 +6445,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("datasets-image-label",
-                    Some(r##"Starts a labeling task for image. The type of image labeling task is configured by feature in the request."##),
+                    Some(r##" Starts a labeling task for image. The type of image labeling task is configured by feature in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli/projects_datasets-image-label",
                   vec![
                     (Some(r##"parent"##),
@@ -6563,7 +6565,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("evaluation-jobs-create",
-                    Some(r##"Creates an evaluation job."##),
+                    Some(r##" Creates an evaluation job."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli/projects_evaluation-jobs-create",
                   vec![
                     (Some(r##"parent"##),
@@ -6828,7 +6830,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli/projects_operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -6912,7 +6914,7 @@ async fn main() {
 
     let mut app = App::new("datalabeling1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240207")
+           .version("7.0.0+20250723")
            .about("Public API for Google Cloud AI Data Labeling Service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -6977,7 +6979,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

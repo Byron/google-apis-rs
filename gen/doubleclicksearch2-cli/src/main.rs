@@ -48,34 +48,52 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let agency_id: i64 = arg_from_str(
+            &opt.value_of("agency-id").unwrap_or(""),
+            err,
+            "<agency-id>",
+            "int64",
+        );
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let engine_account_id: i64 = arg_from_str(
+            &opt.value_of("engine-account-id").unwrap_or(""),
+            err,
+            "<engine-account-id>",
+            "int64",
+        );
         let end_date: i32 = arg_from_str(
             &opt.value_of("end-date").unwrap_or(""),
             err,
             "<end-date>",
-            "integer",
+            "int32",
         );
         let row_count: i32 = arg_from_str(
             &opt.value_of("row-count").unwrap_or(""),
             err,
             "<row-count>",
-            "integer",
+            "int32",
         );
         let start_date: i32 = arg_from_str(
             &opt.value_of("start-date").unwrap_or(""),
             err,
             "<start-date>",
-            "integer",
+            "int32",
         );
         let start_row: u32 = arg_from_str(
             &opt.value_of("start-row").unwrap_or(""),
             err,
             "<start-row>",
-            "integer",
+            "uint32",
         );
         let mut call = self.hub.conversion().get(
-            opt.value_of("agency-id").unwrap_or(""),
-            opt.value_of("advertiser-id").unwrap_or(""),
-            opt.value_of("engine-account-id").unwrap_or(""),
+            agency_id,
+            advertiser_id,
+            engine_account_id,
             end_date,
             row_count,
             start_date,
@@ -204,25 +222,25 @@ where
             &opt.value_of("end-date").unwrap_or(""),
             err,
             "<end-date>",
-            "integer",
+            "int32",
         );
         let row_count: i32 = arg_from_str(
             &opt.value_of("row-count").unwrap_or(""),
             err,
             "<row-count>",
-            "integer",
+            "int32",
         );
         let start_date: i32 = arg_from_str(
             &opt.value_of("start-date").unwrap_or(""),
             err,
             "<start-date>",
-            "integer",
+            "int32",
         );
         let start_row: u32 = arg_from_str(
             &opt.value_of("start-row").unwrap_or(""),
             err,
             "<start-row>",
-            "integer",
+            "uint32",
         );
         let mut call = self.hub.conversion().get_by_customer_id(
             opt.value_of("customer-id").unwrap_or(""),
@@ -1132,7 +1150,7 @@ where
             &opt.value_of("report-fragment").unwrap_or(""),
             err,
             "<report-fragment>",
-            "integer",
+            "int32",
         );
         let mut download_mode = false;
         let mut call = self
@@ -1227,11 +1245,23 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut download_mode = false;
-        let mut call = self.hub.reports().get_id_mapping_file(
-            opt.value_of("agency-id").unwrap_or(""),
-            opt.value_of("advertiser-id").unwrap_or(""),
+        let agency_id: i64 = arg_from_str(
+            &opt.value_of("agency-id").unwrap_or(""),
+            err,
+            "<agency-id>",
+            "int64",
         );
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut download_mode = false;
+        let mut call = self
+            .hub
+            .reports()
+            .get_id_mapping_file(agency_id, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1615,10 +1645,19 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.saved_columns().list(
-            opt.value_of("agency-id").unwrap_or(""),
-            opt.value_of("advertiser-id").unwrap_or(""),
+        let agency_id: i64 = arg_from_str(
+            &opt.value_of("agency-id").unwrap_or(""),
+            err,
+            "<agency-id>",
+            "int64",
         );
+        let advertiser_id: i64 = arg_from_str(
+            &opt.value_of("advertiser-id").unwrap_or(""),
+            err,
+            "<advertiser-id>",
+            "int64",
+        );
+        let mut call = self.hub.saved_columns().list(agency_id, advertiser_id);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -1798,7 +1837,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/doubleclicksearch2", config_dir))
         .build()
@@ -2146,7 +2187,7 @@ async fn main() {
 
     let mut app = App::new("doubleclicksearch2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240618")
+           .version("7.0.0+20251210")
            .about("The Search Ads 360 API allows developers to automate uploading conversions and downloading reports from Search Ads 360.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli")
            .arg(Arg::with_name("url")
@@ -2211,7 +2252,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

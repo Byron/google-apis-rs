@@ -1,4 +1,4 @@
-site_name: baremetalsolution v6.0.0+20240617
+site_name: baremetalsolution v7.0.0+20251008
 site_url: http://byron.github.io/google-apis-rs/google-baremetalsolution2-cli
 site_description: A complete library to interact with baremetalsolution (protocol v2)
 

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Talent Solution* API at revision *20240620*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Cloud Talent Solution* API at revision *20251014*. The CLI is at version *7.0.0*.
 
 ```bash
 jobs3 [options]

@@ -908,6 +908,172 @@ where
         }
     }
 
+    async fn _projects_databases_documents_execute_pipeline(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "new-transaction.read-only.read-time" => Some((
+                    "newTransaction.readOnly.readTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "new-transaction.read-write.retry-transaction" => Some((
+                    "newTransaction.readWrite.retryTransaction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "read-time" => Some((
+                    "readTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "transaction" => Some((
+                    "transaction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "new-transaction",
+                            "read-only",
+                            "read-time",
+                            "read-write",
+                            "retry-transaction",
+                            "transaction",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::ExecutePipelineRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .databases_documents_execute_pipeline(request, opt.value_of("database").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_databases_documents_get(
         &self,
         opt: &ArgMatches<'n>,
@@ -1462,10 +1628,14 @@ where
                     "add-target.query.parent" => Some(("addTarget.query.parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.end-at.before" => Some(("addTarget.query.structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.distance-measure" => Some(("addTarget.query.structuredQuery.findNearest.distanceMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.distance-result-field" => Some(("addTarget.query.structuredQuery.findNearest.distanceResultField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.distance-threshold" => Some(("addTarget.query.structuredQuery.findNearest.distanceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.limit" => Some(("addTarget.query.structuredQuery.findNearest.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.boolean-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.bytes-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.double-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.field-reference-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.fieldReferenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.function-value.name" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.functionValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.geo-point-value.latitude" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.geo-point-value.longitude" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.find-nearest.query-vector.integer-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1483,6 +1653,8 @@ where
                     "add-target.query.structured-query.where.field-filter.value.boolean-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.bytes-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.double-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.field-filter.value.field-reference-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.fieldReferenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.field-filter.value.function-value.name" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.functionValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.integer-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1498,7 +1670,7 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "remove-target" => Some(("removeTarget", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "documents", "double-value", "end-at", "expected-count", "field", "field-filter", "field-path", "find-nearest", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "null-value", "offset", "once", "op", "parent", "query", "query-vector", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "vector-field", "where"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "distance-result-field", "distance-threshold", "documents", "double-value", "end-at", "expected-count", "field", "field-filter", "field-path", "field-reference-value", "find-nearest", "function-value", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "name", "null-value", "offset", "once", "op", "parent", "query", "query-vector", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "vector-field", "where"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1662,6 +1834,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "structured-query.find-nearest.distance-result-field" => Some((
+                    "structuredQuery.findNearest.distanceResultField",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.distance-threshold" => Some((
+                    "structuredQuery.findNearest.distanceThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "structured-query.find-nearest.limit" => Some((
                     "structuredQuery.findNearest.limit",
                     JsonTypeInfo {
@@ -1687,6 +1873,20 @@ where
                     "structuredQuery.findNearest.queryVector.doubleValue",
                     JsonTypeInfo {
                         jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.query-vector.field-reference-value" => Some((
+                    "structuredQuery.findNearest.queryVector.fieldReferenceValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.query-vector.function-value.name" => Some((
+                    "structuredQuery.findNearest.queryVector.functionValue.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -1809,6 +2009,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "structured-query.where.field-filter.value.field-reference-value" => Some((
+                    "structuredQuery.where.fieldFilter.value.fieldReferenceValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.where.field-filter.value.function-value.name" => Some((
+                    "structuredQuery.where.fieldFilter.value.functionValue.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "structured-query.where.field-filter.value.geo-point-value.latitude" => Some((
                     "structuredQuery.where.fieldFilter.value.geoPointValue.latitude",
                     JsonTypeInfo {
@@ -1881,17 +2095,22 @@ where
                             "bytes-value",
                             "composite-filter",
                             "distance-measure",
+                            "distance-result-field",
+                            "distance-threshold",
                             "double-value",
                             "end-at",
                             "field",
                             "field-filter",
                             "field-path",
+                            "field-reference-value",
                             "find-nearest",
+                            "function-value",
                             "geo-point-value",
                             "integer-value",
                             "latitude",
                             "limit",
                             "longitude",
+                            "name",
                             "null-value",
                             "offset",
                             "op",
@@ -2363,10 +2582,14 @@ where
                     "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.end-at.before" => Some(("structuredAggregationQuery.structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.distance-measure" => Some(("structuredAggregationQuery.structuredQuery.findNearest.distanceMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.distance-result-field" => Some(("structuredAggregationQuery.structuredQuery.findNearest.distanceResultField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.distance-threshold" => Some(("structuredAggregationQuery.structuredQuery.findNearest.distanceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.limit" => Some(("structuredAggregationQuery.structuredQuery.findNearest.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.boolean-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.bytes-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.double-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.field-reference-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.fieldReferenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.function-value.name" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.functionValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.geo-point-value.latitude" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.geo-point-value.longitude" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.find-nearest.query-vector.integer-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2384,6 +2607,8 @@ where
                     "structured-aggregation-query.structured-query.where.field-filter.value.boolean-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.bytes-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.double-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.where.field-filter.value.field-reference-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.fieldReferenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.where.field-filter.value.function-value.name" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.functionValue.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.where.field-filter.value.integer-value" => Some(("structuredAggregationQuery.structuredQuery.where.fieldFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2395,7 +2620,7 @@ where
                     "structured-aggregation-query.structured-query.where.unary-filter.op" => Some(("structuredAggregationQuery.structuredQuery.where.unaryFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "double-value", "end-at", "explain-options", "field", "field-filter", "field-path", "find-nearest", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "new-transaction", "null-value", "offset", "op", "query-vector", "read-only", "read-time", "read-write", "reference-value", "retry-transaction", "start-at", "string-value", "structured-aggregation-query", "structured-query", "timestamp-value", "transaction", "unary-filter", "value", "vector-field", "where"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "distance-result-field", "distance-threshold", "double-value", "end-at", "explain-options", "field", "field-filter", "field-path", "field-reference-value", "find-nearest", "function-value", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "name", "new-transaction", "null-value", "offset", "op", "query-vector", "read-only", "read-time", "read-write", "reference-value", "retry-transaction", "start-at", "string-value", "structured-aggregation-query", "structured-query", "timestamp-value", "transaction", "unary-filter", "value", "vector-field", "where"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2563,6 +2788,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "structured-query.find-nearest.distance-result-field" => Some((
+                    "structuredQuery.findNearest.distanceResultField",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.distance-threshold" => Some((
+                    "structuredQuery.findNearest.distanceThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "structured-query.find-nearest.limit" => Some((
                     "structuredQuery.findNearest.limit",
                     JsonTypeInfo {
@@ -2588,6 +2827,20 @@ where
                     "structuredQuery.findNearest.queryVector.doubleValue",
                     JsonTypeInfo {
                         jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.query-vector.field-reference-value" => Some((
+                    "structuredQuery.findNearest.queryVector.fieldReferenceValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.find-nearest.query-vector.function-value.name" => Some((
+                    "structuredQuery.findNearest.queryVector.functionValue.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -2710,6 +2963,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "structured-query.where.field-filter.value.field-reference-value" => Some((
+                    "structuredQuery.where.fieldFilter.value.fieldReferenceValue",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "structured-query.where.field-filter.value.function-value.name" => Some((
+                    "structuredQuery.where.fieldFilter.value.functionValue.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "structured-query.where.field-filter.value.geo-point-value.latitude" => Some((
                     "structuredQuery.where.fieldFilter.value.geoPointValue.latitude",
                     JsonTypeInfo {
@@ -2790,18 +3057,23 @@ where
                             "bytes-value",
                             "composite-filter",
                             "distance-measure",
+                            "distance-result-field",
+                            "distance-threshold",
                             "double-value",
                             "end-at",
                             "explain-options",
                             "field",
                             "field-filter",
                             "field-path",
+                            "field-reference-value",
                             "find-nearest",
+                            "function-value",
                             "geo-point-value",
                             "integer-value",
                             "latitude",
                             "limit",
                             "longitude",
+                            "name",
                             "new-transaction",
                             "null-value",
                             "offset",
@@ -3802,6 +4074,11 @@ where
                         ._projects_databases_documents_delete(opt, dry_run, &mut err)
                         .await;
                 }
+                ("databases-documents-execute-pipeline", Some(opt)) => {
+                    call_result = self
+                        ._projects_databases_documents_execute_pipeline(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("databases-documents-get", Some(opt)) => {
                     call_result = self
                         ._projects_databases_documents_get(opt, dry_run, &mut err)
@@ -3933,7 +4210,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/firestore1-beta1", config_dir))
         .build()
@@ -3986,7 +4265,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'databases-documents-batch-get', 'databases-documents-batch-write', 'databases-documents-begin-transaction', 'databases-documents-commit', 'databases-documents-create-document', 'databases-documents-delete', 'databases-documents-get', 'databases-documents-list', 'databases-documents-list-collection-ids', 'databases-documents-list-documents', 'databases-documents-listen', 'databases-documents-partition-query', 'databases-documents-patch', 'databases-documents-rollback', 'databases-documents-run-aggregation-query', 'databases-documents-run-query', 'databases-documents-write', 'databases-export-documents', 'databases-import-documents', 'databases-indexes-create', 'databases-indexes-delete', 'databases-indexes-get' and 'databases-indexes-list'", vec![
+        ("projects", "methods: 'databases-documents-batch-get', 'databases-documents-batch-write', 'databases-documents-begin-transaction', 'databases-documents-commit', 'databases-documents-create-document', 'databases-documents-delete', 'databases-documents-execute-pipeline', 'databases-documents-get', 'databases-documents-list', 'databases-documents-list-collection-ids', 'databases-documents-list-documents', 'databases-documents-listen', 'databases-documents-partition-query', 'databases-documents-patch', 'databases-documents-rollback', 'databases-documents-run-aggregation-query', 'databases-documents-run-query', 'databases-documents-write', 'databases-export-documents', 'databases-import-documents', 'databases-indexes-create', 'databases-indexes-delete', 'databases-indexes-get' and 'databases-indexes-list'", vec![
             ("databases-documents-batch-get",
                     Some(r##"Gets multiple documents. Documents returned by this method are not guaranteed to be returned in the same order that they were requested."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli/projects_databases-documents-batch-get",
@@ -4126,6 +4405,31 @@ async fn main() {
                      Some(r##"Required. The resource name of the Document to delete. In the format: `projects/{project_id}/databases/{database_id}/documents/{document_path}`."##),
                      Some(true),
                      Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-documents-execute-pipeline",
+                    Some(r##"Executes a pipeline query."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli/projects_databases-documents-execute-pipeline",
+                  vec![
+                    (Some(r##"database"##),
+                     None,
+                     Some(r##"Required. Database identifier, in the form `projects/{project}/databases/{database}`."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -4547,7 +4851,7 @@ async fn main() {
 
     let mut app = App::new("firestore1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251216")
            .about("Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -4612,7 +4916,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

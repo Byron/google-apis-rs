@@ -1,4 +1,4 @@
-site_name: storage v7.0.0+20240621
+site_name: storage v7.0.0+20251218
 site_url: http://byron.github.io/google-apis-rs/google-storage1-cli
 site_description: A complete library to interact with storage (protocol v1)
 
@@ -32,10 +32,13 @@ nav:
     - 'Insert': 'buckets_insert.md'
     - 'List': 'buckets_list.md'
     - 'Lock Retention Policy': 'buckets_lock-retention-policy.md'
+    - 'Operations Advance Relocate Bucket': 'buckets_operations-advance-relocate-bucket.md'
     - 'Operations Cancel': 'buckets_operations-cancel.md'
     - 'Operations Get': 'buckets_operations-get.md'
     - 'Operations List': 'buckets_operations-list.md'
     - 'Patch': 'buckets_patch.md'
+    - 'Relocate': 'buckets_relocate.md'
+    - 'Restore': 'buckets_restore.md'
     - 'Set Iam Policy': 'buckets_set-iam-policy.md'
     - 'Test Iam Permissions': 'buckets_test-iam-permissions.md'
     - 'Update': 'buckets_update.md'
@@ -83,6 +86,7 @@ nav:
     - 'Get Iam Policy': 'objects_get-iam-policy.md'
     - 'Insert': 'objects_insert.md'
     - 'List': 'objects_list.md'
+    - 'Move': 'objects_move.md'
     - 'Patch': 'objects_patch.md'
     - 'Restore': 'objects_restore.md'
     - 'Rewrite': 'objects_rewrite.md'

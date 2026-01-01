@@ -25,10 +25,22 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Network Management* API at revision *20240619*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Network Management* API at revision *20251203*. The CLI is at version *7.0.0*.
 
 ```bash
 networkmanagement1 [options]
+        organizations
+                locations-get <name> [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
+                locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-operations-delete <name> [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-delete <name> [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-get <name> [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-list <parent> [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-global-connectivity-tests-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -45,6 +57,13 @@ networkmanagement1 [options]
                 locations-global-operations-get <name> [-p <v>]... [-o <out>]
                 locations-global-operations-list <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-delete <name> [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-get <name> [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-list <parent> [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-query-org-vpc-flow-logs-configs <parent> [-p <v>]... [-o <out>]
+                locations-vpc-flow-logs-configs-show-effective-flow-logs-configs <parent> [-p <v>]... [-o <out>]
   networkmanagement1 --help
 
 Configuration:

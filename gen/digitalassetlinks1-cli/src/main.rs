@@ -73,13 +73,6 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
-                "allow-google-internal-data-sources" => Some((
-                    "allowGoogleInternalDataSources",
-                    JsonTypeInfo {
-                        jtype: JsonType::Boolean,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
                 "default-relation" => Some((
                     "defaultRelation",
                     JsonTypeInfo {
@@ -129,8 +122,8 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
-                "skip-cache-lookup" => Some((
-                    "skipCacheLookup",
+                "return-relation-extensions" => Some((
+                    "returnRelationExtensions",
                     JsonTypeInfo {
                         jtype: JsonType::Boolean,
                         ctype: ComplexType::Pod,
@@ -140,16 +133,15 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
-                            "allow-google-internal-data-sources",
                             "android-app",
                             "certificate",
                             "default-relation",
                             "default-source",
                             "default-target",
                             "package-name",
+                            "return-relation-extensions",
                             "sha256-fingerprint",
                             "site",
-                            "skip-cache-lookup",
                             "web",
                         ],
                     );
@@ -270,6 +262,13 @@ where
                     call =
                         call.source_android_app_certificate_sha256_fingerprint(value.unwrap_or(""));
                 }
+                "return-relation-extensions" => {
+                    call = call.return_relation_extensions(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-relation-extensions", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "relation" => {
                     call = call.relation(value.unwrap_or(""));
                 }
@@ -293,6 +292,7 @@ where
                                 v.extend(
                                     [
                                         "relation",
+                                        "return-relation-extensions",
                                         "source-android-app-certificate-sha256-fingerprint",
                                         "source-android-app-package-name",
                                         "source-web-site",
@@ -365,6 +365,13 @@ where
                     call =
                         call.source_android_app_certificate_sha256_fingerprint(value.unwrap_or(""));
                 }
+                "return-relation-extensions" => {
+                    call = call.return_relation_extensions(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-relation-extensions", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "relation" => {
                     call = call.relation(value.unwrap_or(""));
                 }
@@ -388,6 +395,7 @@ where
                                 v.extend(
                                     [
                                         "relation",
+                                        "return-relation-extensions",
                                         "source-android-app-certificate-sha256-fingerprint",
                                         "source-android-app-package-name",
                                         "source-web-site",
@@ -503,7 +511,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/digitalassetlinks1", config_dir))
         .build()
@@ -614,7 +624,7 @@ async fn main() {
 
     let mut app = App::new("digitalassetlinks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240622")
+           .version("7.0.0+20251206")
            .about("Discovers relationships between online assets such as websites or mobile apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_digitalassetlinks1_cli")
            .arg(Arg::with_name("folder")
@@ -674,7 +684,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

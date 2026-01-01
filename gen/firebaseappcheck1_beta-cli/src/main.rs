@@ -3864,6 +3864,27 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "account-details.require-licensed" => Some((
+                    "accountDetails.requireLicensed",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "app-integrity.allow-unrecognized-version" => Some((
+                    "appIntegrity.allowUnrecognizedVersion",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "device-integrity.min-device-recognition-level" => Some((
+                    "deviceIntegrity.minDeviceRecognitionLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -3879,7 +3900,19 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "token-ttl"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "account-details",
+                            "allow-unrecognized-version",
+                            "app-integrity",
+                            "device-integrity",
+                            "min-device-recognition-level",
+                            "name",
+                            "require-licensed",
+                            "token-ttl",
+                        ],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -4180,6 +4213,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "min-valid-score" => Some((
+                    "minValidScore",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -4211,7 +4251,13 @@ where
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["name", "site-secret", "site-secret-set", "token-ttl"],
+                        &vec![
+                            "min-valid-score",
+                            "name",
+                            "site-secret",
+                            "site-secret-set",
+                            "token-ttl",
+                        ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -4520,6 +4566,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "risk-analysis.min-valid-score" => Some((
+                    "riskAnalysis.minValidScore",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "site-key" => Some((
                     "siteKey",
                     JsonTypeInfo {
@@ -4535,8 +4588,16 @@ where
                     },
                 )),
                 _ => {
-                    let suggestion =
-                        FieldCursor::did_you_mean(key, &vec!["name", "site-key", "token-ttl"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "min-valid-score",
+                            "name",
+                            "risk-analysis",
+                            "site-key",
+                            "token-ttl",
+                        ],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -4837,6 +4898,13 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "min-valid-score" => Some((
+                    "minValidScore",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -4868,7 +4936,13 @@ where
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["name", "site-secret", "site-secret-set", "token-ttl"],
+                        &vec![
+                            "min-valid-score",
+                            "name",
+                            "site-secret",
+                            "site-secret-set",
+                            "token-ttl",
+                        ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -6980,7 +7054,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/firebaseappcheck1-beta", config_dir))
         .build()
@@ -8094,7 +8170,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the service configuration object, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform)"##),
+                     Some(r##"Required. The relative resource name of the service configuration object, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform) * `oauth2.googleapis.com` (Google Identity for iOS)"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -8278,7 +8354,7 @@ async fn main() {
 
     let mut app = App::new("firebaseappcheck1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240617")
+           .version("7.0.0+20251213")
            .about("Firebase App Check works alongside other Firebase services to help protect your backend resources from abuse, such as billing fraud or phishing.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebaseappcheck1_beta_cli")
            .arg(Arg::with_name("url")
@@ -8343,7 +8419,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

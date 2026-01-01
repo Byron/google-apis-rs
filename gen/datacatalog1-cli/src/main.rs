@@ -364,6 +364,313 @@ where
         }
     }
 
+    async fn _organizations_locations_retrieve_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_retrieve_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_retrieve_effective_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_retrieve_effective_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_set_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "catalog-ui-experience" => Some((
+                    "catalogUiExperience",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tag-template-migration" => Some((
+                    "tagTemplateMigration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["catalog-ui-experience", "tag-template-migration"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudDatacatalogV1SetConfigRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .organizations()
+            .locations_set_config(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_entry_groups_create(
         &self,
         opt: &ArgMatches<'n>,
@@ -437,6 +744,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transferred-to-dataplex" => Some((
+                    "transferredToDataplex",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -447,6 +761,7 @@ where
                             "display-name",
                             "expire-time",
                             "name",
+                            "transferred-to-dataplex",
                             "update-time",
                         ],
                     );
@@ -978,6 +1293,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "graph-spec.name" => Some((
+                    "graphSpec.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "integrated-system" => Some((
                     "integratedSystem",
                     JsonTypeInfo {
@@ -1262,6 +1584,7 @@ where
                             "fileset-spec",
                             "fully-qualified-name",
                             "gcs-fileset-spec",
+                            "graph-spec",
                             "grouped-entry",
                             "has-credential",
                             "imported-libraries",
@@ -2579,6 +2902,13 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
+                "graph-spec.name" => Some((
+                    "graphSpec.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "integrated-system" => Some((
                     "integratedSystem",
                     JsonTypeInfo {
@@ -2863,6 +3193,7 @@ where
                             "fileset-spec",
                             "fully-qualified-name",
                             "gcs-fileset-spec",
+                            "graph-spec",
                             "grouped-entry",
                             "has-credential",
                             "imported-libraries",
@@ -3194,6 +3525,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "dataplex-transfer-status" => Some((
+                    "dataplexTransferStatus",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -3218,7 +3556,13 @@ where
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["column", "name", "template", "template-display-name"],
+                        &vec![
+                            "column",
+                            "dataplex-transfer-status",
+                            "name",
+                            "template",
+                            "template-display-name",
+                        ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -3529,6 +3873,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "dataplex-transfer-status" => Some((
+                    "dataplexTransferStatus",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -3553,7 +3904,13 @@ where
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["column", "name", "template", "template-display-name"],
+                        &vec![
+                            "column",
+                            "dataplex-transfer-status",
+                            "name",
+                            "template",
+                            "template-display-name",
+                        ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -4463,6 +4820,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "transferred-to-dataplex" => Some((
+                    "transferredToDataplex",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -4473,6 +4837,7 @@ where
                             "display-name",
                             "expire-time",
                             "name",
+                            "transferred-to-dataplex",
                             "update-time",
                         ],
                     );
@@ -4759,6 +5124,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "dataplex-transfer-status" => Some((
+                    "dataplexTransferStatus",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -4783,7 +5155,13 @@ where
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["column", "name", "template", "template-display-name"],
+                        &vec![
+                            "column",
+                            "dataplex-transfer-status",
+                            "name",
+                            "template",
+                            "template-display-name",
+                        ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -5091,6 +5469,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "dataplex-transfer-status" => Some((
+                    "dataplexTransferStatus",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "name" => Some((
                     "name",
                     JsonTypeInfo {
@@ -5115,7 +5500,13 @@ where
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
-                        &vec!["column", "name", "template", "template-display-name"],
+                        &vec![
+                            "column",
+                            "dataplex-transfer-status",
+                            "name",
+                            "template",
+                            "template-display-name",
+                        ],
                     );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
@@ -5619,6 +6010,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -5649,7 +6047,242 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_retrieve_effective_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_retrieve_effective_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_set_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "catalog-ui-experience" => Some((
+                    "catalogUiExperience",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tag-template-migration" => Some((
+                    "tagTemplateMigration",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["catalog-ui-experience", "tag-template-migration"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::GoogleCloudDatacatalogV1SetConfigRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_set_config(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -9913,6 +10546,28 @@ where
                     writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
+            ("organizations", Some(opt)) => match opt.subcommand() {
+                ("locations-retrieve-config", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_retrieve_config(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-retrieve-effective-config", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_retrieve_effective_config(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-set-config", Some(opt)) => {
+                    call_result = self
+                        ._organizations_locations_set_config(opt, dry_run, &mut err)
+                        .await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("organizations".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
+                }
+            },
             ("projects", Some(opt)) => match opt.subcommand() {
                 ("locations-entry-groups-create", Some(opt)) => {
                     call_result = self
@@ -10093,6 +10748,16 @@ where
                 ("locations-operations-list", Some(opt)) => {
                     call_result = self
                         ._projects_locations_operations_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-retrieve-effective-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_retrieve_effective_config(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-set-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_set_config(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-tag-templates-create", Some(opt)) => {
@@ -10306,7 +10971,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/datacatalog1", config_dir))
         .build()
@@ -10398,7 +11065,74 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("projects", "methods: 'locations-entry-groups-create', 'locations-entry-groups-delete', 'locations-entry-groups-entries-create', 'locations-entry-groups-entries-delete', 'locations-entry-groups-entries-get', 'locations-entry-groups-entries-get-iam-policy', 'locations-entry-groups-entries-import', 'locations-entry-groups-entries-list', 'locations-entry-groups-entries-modify-entry-contacts', 'locations-entry-groups-entries-modify-entry-overview', 'locations-entry-groups-entries-patch', 'locations-entry-groups-entries-star', 'locations-entry-groups-entries-tags-create', 'locations-entry-groups-entries-tags-delete', 'locations-entry-groups-entries-tags-list', 'locations-entry-groups-entries-tags-patch', 'locations-entry-groups-entries-tags-reconcile', 'locations-entry-groups-entries-test-iam-permissions', 'locations-entry-groups-entries-unstar', 'locations-entry-groups-get', 'locations-entry-groups-get-iam-policy', 'locations-entry-groups-list', 'locations-entry-groups-patch', 'locations-entry-groups-set-iam-policy', 'locations-entry-groups-tags-create', 'locations-entry-groups-tags-delete', 'locations-entry-groups-tags-list', 'locations-entry-groups-tags-patch', 'locations-entry-groups-test-iam-permissions', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-tag-templates-create', 'locations-tag-templates-delete', 'locations-tag-templates-fields-create', 'locations-tag-templates-fields-delete', 'locations-tag-templates-fields-enum-values-rename', 'locations-tag-templates-fields-patch', 'locations-tag-templates-fields-rename', 'locations-tag-templates-get', 'locations-tag-templates-get-iam-policy', 'locations-tag-templates-patch', 'locations-tag-templates-set-iam-policy', 'locations-tag-templates-test-iam-permissions', 'locations-taxonomies-create', 'locations-taxonomies-delete', 'locations-taxonomies-export', 'locations-taxonomies-get', 'locations-taxonomies-get-iam-policy', 'locations-taxonomies-import', 'locations-taxonomies-list', 'locations-taxonomies-patch', 'locations-taxonomies-policy-tags-create', 'locations-taxonomies-policy-tags-delete', 'locations-taxonomies-policy-tags-get', 'locations-taxonomies-policy-tags-get-iam-policy', 'locations-taxonomies-policy-tags-list', 'locations-taxonomies-policy-tags-patch', 'locations-taxonomies-policy-tags-set-iam-policy', 'locations-taxonomies-policy-tags-test-iam-permissions', 'locations-taxonomies-replace', 'locations-taxonomies-set-iam-policy' and 'locations-taxonomies-test-iam-permissions'", vec![
+            ("organizations", "methods: 'locations-retrieve-config', 'locations-retrieve-effective-config' and 'locations-set-config'", vec![
+            ("locations-retrieve-config",
+                    Some(r##"Retrieves the configuration related to the migration from Data Catalog to Dataplex Universal Catalog for a specific organization, including all the projects under it which have a separate configuration set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/organizations_locations-retrieve-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The organization whose config is being retrieved."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-retrieve-effective-config",
+                    Some(r##"Retrieves the effective configuration related to the migration from Data Catalog to Dataplex Universal Catalog for a specific organization or project. If there is no specific configuration set for the resource, the setting is checked hierarchicahlly through the ancestors of the resource, starting from the resource itself."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/organizations_locations-retrieve-effective-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource whose effective config is being retrieved."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-set-config",
+                    Some(r##"Sets the configuration related to the migration to Dataplex Universal Catalog for an organization or project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/organizations_locations-set-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The organization or project whose config is being specified."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+            ("projects", "methods: 'locations-entry-groups-create', 'locations-entry-groups-delete', 'locations-entry-groups-entries-create', 'locations-entry-groups-entries-delete', 'locations-entry-groups-entries-get', 'locations-entry-groups-entries-get-iam-policy', 'locations-entry-groups-entries-import', 'locations-entry-groups-entries-list', 'locations-entry-groups-entries-modify-entry-contacts', 'locations-entry-groups-entries-modify-entry-overview', 'locations-entry-groups-entries-patch', 'locations-entry-groups-entries-star', 'locations-entry-groups-entries-tags-create', 'locations-entry-groups-entries-tags-delete', 'locations-entry-groups-entries-tags-list', 'locations-entry-groups-entries-tags-patch', 'locations-entry-groups-entries-tags-reconcile', 'locations-entry-groups-entries-test-iam-permissions', 'locations-entry-groups-entries-unstar', 'locations-entry-groups-get', 'locations-entry-groups-get-iam-policy', 'locations-entry-groups-list', 'locations-entry-groups-patch', 'locations-entry-groups-set-iam-policy', 'locations-entry-groups-tags-create', 'locations-entry-groups-tags-delete', 'locations-entry-groups-tags-list', 'locations-entry-groups-tags-patch', 'locations-entry-groups-test-iam-permissions', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-retrieve-effective-config', 'locations-set-config', 'locations-tag-templates-create', 'locations-tag-templates-delete', 'locations-tag-templates-fields-create', 'locations-tag-templates-fields-delete', 'locations-tag-templates-fields-enum-values-rename', 'locations-tag-templates-fields-patch', 'locations-tag-templates-fields-rename', 'locations-tag-templates-get', 'locations-tag-templates-get-iam-policy', 'locations-tag-templates-patch', 'locations-tag-templates-set-iam-policy', 'locations-tag-templates-test-iam-permissions', 'locations-taxonomies-create', 'locations-taxonomies-delete', 'locations-taxonomies-export', 'locations-taxonomies-get', 'locations-taxonomies-get-iam-policy', 'locations-taxonomies-import', 'locations-taxonomies-list', 'locations-taxonomies-patch', 'locations-taxonomies-policy-tags-create', 'locations-taxonomies-policy-tags-delete', 'locations-taxonomies-policy-tags-get', 'locations-taxonomies-policy-tags-get-iam-policy', 'locations-taxonomies-policy-tags-list', 'locations-taxonomies-policy-tags-patch', 'locations-taxonomies-policy-tags-set-iam-policy', 'locations-taxonomies-policy-tags-test-iam-permissions', 'locations-taxonomies-replace', 'locations-taxonomies-set-iam-policy' and 'locations-taxonomies-test-iam-permissions'", vec![
             ("locations-entry-groups-create",
                     Some(r##"Creates an entry group. An entry group contains logically related entries together with [Cloud Identity and Access Management](/data-catalog/docs/concepts/iam) policies. These policies specify users who can create, edit, and view entries within entry groups. Data Catalog automatically creates entry groups with names that start with the `@` symbol for the following resources: * BigQuery entries (`@bigquery`) * Pub/Sub topics (`@pubsub`) * Dataproc Metastore services (`@dataproc_metastore_{SERVICE_NAME_HASH}`) You can create your own entry groups for Cloud Storage fileset entries and custom entries together with the corresponding IAM policies. User-created entry groups can't contain the `@` symbol, it is reserved for automatically created groups. Entry groups, like entries, can be searched. A maximum of 10,000 entry groups may be created per organization across all locations. You must enable the Data Catalog API in the project identified by the `parent` parameter. For more information, see [Data Catalog resource project](https://cloud.google.com/data-catalog/docs/concepts/resource-project)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/projects_locations-entry-groups-create",
@@ -10770,7 +11504,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-entry-groups-entries-tags-reconcile",
-                    Some(r##"`ReconcileTags` creates or updates a list of tags on the entry. If the ReconcileTagsRequest.force_delete_missing parameter is set, the operation deletes tags not included in the input tag list. `ReconcileTags` returns a long-running operation resource that can be queried with Operations.GetOperation to return ReconcileTagsMetadata and a ReconcileTagsResponse message."##),
+                    Some(r##"`ReconcileTags` creates or updates a list of tags on the entry. If the ReconcileTagsRequest.force_delete_missing parameter is set, the operation deletes tags not included in the input tag list. `ReconcileTags` returns a long-running operation resource that can be queried with Operations.GetOperation to return ReconcileTagsMetadata and a ReconcileTagsResponse message. Note: SearchCatalog might return stale search results for up to 24 hours after the `ReconcileTags` operation completes."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/projects_locations-entry-groups-entries-tags-reconcile",
                   vec![
                     (Some(r##"parent"##),
@@ -11075,7 +11809,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/projects_locations-operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -11143,6 +11877,51 @@ async fn main() {
                      Some(r##"The name of the operation's parent resource."##),
                      Some(true),
                      Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-retrieve-effective-config",
+                    Some(r##"Retrieves the effective configuration related to the migration from Data Catalog to Dataplex Universal Catalog for a specific organization or project. If there is no specific configuration set for the resource, the setting is checked hierarchicahlly through the ancestors of the resource, starting from the resource itself."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/projects_locations-retrieve-effective-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource whose effective config is being retrieved."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-set-config",
+                    Some(r##"Sets the configuration related to the migration to Dataplex Universal Catalog for an organization or project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datacatalog1_cli/projects_locations-set-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The organization or project whose config is being specified."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -11884,7 +12663,7 @@ async fn main() {
 
     let mut app = App::new("datacatalog1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240624")
+           .version("7.0.0+20251210")
            .about("A fully managed and highly scalable data discovery and metadata management service. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datacatalog1_cli")
            .arg(Arg::with_name("url")
@@ -11949,7 +12728,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

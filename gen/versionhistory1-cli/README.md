@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Version History* API can be found at the
-[official documentation site](https://developers.chrome.com/versionhistory).
+[official documentation site](https://developer.chrome.com/docs/web-platform/versionhistory/guide).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Version History* API at revision *20240625*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Version History* API at revision *20251217*. The CLI is at version *7.0.0*.
 
 ```bash
 versionhistory1 [options]

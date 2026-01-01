@@ -185,8 +185,8 @@ where
                         ctype: ComplexType::Vec,
                     },
                 )),
-                "attributes.request.auth.credential-id" => Some((
-                    "attributes.request.auth.credentialId",
+                "attributes.request.auth.oauth.client-id" => Some((
+                    "attributes.request.auth.oauth.clientId",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -229,6 +229,13 @@ where
                 )),
                 "attributes.request.method" => Some((
                     "attributes.request.method",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "attributes.request.origin" => Some((
+                    "attributes.request.origin",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -462,9 +469,9 @@ where
                             "audiences",
                             "auth",
                             "backend-latency",
+                            "client-id",
                             "code",
                             "create-time",
-                            "credential-id",
                             "delete-time",
                             "destination",
                             "display-name",
@@ -478,6 +485,7 @@ where
                             "location",
                             "method",
                             "name",
+                            "oauth",
                             "operation",
                             "origin",
                             "path",
@@ -792,7 +800,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/servicecontrol2", config_dir))
         .build()
@@ -847,7 +857,7 @@ async fn main() {
     let arg_data = [
         ("services", "methods: 'check' and 'report'", vec![
             ("check",
-                    Some(r##"Private Preview. This feature is only available for approved services. This method provides admission control for services that are integrated with [Service Infrastructure](https://cloud.google.com/service-infrastructure). It checks whether an operation should be allowed based on the service configuration and relevant policies. It must be called before the operation is executed. For more information, see [Admission Control](https://cloud.google.com/service-infrastructure/docs/admission-control). NOTE: The admission control has an expected policy propagation delay of 60s. The caller **must** not depend on the most recent policy changes. NOTE: The admission control has a hard limit of 1 referenced resources per call. If an operation refers to more than 1 resources, the caller must call the Check method multiple times. This method requires the `servicemanagement.services.check` permission on the specified service. For more information, see [Service Control API Access Control](https://cloud.google.com/service-infrastructure/docs/service-control/access-control)."##),
+                    Some(r##"This method provides admission control for services that are integrated with [Service Infrastructure](https://cloud.google.com/service-infrastructure). It checks whether an operation should be allowed based on the service configuration and relevant policies. It must be called before the operation is executed. For more information, see [Admission Control](https://cloud.google.com/service-infrastructure/docs/admission-control). NOTE: The admission control has an expected policy propagation delay of 60s. The caller **must** not depend on the most recent policy changes. NOTE: The admission control has a hard limit of 1 referenced resources per call. If an operation refers to more than 1 resources, the caller must call the Check method multiple times. This method requires the `servicemanagement.services.check` permission on the specified service. For more information, see [Service Control API Access Control](https://cloud.google.com/service-infrastructure/docs/service-control/access-control)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicecontrol2_cli/services_check",
                   vec![
                     (Some(r##"service-name"##),
@@ -872,7 +882,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("report",
-                    Some(r##"Private Preview. This feature is only available for approved services. This method provides telemetry reporting for services that are integrated with [Service Infrastructure](https://cloud.google.com/service-infrastructure). It reports a list of operations that have occurred on a service. It must be called after the operations have been executed. For more information, see [Telemetry Reporting](https://cloud.google.com/service-infrastructure/docs/telemetry-reporting). NOTE: The telemetry reporting has a hard limit of 1000 operations and 1MB per Report call. It is recommended to have no more than 100 operations per call. This method requires the `servicemanagement.services.report` permission on the specified service. For more information, see [Service Control API Access Control](https://cloud.google.com/service-infrastructure/docs/service-control/access-control)."##),
+                    Some(r##"This method provides telemetry reporting for services that are integrated with [Service Infrastructure](https://cloud.google.com/service-infrastructure). It reports a list of operations that have occurred on a service. It must be called after the operations have been executed. For more information, see [Telemetry Reporting](https://cloud.google.com/service-infrastructure/docs/telemetry-reporting). NOTE: The telemetry reporting has a hard limit of 100 operations and 1MB per Report call. This method requires the `servicemanagement.services.report` permission on the specified service. For more information, see [Service Control API Access Control](https://cloud.google.com/service-infrastructure/docs/service-control/access-control)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_servicecontrol2_cli/services_report",
                   vec![
                     (Some(r##"service-name"##),
@@ -901,7 +911,7 @@ async fn main() {
 
     let mut app = App::new("servicecontrol2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240607")
+           .version("7.0.0+20251125")
            .about("Provides admission control and telemetry reporting for services integrated with Service Infrastructure. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_servicecontrol2_cli")
            .arg(Arg::with_name("url")
@@ -966,7 +976,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

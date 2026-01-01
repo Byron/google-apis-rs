@@ -1032,6 +1032,41 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "assignment-info.drive-resource-info.drive-file-id" => Some((
+                    "assignmentInfo.driveResourceInfo.driveFileId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.drive-resource-info.resource-key" => Some((
+                    "assignmentInfo.driveResourceInfo.resourceKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.link-to-task" => Some((
+                    "assignmentInfo.linkToTask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.space-info.space" => Some((
+                    "assignmentInfo.spaceInfo.space",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.surface-type" => Some((
+                    "assignmentInfo.surfaceType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "completed" => Some((
                     "completed",
                     JsonTypeInfo {
@@ -1141,18 +1176,26 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "assignment-info",
                             "completed",
                             "deleted",
+                            "drive-file-id",
+                            "drive-resource-info",
                             "due",
                             "etag",
                             "hidden",
                             "id",
                             "kind",
+                            "link-to-task",
                             "notes",
                             "parent",
                             "position",
+                            "resource-key",
                             "self-link",
+                            "space",
+                            "space-info",
                             "status",
+                            "surface-type",
                             "title",
                             "updated",
                             "web-view-link",
@@ -1301,6 +1344,13 @@ where
                             .unwrap_or(false),
                     );
                 }
+                "show-assigned" => {
+                    call = call.show_assigned(
+                        value
+                            .map(|v| arg_from_str(v, err, "show-assigned", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -1348,6 +1398,7 @@ where
                                         "due-min",
                                         "max-results",
                                         "page-token",
+                                        "show-assigned",
                                         "show-completed",
                                         "show-deleted",
                                         "show-hidden",
@@ -1426,6 +1477,9 @@ where
                 "parent" => {
                     call = call.parent(value.unwrap_or(""));
                 }
+                "destination-tasklist" => {
+                    call = call.destination_tasklist(value.unwrap_or(""));
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1443,7 +1497,11 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["parent", "previous"].iter().map(|v| *v));
+                                v.extend(
+                                    ["destination-tasklist", "parent", "previous"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -1521,6 +1579,41 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "assignment-info.drive-resource-info.drive-file-id" => Some((
+                    "assignmentInfo.driveResourceInfo.driveFileId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.drive-resource-info.resource-key" => Some((
+                    "assignmentInfo.driveResourceInfo.resourceKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.link-to-task" => Some((
+                    "assignmentInfo.linkToTask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.space-info.space" => Some((
+                    "assignmentInfo.spaceInfo.space",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.surface-type" => Some((
+                    "assignmentInfo.surfaceType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "completed" => Some((
                     "completed",
                     JsonTypeInfo {
@@ -1630,18 +1723,26 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "assignment-info",
                             "completed",
                             "deleted",
+                            "drive-file-id",
+                            "drive-resource-info",
                             "due",
                             "etag",
                             "hidden",
                             "id",
                             "kind",
+                            "link-to-task",
                             "notes",
                             "parent",
                             "position",
+                            "resource-key",
                             "self-link",
+                            "space",
+                            "space-info",
                             "status",
+                            "surface-type",
                             "title",
                             "updated",
                             "web-view-link",
@@ -1773,6 +1874,41 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "assignment-info.drive-resource-info.drive-file-id" => Some((
+                    "assignmentInfo.driveResourceInfo.driveFileId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.drive-resource-info.resource-key" => Some((
+                    "assignmentInfo.driveResourceInfo.resourceKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.link-to-task" => Some((
+                    "assignmentInfo.linkToTask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.space-info.space" => Some((
+                    "assignmentInfo.spaceInfo.space",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assignment-info.surface-type" => Some((
+                    "assignmentInfo.surfaceType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "completed" => Some((
                     "completed",
                     JsonTypeInfo {
@@ -1882,18 +2018,26 @@ where
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "assignment-info",
                             "completed",
                             "deleted",
+                            "drive-file-id",
+                            "drive-resource-info",
                             "due",
                             "etag",
                             "hidden",
                             "id",
                             "kind",
+                            "link-to-task",
                             "notes",
                             "parent",
                             "position",
+                            "resource-key",
                             "self-link",
+                            "space",
+                            "space-info",
                             "status",
+                            "surface-type",
                             "title",
                             "updated",
                             "web-view-link",
@@ -2098,7 +2242,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/tasks1", config_dir))
         .build()
@@ -2153,7 +2299,7 @@ async fn main() {
     let arg_data = [
         ("tasklists", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
             ("delete",
-                    Some(r##"Deletes the authenticated user's specified task list."##),
+                    Some(r##"Deletes the authenticated user's specified task list. If the list contains assigned tasks, both the assigned tasks and the original tasks in the assignment surface (Docs, Chat Spaces) are deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasklists_delete",
                   vec![
                     (Some(r##"tasklist"##),
@@ -2290,7 +2436,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("delete",
-                    Some(r##"Deletes the specified task from the task list."##),
+                    Some(r##"Deletes the specified task from the task list. If the task is assigned, both the assigned task and the original task (in Docs, Chat Spaces) are deleted. To delete the assigned task only, navigate to the assignment surface and unassign the task from there."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasks_delete",
                   vec![
                     (Some(r##"tasklist"##),
@@ -2335,7 +2481,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a new task on the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time."##),
+                    Some(r##"Creates a new task on the specified task list. Tasks assigned from Docs or Chat Spaces cannot be inserted from Tasks Public API; they can only be created by assigning them from Docs or Chat Spaces. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasks_insert",
                   vec![
                     (Some(r##"tasklist"##),
@@ -2360,7 +2506,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns all tasks in the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time."##),
+                    Some(r##"Returns all tasks in the specified task list. Doesn't return assigned tasks by default (from Docs, Chat Spaces). A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasks_list",
                   vec![
                     (Some(r##"tasklist"##),
@@ -2380,7 +2526,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("move",
-                    Some(r##"Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks. A user can have up to 2,000 subtasks per task."##),
+                    Some(r##"Moves the specified task to another position in the destination task list. If the destination list is not specified, the task is moved within its current list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks. A user can have up to 2,000 subtasks per task."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasks_move",
                   vec![
                     (Some(r##"tasklist"##),
@@ -2469,7 +2615,7 @@ async fn main() {
 
     let mut app = App::new("tasks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240625")
+           .version("7.0.0+20251216")
            .about("The Google Tasks API lets you manage your tasks and task lists.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tasks1_cli")
            .arg(Arg::with_name("url")
@@ -2534,7 +2680,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

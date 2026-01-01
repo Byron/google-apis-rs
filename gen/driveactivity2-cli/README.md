@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Drive Activity* API can be found at the
-[official documentation site](https://developers.google.com/drive/activity/).
+[official documentation site](https://developers.google.com/workspace/drive/activity/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Drive Activity* API at revision *20240623*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Drive Activity* API at revision *20251216*. The CLI is at version *7.0.0*.
 
 ```bash
 driveactivity2 [options]

@@ -1,4 +1,4 @@
-site_name: Data Catalog v6.0.0+20240624
+site_name: Data Catalog v7.0.0+20251210
 site_url: http://byron.github.io/google-apis-rs/google-datacatalog1-cli
 site_description: A complete library to interact with Data Catalog (protocol v1)
 
@@ -13,6 +13,10 @@ nav:
     - 'Search': 'catalog_search.md'
 - 'Entries':
     - 'Lookup': 'entries_lookup.md'
+- 'Organizations':
+    - 'Locations Retrieve Config': 'organizations_locations-retrieve-config.md'
+    - 'Locations Retrieve Effective Config': 'organizations_locations-retrieve-effective-config.md'
+    - 'Locations Set Config': 'organizations_locations-set-config.md'
 - 'Projects':
     - 'Locations Entry Groups Create': 'projects_locations-entry-groups-create.md'
     - 'Locations Entry Groups Delete': 'projects_locations-entry-groups-delete.md'
@@ -47,6 +51,8 @@ nav:
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Retrieve Effective Config': 'projects_locations-retrieve-effective-config.md'
+    - 'Locations Set Config': 'projects_locations-set-config.md'
     - 'Locations Tag Templates Create': 'projects_locations-tag-templates-create.md'
     - 'Locations Tag Templates Delete': 'projects_locations-tag-templates-delete.md'
     - 'Locations Tag Templates Fields Create': 'projects_locations-tag-templates-fields-create.md'

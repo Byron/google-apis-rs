@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Management* API at revision *20240626*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Android Management* API at revision *20251216*. The CLI is at version *7.0.0*.
 
 ```bash
 androidmanagement1 [options]
@@ -45,6 +45,7 @@ androidmanagement1 [options]
                 enrollment-tokens-delete <name> [-p <v>]... [-o <out>]
                 enrollment-tokens-get <name> [-p <v>]... [-o <out>]
                 enrollment-tokens-list <parent> [-p <v>]... [-o <out>]
+                generate-enterprise-upgrade-url <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 migration-tokens-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -54,7 +55,9 @@ androidmanagement1 [options]
                 policies-delete <name> [-p <v>]... [-o <out>]
                 policies-get <name> [-p <v>]... [-o <out>]
                 policies-list <parent> [-p <v>]... [-o <out>]
+                policies-modify-policy-applications <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 policies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                policies-remove-policy-applications <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 web-apps-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 web-apps-delete <name> [-p <v>]... [-o <out>]
                 web-apps-get <name> [-p <v>]... [-o <out>]

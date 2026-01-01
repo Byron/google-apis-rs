@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *IDS* API at revision *20240613*. The CLI is at version *6.0.0*.
+This documentation was generated from the *IDS* API at revision *20251201*. The CLI is at version *7.0.0*.
 
 ```bash
 ids1 [options]
@@ -33,11 +33,8 @@ ids1 [options]
                 locations-endpoints-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-endpoints-delete <name> [-p <v>]... [-o <out>]
                 locations-endpoints-get <name> [-p <v>]... [-o <out>]
-                locations-endpoints-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-endpoints-list <parent> [-p <v>]... [-o <out>]
                 locations-endpoints-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-endpoints-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-endpoints-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]

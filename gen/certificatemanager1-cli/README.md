@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Certificate Manager* API at revision *20240617*. The CLI is at version *6.0.0*.
+This documentation was generated from the *Certificate Manager* API at revision *20251204*. The CLI is at version *7.0.0*.
 
 ```bash
 certificatemanager1 [options]
@@ -34,6 +34,7 @@ certificatemanager1 [options]
                 locations-certificate-issuance-configs-delete <name> [-p <v>]... [-o <out>]
                 locations-certificate-issuance-configs-get <name> [-p <v>]... [-o <out>]
                 locations-certificate-issuance-configs-list <parent> [-p <v>]... [-o <out>]
+                locations-certificate-issuance-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-certificate-maps-certificate-map-entries-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-certificate-maps-certificate-map-entries-delete <name> [-p <v>]... [-o <out>]
                 locations-certificate-maps-certificate-map-entries-get <name> [-p <v>]... [-o <out>]

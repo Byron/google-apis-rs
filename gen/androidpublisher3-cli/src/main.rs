@@ -325,9 +325,15 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let device_tier_config_id: i64 = arg_from_str(
+            &opt.value_of("device-tier-config-id").unwrap_or(""),
+            err,
+            "<device-tier-config-id>",
+            "int64",
+        );
         let mut call = self.hub.applications().device_tier_configs_get(
             opt.value_of("package-name").unwrap_or(""),
-            opt.value_of("device-tier-config-id").unwrap_or(""),
+            device_tier_config_id,
         );
         for parg in opt
             .values_of("v")
@@ -576,10 +582,16 @@ where
             }
         }
         let mut request: api::AddTargetingRequest = serde_json::value::from_value(object).unwrap();
+        let app_recovery_id: i64 = arg_from_str(
+            &opt.value_of("app-recovery-id").unwrap_or(""),
+            err,
+            "<app-recovery-id>",
+            "int64",
+        );
         let mut call = self.hub.apprecovery().add_targeting(
             request,
             opt.value_of("package-name").unwrap_or(""),
-            opt.value_of("app-recovery-id").unwrap_or(""),
+            app_recovery_id,
         );
         for parg in opt
             .values_of("v")
@@ -606,95 +618,6 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _apprecovery_app_recoveries(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .apprecovery()
-            .app_recoveries(opt.value_of("package-name").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "version-code" => {
-                    call = call.version_code(
-                        value
-                            .map(|v| arg_from_str(v, err, "version-code", "int64"))
-                            .unwrap_or(-0),
-                    );
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["version-code"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -794,10 +717,16 @@ where
         }
         let mut request: api::CancelAppRecoveryRequest =
             serde_json::value::from_value(object).unwrap();
+        let app_recovery_id: i64 = arg_from_str(
+            &opt.value_of("app-recovery-id").unwrap_or(""),
+            err,
+            "<app-recovery-id>",
+            "int64",
+        );
         let mut call = self.hub.apprecovery().cancel(
             request,
             opt.value_of("package-name").unwrap_or(""),
-            opt.value_of("app-recovery-id").unwrap_or(""),
+            app_recovery_id,
         );
         for parg in opt
             .values_of("v")
@@ -1118,10 +1047,16 @@ where
         }
         let mut request: api::DeployAppRecoveryRequest =
             serde_json::value::from_value(object).unwrap();
+        let app_recovery_id: i64 = arg_from_str(
+            &opt.value_of("app-recovery-id").unwrap_or(""),
+            err,
+            "<app-recovery-id>",
+            "int64",
+        );
         let mut call = self.hub.apprecovery().deploy(
             request,
             opt.value_of("package-name").unwrap_or(""),
-            opt.value_of("app-recovery-id").unwrap_or(""),
+            app_recovery_id,
         );
         for parg in opt
             .values_of("v")
@@ -1148,6 +1083,95 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _apprecovery_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .apprecovery()
+            .list(opt.value_of("package-name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version-code" => {
+                    call = call.version_code(
+                        value
+                            .map(|v| arg_from_str(v, err, "version-code", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["version-code"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -2051,7 +2075,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().deobfuscationfiles_upload(
             opt.value_of("package-name").unwrap_or(""),
@@ -2561,7 +2585,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().expansionfiles_get(
             opt.value_of("package-name").unwrap_or(""),
@@ -2711,7 +2735,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().expansionfiles_patch(
             request,
@@ -2862,7 +2886,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().expansionfiles_update(
             request,
@@ -2952,7 +2976,7 @@ where
             &opt.value_of("apk-version-code").unwrap_or(""),
             err,
             "<apk-version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self.hub.edits().expansionfiles_upload(
             opt.value_of("package-name").unwrap_or(""),
@@ -5321,6 +5345,34 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "external-offer-details.app-download-event-external-transaction-id" => Some((
+                    "externalOfferDetails.appDownloadEventExternalTransactionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "external-offer-details.installed-app-category" => Some((
+                    "externalOfferDetails.installedAppCategory",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "external-offer-details.installed-app-package" => Some((
+                    "externalOfferDetails.installedAppPackage",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "external-offer-details.link-type" => Some((
+                    "externalOfferDetails.linkType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "external-transaction-id" => Some((
                     "externalTransactionId",
                     JsonTypeInfo {
@@ -5438,14 +5490,19 @@ where
                         key,
                         &vec![
                             "administrative-area",
+                            "app-download-event-external-transaction-id",
                             "create-time",
                             "currency",
                             "current-pre-tax-amount",
                             "current-tax-amount",
+                            "external-offer-details",
                             "external-subscription",
                             "external-transaction-id",
                             "external-transaction-token",
                             "initial-external-transaction-id",
+                            "installed-app-category",
+                            "installed-app-package",
+                            "link-type",
                             "migrated-transaction-program",
                             "one-time-transaction",
                             "original-pre-tax-amount",
@@ -5816,7 +5873,7 @@ where
             &opt.value_of("version-code").unwrap_or(""),
             err,
             "<version-code>",
-            "integer",
+            "int32",
         );
         let mut download_mode = false;
         let mut call = self.hub.generatedapks().download(
@@ -5916,7 +5973,7 @@ where
             &opt.value_of("version-code").unwrap_or(""),
             err,
             "<version-code>",
-            "integer",
+            "int32",
         );
         let mut call = self
             .hub
@@ -6917,6 +6974,15 @@ where
                         },
                     ))
                 }
+                "managed-product-taxes-and-compliance-settings.product-tax-category-code" => {
+                    Some((
+                        "managedProductTaxesAndComplianceSettings.productTaxCategoryCode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "package-name" => Some((
                     "packageName",
                     JsonTypeInfo {
@@ -6966,6 +7032,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "subscription-taxes-and-compliance-settings.product-tax-category-code" => Some((
+                    "subscriptionTaxesAndComplianceSettings.productTaxCategoryCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "trial-period" => Some((
                     "trialPeriod",
                     JsonTypeInfo {
@@ -6986,6 +7059,7 @@ where
                             "managed-product-taxes-and-compliance-settings",
                             "package-name",
                             "price-micros",
+                            "product-tax-category-code",
                             "purchase-type",
                             "sku",
                             "status",
@@ -7274,6 +7348,15 @@ where
                         },
                     ))
                 }
+                "managed-product-taxes-and-compliance-settings.product-tax-category-code" => {
+                    Some((
+                        "managedProductTaxesAndComplianceSettings.productTaxCategoryCode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "package-name" => Some((
                     "packageName",
                     JsonTypeInfo {
@@ -7323,6 +7406,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "subscription-taxes-and-compliance-settings.product-tax-category-code" => Some((
+                    "subscriptionTaxesAndComplianceSettings.productTaxCategoryCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "trial-period" => Some((
                     "trialPeriod",
                     JsonTypeInfo {
@@ -7343,6 +7433,7 @@ where
                             "managed-product-taxes-and-compliance-settings",
                             "package-name",
                             "price-micros",
+                            "product-tax-category-code",
                             "purchase-type",
                             "sku",
                             "status",
@@ -7538,6 +7629,15 @@ where
                         },
                     ))
                 }
+                "managed-product-taxes-and-compliance-settings.product-tax-category-code" => {
+                    Some((
+                        "managedProductTaxesAndComplianceSettings.productTaxCategoryCode",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
                 "package-name" => Some((
                     "packageName",
                     JsonTypeInfo {
@@ -7587,6 +7687,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "subscription-taxes-and-compliance-settings.product-tax-category-code" => Some((
+                    "subscriptionTaxesAndComplianceSettings.productTaxCategoryCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "trial-period" => Some((
                     "trialPeriod",
                     JsonTypeInfo {
@@ -7607,6 +7714,7 @@ where
                             "managed-product-taxes-and-compliance-settings",
                             "package-name",
                             "price-micros",
+                            "product-tax-category-code",
                             "purchase-type",
                             "sku",
                             "status",
@@ -8028,6 +8136,2180 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_batch_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BatchDeleteOneTimeProductsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_batch_delete(request, opt.value_of("package-name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => Ok(()),
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_batch_get(opt.value_of("package-name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "product-ids" => {
+                    call = call.add_product_ids(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["product-ids"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_batch_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BatchUpdateOneTimeProductsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_batch_update(request, opt.value_of("package-name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.monetization().onetimeproducts_delete(
+            opt.value_of("package-name").unwrap_or(""),
+            opt.value_of("product-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "latency-tolerance" => {
+                    call = call.latency_tolerance(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["latency-tolerance"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => Ok(()),
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.monetization().onetimeproducts_get(
+            opt.value_of("package-name").unwrap_or(""),
+            opt.value_of("product-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_list(opt.value_of("package-name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "package-name" => Some((
+                    "packageName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "regions-version.version" => Some((
+                    "regionsVersion.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "restricted-payment-countries.region-codes" => Some((
+                    "restrictedPaymentCountries.regionCodes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "tax-and-compliance-settings.is-tokenized-digital-asset" => Some((
+                    "taxAndComplianceSettings.isTokenizedDigitalAsset",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tax-and-compliance-settings.product-tax-category-code" => Some((
+                    "taxAndComplianceSettings.productTaxCategoryCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "is-tokenized-digital-asset",
+                            "package-name",
+                            "product-id",
+                            "product-tax-category-code",
+                            "region-codes",
+                            "regions-version",
+                            "restricted-payment-countries",
+                            "tax-and-compliance-settings",
+                            "version",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::OneTimeProduct = serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.monetization().onetimeproducts_patch(
+            request,
+            opt.value_of("package-name").unwrap_or(""),
+            opt.value_of("product-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
+                "regions-version-version" => {
+                    call = call.regions_version_version(value.unwrap_or(""));
+                }
+                "latency-tolerance" => {
+                    call = call.latency_tolerance(value.unwrap_or(""));
+                }
+                "allow-missing" => {
+                    call = call.allow_missing(
+                        value
+                            .map(|v| arg_from_str(v, err, "allow-missing", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "allow-missing",
+                                        "latency-tolerance",
+                                        "regions-version-version",
+                                        "update-mask",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_batch_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BatchDeletePurchaseOptionsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_batch_delete(
+                request,
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => Ok(()),
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_batch_update_states(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BatchUpdatePurchaseOptionStatesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_batch_update_states(
+                request,
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_offers_activate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "latency-tolerance" => Some((
+                    "latencyTolerance",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "offer-id" => Some((
+                    "offerId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "package-name" => Some((
+                    "packageName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "purchase-option-id" => Some((
+                    "purchaseOptionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "latency-tolerance",
+                            "offer-id",
+                            "package-name",
+                            "product-id",
+                            "purchase-option-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::ActivateOneTimeProductOfferRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_offers_activate(
+                request,
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+                opt.value_of("purchase-option-id").unwrap_or(""),
+                opt.value_of("offer-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_offers_batch_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BatchDeleteOneTimeProductOffersRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_offers_batch_delete(
+                request,
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+                opt.value_of("purchase-option-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => Ok(()),
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_offers_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BatchGetOneTimeProductOffersRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_offers_batch_get(
+                request,
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+                opt.value_of("purchase-option-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_offers_batch_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BatchUpdateOneTimeProductOffersRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_offers_batch_update(
+                request,
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+                opt.value_of("purchase-option-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_offers_batch_update_states(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::BatchUpdateOneTimeProductOfferStatesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_offers_batch_update_states(
+                request,
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+                opt.value_of("purchase-option-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_offers_cancel(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "latency-tolerance" => Some((
+                    "latencyTolerance",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "offer-id" => Some((
+                    "offerId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "package-name" => Some((
+                    "packageName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "purchase-option-id" => Some((
+                    "purchaseOptionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "latency-tolerance",
+                            "offer-id",
+                            "package-name",
+                            "product-id",
+                            "purchase-option-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::CancelOneTimeProductOfferRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_offers_cancel(
+                request,
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+                opt.value_of("purchase-option-id").unwrap_or(""),
+                opt.value_of("offer-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_offers_deactivate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "latency-tolerance" => Some((
+                    "latencyTolerance",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "offer-id" => Some((
+                    "offerId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "package-name" => Some((
+                    "packageName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "purchase-option-id" => Some((
+                    "purchaseOptionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "latency-tolerance",
+                            "offer-id",
+                            "package-name",
+                            "product-id",
+                            "purchase-option-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::DeactivateOneTimeProductOfferRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_offers_deactivate(
+                request,
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+                opt.value_of("purchase-option-id").unwrap_or(""),
+                opt.value_of("offer-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _monetization_onetimeproducts_purchase_options_offers_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .monetization()
+            .onetimeproducts_purchase_options_offers_list(
+                opt.value_of("package-name").unwrap_or(""),
+                opt.value_of("product-id").unwrap_or(""),
+                opt.value_of("purchase-option-id").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -10813,6 +13095,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tax-and-compliance-settings.product-tax-category-code" => Some((
+                    "taxAndComplianceSettings.productTaxCategoryCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -10822,6 +13111,7 @@ where
                             "is-tokenized-digital-asset",
                             "package-name",
                             "product-id",
+                            "product-tax-category-code",
                             "region-codes",
                             "restricted-payment-countries",
                             "tax-and-compliance-settings",
@@ -11252,6 +13542,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "tax-and-compliance-settings.product-tax-category-code" => Some((
+                    "taxAndComplianceSettings.productTaxCategoryCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
@@ -11261,6 +13558,7 @@ where
                             "is-tokenized-digital-asset",
                             "package-name",
                             "product-id",
+                            "product-tax-category-code",
                             "region-codes",
                             "restricted-payment-countries",
                             "tax-and-compliance-settings",
@@ -11345,6 +13643,172 @@ where
                                     .iter()
                                     .map(|v| *v),
                                 );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _orders_batchget(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .orders()
+            .batchget(opt.value_of("package-name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "order-ids" => {
+                    call = call.add_order_ids(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["order-ids"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _orders_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.orders().get(
+            opt.value_of("package-name").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -11733,6 +14197,87 @@ where
         }
     }
 
+    async fn _purchases_productsv2_getproductpurchasev2(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.purchases().productsv2_getproductpurchasev2(
+            opt.value_of("package-name").unwrap_or(""),
+            opt.value_of("token").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _purchases_subscriptions_acknowledge(
         &self,
         opt: &ArgMatches<'n>,
@@ -11771,8 +14316,30 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "external-account-ids.obfuscated-account-id" => Some((
+                    "externalAccountIds.obfuscatedAccountId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "external-account-ids.obfuscated-profile-id" => Some((
+                    "externalAccountIds.obfuscatedProfileId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["developer-payload"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "developer-payload",
+                            "external-account-ids",
+                            "obfuscated-account-id",
+                            "obfuscated-profile-id",
+                        ],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -12285,6 +14852,145 @@ where
         }
     }
 
+    async fn _purchases_subscriptionsv2_cancel(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut field_cursor = FieldCursor::default();
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "cancellation-context.cancellation-type" => Some((
+                    "cancellationContext.cancellationType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["cancellation-context", "cancellation-type"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
+            }
+        }
+        let mut request: api::CancelSubscriptionPurchaseRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.purchases().subscriptionsv2_cancel(
+            request,
+            opt.value_of("package-name").unwrap_or(""),
+            opt.value_of("token").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _purchases_subscriptionsv2_get(
         &self,
         opt: &ArgMatches<'n>,
@@ -12397,8 +15103,18 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "revocation-context.item-based-refund.product-id" => Some((
+                    "revocationContext.itemBasedRefund.productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["item-based-refund", "product-id", "revocation-context"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -13086,10 +15802,16 @@ where
             }
         }
         let mut request: api::Variant = serde_json::value::from_value(object).unwrap();
+        let version_code: i64 = arg_from_str(
+            &opt.value_of("version-code").unwrap_or(""),
+            err,
+            "<version-code>",
+            "int64",
+        );
         let mut call = self.hub.systemapks().variants_create(
             request,
             opt.value_of("package-name").unwrap_or(""),
-            opt.value_of("version-code").unwrap_or(""),
+            version_code,
         );
         for parg in opt
             .values_of("v")
@@ -13168,16 +15890,22 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let version_code: i64 = arg_from_str(
+            &opt.value_of("version-code").unwrap_or(""),
+            err,
+            "<version-code>",
+            "int64",
+        );
         let variant_id: u32 = arg_from_str(
             &opt.value_of("variant-id").unwrap_or(""),
             err,
             "<variant-id>",
-            "integer",
+            "uint32",
         );
         let mut download_mode = false;
         let mut call = self.hub.systemapks().variants_download(
             opt.value_of("package-name").unwrap_or(""),
-            opt.value_of("version-code").unwrap_or(""),
+            version_code,
             variant_id,
         );
         for parg in opt
@@ -13268,15 +15996,21 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let version_code: i64 = arg_from_str(
+            &opt.value_of("version-code").unwrap_or(""),
+            err,
+            "<version-code>",
+            "int64",
+        );
         let variant_id: u32 = arg_from_str(
             &opt.value_of("variant-id").unwrap_or(""),
             err,
             "<variant-id>",
-            "integer",
+            "uint32",
         );
         let mut call = self.hub.systemapks().variants_get(
             opt.value_of("package-name").unwrap_or(""),
-            opt.value_of("version-code").unwrap_or(""),
+            version_code,
             variant_id,
         );
         for parg in opt
@@ -13356,10 +16090,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
-        let mut call = self.hub.systemapks().variants_list(
-            opt.value_of("package-name").unwrap_or(""),
-            opt.value_of("version-code").unwrap_or(""),
+        let version_code: i64 = arg_from_str(
+            &opt.value_of("version-code").unwrap_or(""),
+            err,
+            "<version-code>",
+            "int64",
         );
+        let mut call = self
+            .hub
+            .systemapks()
+            .variants_list(opt.value_of("package-name").unwrap_or(""), version_code);
         for parg in opt
             .values_of("v")
             .map(|i| i.collect())
@@ -13987,11 +16727,6 @@ where
                         ._apprecovery_add_targeting(opt, dry_run, &mut err)
                         .await;
                 }
-                ("app-recoveries", Some(opt)) => {
-                    call_result = self
-                        ._apprecovery_app_recoveries(opt, dry_run, &mut err)
-                        .await;
-                }
                 ("cancel", Some(opt)) => {
                     call_result = self._apprecovery_cancel(opt, dry_run, &mut err).await;
                 }
@@ -14000,6 +16735,9 @@ where
                 }
                 ("deploy", Some(opt)) => {
                     call_result = self._apprecovery_deploy(opt, dry_run, &mut err).await;
+                }
+                ("list", Some(opt)) => {
+                    call_result = self._apprecovery_list(opt, dry_run, &mut err).await;
                 }
                 _ => {
                     err.issues
@@ -14251,6 +16989,111 @@ where
                         ._monetization_convert_region_prices(opt, dry_run, &mut err)
                         .await;
                 }
+                ("onetimeproducts-batch-delete", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_batch_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("onetimeproducts-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_batch_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("onetimeproducts-batch-update", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_batch_update(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("onetimeproducts-delete", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("onetimeproducts-get", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("onetimeproducts-list", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("onetimeproducts-patch", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-batch-delete", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_batch_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-batch-update-states", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_batch_update_states(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-offers-activate", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_offers_activate(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-offers-batch-delete", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_offers_batch_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-offers-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_offers_batch_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-offers-batch-update", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_offers_batch_update(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-offers-batch-update-states", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_offers_batch_update_states(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-offers-cancel", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_offers_cancel(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-offers-deactivate", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_offers_deactivate(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("onetimeproducts-purchase-options-offers-list", Some(opt)) => {
+                    call_result = self
+                        ._monetization_onetimeproducts_purchase_options_offers_list(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
                 ("subscriptions-archive", Some(opt)) => {
                     call_result = self
                         ._monetization_subscriptions_archive(opt, dry_run, &mut err)
@@ -14398,6 +17241,12 @@ where
                 }
             },
             ("orders", Some(opt)) => match opt.subcommand() {
+                ("batchget", Some(opt)) => {
+                    call_result = self._orders_batchget(opt, dry_run, &mut err).await;
+                }
+                ("get", Some(opt)) => {
+                    call_result = self._orders_get(opt, dry_run, &mut err).await;
+                }
                 ("refund", Some(opt)) => {
                     call_result = self._orders_refund(opt, dry_run, &mut err).await;
                 }
@@ -14420,6 +17269,11 @@ where
                 }
                 ("products-get", Some(opt)) => {
                     call_result = self._purchases_products_get(opt, dry_run, &mut err).await;
+                }
+                ("productsv2-getproductpurchasev2", Some(opt)) => {
+                    call_result = self
+                        ._purchases_productsv2_getproductpurchasev2(opt, dry_run, &mut err)
+                        .await;
                 }
                 ("subscriptions-acknowledge", Some(opt)) => {
                     call_result = self
@@ -14449,6 +17303,11 @@ where
                 ("subscriptions-revoke", Some(opt)) => {
                     call_result = self
                         ._purchases_subscriptions_revoke(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("subscriptionsv2-cancel", Some(opt)) => {
+                    call_result = self
+                        ._purchases_subscriptionsv2_cancel(opt, dry_run, &mut err)
                         .await;
                 }
                 ("subscriptionsv2-get", Some(opt)) => {
@@ -14570,7 +17429,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/androidpublisher3", config_dir))
         .build()
@@ -14721,7 +17582,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("apprecovery", "methods: 'add-targeting', 'app-recoveries', 'cancel', 'create' and 'deploy'", vec![
+            ("apprecovery", "methods: 'add-targeting', 'cancel', 'create', 'deploy' and 'list'", vec![
             ("add-targeting",
                     Some(r##"Incrementally update targeting for a recovery action. Note that only the criteria selected during the creation of recovery action can be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/apprecovery_add-targeting",
@@ -14741,26 +17602,6 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("app-recoveries",
-                    Some(r##"List all app recovery action resources associated with a particular package name and app version."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/apprecovery_app-recoveries",
-                  vec![
-                    (Some(r##"package-name"##),
-                     None,
-                     Some(r##"Required. Package name of the app for which list of recovery actions is requested."##),
-                     Some(true),
-                     Some(false)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -14846,6 +17687,26 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",
+                    Some(r##"List all app recovery action resources associated with a particular package name and app version."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/apprecovery_list",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. Package name of the app for which list of recovery actions is requested."##),
+                     Some(true),
+                     Some(false)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -16465,7 +19326,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("monetization", "methods: 'convert-region-prices', 'subscriptions-archive', 'subscriptions-base-plans-activate', 'subscriptions-base-plans-batch-migrate-prices', 'subscriptions-base-plans-batch-update-states', 'subscriptions-base-plans-deactivate', 'subscriptions-base-plans-delete', 'subscriptions-base-plans-migrate-prices', 'subscriptions-base-plans-offers-activate', 'subscriptions-base-plans-offers-batch-get', 'subscriptions-base-plans-offers-batch-update', 'subscriptions-base-plans-offers-batch-update-states', 'subscriptions-base-plans-offers-create', 'subscriptions-base-plans-offers-deactivate', 'subscriptions-base-plans-offers-delete', 'subscriptions-base-plans-offers-get', 'subscriptions-base-plans-offers-list', 'subscriptions-base-plans-offers-patch', 'subscriptions-batch-get', 'subscriptions-batch-update', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-list' and 'subscriptions-patch'", vec![
+            ("monetization", "methods: 'convert-region-prices', 'onetimeproducts-batch-delete', 'onetimeproducts-batch-get', 'onetimeproducts-batch-update', 'onetimeproducts-delete', 'onetimeproducts-get', 'onetimeproducts-list', 'onetimeproducts-patch', 'onetimeproducts-purchase-options-batch-delete', 'onetimeproducts-purchase-options-batch-update-states', 'onetimeproducts-purchase-options-offers-activate', 'onetimeproducts-purchase-options-offers-batch-delete', 'onetimeproducts-purchase-options-offers-batch-get', 'onetimeproducts-purchase-options-offers-batch-update', 'onetimeproducts-purchase-options-offers-batch-update-states', 'onetimeproducts-purchase-options-offers-cancel', 'onetimeproducts-purchase-options-offers-deactivate', 'onetimeproducts-purchase-options-offers-list', 'subscriptions-archive', 'subscriptions-base-plans-activate', 'subscriptions-base-plans-batch-migrate-prices', 'subscriptions-base-plans-batch-update-states', 'subscriptions-base-plans-deactivate', 'subscriptions-base-plans-delete', 'subscriptions-base-plans-migrate-prices', 'subscriptions-base-plans-offers-activate', 'subscriptions-base-plans-offers-batch-get', 'subscriptions-base-plans-offers-batch-update', 'subscriptions-base-plans-offers-batch-update-states', 'subscriptions-base-plans-offers-create', 'subscriptions-base-plans-offers-deactivate', 'subscriptions-base-plans-offers-delete', 'subscriptions-base-plans-offers-get', 'subscriptions-base-plans-offers-list', 'subscriptions-base-plans-offers-patch', 'subscriptions-batch-get', 'subscriptions-batch-update', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-list' and 'subscriptions-patch'", vec![
             ("convert-region-prices",
                     Some(r##"Calculates the region prices, using today's exchange rate and country-specific pricing patterns, based on the price in the request for a set of regions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_convert-region-prices",
@@ -16480,6 +19341,506 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-batch-delete",
+                    Some(r##"Deletes one or more one-time products."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-batch-delete",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) for which the one-time products should be deleted. Must be equal to the package_name field on all the OneTimeProduct resources."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("onetimeproducts-batch-get",
+                    Some(r##"Reads one or more one-time products."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-batch-get",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) for which the products should be retrieved. Must be equal to the package_name field on all requests."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-batch-update",
+                    Some(r##"Creates or updates one or more one-time products."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-batch-update",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) for which the one-time products should be updated. Must be equal to the package_name field on all the OneTimeProduct resources."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-delete",
+                    Some(r##"Deletes a one-time product."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-delete",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the one-time product to delete."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The one-time product ID of the one-time product to delete."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("onetimeproducts-get",
+                    Some(r##"Reads a single one-time product."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-get",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the product to retrieve."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the product to retrieve."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-list",
+                    Some(r##"Lists all one-time products under a given app."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-list",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) for which the one-time product should be read."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-patch",
+                    Some(r##"Creates or updates a one-time product."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-patch",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. Immutable. Package name of the parent app."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. Immutable. Unique product ID of the product. Unique within the parent app. Product IDs must start with a number or lowercase letter, and can contain numbers (0-9), lowercase letters (a-z), underscores (_), and periods (.)."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-purchase-options-batch-delete",
+                    Some(r##"Deletes purchase options across one or multiple one-time products. By default this operation will fail if there are any existing offers under the deleted purchase options. Use the force parameter to override the default behavior."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-batch-delete",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the purchase options to delete."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent one-time product, if all purchase options to delete belong to the same one-time product. If this batch delete spans multiple one-time products, set this field to "-"."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("onetimeproducts-purchase-options-batch-update-states",
+                    Some(r##"Activates or deactivates purchase options across one or multiple one-time products."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-batch-update-states",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the updated purchase options."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent one-time product, if all updated purchase options belong to the same one-time product. If this batch update spans multiple one-time products, set this field to "-"."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-purchase-options-offers-activate",
+                    Some(r##"Activates a one-time product offer."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-offers-activate",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the offer to activate."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The parent one-time product (ID) of the offer to activate."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"purchase-option-id"##),
+                     None,
+                     Some(r##"Required. The parent purchase option (ID) of the offer to activate."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"offer-id"##),
+                     None,
+                     Some(r##"Required. The offer ID of the offer to activate."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-purchase-options-offers-batch-delete",
+                    Some(r##"Deletes one or more one-time product offers."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-offers-batch-delete",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the offers to delete. Must be equal to the package_name field on all the OneTimeProductOffer resources."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent one-time product, if all offers to delete belong to the same product. If this request spans multiple one-time products, set this field to "-"."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"purchase-option-id"##),
+                     None,
+                     Some(r##"Required. The parent purchase option (ID) for which the offers should be deleted. May be specified as '-' to update offers from multiple purchase options."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("onetimeproducts-purchase-options-offers-batch-get",
+                    Some(r##"Reads one or more one-time product offers."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-offers-batch-get",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the updated offers. Must be equal to the package_name field on all the updated OneTimeProductOffer resources."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent one-time product, if all updated offers belong to the same product. If this request spans multiple one-time products, set this field to "-"."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"purchase-option-id"##),
+                     None,
+                     Some(r##"Required. The parent purchase option (ID) for which the offers should be updated. May be specified as '-' to update offers from multiple purchase options."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-purchase-options-offers-batch-update",
+                    Some(r##"Creates or updates one or more one-time product offers."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-offers-batch-update",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the updated offers. Must be equal to the package_name field on all the updated OneTimeProductOffer resources."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent one-time product, if all updated offers belong to the same product. If this request spans multiple one-time products, set this field to "-"."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"purchase-option-id"##),
+                     None,
+                     Some(r##"Required. The parent purchase option (ID) for which the offers should be updated. May be specified as '-' to update offers from multiple purchase options."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-purchase-options-offers-batch-update-states",
+                    Some(r##"Updates a batch of one-time product offer states."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-offers-batch-update-states",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the updated one-time product offers."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The product ID of the parent one-time product, if all updated offers belong to the same one-time product. If this batch update spans multiple one-time products, set this field to "-"."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"purchase-option-id"##),
+                     None,
+                     Some(r##"Required. The purchase option ID of the parent purchase option, if all updated offers belong to the same purchase option. If this batch update spans multiple purchase options, set this field to "-"."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-purchase-options-offers-cancel",
+                    Some(r##"Cancels a one-time product offer."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-offers-cancel",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the offer to cancel."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The parent one-time product (ID) of the offer to cancel."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"purchase-option-id"##),
+                     None,
+                     Some(r##"Required. The parent purchase option (ID) of the offer to cancel."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"offer-id"##),
+                     None,
+                     Some(r##"Required. The offer ID of the offer to cancel."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-purchase-options-offers-deactivate",
+                    Some(r##"Deactivates a one-time product offer."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-offers-deactivate",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) of the offer to deactivate."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The parent one-time product (ID) of the offer to deactivate."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"purchase-option-id"##),
+                     None,
+                     Some(r##"Required. The parent purchase option (ID) of the offer to deactivate."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"offer-id"##),
+                     None,
+                     Some(r##"Required. The offer ID of the offer to deactivate."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("onetimeproducts-purchase-options-offers-list",
+                    Some(r##"Lists all offers under a given app, product, or purchase option."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_onetimeproducts-purchase-options-offers-list",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The parent app (package name) for which the offers should be read."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"Required. The parent one-time product (ID) for which the offers should be read. May be specified as '-' to read all offers under an app."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"purchase-option-id"##),
+                     None,
+                     Some(r##"Required. The parent purchase option (ID) for which the offers should be read. May be specified as '-' to read all offers under a one-time product or an app. Must be specified as '-' if product_id is specified as '-'."##),
+                     Some(true),
+                     Some(false)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -16677,7 +20038,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("subscriptions-base-plans-migrate-prices",
-                    Some(r##"Migrates subscribers who are receiving an historical subscription price to the currently-offered price for the specified region. Requests will cause price change notifications to be sent to users who are currently receiving an historical price older than the supplied timestamp. Subscribers who do not agree to the new price will have their subscription ended at the next renewal."##),
+                    Some(r##"Migrates subscribers from one or more legacy price cohorts to the current price. Requests result in Google Play notifying affected subscribers. Only up to 250 simultaneous legacy price cohorts are supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/monetization_subscriptions-base-plans-migrate-prices",
                   vec![
                     (Some(r##"package-name"##),
@@ -17232,7 +20593,52 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("orders", "methods: 'refund'", vec![
+            ("orders", "methods: 'batchget', 'get' and 'refund'", vec![
+            ("batchget",
+                    Some(r##"Get order details for a list of orders."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/orders_batchget",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The package name of the application for which this subscription or in-app item was purchased (for example, 'com.some.thing')."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",
+                    Some(r##"Get order details for a single order."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/orders_get",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The package name of the application for which this subscription or in-app item was purchased (for example, 'com.some.thing')."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"order-id"##),
+                     None,
+                     Some(r##"Required. The order ID provided to the user when the subscription or in-app order was purchased."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("refund",
                     Some(r##"Refunds a user's subscription or in-app purchase order. Orders older than 3 years cannot be refunded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/orders_refund",
@@ -17254,7 +20660,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ]),
-            ("purchases", "methods: 'products-acknowledge', 'products-consume', 'products-get', 'subscriptions-acknowledge', 'subscriptions-cancel', 'subscriptions-defer', 'subscriptions-get', 'subscriptions-refund', 'subscriptions-revoke', 'subscriptionsv2-get', 'subscriptionsv2-revoke' and 'voidedpurchases-list'", vec![
+            ("purchases", "methods: 'products-acknowledge', 'products-consume', 'products-get', 'productsv2-getproductpurchasev2', 'subscriptions-acknowledge', 'subscriptions-cancel', 'subscriptions-defer', 'subscriptions-get', 'subscriptions-refund', 'subscriptions-revoke', 'subscriptionsv2-cancel', 'subscriptionsv2-get', 'subscriptionsv2-revoke' and 'voidedpurchases-list'", vec![
             ("products-acknowledge",
                     Some(r##"Acknowledges a purchase of an inapp item."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_products-acknowledge",
@@ -17340,6 +20746,31 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("productsv2-getproductpurchasev2",
+                    Some(r##"Checks the purchase and consumption status of an inapp item."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_productsv2-getproductpurchasev2",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"The package name of the application the inapp product was sold in (for example, 'com.some.thing')."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"token"##),
+                     None,
+                     Some(r##"The token provided to the user's device when the inapp product was purchased."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("subscriptions-acknowledge",
                     Some(r##"Acknowledges a subscription purchase."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-acknowledge",
@@ -17351,7 +20782,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"subscription-id"##),
                      None,
-                     Some(r##"The purchased subscription ID (for example, 'monthly001')."##),
+                     Some(r##"Note: Since May 21, 2025, subscription_id is not required, and not recommended for subscription with add-ons. The purchased subscription ID (for example, 'monthly001')."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"token"##),
@@ -17371,7 +20802,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("subscriptions-cancel",
-                    Some(r##"Cancels a user's subscription purchase. The subscription remains valid until its expiration time."##),
+                    Some(r##"Cancels a user's subscription purchase. The subscription remains valid until its expiration time. Newer version is available at purchases.subscriptionsv2.cancel for better client library support."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-cancel",
                   vec![
                     (Some(r##"package-name"##),
@@ -17381,7 +20812,7 @@ async fn main() {
                      Some(false)),
                     (Some(r##"subscription-id"##),
                      None,
-                     Some(r##"The purchased subscription ID (for example, 'monthly001')."##),
+                     Some(r##"Note: Since May 21, 2025, subscription_id is not required, and not recommended for subscription with add-ons. The purchased subscription ID (for example, 'monthly001')."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"token"##),
@@ -17431,7 +20862,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-get",
-                    Some(r##"Checks whether a user's subscription purchase is valid and returns its expiry time."##),
+                    Some(r##"Deprecated: Use purchases.subscriptionsv2.get instead. Checks whether a user's subscription purchase is valid and returns its expiry time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-get",
                   vec![
                     (Some(r##"package-name"##),
@@ -17461,7 +20892,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-refund",
-                    Some(r##"Refunds a user's subscription purchase, but the subscription remains valid until its expiration time and it will continue to recur."##),
+                    Some(r##"Deprecated: Use orders.refund instead. Refunds a user's subscription purchase, but the subscription remains valid until its expiration time and it will continue to recur."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-refund",
                   vec![
                     (Some(r##"package-name"##),
@@ -17486,7 +20917,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("subscriptions-revoke",
-                    Some(r##"Refunds and immediately revokes a user's subscription purchase. Access to the subscription will be terminated immediately and it will stop recurring."##),
+                    Some(r##"Deprecated: Use purchases.subscriptionsv2.revoke instead. Refunds and immediately revokes a user's subscription purchase. Access to the subscription will be terminated immediately and it will stop recurring."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptions-revoke",
                   vec![
                     (Some(r##"package-name"##),
@@ -17509,6 +20940,36 @@ async fn main() {
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
+                  ]),
+            ("subscriptionsv2-cancel",
+                    Some(r##"Cancel a subscription purchase for the user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli/purchases_subscriptionsv2-cancel",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Required. The package of the application for which this subscription was purchased (for example, 'com.some.thing')."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"token"##),
+                     None,
+                     Some(r##"Required. The token provided to the user's device when the subscription was purchased."##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
                   ]),
             ("subscriptionsv2-get",
                     Some(r##"Get metadata about a subscription"##),
@@ -17871,7 +21332,7 @@ async fn main() {
 
     let mut app = App::new("androidpublisher3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240626")
+           .version("7.0.0+20251216")
            .about("Lets Android application developers access their Google Play accounts. At a high level, the expected workflow is to \"insert\" an Edit, make changes as necessary, and then \"commit\" it. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli")
            .arg(Arg::with_name("url")
@@ -17949,7 +21410,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

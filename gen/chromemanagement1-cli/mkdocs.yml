@@ -1,4 +1,4 @@
-site_name: Chrome Management v6.0.0+20240624
+site_name: Chrome Management v7.0.0+20251217
 site_url: http://byron.github.io/google-apis-rs/google-chromemanagement1-cli
 site_description: A complete library to interact with Chrome Management (protocol v1)
 
@@ -16,12 +16,27 @@ nav:
     - 'Apps Fetch Devices Requesting Extension': 'customers_apps-fetch-devices-requesting-extension.md'
     - 'Apps Fetch Users Requesting Extension': 'customers_apps-fetch-users-requesting-extension.md'
     - 'Apps Web Get': 'customers_apps-web-get.md'
+    - 'Certificate Provisioning Processes Claim': 'customers_certificate-provisioning-processes-claim.md'
+    - 'Certificate Provisioning Processes Get': 'customers_certificate-provisioning-processes-get.md'
+    - 'Certificate Provisioning Processes Operations Get': 'customers_certificate-provisioning-processes-operations-get.md'
+    - 'Certificate Provisioning Processes Set Failure': 'customers_certificate-provisioning-processes-set-failure.md'
+    - 'Certificate Provisioning Processes Sign Data': 'customers_certificate-provisioning-processes-sign-data.md'
+    - 'Certificate Provisioning Processes Upload Certificate': 'customers_certificate-provisioning-processes-upload-certificate.md'
+    - 'Profiles Commands Create': 'customers_profiles-commands-create.md'
+    - 'Profiles Commands Get': 'customers_profiles-commands-get.md'
+    - 'Profiles Commands List': 'customers_profiles-commands-list.md'
+    - 'Profiles Delete': 'customers_profiles-delete.md'
+    - 'Profiles Get': 'customers_profiles-get.md'
+    - 'Profiles List': 'customers_profiles-list.md'
+    - 'Reports Count Active Devices': 'customers_reports-count-active-devices.md'
     - 'Reports Count Chrome Browsers Needing Attention': 'customers_reports-count-chrome-browsers-needing-attention.md'
     - 'Reports Count Chrome Crash Events': 'customers_reports-count-chrome-crash-events.md'
     - 'Reports Count Chrome Devices Reaching Auto Expiration Date': 'customers_reports-count-chrome-devices-reaching-auto-expiration-date.md'
     - 'Reports Count Chrome Devices That Need Attention': 'customers_reports-count-chrome-devices-that-need-attention.md'
     - 'Reports Count Chrome Hardware Fleet Devices': 'customers_reports-count-chrome-hardware-fleet-devices.md'
     - 'Reports Count Chrome Versions': 'customers_reports-count-chrome-versions.md'
+    - 'Reports Count Devices Per Boot Type': 'customers_reports-count-devices-per-boot-type.md'
+    - 'Reports Count Devices Per Release Channel': 'customers_reports-count-devices-per-release-channel.md'
     - 'Reports Count Installed Apps': 'customers_reports-count-installed-apps.md'
     - 'Reports Count Print Jobs By Printer': 'customers_reports-count-print-jobs-by-printer.md'
     - 'Reports Count Print Jobs By User': 'customers_reports-count-print-jobs-by-user.md'
@@ -35,6 +50,11 @@ nav:
     - 'Telemetry Notification Configs List': 'customers_telemetry-notification-configs-list.md'
     - 'Telemetry Users Get': 'customers_telemetry-users-get.md'
     - 'Telemetry Users List': 'customers_telemetry-users-list.md'
+    - 'Third Party Profile Users Move': 'customers_third-party-profile-users-move.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Delete': 'operations_delete.md'
+    - 'List': 'operations_list.md'
 
 theme: readthedocs
 

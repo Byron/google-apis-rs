@@ -1,4 +1,4 @@
-site_name: Network Management v6.0.0+20240619
+site_name: Network Management v7.0.0+20251203
 site_url: http://byron.github.io/google-apis-rs/google-networkmanagement1-cli
 site_description: A complete library to interact with Network Management (protocol v1)
 
@@ -9,6 +9,18 @@ site_dir: build_html
 
 nav:
 - Home: 'index.md'
+- 'Organizations':
+    - 'Locations Get': 'organizations_locations-get.md'
+    - 'Locations List': 'organizations_locations-list.md'
+    - 'Locations Operations Cancel': 'organizations_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'organizations_locations-operations-delete.md'
+    - 'Locations Operations Get': 'organizations_locations-operations-get.md'
+    - 'Locations Operations List': 'organizations_locations-operations-list.md'
+    - 'Locations Vpc Flow Logs Configs Create': 'organizations_locations-vpc-flow-logs-configs-create.md'
+    - 'Locations Vpc Flow Logs Configs Delete': 'organizations_locations-vpc-flow-logs-configs-delete.md'
+    - 'Locations Vpc Flow Logs Configs Get': 'organizations_locations-vpc-flow-logs-configs-get.md'
+    - 'Locations Vpc Flow Logs Configs List': 'organizations_locations-vpc-flow-logs-configs-list.md'
+    - 'Locations Vpc Flow Logs Configs Patch': 'organizations_locations-vpc-flow-logs-configs-patch.md'
 - 'Projects':
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations Global Connectivity Tests Create': 'projects_locations-global-connectivity-tests-create.md'
@@ -25,6 +37,13 @@ nav:
     - 'Locations Global Operations Get': 'projects_locations-global-operations-get.md'
     - 'Locations Global Operations List': 'projects_locations-global-operations-list.md'
     - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Vpc Flow Logs Configs Create': 'projects_locations-vpc-flow-logs-configs-create.md'
+    - 'Locations Vpc Flow Logs Configs Delete': 'projects_locations-vpc-flow-logs-configs-delete.md'
+    - 'Locations Vpc Flow Logs Configs Get': 'projects_locations-vpc-flow-logs-configs-get.md'
+    - 'Locations Vpc Flow Logs Configs List': 'projects_locations-vpc-flow-logs-configs-list.md'
+    - 'Locations Vpc Flow Logs Configs Patch': 'projects_locations-vpc-flow-logs-configs-patch.md'
+    - 'Locations Vpc Flow Logs Configs Query Org Vpc Flow Logs Configs': 'projects_locations-vpc-flow-logs-configs-query-org-vpc-flow-logs-configs.md'
+    - 'Locations Vpc Flow Logs Configs Show Effective Flow Logs Configs': 'projects_locations-vpc-flow-logs-configs-show-effective-flow-logs-configs.md'
 
 theme: readthedocs
 

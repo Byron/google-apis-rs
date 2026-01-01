@@ -897,6 +897,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "approval-policy.justification-based-approval-policy" => Some((
+                    "approvalPolicy.justificationBasedApprovalPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "effective-approval-policy.justification-based-approval-policy" => Some((
+                    "effectiveApprovalPolicy.justificationBasedApprovalPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "enrolled-ancestor" => Some((
                     "enrolledAncestor",
                     JsonTypeInfo {
@@ -966,8 +980,11 @@ where
                         &vec![
                             "active-key-version",
                             "ancestor-has-active-key-version",
+                            "approval-policy",
+                            "effective-approval-policy",
                             "enrolled-ancestor",
                             "invalid-key-version",
+                            "justification-based-approval-policy",
                             "name",
                             "notification-emails",
                             "notification-pubsub-topic",
@@ -1935,6 +1952,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "approval-policy.justification-based-approval-policy" => Some((
+                    "approvalPolicy.justificationBasedApprovalPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "effective-approval-policy.justification-based-approval-policy" => Some((
+                    "effectiveApprovalPolicy.justificationBasedApprovalPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "enrolled-ancestor" => Some((
                     "enrolledAncestor",
                     JsonTypeInfo {
@@ -2004,8 +2035,11 @@ where
                         &vec![
                             "active-key-version",
                             "ancestor-has-active-key-version",
+                            "approval-policy",
+                            "effective-approval-policy",
                             "enrolled-ancestor",
                             "invalid-key-version",
+                            "justification-based-approval-policy",
                             "name",
                             "notification-emails",
                             "notification-pubsub-topic",
@@ -2973,6 +3007,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "approval-policy.justification-based-approval-policy" => Some((
+                    "approvalPolicy.justificationBasedApprovalPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "effective-approval-policy.justification-based-approval-policy" => Some((
+                    "effectiveApprovalPolicy.justificationBasedApprovalPolicy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "enrolled-ancestor" => Some((
                     "enrolledAncestor",
                     JsonTypeInfo {
@@ -3042,8 +3090,11 @@ where
                         &vec![
                             "active-key-version",
                             "ancestor-has-active-key-version",
+                            "approval-policy",
+                            "effective-approval-policy",
                             "enrolled-ancestor",
                             "invalid-key-version",
+                            "justification-based-approval-policy",
                             "name",
                             "notification-emails",
                             "notification-pubsub-topic",
@@ -3360,7 +3411,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/accessapproval1", config_dir))
         .build()
@@ -3440,7 +3493,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("approval-requests-dismiss",
-                    Some(r##"Dismisses a request. Returns the updated ApprovalRequest. NOTE: This does not deny access to the resource if another request has been made and approved. It is equivalent in effect to ignoring the request altogether. Returns NOT_FOUND if the request does not exist. Returns FAILED_PRECONDITION if the request exists but is not in a pending state."##),
+                    Some(r##"Dismisses a request. Returns the updated ApprovalRequest. NOTE: When a request is dismissed, it is considered ignored. Dismissing a request does not prevent access granted by other Access Approval requests. Returns NOT_FOUND if the request does not exist. Returns FAILED_PRECONDITION if the request exists but is not in a pending state."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/folders_approval-requests-dismiss",
                   vec![
                     (Some(r##"name"##),
@@ -3485,7 +3538,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("approval-requests-invalidate",
-                    Some(r##"Invalidates an existing ApprovalRequest. Returns the updated ApprovalRequest. NOTE: This does not deny access to the resource if another request has been made and approved. It only invalidates a single approval. Returns FAILED_PRECONDITION if the request exists but is not in an approved state."##),
+                    Some(r##"Invalidates an existing ApprovalRequest. Returns the updated ApprovalRequest. NOTE: This action revokes Google access based on this approval request. If the resource has other active approvals, access will remain granted. Returns FAILED_PRECONDITION if the request exists but is not in an approved state."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/folders_approval-requests-invalidate",
                   vec![
                     (Some(r##"name"##),
@@ -3530,7 +3583,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("delete-access-approval-settings",
-                    Some(r##"Deletes the settings associated with a project, folder, or organization. This will have the effect of disabling Access Approval for the project, folder, or organization, but only if all ancestors also have Access Approval disabled. If Access Approval is enabled at a higher level of the hierarchy, then Access Approval will still be enabled at this level as the settings are inherited."##),
+                    Some(r##"Deletes the settings associated with a project, folder, or organization. This will have the effect of disabling Access Approval for the resource. Access Approval may remain active based on parent resource settings. To confirm the effective settings, call GetAccessApprovalSettings and verify effective setting is disabled."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/folders_delete-access-approval-settings",
                   vec![
                     (Some(r##"name"##),
@@ -3550,7 +3603,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get-access-approval-settings",
-                    Some(r##"Gets the settings associated with a project, folder, or organization."##),
+                    Some(r##"Gets the Access Approval settings associated with a project, folder, or organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/folders_get-access-approval-settings",
                   vec![
                     (Some(r##"name"##),
@@ -3642,7 +3695,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("approval-requests-dismiss",
-                    Some(r##"Dismisses a request. Returns the updated ApprovalRequest. NOTE: This does not deny access to the resource if another request has been made and approved. It is equivalent in effect to ignoring the request altogether. Returns NOT_FOUND if the request does not exist. Returns FAILED_PRECONDITION if the request exists but is not in a pending state."##),
+                    Some(r##"Dismisses a request. Returns the updated ApprovalRequest. NOTE: When a request is dismissed, it is considered ignored. Dismissing a request does not prevent access granted by other Access Approval requests. Returns NOT_FOUND if the request does not exist. Returns FAILED_PRECONDITION if the request exists but is not in a pending state."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/organizations_approval-requests-dismiss",
                   vec![
                     (Some(r##"name"##),
@@ -3687,7 +3740,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("approval-requests-invalidate",
-                    Some(r##"Invalidates an existing ApprovalRequest. Returns the updated ApprovalRequest. NOTE: This does not deny access to the resource if another request has been made and approved. It only invalidates a single approval. Returns FAILED_PRECONDITION if the request exists but is not in an approved state."##),
+                    Some(r##"Invalidates an existing ApprovalRequest. Returns the updated ApprovalRequest. NOTE: This action revokes Google access based on this approval request. If the resource has other active approvals, access will remain granted. Returns FAILED_PRECONDITION if the request exists but is not in an approved state."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/organizations_approval-requests-invalidate",
                   vec![
                     (Some(r##"name"##),
@@ -3732,7 +3785,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("delete-access-approval-settings",
-                    Some(r##"Deletes the settings associated with a project, folder, or organization. This will have the effect of disabling Access Approval for the project, folder, or organization, but only if all ancestors also have Access Approval disabled. If Access Approval is enabled at a higher level of the hierarchy, then Access Approval will still be enabled at this level as the settings are inherited."##),
+                    Some(r##"Deletes the settings associated with a project, folder, or organization. This will have the effect of disabling Access Approval for the resource. Access Approval may remain active based on parent resource settings. To confirm the effective settings, call GetAccessApprovalSettings and verify effective setting is disabled."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/organizations_delete-access-approval-settings",
                   vec![
                     (Some(r##"name"##),
@@ -3752,7 +3805,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get-access-approval-settings",
-                    Some(r##"Gets the settings associated with a project, folder, or organization."##),
+                    Some(r##"Gets the Access Approval settings associated with a project, folder, or organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/organizations_get-access-approval-settings",
                   vec![
                     (Some(r##"name"##),
@@ -3844,7 +3897,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("approval-requests-dismiss",
-                    Some(r##"Dismisses a request. Returns the updated ApprovalRequest. NOTE: This does not deny access to the resource if another request has been made and approved. It is equivalent in effect to ignoring the request altogether. Returns NOT_FOUND if the request does not exist. Returns FAILED_PRECONDITION if the request exists but is not in a pending state."##),
+                    Some(r##"Dismisses a request. Returns the updated ApprovalRequest. NOTE: When a request is dismissed, it is considered ignored. Dismissing a request does not prevent access granted by other Access Approval requests. Returns NOT_FOUND if the request does not exist. Returns FAILED_PRECONDITION if the request exists but is not in a pending state."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/projects_approval-requests-dismiss",
                   vec![
                     (Some(r##"name"##),
@@ -3889,7 +3942,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("approval-requests-invalidate",
-                    Some(r##"Invalidates an existing ApprovalRequest. Returns the updated ApprovalRequest. NOTE: This does not deny access to the resource if another request has been made and approved. It only invalidates a single approval. Returns FAILED_PRECONDITION if the request exists but is not in an approved state."##),
+                    Some(r##"Invalidates an existing ApprovalRequest. Returns the updated ApprovalRequest. NOTE: This action revokes Google access based on this approval request. If the resource has other active approvals, access will remain granted. Returns FAILED_PRECONDITION if the request exists but is not in an approved state."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/projects_approval-requests-invalidate",
                   vec![
                     (Some(r##"name"##),
@@ -3934,7 +3987,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("delete-access-approval-settings",
-                    Some(r##"Deletes the settings associated with a project, folder, or organization. This will have the effect of disabling Access Approval for the project, folder, or organization, but only if all ancestors also have Access Approval disabled. If Access Approval is enabled at a higher level of the hierarchy, then Access Approval will still be enabled at this level as the settings are inherited."##),
+                    Some(r##"Deletes the settings associated with a project, folder, or organization. This will have the effect of disabling Access Approval for the resource. Access Approval may remain active based on parent resource settings. To confirm the effective settings, call GetAccessApprovalSettings and verify effective setting is disabled."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/projects_delete-access-approval-settings",
                   vec![
                     (Some(r##"name"##),
@@ -3954,7 +4007,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get-access-approval-settings",
-                    Some(r##"Gets the settings associated with a project, folder, or organization."##),
+                    Some(r##"Gets the Access Approval settings associated with a project, folder, or organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_accessapproval1_cli/projects_get-access-approval-settings",
                   vec![
                     (Some(r##"name"##),
@@ -4023,7 +4076,7 @@ async fn main() {
 
     let mut app = App::new("accessapproval1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240621")
+           .version("7.0.0+20251205")
            .about("An API for controlling access to data by Google personnel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accessapproval1_cli")
            .arg(Arg::with_name("url")
@@ -4088,7 +4141,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

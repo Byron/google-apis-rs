@@ -1212,6 +1212,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "description" => Some((
                     "description",
                     JsonTypeInfo {
@@ -1266,6 +1273,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "description",
                             "display-name",
                             "enablement-state",
@@ -1763,6 +1771,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "description" => Some((
                     "description",
                     JsonTypeInfo {
@@ -1817,6 +1832,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "description",
                             "display-name",
                             "enablement-state",
@@ -2299,9 +2315,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "mute-state" => Some((
+                    "muteState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion =
-                        FieldCursor::did_you_mean(key, &vec!["filter", "mute-annotation"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["filter", "mute-annotation", "mute-state"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -2351,198 +2376,6 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _folders_locations_mute_configs_create(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut field_cursor = FieldCursor::default();
-        let mut object = serde_json::value::Value::Object(Default::default());
-
-        for kvarg in opt
-            .values_of("kv")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "description" => Some((
-                    "description",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "filter" => Some((
-                    "filter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "most-recent-editor" => Some((
-                    "mostRecentEditor",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "create-time",
-                            "description",
-                            "display-name",
-                            "filter",
-                            "most-recent-editor",
-                            "name",
-                            "update-time",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(
-                    &mut object,
-                    value.unwrap(),
-                    type_info,
-                    err,
-                    &temp_cursor,
-                );
-            }
-        }
-        let mut request: api::GoogleCloudSecuritycenterV1MuteConfig =
-            serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .folders()
-            .locations_mute_configs_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "mute-config-id" => {
-                    call = call.mute_config_id(value.unwrap_or(""));
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["mute-config-id"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -2751,98 +2584,6 @@ where
         }
     }
 
-    async fn _folders_locations_mute_configs_list(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .folders()
-            .locations_mute_configs_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                }
-                "page-size" => {
-                    call = call.page_size(
-                        value
-                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
-                            .unwrap_or(-0),
-                    );
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _folders_locations_mute_configs_patch(
         &self,
         opt: &ArgMatches<'n>,
@@ -2895,6 +2636,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "expiry-time" => Some((
+                    "expiryTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "filter" => Some((
                     "filter",
                     JsonTypeInfo {
@@ -2916,6 +2664,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -2930,9 +2685,11 @@ where
                             "create-time",
                             "description",
                             "display-name",
+                            "expiry-time",
                             "filter",
                             "most-recent-editor",
                             "name",
+                            "type",
                             "update-time",
                         ],
                     );
@@ -3091,6 +2848,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "expiry-time" => Some((
+                    "expiryTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "filter" => Some((
                     "filter",
                     JsonTypeInfo {
@@ -3112,6 +2876,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -3126,9 +2897,11 @@ where
                             "create-time",
                             "description",
                             "display-name",
+                            "expiry-time",
                             "filter",
                             "most-recent-editor",
                             "name",
+                            "type",
                             "update-time",
                         ],
                     );
@@ -3537,6 +3310,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "expiry-time" => Some((
+                    "expiryTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "filter" => Some((
                     "filter",
                     JsonTypeInfo {
@@ -3558,6 +3338,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -3572,9 +3359,11 @@ where
                             "create-time",
                             "description",
                             "display-name",
+                            "expiry-time",
                             "filter",
                             "most-recent-editor",
                             "name",
+                            "type",
                             "update-time",
                         ],
                     );
@@ -4329,6 +4118,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "custom-config.description" => Some((
                     "customConfig.description",
                     JsonTypeInfo {
@@ -4425,6 +4221,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "custom-config",
                             "description",
                             "display-name",
@@ -4932,6 +4729,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "custom-config.description" => Some((
                     "customConfig.description",
                     JsonTypeInfo {
@@ -5028,6 +4832,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "custom-config",
                             "description",
                             "display-name",
@@ -6234,6 +6039,69 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "affected-resources.count" => Some((
+                    "affectedResources.count",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.deployment-platform" => Some((
+                    "aiModel.deploymentPlatform",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.display-name" => Some((
+                    "aiModel.displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.domain" => Some((
+                    "aiModel.domain",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.library" => Some((
+                    "aiModel.library",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.location" => Some((
+                    "aiModel.location",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.name" => Some((
+                    "aiModel.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.publisher" => Some((
+                    "aiModel.publisher",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.usage-category" => Some((
+                    "aiModel.usageCategory",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "application.base-uri" => Some((
                     "application.baseUri",
                     JsonTypeInfo {
@@ -6381,6 +6249,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "chokepoint.related-findings" => Some((
+                    "chokepoint.relatedFindings",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "cloud-armor.adaptive-protection.confidence" => Some((
                     "cloudArmor.adaptiveProtection.confidence",
                     JsonTypeInfo {
@@ -6402,10 +6277,24 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-armor.attack.volume-bps-long" => Some((
+                    "cloudArmor.attack.volumeBpsLong",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "cloud-armor.attack.volume-pps" => Some((
                     "cloudArmor.attack.volumePps",
                     JsonTypeInfo {
                         jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "cloud-armor.attack.volume-pps-long" => Some((
+                    "cloudArmor.attack.volumePpsLong",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -6514,6 +6403,41 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "compliance-details.cloud-control.cloud-control-name" => Some((
+                    "complianceDetails.cloudControl.cloudControlName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.policy-type" => Some((
+                    "complianceDetails.cloudControl.policyType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.type" => Some((
+                    "complianceDetails.cloudControl.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.version" => Some((
+                    "complianceDetails.cloudControl.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control-deployment-names" => Some((
+                    "complianceDetails.cloudControlDeploymentNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -6570,6 +6494,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "disk.name" => Some((
+                    "disk.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "event-time" => Some((
                     "eventTime",
                     JsonTypeInfo {
@@ -6617,6 +6548,62 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.destination-ip-ranges" => Some((
+                    "ipRules.destinationIpRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.direction" => Some((
+                    "ipRules.direction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-rules.exposed-services" => Some((
+                    "ipRules.exposedServices",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.source-ip-ranges" => Some((
+                    "ipRules.sourceIpRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "job.error-code" => Some((
+                    "job.errorCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.location" => Some((
+                    "job.location",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.name" => Some((
+                    "job.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.state" => Some((
+                    "job.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "kernel-rootkit.name" => Some((
@@ -6726,6 +6713,20 @@ where
                 )),
                 "mute" => Some((
                     "mute",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mute-info.static-mute.apply-time" => Some((
+                    "muteInfo.staticMute.applyTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mute-info.static-mute.state" => Some((
+                    "muteInfo.staticMute.state",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -6969,8 +6970,22 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "vulnerability.cve.exploit-release-date" => Some((
+                    "vulnerability.cve.exploitReleaseDate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "vulnerability.cve.exploitation-activity" => Some((
                     "vulnerability.cve.exploitationActivity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vulnerability.cve.first-exploitation-date" => Some((
+                    "vulnerability.cve.firstExploitationDate",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -7067,6 +7082,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "vulnerability.provider-risk-score" => Some((
+                    "vulnerability.providerRiskScore",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vulnerability.reachable" => Some((
+                    "vulnerability.reachable",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "vulnerability.security-bulletin.bulletin-id" => Some((
                     "vulnerability.securityBulletin.bulletinId",
                     JsonTypeInfo {
@@ -7096,9 +7125,12 @@ where
                             "adaptive-protection",
                             "additional-tactics",
                             "additional-techniques",
+                            "affected-resources",
+                            "ai-model",
                             "appliance",
                             "application",
                             "applications",
+                            "apply-time",
                             "attack",
                             "attack-complexity",
                             "attack-exposure",
@@ -7118,30 +7150,45 @@ where
                             "canonical-name",
                             "category",
                             "changed-policy",
+                            "chokepoint",
                             "classification",
                             "cloud-armor",
+                            "cloud-control",
+                            "cloud-control-deployment-names",
+                            "cloud-control-name",
                             "cloud-dlp-data-profile",
                             "cloud-dlp-inspection",
+                            "compliance-details",
                             "confidence",
                             "confidentiality-impact",
+                            "count",
                             "cpe-uri",
                             "create-time",
                             "cve",
                             "cvssv3",
                             "data-profile",
                             "database",
+                            "deployment-platform",
                             "description",
+                            "destination-ip-ranges",
+                            "direction",
+                            "disk",
                             "display-name",
+                            "domain",
                             "domains",
                             "duration",
+                            "error-code",
                             "event-time",
                             "exfiltration",
+                            "exploit-release-date",
                             "exploitation-activity",
                             "exposed-high-value-resources-count",
                             "exposed-low-value-resources-count",
                             "exposed-medium-value-resources-count",
+                            "exposed-services",
                             "external-uri",
                             "finding-class",
+                            "first-exploitation-date",
                             "fixed-package",
                             "full-scan",
                             "full-uri",
@@ -7155,9 +7202,13 @@ where
                             "inspect-job",
                             "integrity-impact",
                             "ip-addresses",
+                            "ip-rules",
+                            "job",
                             "kernel-rootkit",
                             "last-author",
                             "latest-calculation-time",
+                            "library",
+                            "location",
                             "long-term-allowed",
                             "long-term-denied",
                             "marks",
@@ -7165,6 +7216,7 @@ where
                             "mitre-attack",
                             "module-name",
                             "mute",
+                            "mute-info",
                             "mute-initiator",
                             "mute-update-time",
                             "name",
@@ -7183,6 +7235,7 @@ where
                             "policy",
                             "policy-options",
                             "policy-set",
+                            "policy-type",
                             "posture-deployment",
                             "posture-deployment-resource",
                             "preview",
@@ -7192,8 +7245,11 @@ where
                             "principal-subject",
                             "privileges-required",
                             "profile",
+                            "provider-risk-score",
+                            "publisher",
                             "query",
                             "ratio",
+                            "reachable",
                             "region-code",
                             "related-findings",
                             "requests",
@@ -7210,7 +7266,9 @@ where
                             "service-name",
                             "severity",
                             "short-term-allowed",
+                            "source-ip-ranges",
                             "state",
+                            "static-mute",
                             "storage-pool",
                             "submission-time",
                             "suggested-upgrade-version",
@@ -7228,13 +7286,16 @@ where
                             "unexpected-system-call-handler",
                             "upstream-fix-available",
                             "uris",
+                            "usage-category",
                             "user-agent",
                             "user-agent-family",
                             "user-interaction",
                             "user-name",
                             "version",
                             "volume-bps",
+                            "volume-bps-long",
                             "volume-pps",
+                            "volume-pps-long",
                             "vulnerability",
                             "zero-day",
                         ],
@@ -8475,6 +8536,101 @@ where
         }
     }
 
+    async fn _organizations_attack_paths_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .attack_paths_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _organizations_big_query_exports_create(
         &self,
         opt: &ArgMatches<'n>,
@@ -9171,6 +9327,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "description" => Some((
                     "description",
                     JsonTypeInfo {
@@ -9225,6 +9388,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "description",
                             "display-name",
                             "enablement-state",
@@ -9722,6 +9886,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "description" => Some((
                     "description",
                     JsonTypeInfo {
@@ -9776,6 +9947,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "description",
                             "display-name",
                             "enablement-state",
@@ -10258,9 +10430,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "mute-state" => Some((
+                    "muteState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion =
-                        FieldCursor::did_you_mean(key, &vec!["filter", "mute-annotation"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["filter", "mute-annotation", "mute-state"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -10391,198 +10572,6 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _organizations_locations_mute_configs_create(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut field_cursor = FieldCursor::default();
-        let mut object = serde_json::value::Value::Object(Default::default());
-
-        for kvarg in opt
-            .values_of("kv")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "description" => Some((
-                    "description",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "filter" => Some((
-                    "filter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "most-recent-editor" => Some((
-                    "mostRecentEditor",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "create-time",
-                            "description",
-                            "display-name",
-                            "filter",
-                            "most-recent-editor",
-                            "name",
-                            "update-time",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(
-                    &mut object,
-                    value.unwrap(),
-                    type_info,
-                    err,
-                    &temp_cursor,
-                );
-            }
-        }
-        let mut request: api::GoogleCloudSecuritycenterV1MuteConfig =
-            serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .organizations()
-            .locations_mute_configs_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "mute-config-id" => {
-                    call = call.mute_config_id(value.unwrap_or(""));
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["mute-config-id"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -10791,98 +10780,6 @@ where
         }
     }
 
-    async fn _organizations_locations_mute_configs_list(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .organizations()
-            .locations_mute_configs_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                }
-                "page-size" => {
-                    call = call.page_size(
-                        value
-                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
-                            .unwrap_or(-0),
-                    );
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _organizations_locations_mute_configs_patch(
         &self,
         opt: &ArgMatches<'n>,
@@ -10935,6 +10832,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "expiry-time" => Some((
+                    "expiryTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "filter" => Some((
                     "filter",
                     JsonTypeInfo {
@@ -10956,6 +10860,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -10970,9 +10881,11 @@ where
                             "create-time",
                             "description",
                             "display-name",
+                            "expiry-time",
                             "filter",
                             "most-recent-editor",
                             "name",
+                            "type",
                             "update-time",
                         ],
                     );
@@ -11131,6 +11044,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "expiry-time" => Some((
+                    "expiryTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "filter" => Some((
                     "filter",
                     JsonTypeInfo {
@@ -11152,6 +11072,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -11166,9 +11093,11 @@ where
                             "create-time",
                             "description",
                             "display-name",
+                            "expiry-time",
                             "filter",
                             "most-recent-editor",
                             "name",
+                            "type",
                             "update-time",
                         ],
                     );
@@ -11577,6 +11506,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "expiry-time" => Some((
+                    "expiryTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "filter" => Some((
                     "filter",
                     JsonTypeInfo {
@@ -11598,6 +11534,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -11612,9 +11555,11 @@ where
                             "create-time",
                             "description",
                             "display-name",
+                            "expiry-time",
                             "filter",
                             "most-recent-editor",
                             "name",
+                            "type",
                             "update-time",
                         ],
                     );
@@ -12592,6 +12537,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -12622,7 +12574,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -13326,6 +13287,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "custom-config.description" => Some((
                     "customConfig.description",
                     JsonTypeInfo {
@@ -13422,6 +13390,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "custom-config",
                             "description",
                             "display-name",
@@ -13929,6 +13898,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "custom-config.description" => Some((
                     "customConfig.description",
                     JsonTypeInfo {
@@ -14025,6 +14001,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "custom-config",
                             "description",
                             "display-name",
@@ -15466,6 +15443,69 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "affected-resources.count" => Some((
+                    "affectedResources.count",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.deployment-platform" => Some((
+                    "aiModel.deploymentPlatform",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.display-name" => Some((
+                    "aiModel.displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.domain" => Some((
+                    "aiModel.domain",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.library" => Some((
+                    "aiModel.library",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.location" => Some((
+                    "aiModel.location",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.name" => Some((
+                    "aiModel.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.publisher" => Some((
+                    "aiModel.publisher",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.usage-category" => Some((
+                    "aiModel.usageCategory",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "application.base-uri" => Some((
                     "application.baseUri",
                     JsonTypeInfo {
@@ -15613,6 +15653,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "chokepoint.related-findings" => Some((
+                    "chokepoint.relatedFindings",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "cloud-armor.adaptive-protection.confidence" => Some((
                     "cloudArmor.adaptiveProtection.confidence",
                     JsonTypeInfo {
@@ -15634,10 +15681,24 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-armor.attack.volume-bps-long" => Some((
+                    "cloudArmor.attack.volumeBpsLong",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "cloud-armor.attack.volume-pps" => Some((
                     "cloudArmor.attack.volumePps",
                     JsonTypeInfo {
                         jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "cloud-armor.attack.volume-pps-long" => Some((
+                    "cloudArmor.attack.volumePpsLong",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -15746,6 +15807,41 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "compliance-details.cloud-control.cloud-control-name" => Some((
+                    "complianceDetails.cloudControl.cloudControlName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.policy-type" => Some((
+                    "complianceDetails.cloudControl.policyType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.type" => Some((
+                    "complianceDetails.cloudControl.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.version" => Some((
+                    "complianceDetails.cloudControl.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control-deployment-names" => Some((
+                    "complianceDetails.cloudControlDeploymentNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -15802,6 +15898,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "disk.name" => Some((
+                    "disk.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "event-time" => Some((
                     "eventTime",
                     JsonTypeInfo {
@@ -15849,6 +15952,62 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.destination-ip-ranges" => Some((
+                    "ipRules.destinationIpRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.direction" => Some((
+                    "ipRules.direction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-rules.exposed-services" => Some((
+                    "ipRules.exposedServices",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.source-ip-ranges" => Some((
+                    "ipRules.sourceIpRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "job.error-code" => Some((
+                    "job.errorCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.location" => Some((
+                    "job.location",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.name" => Some((
+                    "job.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.state" => Some((
+                    "job.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "kernel-rootkit.name" => Some((
@@ -15958,6 +16117,20 @@ where
                 )),
                 "mute" => Some((
                     "mute",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mute-info.static-mute.apply-time" => Some((
+                    "muteInfo.staticMute.applyTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mute-info.static-mute.state" => Some((
+                    "muteInfo.staticMute.state",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -16201,8 +16374,22 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "vulnerability.cve.exploit-release-date" => Some((
+                    "vulnerability.cve.exploitReleaseDate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "vulnerability.cve.exploitation-activity" => Some((
                     "vulnerability.cve.exploitationActivity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vulnerability.cve.first-exploitation-date" => Some((
+                    "vulnerability.cve.firstExploitationDate",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -16299,6 +16486,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "vulnerability.provider-risk-score" => Some((
+                    "vulnerability.providerRiskScore",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vulnerability.reachable" => Some((
+                    "vulnerability.reachable",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "vulnerability.security-bulletin.bulletin-id" => Some((
                     "vulnerability.securityBulletin.bulletinId",
                     JsonTypeInfo {
@@ -16328,9 +16529,12 @@ where
                             "adaptive-protection",
                             "additional-tactics",
                             "additional-techniques",
+                            "affected-resources",
+                            "ai-model",
                             "appliance",
                             "application",
                             "applications",
+                            "apply-time",
                             "attack",
                             "attack-complexity",
                             "attack-exposure",
@@ -16350,30 +16554,45 @@ where
                             "canonical-name",
                             "category",
                             "changed-policy",
+                            "chokepoint",
                             "classification",
                             "cloud-armor",
+                            "cloud-control",
+                            "cloud-control-deployment-names",
+                            "cloud-control-name",
                             "cloud-dlp-data-profile",
                             "cloud-dlp-inspection",
+                            "compliance-details",
                             "confidence",
                             "confidentiality-impact",
+                            "count",
                             "cpe-uri",
                             "create-time",
                             "cve",
                             "cvssv3",
                             "data-profile",
                             "database",
+                            "deployment-platform",
                             "description",
+                            "destination-ip-ranges",
+                            "direction",
+                            "disk",
                             "display-name",
+                            "domain",
                             "domains",
                             "duration",
+                            "error-code",
                             "event-time",
                             "exfiltration",
+                            "exploit-release-date",
                             "exploitation-activity",
                             "exposed-high-value-resources-count",
                             "exposed-low-value-resources-count",
                             "exposed-medium-value-resources-count",
+                            "exposed-services",
                             "external-uri",
                             "finding-class",
+                            "first-exploitation-date",
                             "fixed-package",
                             "full-scan",
                             "full-uri",
@@ -16387,9 +16606,13 @@ where
                             "inspect-job",
                             "integrity-impact",
                             "ip-addresses",
+                            "ip-rules",
+                            "job",
                             "kernel-rootkit",
                             "last-author",
                             "latest-calculation-time",
+                            "library",
+                            "location",
                             "long-term-allowed",
                             "long-term-denied",
                             "marks",
@@ -16397,6 +16620,7 @@ where
                             "mitre-attack",
                             "module-name",
                             "mute",
+                            "mute-info",
                             "mute-initiator",
                             "mute-update-time",
                             "name",
@@ -16415,6 +16639,7 @@ where
                             "policy",
                             "policy-options",
                             "policy-set",
+                            "policy-type",
                             "posture-deployment",
                             "posture-deployment-resource",
                             "preview",
@@ -16424,8 +16649,11 @@ where
                             "principal-subject",
                             "privileges-required",
                             "profile",
+                            "provider-risk-score",
+                            "publisher",
                             "query",
                             "ratio",
+                            "reachable",
                             "region-code",
                             "related-findings",
                             "requests",
@@ -16442,7 +16670,9 @@ where
                             "service-name",
                             "severity",
                             "short-term-allowed",
+                            "source-ip-ranges",
                             "state",
+                            "static-mute",
                             "storage-pool",
                             "submission-time",
                             "suggested-upgrade-version",
@@ -16460,13 +16690,16 @@ where
                             "unexpected-system-call-handler",
                             "upstream-fix-available",
                             "uris",
+                            "usage-category",
                             "user-agent",
                             "user-agent-family",
                             "user-interaction",
                             "user-name",
                             "version",
                             "volume-bps",
+                            "volume-bps-long",
                             "volume-pps",
+                            "volume-pps-long",
                             "vulnerability",
                             "zero-day",
                         ],
@@ -17248,6 +17481,69 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "affected-resources.count" => Some((
+                    "affectedResources.count",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.deployment-platform" => Some((
+                    "aiModel.deploymentPlatform",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.display-name" => Some((
+                    "aiModel.displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.domain" => Some((
+                    "aiModel.domain",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.library" => Some((
+                    "aiModel.library",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.location" => Some((
+                    "aiModel.location",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.name" => Some((
+                    "aiModel.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.publisher" => Some((
+                    "aiModel.publisher",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.usage-category" => Some((
+                    "aiModel.usageCategory",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "application.base-uri" => Some((
                     "application.baseUri",
                     JsonTypeInfo {
@@ -17395,6 +17691,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "chokepoint.related-findings" => Some((
+                    "chokepoint.relatedFindings",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "cloud-armor.adaptive-protection.confidence" => Some((
                     "cloudArmor.adaptiveProtection.confidence",
                     JsonTypeInfo {
@@ -17416,10 +17719,24 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-armor.attack.volume-bps-long" => Some((
+                    "cloudArmor.attack.volumeBpsLong",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "cloud-armor.attack.volume-pps" => Some((
                     "cloudArmor.attack.volumePps",
                     JsonTypeInfo {
                         jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "cloud-armor.attack.volume-pps-long" => Some((
+                    "cloudArmor.attack.volumePpsLong",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -17528,6 +17845,41 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "compliance-details.cloud-control.cloud-control-name" => Some((
+                    "complianceDetails.cloudControl.cloudControlName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.policy-type" => Some((
+                    "complianceDetails.cloudControl.policyType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.type" => Some((
+                    "complianceDetails.cloudControl.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.version" => Some((
+                    "complianceDetails.cloudControl.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control-deployment-names" => Some((
+                    "complianceDetails.cloudControlDeploymentNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -17584,6 +17936,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "disk.name" => Some((
+                    "disk.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "event-time" => Some((
                     "eventTime",
                     JsonTypeInfo {
@@ -17631,6 +17990,62 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.destination-ip-ranges" => Some((
+                    "ipRules.destinationIpRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.direction" => Some((
+                    "ipRules.direction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-rules.exposed-services" => Some((
+                    "ipRules.exposedServices",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.source-ip-ranges" => Some((
+                    "ipRules.sourceIpRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "job.error-code" => Some((
+                    "job.errorCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.location" => Some((
+                    "job.location",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.name" => Some((
+                    "job.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.state" => Some((
+                    "job.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "kernel-rootkit.name" => Some((
@@ -17740,6 +18155,20 @@ where
                 )),
                 "mute" => Some((
                     "mute",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mute-info.static-mute.apply-time" => Some((
+                    "muteInfo.staticMute.applyTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mute-info.static-mute.state" => Some((
+                    "muteInfo.staticMute.state",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -17983,8 +18412,22 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "vulnerability.cve.exploit-release-date" => Some((
+                    "vulnerability.cve.exploitReleaseDate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "vulnerability.cve.exploitation-activity" => Some((
                     "vulnerability.cve.exploitationActivity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vulnerability.cve.first-exploitation-date" => Some((
+                    "vulnerability.cve.firstExploitationDate",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -18081,6 +18524,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "vulnerability.provider-risk-score" => Some((
+                    "vulnerability.providerRiskScore",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vulnerability.reachable" => Some((
+                    "vulnerability.reachable",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "vulnerability.security-bulletin.bulletin-id" => Some((
                     "vulnerability.securityBulletin.bulletinId",
                     JsonTypeInfo {
@@ -18110,9 +18567,12 @@ where
                             "adaptive-protection",
                             "additional-tactics",
                             "additional-techniques",
+                            "affected-resources",
+                            "ai-model",
                             "appliance",
                             "application",
                             "applications",
+                            "apply-time",
                             "attack",
                             "attack-complexity",
                             "attack-exposure",
@@ -18132,30 +18592,45 @@ where
                             "canonical-name",
                             "category",
                             "changed-policy",
+                            "chokepoint",
                             "classification",
                             "cloud-armor",
+                            "cloud-control",
+                            "cloud-control-deployment-names",
+                            "cloud-control-name",
                             "cloud-dlp-data-profile",
                             "cloud-dlp-inspection",
+                            "compliance-details",
                             "confidence",
                             "confidentiality-impact",
+                            "count",
                             "cpe-uri",
                             "create-time",
                             "cve",
                             "cvssv3",
                             "data-profile",
                             "database",
+                            "deployment-platform",
                             "description",
+                            "destination-ip-ranges",
+                            "direction",
+                            "disk",
                             "display-name",
+                            "domain",
                             "domains",
                             "duration",
+                            "error-code",
                             "event-time",
                             "exfiltration",
+                            "exploit-release-date",
                             "exploitation-activity",
                             "exposed-high-value-resources-count",
                             "exposed-low-value-resources-count",
                             "exposed-medium-value-resources-count",
+                            "exposed-services",
                             "external-uri",
                             "finding-class",
+                            "first-exploitation-date",
                             "fixed-package",
                             "full-scan",
                             "full-uri",
@@ -18169,9 +18644,13 @@ where
                             "inspect-job",
                             "integrity-impact",
                             "ip-addresses",
+                            "ip-rules",
+                            "job",
                             "kernel-rootkit",
                             "last-author",
                             "latest-calculation-time",
+                            "library",
+                            "location",
                             "long-term-allowed",
                             "long-term-denied",
                             "marks",
@@ -18179,6 +18658,7 @@ where
                             "mitre-attack",
                             "module-name",
                             "mute",
+                            "mute-info",
                             "mute-initiator",
                             "mute-update-time",
                             "name",
@@ -18197,6 +18677,7 @@ where
                             "policy",
                             "policy-options",
                             "policy-set",
+                            "policy-type",
                             "posture-deployment",
                             "posture-deployment-resource",
                             "preview",
@@ -18206,8 +18687,11 @@ where
                             "principal-subject",
                             "privileges-required",
                             "profile",
+                            "provider-risk-score",
+                            "publisher",
                             "query",
                             "ratio",
+                            "reachable",
                             "region-code",
                             "related-findings",
                             "requests",
@@ -18224,7 +18708,9 @@ where
                             "service-name",
                             "severity",
                             "short-term-allowed",
+                            "source-ip-ranges",
                             "state",
+                            "static-mute",
                             "storage-pool",
                             "submission-time",
                             "suggested-upgrade-version",
@@ -18242,13 +18728,16 @@ where
                             "unexpected-system-call-handler",
                             "upstream-fix-available",
                             "uris",
+                            "usage-category",
                             "user-agent",
                             "user-agent-family",
                             "user-interaction",
                             "user-name",
                             "version",
                             "volume-bps",
+                            "volume-bps-long",
                             "volume-pps",
+                            "volume-pps-long",
                             "vulnerability",
                             "zero-day",
                         ],
@@ -19737,6 +20226,108 @@ where
         }
     }
 
+    async fn _organizations_valued_resources_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .organizations()
+            .valued_resources_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "order-by", "page-size", "page-token"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_assets_group(
         &self,
         opt: &ArgMatches<'n>,
@@ -20907,6 +21498,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "description" => Some((
                     "description",
                     JsonTypeInfo {
@@ -20961,6 +21559,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "description",
                             "display-name",
                             "enablement-state",
@@ -21458,6 +22057,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "description" => Some((
                     "description",
                     JsonTypeInfo {
@@ -21512,6 +22118,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "description",
                             "display-name",
                             "enablement-state",
@@ -21994,9 +22601,18 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "mute-state" => Some((
+                    "muteState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
-                    let suggestion =
-                        FieldCursor::did_you_mean(key, &vec!["filter", "mute-annotation"]);
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["filter", "mute-annotation", "mute-state"],
+                    );
                     err.issues.push(CLIError::Field(FieldError::Unknown(
                         temp_cursor.to_string(),
                         suggestion,
@@ -22046,198 +22662,6 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _projects_locations_mute_configs_create(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut field_cursor = FieldCursor::default();
-        let mut object = serde_json::value::Value::Object(Default::default());
-
-        for kvarg in opt
-            .values_of("kv")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-
-            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
-            {
-                "create-time" => Some((
-                    "createTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "description" => Some((
-                    "description",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "display-name" => Some((
-                    "displayName",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "filter" => Some((
-                    "filter",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "most-recent-editor" => Some((
-                    "mostRecentEditor",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "name" => Some((
-                    "name",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                "update-time" => Some((
-                    "updateTime",
-                    JsonTypeInfo {
-                        jtype: JsonType::String,
-                        ctype: ComplexType::Pod,
-                    },
-                )),
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(
-                        key,
-                        &vec![
-                            "create-time",
-                            "description",
-                            "display-name",
-                            "filter",
-                            "most-recent-editor",
-                            "name",
-                            "update-time",
-                        ],
-                    );
-                    err.issues.push(CLIError::Field(FieldError::Unknown(
-                        temp_cursor.to_string(),
-                        suggestion,
-                        value.map(|v| v.to_string()),
-                    )));
-                    None
-                }
-            };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(
-                    &mut object,
-                    value.unwrap(),
-                    type_info,
-                    err,
-                    &temp_cursor,
-                );
-            }
-        }
-        let mut request: api::GoogleCloudSecuritycenterV1MuteConfig =
-            serde_json::value::from_value(object).unwrap();
-        let mut call = self
-            .hub
-            .projects()
-            .locations_mute_configs_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "mute-config-id" => {
-                    call = call.mute_config_id(value.unwrap_or(""));
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["mute-config-id"].iter().map(|v| *v));
                                 v
                             }));
                     }
@@ -22446,98 +22870,6 @@ where
         }
     }
 
-    async fn _projects_locations_mute_configs_list(
-        &self,
-        opt: &ArgMatches<'n>,
-        dry_run: bool,
-        err: &mut InvalidOptionsError,
-    ) -> Result<(), DoitError> {
-        let mut call = self
-            .hub
-            .projects()
-            .locations_mute_configs_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt
-            .values_of("v")
-            .map(|i| i.collect())
-            .unwrap_or(Vec::new())
-            .iter()
-        {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                }
-                "page-size" => {
-                    call = call.page_size(
-                        value
-                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
-                            .unwrap_or(-0),
-                    );
-                }
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(
-                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
-                                value.unwrap_or("unset"),
-                            );
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues
-                            .push(CLIError::UnknownParameter(key.to_string(), {
-                                let mut v = Vec::new();
-                                v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
-                                v
-                            }));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self
-                .opt
-                .values_of("url")
-                .map(|i| i.collect())
-                .unwrap_or(Vec::new())
-                .iter()
-            {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => {
-                    return Err(DoitError::IoError(
-                        opt.value_of("out").unwrap_or("-").to_string(),
-                        io_err,
-                    ))
-                }
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value =
-                        serde_json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _projects_locations_mute_configs_patch(
         &self,
         opt: &ArgMatches<'n>,
@@ -22590,6 +22922,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "expiry-time" => Some((
+                    "expiryTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "filter" => Some((
                     "filter",
                     JsonTypeInfo {
@@ -22611,6 +22950,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -22625,9 +22971,11 @@ where
                             "create-time",
                             "description",
                             "display-name",
+                            "expiry-time",
                             "filter",
                             "most-recent-editor",
                             "name",
+                            "type",
                             "update-time",
                         ],
                     );
@@ -22786,6 +23134,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "expiry-time" => Some((
+                    "expiryTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "filter" => Some((
                     "filter",
                     JsonTypeInfo {
@@ -22807,6 +23162,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -22821,9 +23183,11 @@ where
                             "create-time",
                             "description",
                             "display-name",
+                            "expiry-time",
                             "filter",
                             "most-recent-editor",
                             "name",
+                            "type",
                             "update-time",
                         ],
                     );
@@ -23232,6 +23596,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "expiry-time" => Some((
+                    "expiryTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "filter" => Some((
                     "filter",
                     JsonTypeInfo {
@@ -23253,6 +23624,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "update-time" => Some((
                     "updateTime",
                     JsonTypeInfo {
@@ -23267,9 +23645,11 @@ where
                             "create-time",
                             "description",
                             "display-name",
+                            "expiry-time",
                             "filter",
                             "most-recent-editor",
                             "name",
+                            "type",
                             "update-time",
                         ],
                     );
@@ -24024,6 +24404,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "custom-config.description" => Some((
                     "customConfig.description",
                     JsonTypeInfo {
@@ -24120,6 +24507,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "custom-config",
                             "description",
                             "display-name",
@@ -24627,6 +25015,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-provider" => Some((
+                    "cloudProvider",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "custom-config.description" => Some((
                     "customConfig.description",
                     JsonTypeInfo {
@@ -24723,6 +25118,7 @@ where
                         key,
                         &vec![
                             "ancestor-module",
+                            "cloud-provider",
                             "custom-config",
                             "description",
                             "display-name",
@@ -25929,6 +26325,69 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "affected-resources.count" => Some((
+                    "affectedResources.count",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.deployment-platform" => Some((
+                    "aiModel.deploymentPlatform",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.display-name" => Some((
+                    "aiModel.displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.domain" => Some((
+                    "aiModel.domain",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.library" => Some((
+                    "aiModel.library",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.location" => Some((
+                    "aiModel.location",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.name" => Some((
+                    "aiModel.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.publisher" => Some((
+                    "aiModel.publisher",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ai-model.usage-category" => Some((
+                    "aiModel.usageCategory",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "application.base-uri" => Some((
                     "application.baseUri",
                     JsonTypeInfo {
@@ -26076,6 +26535,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "chokepoint.related-findings" => Some((
+                    "chokepoint.relatedFindings",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "cloud-armor.adaptive-protection.confidence" => Some((
                     "cloudArmor.adaptiveProtection.confidence",
                     JsonTypeInfo {
@@ -26097,10 +26563,24 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "cloud-armor.attack.volume-bps-long" => Some((
+                    "cloudArmor.attack.volumeBpsLong",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "cloud-armor.attack.volume-pps" => Some((
                     "cloudArmor.attack.volumePps",
                     JsonTypeInfo {
                         jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "cloud-armor.attack.volume-pps-long" => Some((
+                    "cloudArmor.attack.volumePpsLong",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
                         ctype: ComplexType::Pod,
                     },
                 )),
@@ -26209,6 +26689,41 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "compliance-details.cloud-control.cloud-control-name" => Some((
+                    "complianceDetails.cloudControl.cloudControlName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.policy-type" => Some((
+                    "complianceDetails.cloudControl.policyType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.type" => Some((
+                    "complianceDetails.cloudControl.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control.version" => Some((
+                    "complianceDetails.cloudControl.version",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "compliance-details.cloud-control-deployment-names" => Some((
+                    "complianceDetails.cloudControlDeploymentNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
                 "create-time" => Some((
                     "createTime",
                     JsonTypeInfo {
@@ -26265,6 +26780,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "disk.name" => Some((
+                    "disk.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "event-time" => Some((
                     "eventTime",
                     JsonTypeInfo {
@@ -26312,6 +26834,62 @@ where
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.destination-ip-ranges" => Some((
+                    "ipRules.destinationIpRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.direction" => Some((
+                    "ipRules.direction",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ip-rules.exposed-services" => Some((
+                    "ipRules.exposedServices",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ip-rules.source-ip-ranges" => Some((
+                    "ipRules.sourceIpRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "job.error-code" => Some((
+                    "job.errorCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.location" => Some((
+                    "job.location",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.name" => Some((
+                    "job.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "job.state" => Some((
+                    "job.state",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
                     },
                 )),
                 "kernel-rootkit.name" => Some((
@@ -26421,6 +26999,20 @@ where
                 )),
                 "mute" => Some((
                     "mute",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mute-info.static-mute.apply-time" => Some((
+                    "muteInfo.staticMute.applyTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "mute-info.static-mute.state" => Some((
+                    "muteInfo.staticMute.state",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -26664,8 +27256,22 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "vulnerability.cve.exploit-release-date" => Some((
+                    "vulnerability.cve.exploitReleaseDate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "vulnerability.cve.exploitation-activity" => Some((
                     "vulnerability.cve.exploitationActivity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vulnerability.cve.first-exploitation-date" => Some((
+                    "vulnerability.cve.firstExploitationDate",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -26762,6 +27368,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "vulnerability.provider-risk-score" => Some((
+                    "vulnerability.providerRiskScore",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "vulnerability.reachable" => Some((
+                    "vulnerability.reachable",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "vulnerability.security-bulletin.bulletin-id" => Some((
                     "vulnerability.securityBulletin.bulletinId",
                     JsonTypeInfo {
@@ -26791,9 +27411,12 @@ where
                             "adaptive-protection",
                             "additional-tactics",
                             "additional-techniques",
+                            "affected-resources",
+                            "ai-model",
                             "appliance",
                             "application",
                             "applications",
+                            "apply-time",
                             "attack",
                             "attack-complexity",
                             "attack-exposure",
@@ -26813,30 +27436,45 @@ where
                             "canonical-name",
                             "category",
                             "changed-policy",
+                            "chokepoint",
                             "classification",
                             "cloud-armor",
+                            "cloud-control",
+                            "cloud-control-deployment-names",
+                            "cloud-control-name",
                             "cloud-dlp-data-profile",
                             "cloud-dlp-inspection",
+                            "compliance-details",
                             "confidence",
                             "confidentiality-impact",
+                            "count",
                             "cpe-uri",
                             "create-time",
                             "cve",
                             "cvssv3",
                             "data-profile",
                             "database",
+                            "deployment-platform",
                             "description",
+                            "destination-ip-ranges",
+                            "direction",
+                            "disk",
                             "display-name",
+                            "domain",
                             "domains",
                             "duration",
+                            "error-code",
                             "event-time",
                             "exfiltration",
+                            "exploit-release-date",
                             "exploitation-activity",
                             "exposed-high-value-resources-count",
                             "exposed-low-value-resources-count",
                             "exposed-medium-value-resources-count",
+                            "exposed-services",
                             "external-uri",
                             "finding-class",
+                            "first-exploitation-date",
                             "fixed-package",
                             "full-scan",
                             "full-uri",
@@ -26850,9 +27488,13 @@ where
                             "inspect-job",
                             "integrity-impact",
                             "ip-addresses",
+                            "ip-rules",
+                            "job",
                             "kernel-rootkit",
                             "last-author",
                             "latest-calculation-time",
+                            "library",
+                            "location",
                             "long-term-allowed",
                             "long-term-denied",
                             "marks",
@@ -26860,6 +27502,7 @@ where
                             "mitre-attack",
                             "module-name",
                             "mute",
+                            "mute-info",
                             "mute-initiator",
                             "mute-update-time",
                             "name",
@@ -26878,6 +27521,7 @@ where
                             "policy",
                             "policy-options",
                             "policy-set",
+                            "policy-type",
                             "posture-deployment",
                             "posture-deployment-resource",
                             "preview",
@@ -26887,8 +27531,11 @@ where
                             "principal-subject",
                             "privileges-required",
                             "profile",
+                            "provider-risk-score",
+                            "publisher",
                             "query",
                             "ratio",
+                            "reachable",
                             "region-code",
                             "related-findings",
                             "requests",
@@ -26905,7 +27552,9 @@ where
                             "service-name",
                             "severity",
                             "short-term-allowed",
+                            "source-ip-ranges",
                             "state",
+                            "static-mute",
                             "storage-pool",
                             "submission-time",
                             "suggested-upgrade-version",
@@ -26923,13 +27572,16 @@ where
                             "unexpected-system-call-handler",
                             "upstream-fix-available",
                             "uris",
+                            "usage-category",
                             "user-agent",
                             "user-agent-family",
                             "user-interaction",
                             "user-name",
                             "version",
                             "volume-bps",
+                            "volume-bps-long",
                             "volume-pps",
+                            "volume-pps-long",
                             "vulnerability",
                             "zero-day",
                         ],
@@ -27684,11 +28336,6 @@ where
                             ._folders_findings_bulk_mute(opt, dry_run, &mut err)
                             .await;
                     }
-                    ("locations-mute-configs-create", Some(opt)) => {
-                        call_result = self
-                            ._folders_locations_mute_configs_create(opt, dry_run, &mut err)
-                            .await;
-                    }
                     ("locations-mute-configs-delete", Some(opt)) => {
                         call_result = self
                             ._folders_locations_mute_configs_delete(opt, dry_run, &mut err)
@@ -27697,11 +28344,6 @@ where
                     ("locations-mute-configs-get", Some(opt)) => {
                         call_result = self
                             ._folders_locations_mute_configs_get(opt, dry_run, &mut err)
-                            .await;
-                    }
-                    ("locations-mute-configs-list", Some(opt)) => {
-                        call_result = self
-                            ._folders_locations_mute_configs_list(opt, dry_run, &mut err)
                             .await;
                     }
                     ("locations-mute-configs-patch", Some(opt)) => {
@@ -27885,6 +28527,11 @@ where
                         ._organizations_assets_update_security_marks(opt, dry_run, &mut err)
                         .await;
                 }
+                ("attack-paths-list", Some(opt)) => {
+                    call_result = self
+                        ._organizations_attack_paths_list(opt, dry_run, &mut err)
+                        .await;
+                }
                 ("big-query-exports-create", Some(opt)) => {
                     call_result = self
                         ._organizations_big_query_exports_create(opt, dry_run, &mut err)
@@ -27971,11 +28618,6 @@ where
                         ._organizations_get_organization_settings(opt, dry_run, &mut err)
                         .await;
                 }
-                ("locations-mute-configs-create", Some(opt)) => {
-                    call_result = self
-                        ._organizations_locations_mute_configs_create(opt, dry_run, &mut err)
-                        .await;
-                }
                 ("locations-mute-configs-delete", Some(opt)) => {
                     call_result = self
                         ._organizations_locations_mute_configs_delete(opt, dry_run, &mut err)
@@ -27984,11 +28626,6 @@ where
                 ("locations-mute-configs-get", Some(opt)) => {
                     call_result = self
                         ._organizations_locations_mute_configs_get(opt, dry_run, &mut err)
-                        .await;
-                }
-                ("locations-mute-configs-list", Some(opt)) => {
-                    call_result = self
-                        ._organizations_locations_mute_configs_list(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-mute-configs-patch", Some(opt)) => {
@@ -28270,6 +28907,11 @@ where
                         ._organizations_update_organization_settings(opt, dry_run, &mut err)
                         .await;
                 }
+                ("valued-resources-list", Some(opt)) => {
+                    call_result = self
+                        ._organizations_valued_resources_list(opt, dry_run, &mut err)
+                        .await;
+                }
                 _ => {
                     err.issues
                         .push(CLIError::MissingMethodError("organizations".to_string()));
@@ -28381,11 +29023,6 @@ where
                         ._projects_findings_bulk_mute(opt, dry_run, &mut err)
                         .await;
                 }
-                ("locations-mute-configs-create", Some(opt)) => {
-                    call_result = self
-                        ._projects_locations_mute_configs_create(opt, dry_run, &mut err)
-                        .await;
-                }
                 ("locations-mute-configs-delete", Some(opt)) => {
                     call_result = self
                         ._projects_locations_mute_configs_delete(opt, dry_run, &mut err)
@@ -28394,11 +29031,6 @@ where
                 ("locations-mute-configs-get", Some(opt)) => {
                     call_result = self
                         ._projects_locations_mute_configs_get(opt, dry_run, &mut err)
-                        .await;
-                }
-                ("locations-mute-configs-list", Some(opt)) => {
-                    call_result = self
-                        ._projects_locations_mute_configs_list(opt, dry_run, &mut err)
                         .await;
                 }
                 ("locations-mute-configs-patch", Some(opt)) => {
@@ -28602,7 +29234,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/securitycenter1", config_dir))
         .build()
@@ -28655,14 +29289,14 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("folders", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'event-threat-detection-settings-custom-modules-create', 'event-threat-detection-settings-custom-modules-delete', 'event-threat-detection-settings-custom-modules-get', 'event-threat-detection-settings-custom-modules-list', 'event-threat-detection-settings-custom-modules-list-descendant', 'event-threat-detection-settings-custom-modules-patch', 'event-threat-detection-settings-effective-custom-modules-get', 'event-threat-detection-settings-effective-custom-modules-list', 'event-threat-detection-settings-validate-custom-module', 'findings-bulk-mute', 'locations-mute-configs-create', 'locations-mute-configs-delete', 'locations-mute-configs-get', 'locations-mute-configs-list', 'locations-mute-configs-patch', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'security-health-analytics-settings-custom-modules-create', 'security-health-analytics-settings-custom-modules-delete', 'security-health-analytics-settings-custom-modules-get', 'security-health-analytics-settings-custom-modules-list', 'security-health-analytics-settings-custom-modules-list-descendant', 'security-health-analytics-settings-custom-modules-patch', 'security-health-analytics-settings-custom-modules-simulate', 'security-health-analytics-settings-effective-custom-modules-get', 'security-health-analytics-settings-effective-custom-modules-list', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
+        ("folders", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'event-threat-detection-settings-custom-modules-create', 'event-threat-detection-settings-custom-modules-delete', 'event-threat-detection-settings-custom-modules-get', 'event-threat-detection-settings-custom-modules-list', 'event-threat-detection-settings-custom-modules-list-descendant', 'event-threat-detection-settings-custom-modules-patch', 'event-threat-detection-settings-effective-custom-modules-get', 'event-threat-detection-settings-effective-custom-modules-list', 'event-threat-detection-settings-validate-custom-module', 'findings-bulk-mute', 'locations-mute-configs-delete', 'locations-mute-configs-get', 'locations-mute-configs-patch', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'security-health-analytics-settings-custom-modules-create', 'security-health-analytics-settings-custom-modules-delete', 'security-health-analytics-settings-custom-modules-get', 'security-health-analytics-settings-custom-modules-list', 'security-health-analytics-settings-custom-modules-list-descendant', 'security-health-analytics-settings-custom-modules-patch', 'security-health-analytics-settings-custom-modules-simulate', 'security-health-analytics-settings-effective-custom-modules-get', 'security-health-analytics-settings-effective-custom-modules-list', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
             ("assets-group",
                     Some(r##"Filters an organization's assets and groups them by their specified properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_assets-group",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent to group the assets by. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -28687,7 +29321,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -28732,7 +29366,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource of the new BigQuery export. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -28757,7 +29391,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. The name of the BigQuery export to delete. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -28777,7 +29411,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. Name of the BigQuery export to retrieve. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -28797,7 +29431,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns the collection of BigQuery exports. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. The parent, which owns the collection of BigQuery exports. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -28842,7 +29476,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. The new custom module's parent. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -28867,7 +29501,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(r##"Required. Name of the custom module to delete. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -28887,7 +29521,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(r##"Required. Name of the custom module to get. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -28907,7 +29541,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -28927,7 +29561,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -28947,7 +29581,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(r##"Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -28972,7 +29606,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}"."##),
+                     Some(r##"Required. The resource name of the effective Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -28992,7 +29626,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Name of the parent to list custom modules for. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29012,7 +29646,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Resource name of the parent to validate the Custom Module under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29037,32 +29671,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-mute-configs-create",
-                    Some(r##"Creates a mute config."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_locations-mute-configs-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The parent, at which bulk action needs to be applied. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29087,7 +29696,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29107,27 +29716,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-mute-configs-list",
-                    Some(r##"Lists mute configs."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_locations-mute-configs-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29147,7 +29736,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
+                     Some(r##"This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29172,7 +29761,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the new mute configs's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29197,7 +29786,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29217,7 +29806,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29237,7 +29826,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. The parent, which owns the collection of mute configs. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29257,7 +29846,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
+                     Some(r##"This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29282,7 +29871,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the new notification config's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29307,7 +29896,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(r##"Required. Name of the notification config to delete. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29327,7 +29916,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(r##"Required. Name of the notification config to get. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29392,7 +29981,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Resource name of the new custom module's parent. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29417,7 +30006,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(r##"Required. Name of the custom module to delete. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29437,7 +30026,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(r##"Required. Name of the custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29457,7 +30046,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Name of parent to list custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29477,7 +30066,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Name of parent to list descendant custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29547,7 +30136,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}""##),
+                     Some(r##"Required. Name of the effective custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29567,7 +30156,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Name of parent to list effective custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29612,7 +30201,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the source to groupBy. Its format is "organizations/[organization_id]/sources/[source_id]", folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]. To groupBy across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-, or projects/{project_id}/sources/-"##),
+                     Some(r##"Required. Name of the source to groupBy. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To groupBy across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-`, or `projects/{project_id}/sources/-`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29637,7 +30226,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the source the findings belong to. Its format is "organizations/[organization_id]/sources/[source_id], folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]". To list across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/- or projects/{projects_id}/sources/-"##),
+                     Some(r##"Required. Name of the source the findings belong to. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To list across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-`, `folders/{folder_id}/sources/-` or `projects/{projects_id}/sources/-`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29682,7 +30271,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29707,7 +30296,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29757,7 +30346,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29772,14 +30361,14 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-            ("organizations", "methods: 'assets-group', 'assets-list', 'assets-run-discovery', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'event-threat-detection-settings-custom-modules-create', 'event-threat-detection-settings-custom-modules-delete', 'event-threat-detection-settings-custom-modules-get', 'event-threat-detection-settings-custom-modules-list', 'event-threat-detection-settings-custom-modules-list-descendant', 'event-threat-detection-settings-custom-modules-patch', 'event-threat-detection-settings-effective-custom-modules-get', 'event-threat-detection-settings-effective-custom-modules-list', 'event-threat-detection-settings-validate-custom-module', 'findings-bulk-mute', 'get-organization-settings', 'locations-mute-configs-create', 'locations-mute-configs-delete', 'locations-mute-configs-get', 'locations-mute-configs-list', 'locations-mute-configs-patch', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'operations-cancel', 'operations-delete', 'operations-get', 'operations-list', 'resource-value-configs-batch-create', 'resource-value-configs-delete', 'resource-value-configs-get', 'resource-value-configs-list', 'resource-value-configs-patch', 'security-health-analytics-settings-custom-modules-create', 'security-health-analytics-settings-custom-modules-delete', 'security-health-analytics-settings-custom-modules-get', 'security-health-analytics-settings-custom-modules-list', 'security-health-analytics-settings-custom-modules-list-descendant', 'security-health-analytics-settings-custom-modules-patch', 'security-health-analytics-settings-custom-modules-simulate', 'security-health-analytics-settings-effective-custom-modules-get', 'security-health-analytics-settings-effective-custom-modules-list', 'simulations-attack-exposure-results-attack-paths-list', 'simulations-attack-exposure-results-valued-resources-list', 'simulations-attack-paths-list', 'simulations-get', 'simulations-valued-resources-attack-paths-list', 'simulations-valued-resources-get', 'simulations-valued-resources-list', 'sources-create', 'sources-findings-create', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks', 'sources-get', 'sources-get-iam-policy', 'sources-list', 'sources-patch', 'sources-set-iam-policy', 'sources-test-iam-permissions' and 'update-organization-settings'", vec![
+            ("organizations", "methods: 'assets-group', 'assets-list', 'assets-run-discovery', 'assets-update-security-marks', 'attack-paths-list', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'event-threat-detection-settings-custom-modules-create', 'event-threat-detection-settings-custom-modules-delete', 'event-threat-detection-settings-custom-modules-get', 'event-threat-detection-settings-custom-modules-list', 'event-threat-detection-settings-custom-modules-list-descendant', 'event-threat-detection-settings-custom-modules-patch', 'event-threat-detection-settings-effective-custom-modules-get', 'event-threat-detection-settings-effective-custom-modules-list', 'event-threat-detection-settings-validate-custom-module', 'findings-bulk-mute', 'get-organization-settings', 'locations-mute-configs-delete', 'locations-mute-configs-get', 'locations-mute-configs-patch', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'operations-cancel', 'operations-delete', 'operations-get', 'operations-list', 'resource-value-configs-batch-create', 'resource-value-configs-delete', 'resource-value-configs-get', 'resource-value-configs-list', 'resource-value-configs-patch', 'security-health-analytics-settings-custom-modules-create', 'security-health-analytics-settings-custom-modules-delete', 'security-health-analytics-settings-custom-modules-get', 'security-health-analytics-settings-custom-modules-list', 'security-health-analytics-settings-custom-modules-list-descendant', 'security-health-analytics-settings-custom-modules-patch', 'security-health-analytics-settings-custom-modules-simulate', 'security-health-analytics-settings-effective-custom-modules-get', 'security-health-analytics-settings-effective-custom-modules-list', 'simulations-attack-exposure-results-attack-paths-list', 'simulations-attack-exposure-results-valued-resources-list', 'simulations-attack-paths-list', 'simulations-get', 'simulations-valued-resources-attack-paths-list', 'simulations-valued-resources-get', 'simulations-valued-resources-list', 'sources-create', 'sources-findings-create', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks', 'sources-get', 'sources-get-iam-policy', 'sources-list', 'sources-patch', 'sources-set-iam-policy', 'sources-test-iam-permissions', 'update-organization-settings' and 'valued-resources-list'", vec![
             ("assets-group",
                     Some(r##"Filters an organization's assets and groups them by their specified properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_assets-group",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent to group the assets by. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29804,7 +30393,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29824,7 +30413,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the organization to run asset discovery for. Its format is "organizations/[organization_id]"."##),
+                     Some(r##"Required. Name of the organization to run asset discovery for. Its format is `organizations/[organization_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29868,13 +30457,33 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("attack-paths-list",
+                    Some(r##"Lists the attack paths for a set of simulation results or valued resources and filter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_attack-paths-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("big-query-exports-create",
                     Some(r##"Creates a BigQuery export."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_big-query-exports-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource of the new BigQuery export. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -29899,7 +30508,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. The name of the BigQuery export to delete. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29919,7 +30528,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. Name of the BigQuery export to retrieve. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29939,7 +30548,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns the collection of BigQuery exports. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. The parent, which owns the collection of BigQuery exports. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -29984,7 +30593,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. The new custom module's parent. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -30009,7 +30618,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(r##"Required. Name of the custom module to delete. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30029,7 +30638,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(r##"Required. Name of the custom module to get. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30049,7 +30658,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30069,7 +30678,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30089,7 +30698,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(r##"Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -30114,7 +30723,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}"."##),
+                     Some(r##"Required. The resource name of the effective Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30134,7 +30743,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Name of the parent to list custom modules for. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30154,7 +30763,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Resource name of the parent to validate the Custom Module under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -30179,7 +30788,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. The parent, at which bulk action needs to be applied. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -30204,34 +30813,9 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the organization to get organization settings for. Its format is "organizations/[organization_id]/organizationSettings"."##),
+                     Some(r##"Required. Name of the organization to get organization settings for. Its format is `organizations/[organization_id]/organizationSettings`."##),
                      Some(true),
                      Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-mute-configs-create",
-                    Some(r##"Creates a mute config."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_locations-mute-configs-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -30249,7 +30833,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30269,27 +30853,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-mute-configs-list",
-                    Some(r##"Lists mute configs."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_locations-mute-configs-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30309,7 +30873,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
+                     Some(r##"This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -30334,7 +30898,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the new mute configs's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -30359,7 +30923,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30379,7 +30943,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30399,7 +30963,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. The parent, which owns the collection of mute configs. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30419,7 +30983,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
+                     Some(r##"This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -30444,7 +31008,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the new notification config's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -30469,7 +31033,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(r##"Required. Name of the notification config to delete. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30489,7 +31053,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(r##"Required. Name of the notification config to get. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30549,7 +31113,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("operations-cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_operations-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -30679,7 +31243,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the resource value config to retrieve. Its format is organizations/{organization}/resourceValueConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the resource value config to retrieve. Its format is `organizations/{organization}/resourceValueConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30699,7 +31263,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns the collection of resource value configs. Its format is "organizations/[organization_id]""##),
+                     Some(r##"Required. The parent, which owns the collection of resource value configs. Its format is `organizations/[organization_id]`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30744,7 +31308,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Resource name of the new custom module's parent. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -30769,7 +31333,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(r##"Required. Name of the custom module to delete. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30789,7 +31353,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(r##"Required. Name of the custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30809,7 +31373,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Name of parent to list custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30829,7 +31393,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Name of parent to list descendant custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30899,7 +31463,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}""##),
+                     Some(r##"Required. Name of the effective custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30919,7 +31483,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Name of parent to list effective custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30939,7 +31503,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}""##),
+                     Some(r##"Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30959,7 +31523,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list valued resources. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}""##),
+                     Some(r##"Required. Name of parent to list valued resources. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30979,7 +31543,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}""##),
+                     Some(r##"Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -30999,7 +31563,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The organization name or simulation name of this simulation Valid format: "organizations/{organization}/simulations/latest" "organizations/{organization}/simulations/{simulation}""##),
+                     Some(r##"Required. The organization name or simulation name of this simulation Valid format: `organizations/{organization}/simulations/latest` `organizations/{organization}/simulations/{simulation}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31019,7 +31583,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}""##),
+                     Some(r##"Required. Name of parent to list attack paths. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}` `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31039,7 +31603,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of this valued resource Valid format: "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}""##),
+                     Some(r##"Required. The name of this valued resource Valid format: `organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31059,7 +31623,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list valued resources. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}""##),
+                     Some(r##"Required. Name of parent to list valued resources. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31079,7 +31643,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new source's parent. Its format should be "organizations/[organization_id]"."##),
+                     Some(r##"Required. Resource name of the new source's parent. Its format should be `organizations/[organization_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31104,7 +31668,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new finding's parent. Its format should be "organizations/[organization_id]/sources/[source_id]"."##),
+                     Some(r##"Required. Resource name of the new finding's parent. Its format should be `organizations/[organization_id]/sources/[source_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31154,7 +31718,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the source to groupBy. Its format is "organizations/[organization_id]/sources/[source_id]", folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]. To groupBy across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-, or projects/{project_id}/sources/-"##),
+                     Some(r##"Required. Name of the source to groupBy. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To groupBy across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-`, or `projects/{project_id}/sources/-`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31179,7 +31743,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the source the findings belong to. Its format is "organizations/[organization_id]/sources/[source_id], folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]". To list across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/- or projects/{projects_id}/sources/-"##),
+                     Some(r##"Required. Name of the source the findings belong to. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To list across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-`, `folders/{folder_id}/sources/-` or `projects/{projects_id}/sources/-`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31224,7 +31788,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31249,7 +31813,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31299,7 +31863,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Relative resource name of the source. Its format is "organizations/[organization_id]/source/[source_id]"."##),
+                     Some(r##"Required. Relative resource name of the source. Its format is `organizations/[organization_id]/source/[source_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31344,7 +31908,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31458,15 +32022,35 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("valued-resources-list",
+                    Some(r##"Lists the valued resources for a set of simulation results and filter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_valued-resources-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list valued resources. Valid formats: `organizations/{organization}`, `organizations/{organization}/simulations/{simulation}` `organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}`"##),
+                     Some(true),
+                     Some(false)),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
-            ("projects", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'event-threat-detection-settings-custom-modules-create', 'event-threat-detection-settings-custom-modules-delete', 'event-threat-detection-settings-custom-modules-get', 'event-threat-detection-settings-custom-modules-list', 'event-threat-detection-settings-custom-modules-list-descendant', 'event-threat-detection-settings-custom-modules-patch', 'event-threat-detection-settings-effective-custom-modules-get', 'event-threat-detection-settings-effective-custom-modules-list', 'event-threat-detection-settings-validate-custom-module', 'findings-bulk-mute', 'locations-mute-configs-create', 'locations-mute-configs-delete', 'locations-mute-configs-get', 'locations-mute-configs-list', 'locations-mute-configs-patch', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'security-health-analytics-settings-custom-modules-create', 'security-health-analytics-settings-custom-modules-delete', 'security-health-analytics-settings-custom-modules-get', 'security-health-analytics-settings-custom-modules-list', 'security-health-analytics-settings-custom-modules-list-descendant', 'security-health-analytics-settings-custom-modules-patch', 'security-health-analytics-settings-custom-modules-simulate', 'security-health-analytics-settings-effective-custom-modules-get', 'security-health-analytics-settings-effective-custom-modules-list', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
+            ("projects", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'event-threat-detection-settings-custom-modules-create', 'event-threat-detection-settings-custom-modules-delete', 'event-threat-detection-settings-custom-modules-get', 'event-threat-detection-settings-custom-modules-list', 'event-threat-detection-settings-custom-modules-list-descendant', 'event-threat-detection-settings-custom-modules-patch', 'event-threat-detection-settings-effective-custom-modules-get', 'event-threat-detection-settings-effective-custom-modules-list', 'event-threat-detection-settings-validate-custom-module', 'findings-bulk-mute', 'locations-mute-configs-delete', 'locations-mute-configs-get', 'locations-mute-configs-patch', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'security-health-analytics-settings-custom-modules-create', 'security-health-analytics-settings-custom-modules-delete', 'security-health-analytics-settings-custom-modules-get', 'security-health-analytics-settings-custom-modules-list', 'security-health-analytics-settings-custom-modules-list-descendant', 'security-health-analytics-settings-custom-modules-patch', 'security-health-analytics-settings-custom-modules-simulate', 'security-health-analytics-settings-effective-custom-modules-get', 'security-health-analytics-settings-effective-custom-modules-list', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
             ("assets-group",
                     Some(r##"Filters an organization's assets and groups them by their specified properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_assets-group",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent to group the assets by. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent to group the assets by. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31491,7 +32075,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource that contains the assets. The value that you can specify on parent depends on the method in which you specify parent. You can specify one of the following values: `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31536,7 +32120,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the parent resource of the new BigQuery export. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The name of the parent resource of the new BigQuery export. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31561,7 +32145,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the BigQuery export to delete. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. The name of the BigQuery export to delete. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31581,7 +32165,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the BigQuery export to retrieve. Its format is organizations/{organization}/bigQueryExports/{export_id}, folders/{folder}/bigQueryExports/{export_id}, or projects/{project}/bigQueryExports/{export_id}"##),
+                     Some(r##"Required. Name of the BigQuery export to retrieve. Its format is `organizations/{organization}/bigQueryExports/{export_id}`, `folders/{folder}/bigQueryExports/{export_id}`, or `projects/{project}/bigQueryExports/{export_id}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31601,7 +32185,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns the collection of BigQuery exports. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. The parent, which owns the collection of BigQuery exports. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31646,7 +32230,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. The new custom module's parent. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31671,7 +32255,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(r##"Required. Name of the custom module to delete. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31691,7 +32275,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(r##"Required. Name of the custom module to get. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31711,7 +32295,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31731,7 +32315,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31751,7 +32335,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(r##"Immutable. The resource name of the Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/customModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/customModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/customModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31776,7 +32360,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}"."##),
+                     Some(r##"Required. The resource name of the effective Event Threat Detection custom module. Its format is: * `organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}`. * `projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31796,7 +32380,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Name of the parent to list custom modules for. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31816,7 +32400,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(r##"Required. Resource name of the parent to validate the Custom Module under. Its format is: * `organizations/{organization}/eventThreatDetectionSettings`. * `folders/{folder}/eventThreatDetectionSettings`. * `projects/{project}/eventThreatDetectionSettings`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31841,32 +32425,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-mute-configs-create",
-                    Some(r##"Creates a mute config."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_locations-mute-configs-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. The parent, at which bulk action needs to be applied. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31891,7 +32450,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31911,27 +32470,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
-                     Some(true),
-                     Some(false)),
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-mute-configs-list",
-                    Some(r##"Lists mute configs."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_locations-mute-configs-list",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -31951,7 +32490,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
+                     Some(r##"This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -31976,7 +32515,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new mute configs's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the new mute configs's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -32001,7 +32540,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the mute config to delete. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32021,7 +32560,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is `organizations/{organization}/muteConfigs/{config_id}`, `folders/{folder}/muteConfigs/{config_id}`, `projects/{project}/muteConfigs/{config_id}`, `organizations/{organization}/locations/global/muteConfigs/{config_id}`, `folders/{folder}/locations/global/muteConfigs/{config_id}`, or `projects/{project}/locations/global/muteConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32041,7 +32580,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns the collection of mute configs. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(r##"Required. The parent, which owns the collection of mute configs. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32061,7 +32600,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
+                     Some(r##"This field will be ignored if provided on config creation. Format `organizations/{organization}/muteConfigs/{mute_config}` `folders/{folder}/muteConfigs/{mute_config}` `projects/{project}/muteConfigs/{mute_config}` `organizations/{organization}/locations/global/muteConfigs/{mute_config}` `folders/{folder}/locations/global/muteConfigs/{mute_config}` `projects/{project}/locations/global/muteConfigs/{mute_config}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -32086,7 +32625,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new notification config's parent. Its format is "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the new notification config's parent. Its format is `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -32111,7 +32650,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the notification config to delete. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(r##"Required. Name of the notification config to delete. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32131,7 +32670,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the notification config to get. Its format is "organizations/[organization_id]/notificationConfigs/[config_id]", "folders/[folder_id]/notificationConfigs/[config_id]", or "projects/[project_id]/notificationConfigs/[config_id]"."##),
+                     Some(r##"Required. Name of the notification config to get. Its format is `organizations/[organization_id]/notificationConfigs/[config_id]`, `folders/[folder_id]/notificationConfigs/[config_id]`, or `projects/[project_id]/notificationConfigs/[config_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32196,7 +32735,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Resource name of the new custom module's parent. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -32221,7 +32760,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(r##"Required. Name of the custom module to delete. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32241,7 +32780,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(r##"Required. Name of the custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32261,7 +32800,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Name of parent to list custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32281,7 +32820,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Name of parent to list descendant custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32351,7 +32890,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}""##),
+                     Some(r##"Required. Name of the effective custom module to get. Its format is `organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32371,7 +32910,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(r##"Required. Name of parent to list effective custom modules. Its format is `organizations/{organization}/securityHealthAnalyticsSettings`, `folders/{folder}/securityHealthAnalyticsSettings`, or `projects/{project}/securityHealthAnalyticsSettings`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32416,7 +32955,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the source to groupBy. Its format is "organizations/[organization_id]/sources/[source_id]", folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]. To groupBy across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-, or projects/{project_id}/sources/-"##),
+                     Some(r##"Required. Name of the source to groupBy. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To groupBy across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-, folders/{folder_id}/sources/-`, or `projects/{project_id}/sources/-`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -32441,7 +32980,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Name of the source the findings belong to. Its format is "organizations/[organization_id]/sources/[source_id], folders/[folder_id]/sources/[source_id], or projects/[project_id]/sources/[source_id]". To list across all sources provide a source_id of `-`. For example: organizations/{organization_id}/sources/-, folders/{folder_id}/sources/- or projects/{projects_id}/sources/-"##),
+                     Some(r##"Required. Name of the source the findings belong to. Its format is `organizations/[organization_id]/sources/[source_id]`, `folders/[folder_id]/sources/[source_id]`, or `projects/[project_id]/sources/[source_id]`. To list across all sources provide a source_id of `-`. For example: `organizations/{organization_id}/sources/-`, `folders/{folder_id}/sources/-` or `projects/{projects_id}/sources/-`"##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32486,7 +33025,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -32511,7 +33050,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
+                     Some(r##"Required. The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: `organizations/{organization_id}/sources/{source_id}/findings/{finding_id}`, `folders/{folder_id}/sources/{source_id}/findings/{finding_id}`, `projects/{project_id}/sources/{source_id}/findings/{finding_id}`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"kv"##),
@@ -32561,7 +33100,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be "organizations/[organization_id]", "folders/[folder_id]", or "projects/[project_id]"."##),
+                     Some(r##"Required. Resource name of the parent of sources to list. Its format should be `organizations/[organization_id]`, `folders/[folder_id]`, or `projects/[project_id]`."##),
                      Some(true),
                      Some(false)),
                     (Some(r##"v"##),
@@ -32580,7 +33119,7 @@ async fn main() {
 
     let mut app = App::new("securitycenter1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240622")
+           .version("7.0.0+20251205")
            .about("Security Command Center API provides access to temporal views of assets and findings within an organization.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_securitycenter1_cli")
            .arg(Arg::with_name("url")
@@ -32645,7 +33184,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {

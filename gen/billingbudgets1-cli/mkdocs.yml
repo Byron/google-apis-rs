@@ -1,4 +1,4 @@
-site_name: CloudBillingBudget v6.0.0+20240623
+site_name: CloudBillingBudget v7.0.0+20251214
 site_url: http://byron.github.io/google-apis-rs/google-billingbudgets1-cli
 site_description: A complete library to interact with CloudBillingBudget (protocol v1)
 

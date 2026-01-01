@@ -350,6 +350,13 @@ where
         {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "return-partial-success" => {
+                    call = call.return_partial_success(
+                        value
+                            .map(|v| arg_from_str(v, err, "return-partial-success", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 }
@@ -380,7 +387,16 @@ where
                             .push(CLIError::UnknownParameter(key.to_string(), {
                                 let mut v = Vec::new();
                                 v.extend(self.gp.iter().map(|v| *v));
-                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "filter",
+                                        "page-size",
+                                        "page-token",
+                                        "return-partial-success",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
                                 v
                             }));
                     }
@@ -500,6 +516,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "input.markup" => Some((
+                    "input.markup",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input.prompt" => Some((
+                    "input.prompt",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "input.ssml" => Some((
                     "input.ssml",
                     JsonTypeInfo {
@@ -542,6 +572,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "voice.model-name" => Some((
+                    "voice.modelName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "voice.name" => Some((
                     "voice.name",
                     JsonTypeInfo {
@@ -551,6 +588,13 @@ where
                 )),
                 "voice.ssml-gender" => Some((
                     "voice.ssmlGender",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "voice.voice-clone.voice-cloning-key" => Some((
+                    "voice.voiceClone.voiceCloningKey",
                     JsonTypeInfo {
                         jtype: JsonType::String,
                         ctype: ComplexType::Pod,
@@ -566,10 +610,13 @@ where
                             "effects-profile-id",
                             "input",
                             "language-code",
+                            "markup",
                             "model",
+                            "model-name",
                             "name",
                             "output-gcs-uri",
                             "pitch",
+                            "prompt",
                             "reported-usage",
                             "sample-rate-hertz",
                             "speaking-rate",
@@ -577,6 +624,8 @@ where
                             "ssml-gender",
                             "text",
                             "voice",
+                            "voice-clone",
+                            "voice-cloning-key",
                             "volume-gain-db",
                         ],
                     );
@@ -706,6 +755,20 @@ where
 
             let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
             {
+                "advanced-voice-options.low-latency-journey-synthesis" => Some((
+                    "advancedVoiceOptions.lowLatencyJourneySynthesis",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "advanced-voice-options.relax-safety-filters" => Some((
+                    "advancedVoiceOptions.relaxSafetyFilters",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "audio-config.audio-encoding" => Some((
                     "audioConfig.audioEncoding",
                     JsonTypeInfo {
@@ -748,6 +811,20 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "input.markup" => Some((
+                    "input.markup",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input.prompt" => Some((
+                    "input.prompt",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "input.ssml" => Some((
                     "input.ssml",
                     JsonTypeInfo {
@@ -783,6 +860,13 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "voice.model-name" => Some((
+                    "voice.modelName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 "voice.name" => Some((
                     "voice.name",
                     JsonTypeInfo {
@@ -797,19 +881,32 @@ where
                         ctype: ComplexType::Pod,
                     },
                 )),
+                "voice.voice-clone.voice-cloning-key" => Some((
+                    "voice.voiceClone.voiceCloningKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
                 _ => {
                     let suggestion = FieldCursor::did_you_mean(
                         key,
                         &vec![
+                            "advanced-voice-options",
                             "audio-config",
                             "audio-encoding",
                             "custom-voice",
                             "effects-profile-id",
                             "input",
                             "language-code",
+                            "low-latency-journey-synthesis",
+                            "markup",
                             "model",
+                            "model-name",
                             "name",
                             "pitch",
+                            "prompt",
+                            "relax-safety-filters",
                             "reported-usage",
                             "sample-rate-hertz",
                             "speaking-rate",
@@ -817,6 +914,8 @@ where
                             "ssml-gender",
                             "text",
                             "voice",
+                            "voice-clone",
+                            "voice-cloning-key",
                             "volume-gain-db",
                         ],
                     );
@@ -1097,7 +1196,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/texttospeech1", config_dir))
         .build()
@@ -1152,7 +1253,7 @@ async fn main() {
     let arg_data = [
         ("operations", "methods: 'cancel' and 'delete'", vec![
             ("cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_texttospeech1_cli/operations_cancel",
                   vec![
                     (Some(r##"name"##),
@@ -1307,7 +1408,7 @@ async fn main() {
 
     let mut app = App::new("texttospeech1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240530")
+           .version("7.0.0+20251202")
            .about("Synthesizes natural-sounding speech by applying powerful neural network models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_texttospeech1_cli")
            .arg(Arg::with_name("url")
@@ -1372,7 +1473,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {
