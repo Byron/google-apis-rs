@@ -143,6 +143,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -272,23 +278,23 @@
                                     ],
                                     "parameters": {
                                         "filter": {
-                                            "description": "Filter expression to restrict the Certificates Configs returned.",
+                                            "description": "Optional. Filter expression to restrict the Certificates Configs returned.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "orderBy": {
-                                            "description": "A list of Certificate Config field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
+                                            "description": "Optional. A list of Certificate Config field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "pageSize": {
-                                            "description": "Maximum number of certificate configs to return per call.",
+                                            "description": "Optional. Maximum number of certificate configs to return per call.",
                                             "format": "int32",
                                             "location": "query",
                                             "type": "integer"
                                         },
                                         "pageToken": {
-                                            "description": "The value returned by the last `ListCertificateIssuanceConfigsResponse`. Indicates that this is a continuation of a prior `ListCertificateIssuanceConfigs` call, and that the system should return the next page of data.",
+                                            "description": "Optional. The value returned by the last `ListCertificateIssuanceConfigsResponse`. Indicates that this is a continuation of a prior `ListCertificateIssuanceConfigs` call, and that the system should return the next page of data.",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -303,6 +309,40 @@
                                     "path": "v1/{+parent}/certificateIssuanceConfigs",
                                     "response": {
                                         "$ref": "ListCertificateIssuanceConfigsResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "patch": {
+                                    "description": "Updates a CertificateIssuanceConfig.",
+                                    "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/certificateIssuanceConfigs/{certificateIssuanceConfigsId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "certificatemanager.projects.locations.certificateIssuanceConfigs.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Identifier. A user-defined name of the certificate issuance config. CertificateIssuanceConfig names must be unique globally and match pattern `projects/*/locations/*/certificateIssuanceConfigs/*`.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/certificateIssuanceConfigs/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Required. The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask.",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}",
+                                    "request": {
+                                        "$ref": "CertificateIssuanceConfig"
+                                    },
+                                    "response": {
+                                        "$ref": "Operation"
                                     },
                                     "scopes": [
                                         "https://www.googleapis.com/auth/cloud-platform"
@@ -405,23 +445,23 @@
                                     ],
                                     "parameters": {
                                         "filter": {
-                                            "description": "Filter expression to restrict the Certificates Maps returned.",
+                                            "description": "Optional. Filter expression to restrict the Certificates Maps returned.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "orderBy": {
-                                            "description": "A list of Certificate Map field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
+                                            "description": "Optional. A list of Certificate Map field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "pageSize": {
-                                            "description": "Maximum number of certificate maps to return per call.",
+                                            "description": "Optional. Maximum number of certificate maps to return per call.",
                                             "format": "int32",
                                             "location": "query",
                                             "type": "integer"
                                         },
                                         "pageToken": {
-                                            "description": "The value returned by the last `ListCertificateMapsResponse`. Indicates that this is a continuation of a prior `ListCertificateMaps` call, and that the system should return the next page of data.",
+                                            "description": "Optional. The value returned by the last `ListCertificateMapsResponse`. Indicates that this is a continuation of a prior `ListCertificateMaps` call, and that the system should return the next page of data.",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -451,7 +491,7 @@
                                     ],
                                     "parameters": {
                                         "name": {
-                                            "description": "A user-defined name of the Certificate Map. Certificate Map names must be unique globally and match pattern `projects/*/locations/*/certificateMaps/*`.",
+                                            "description": "Identifier. A user-defined name of the Certificate Map. Certificate Map names must be unique globally and match pattern `projects/*/locations/*/certificateMaps/*`.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+/certificateMaps/[^/]+$",
                                             "required": true,
@@ -572,23 +612,23 @@
                                             ],
                                             "parameters": {
                                                 "filter": {
-                                                    "description": "Filter expression to restrict the returned Certificate Map Entries.",
+                                                    "description": "Optional. Filter expression to restrict the returned Certificate Map Entries.",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
                                                 "orderBy": {
-                                                    "description": "A list of Certificate Map Entry field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
+                                                    "description": "Optional. A list of Certificate Map Entry field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
                                                 "pageSize": {
-                                                    "description": "Maximum number of certificate map entries to return. The service may return fewer than this value. If unspecified, at most 50 certificate map entries will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                                                    "description": "Optional. Maximum number of certificate map entries to return. The service may return fewer than this value. If unspecified, at most 50 certificate map entries will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
                                                     "format": "int32",
                                                     "location": "query",
                                                     "type": "integer"
                                                 },
                                                 "pageToken": {
-                                                    "description": "The value returned by the last `ListCertificateMapEntriesResponse`. Indicates that this is a continuation of a prior `ListCertificateMapEntries` call, and that the system should return the next page of data.",
+                                                    "description": "Optional. The value returned by the last `ListCertificateMapEntriesResponse`. Indicates that this is a continuation of a prior `ListCertificateMapEntries` call, and that the system should return the next page of data.",
                                                     "location": "query",
                                                     "type": "string"
                                                 },
@@ -618,7 +658,7 @@
                                             ],
                                             "parameters": {
                                                 "name": {
-                                                    "description": "A user-defined name of the Certificate Map Entry. Certificate Map Entry names must be unique globally and match pattern `projects/*/locations/*/certificateMaps/*/certificateMapEntries/*`.",
+                                                    "description": "Identifier. A user-defined name of the Certificate Map Entry. Certificate Map Entry names must be unique globally and match pattern `projects/*/locations/*/certificateMaps/*/certificateMapEntries/*`.",
                                                     "location": "path",
                                                     "pattern": "^projects/[^/]+/locations/[^/]+/certificateMaps/[^/]+/certificateMapEntries/[^/]+$",
                                                     "required": true,
@@ -741,23 +781,23 @@
                                     ],
                                     "parameters": {
                                         "filter": {
-                                            "description": "Filter expression to restrict the Certificates returned.",
+                                            "description": "Optional. Filter expression to restrict the Certificates returned.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "orderBy": {
-                                            "description": "A list of Certificate field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
+                                            "description": "Optional. A list of Certificate field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "pageSize": {
-                                            "description": "Maximum number of certificates to return per call.",
+                                            "description": "Optional. Maximum number of certificates to return per call.",
                                             "format": "int32",
                                             "location": "query",
                                             "type": "integer"
                                         },
                                         "pageToken": {
-                                            "description": "The value returned by the last `ListCertificatesResponse`. Indicates that this is a continuation of a prior `ListCertificates` call, and that the system should return the next page of data.",
+                                            "description": "Optional. The value returned by the last `ListCertificatesResponse`. Indicates that this is a continuation of a prior `ListCertificates` call, and that the system should return the next page of data.",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -787,7 +827,7 @@
                                     ],
                                     "parameters": {
                                         "name": {
-                                            "description": "A user-defined name of the certificate. Certificate names must be unique globally and match pattern `projects/*/locations/*/certificates/*`.",
+                                            "description": "Identifier. A user-defined name of the certificate. Certificate names must be unique globally and match pattern `projects/*/locations/*/certificates/*`.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+/certificates/[^/]+$",
                                             "required": true,
@@ -908,23 +948,23 @@
                                     ],
                                     "parameters": {
                                         "filter": {
-                                            "description": "Filter expression to restrict the Dns Authorizations returned.",
+                                            "description": "Optional. Filter expression to restrict the Dns Authorizations returned.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "orderBy": {
-                                            "description": "A list of Dns Authorization field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
+                                            "description": "Optional. A list of Dns Authorization field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "pageSize": {
-                                            "description": "Maximum number of dns authorizations to return per call.",
+                                            "description": "Optional. Maximum number of dns authorizations to return per call.",
                                             "format": "int32",
                                             "location": "query",
                                             "type": "integer"
                                         },
                                         "pageToken": {
-                                            "description": "The value returned by the last `ListDnsAuthorizationsResponse`. Indicates that this is a continuation of a prior `ListDnsAuthorizations` call, and that the system should return the next page of data.",
+                                            "description": "Optional. The value returned by the last `ListDnsAuthorizationsResponse`. Indicates that this is a continuation of a prior `ListDnsAuthorizations` call, and that the system should return the next page of data.",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -954,7 +994,7 @@
                                     ],
                                     "parameters": {
                                         "name": {
-                                            "description": "A user-defined name of the dns authorization. DnsAuthorization names must be unique globally and match pattern `projects/*/locations/*/dnsAuthorizations/*`.",
+                                            "description": "Identifier. A user-defined name of the dns authorization. DnsAuthorization names must be unique globally and match pattern `projects/*/locations/*/dnsAuthorizations/*`.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+/dnsAuthorizations/[^/]+$",
                                             "required": true,
@@ -983,7 +1023,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "certificatemanager.projects.locations.operations.cancel",
@@ -1091,6 +1131,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1/{+name}/operations",
@@ -1148,7 +1193,7 @@
                                     ],
                                     "parameters": {
                                         "etag": {
-                                            "description": "The current etag of the TrustConfig. If an etag is provided and does not match the current etag of the resource, deletion will be blocked and an ABORTED error will be returned.",
+                                            "description": "Optional. The current etag of the TrustConfig. If an etag is provided and does not match the current etag of the resource, deletion will be blocked and an ABORTED error will be returned.",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -1203,23 +1248,23 @@
                                     ],
                                     "parameters": {
                                         "filter": {
-                                            "description": "Filter expression to restrict the TrustConfigs returned.",
+                                            "description": "Optional. Filter expression to restrict the TrustConfigs returned.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "orderBy": {
-                                            "description": "A list of TrustConfig field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
+                                            "description": "Optional. A list of TrustConfig field names used to specify the order of the returned results. The default sorting order is ascending. To specify descending order for a field, add a suffix `\" desc\"`.",
                                             "location": "query",
                                             "type": "string"
                                         },
                                         "pageSize": {
-                                            "description": "Maximum number of TrustConfigs to return per call.",
+                                            "description": "Optional. Maximum number of TrustConfigs to return per call.",
                                             "format": "int32",
                                             "location": "query",
                                             "type": "integer"
                                         },
                                         "pageToken": {
-                                            "description": "The value returned by the last `ListTrustConfigsResponse`. Indicates that this is a continuation of a prior `ListTrustConfigs` call, and that the system should return the next page of data.",
+                                            "description": "Optional. The value returned by the last `ListTrustConfigsResponse`. Indicates that this is a continuation of a prior `ListTrustConfigs` call, and that the system should return the next page of data.",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -1249,7 +1294,7 @@
                                     ],
                                     "parameters": {
                                         "name": {
-                                            "description": "A user-defined name of the trust config. TrustConfig names must be unique globally and match pattern `projects/*/locations/*/trustConfigs/*`.",
+                                            "description": "Identifier. A user-defined name of the trust config. TrustConfig names must be unique globally and match pattern `projects/*/locations/*/trustConfigs/*`.",
                                             "location": "path",
                                             "pattern": "^projects/[^/]+/locations/[^/]+/trustConfigs/[^/]+$",
                                             "required": true,
@@ -1280,7 +1325,7 @@
             }
         }
     },
-    "revision": "20240617",
+    "revision": "20251204",
     "rootUrl": "https://certificatemanager.googleapis.com/",
     "schemas": {
         "AllowlistedCertificate": {
@@ -1298,13 +1343,20 @@
             "description": "State of the latest attempt to authorize a domain for certificate issuance.",
             "id": "AuthorizationAttemptInfo",
             "properties": {
+                "attemptTime": {
+                    "description": "Output only. The timestamp, when the authorization attempt was made.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "details": {
                     "description": "Output only. Human readable explanation for reaching the state. Provided to help address the configuration issues. Not guaranteed to be stable. For programmatic access use FailureReason enum.",
                     "readOnly": true,
                     "type": "string"
                 },
                 "domain": {
-                    "description": "Domain name of the authorization attempt.",
+                    "description": "Output only. Domain name of the authorization attempt.",
+                    "readOnly": true,
                     "type": "string"
                 },
                 "failureReason": {
@@ -1340,6 +1392,36 @@
                     ],
                     "readOnly": true,
                     "type": "string"
+                },
+                "troubleshooting": {
+                    "$ref": "Troubleshooting",
+                    "description": "Output only. Troubleshooting information for the authorization attempt. This field is only populated if the authorization attempt failed.",
+                    "readOnly": true
+                }
+            },
+            "type": "object"
+        },
+        "CNAME": {
+            "description": "CNAME troubleshooting information.",
+            "id": "CNAME",
+            "properties": {
+                "expectedData": {
+                    "description": "Output only. The expected value of the CNAME record for the domain, equals to `dns_resource_record.data` in the corresponding `DnsAuthorization`.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Output only. The name of the CNAME record for the domain, equals to `dns_resource_record.name` in the corresponding `DnsAuthorization`.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "resolvedData": {
+                    "description": "Output only. The resolved CNAME chain. Empty list if the CNAME record for `CNAME.name` is not found. Otherwise the first item is the value of the CNAME record for `CNAME.name`. If the CNAME chain is longer, the second item is the value of the CNAME record for the first item, and so on.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1361,7 +1443,7 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "One or more paragraphs of text description of a certificate.",
+                    "description": "Optional. One or more paragraphs of text description of a certificate.",
                     "type": "string"
                 },
                 "expireTime": {
@@ -1374,15 +1456,19 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Set of labels associated with a Certificate.",
+                    "description": "Optional. Set of labels associated with a Certificate.",
                     "type": "object"
                 },
                 "managed": {
                     "$ref": "ManagedCertificate",
                     "description": "If set, contains configuration and state of a managed certificate."
                 },
+                "managedIdentity": {
+                    "$ref": "ManagedIdentityCertificate",
+                    "description": "If set, contains configuration and state of a managed identity certificate."
+                },
                 "name": {
-                    "description": "A user-defined name of the certificate. Certificate names must be unique globally and match pattern `projects/*/locations/*/certificates/*`.",
+                    "description": "Identifier. A user-defined name of the certificate. Certificate names must be unique globally and match pattern `projects/*/locations/*/certificates/*`.",
                     "type": "string"
                 },
                 "pemCertificate": {
@@ -1399,16 +1485,18 @@
                     "type": "array"
                 },
                 "scope": {
-                    "description": "Immutable. The scope of the certificate.",
+                    "description": "Optional. Immutable. The scope of the certificate.",
                     "enum": [
                         "DEFAULT",
                         "EDGE_CACHE",
-                        "ALL_REGIONS"
+                        "ALL_REGIONS",
+                        "CLIENT_AUTH"
                     ],
                     "enumDescriptions": [
-                        "Certificates with default scope are served from core Google data centers. If unsure, choose this option.",
-                        "Certificates with scope EDGE_CACHE are special-purposed certificates, served from Edge Points of Presence. See https://cloud.google.com/vpc/docs/edge-locations.",
-                        "Certificates with ALL_REGIONS scope are served from all Google Cloud regions. See https://cloud.google.com/compute/docs/regions-zones."
+                        "Use the DEFAULT scope if you plan to use the certificate with global external Application Load Balancer, global external proxy Network Load Balancer, or any of the regional Google Cloud services.",
+                        "Use the EDGE_CACHE scope if you plan to use the certificate with Media CDN. The certificates are served from Edge Points of Presence. See https://cloud.google.com/vpc/docs/edge-locations.",
+                        "Use the ALL_REGIONS scope if you plan to use the certificate with cross-region internal Application Load Balancer. The certificates are served from all Google Cloud regions. See https://cloud.google.com/compute/docs/regions-zones.",
+                        "Associated with certificates used as client certificates in Backend mTLS."
                     ],
                     "type": "string"
                 },
@@ -1421,6 +1509,14 @@
                     "format": "google-datetime",
                     "readOnly": true,
                     "type": "string"
+                },
+                "usedBy": {
+                    "description": "Output only. The list of resources that use this Certificate.",
+                    "items": {
+                        "$ref": "UsedBy"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1462,7 +1558,7 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "One or more paragraphs of text description of a CertificateIssuanceConfig.",
+                    "description": "Optional. One or more paragraphs of text description of a CertificateIssuanceConfig.",
                     "type": "string"
                 },
                 "keyAlgorithm": {
@@ -1483,7 +1579,7 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Set of labels associated with a CertificateIssuanceConfig.",
+                    "description": "Optional. Set of labels associated with a CertificateIssuanceConfig.",
                     "type": "object"
                 },
                 "lifetime": {
@@ -1492,7 +1588,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "A user-defined name of the certificate issuance config. CertificateIssuanceConfig names must be unique globally and match pattern `projects/*/locations/*/certificateIssuanceConfigs/*`.",
+                    "description": "Identifier. A user-defined name of the certificate issuance config. CertificateIssuanceConfig names must be unique globally and match pattern `projects/*/locations/*/certificateIssuanceConfigs/*`.",
                     "type": "string"
                 },
                 "rotationWindowPercentage": {
@@ -1520,7 +1616,7 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "One or more paragraphs of text description of a certificate map.",
+                    "description": "Optional. One or more paragraphs of text description of a certificate map.",
                     "type": "string"
                 },
                 "gclbTargets": {
@@ -1535,11 +1631,11 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Set of labels associated with a Certificate Map.",
+                    "description": "Optional. Set of labels associated with a Certificate Map.",
                     "type": "object"
                 },
                 "name": {
-                    "description": "A user-defined name of the Certificate Map. Certificate Map names must be unique globally and match pattern `projects/*/locations/*/certificateMaps/*`.",
+                    "description": "Identifier. A user-defined name of the Certificate Map. Certificate Map names must be unique globally and match pattern `projects/*/locations/*/certificateMaps/*`.",
                     "type": "string"
                 },
                 "updateTime": {
@@ -1556,7 +1652,7 @@
             "id": "CertificateMapEntry",
             "properties": {
                 "certificates": {
-                    "description": "A set of Certificates defines for the given `hostname`. There can be defined up to four certificates in each Certificate Map Entry. Each certificate must match pattern `projects/*/locations/*/certificates/*`.",
+                    "description": "Optional. A set of Certificates defines for the given `hostname`. There can be defined up to four certificates in each Certificate Map Entry. Each certificate must match pattern `projects/*/locations/*/certificates/*`.",
                     "items": {
                         "type": "string"
                     },
@@ -1569,7 +1665,7 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "One or more paragraphs of text description of a certificate map entry.",
+                    "description": "Optional. One or more paragraphs of text description of a certificate map entry.",
                     "type": "string"
                 },
                 "hostname": {
@@ -1580,7 +1676,7 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Set of labels associated with a Certificate Map Entry.",
+                    "description": "Optional. Set of labels associated with a Certificate Map Entry.",
                     "type": "object"
                 },
                 "matcher": {
@@ -1596,7 +1692,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "A user-defined name of the Certificate Map Entry. Certificate Map Entry names must be unique globally and match pattern `projects/*/locations/*/certificateMaps/*/certificateMapEntries/*`.",
+                    "description": "Identifier. A user-defined name of the Certificate Map Entry. Certificate Map Entry names must be unique globally and match pattern `projects/*/locations/*/certificateMaps/*/certificateMapEntries/*`.",
                     "type": "string"
                 },
                 "state": {
@@ -1634,7 +1730,7 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "One or more paragraphs of text description of a DnsAuthorization.",
+                    "description": "Optional. One or more paragraphs of text description of a DnsAuthorization.",
                     "type": "string"
                 },
                 "dnsResourceRecord": {
@@ -1650,15 +1746,15 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Set of labels associated with a DnsAuthorization.",
+                    "description": "Optional. Set of labels associated with a DnsAuthorization.",
                     "type": "object"
                 },
                 "name": {
-                    "description": "A user-defined name of the dns authorization. DnsAuthorization names must be unique globally and match pattern `projects/*/locations/*/dnsAuthorizations/*`.",
+                    "description": "Identifier. A user-defined name of the dns authorization. DnsAuthorization names must be unique globally and match pattern `projects/*/locations/*/dnsAuthorizations/*`.",
                     "type": "string"
                 },
                 "type": {
-                    "description": "Immutable. Type of DnsAuthorization. If unset during resource creation the following default will be used: - in location global: FIXED_RECORD.",
+                    "description": "Optional. Immutable. Type of DnsAuthorization. If unset during resource creation the following default will be used: - in location `global`: FIXED_RECORD, - in other locations: PER_PROJECT_RECORD.",
                     "enum": [
                         "TYPE_UNSPECIFIED",
                         "FIXED_RECORD",
@@ -1729,6 +1825,37 @@
                     "description": "Output only. This field returns the resource name in the following format: `//compute.googleapis.com/projects/*/global/targetSslProxies/*`.",
                     "readOnly": true,
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "IPs": {
+            "description": "IPs troubleshooting information.",
+            "id": "IPs",
+            "properties": {
+                "resolved": {
+                    "description": "Output only. The list of IP addresses resolved from the domain's A/AAAA records. Can contain both ipv4 and ipv6 addresses.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "serving": {
+                    "description": "Output only. The list of IP addresses, where the certificate is attached and port 443 is open.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "servingOnAltPorts": {
+                    "description": "Output only. The list of IP addresses, where the certificate is attached, but port 443 is not open.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1922,6 +2049,13 @@
                         "$ref": "Operation"
                     },
                     "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1998,26 +2132,59 @@
                     "type": "array"
                 },
                 "dnsAuthorizations": {
-                    "description": "Immutable. Authorizations that will be used for performing domain authorization.",
+                    "description": "Optional. Immutable. Authorizations that will be used for performing domain authorization.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "domains": {
-                    "description": "Immutable. The domains for which a managed SSL certificate will be generated. Wildcard domains are only supported with DNS challenge resolution.",
+                    "description": "Optional. Immutable. The domains for which a managed SSL certificate will be generated. Wildcard domains are only supported with DNS challenge resolution.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "issuanceConfig": {
-                    "description": "Immutable. The resource name for a CertificateIssuanceConfig used to configure private PKI certificates in the format `projects/*/locations/*/certificateIssuanceConfigs/*`. If this field is not set, the certificates will instead be publicly signed as documented at https://cloud.google.com/load-balancing/docs/ssl-certificates/google-managed-certs#caa.",
+                    "description": "Optional. Immutable. The resource name for a CertificateIssuanceConfig used to configure private PKI certificates in the format `projects/*/locations/*/certificateIssuanceConfigs/*`. If this field is not set, the certificates will instead be publicly signed as documented at https://cloud.google.com/load-balancing/docs/ssl-certificates/google-managed-certs#caa.",
                     "type": "string"
                 },
                 "provisioningIssue": {
                     "$ref": "ProvisioningIssue",
                     "description": "Output only. Information about issues with provisioning a Managed Certificate.",
+                    "readOnly": true
+                },
+                "state": {
+                    "description": "Output only. State of the managed certificate resource.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "PROVISIONING",
+                        "FAILED",
+                        "ACTIVE"
+                    ],
+                    "enumDescriptions": [
+                        "State is unspecified.",
+                        "Certificate Manager attempts to provision or renew the certificate. If the process takes longer than expected, consult the `provisioning_issue` field.",
+                        "Multiple certificate provisioning attempts failed and Certificate Manager gave up. To try again, delete and create a new managed Certificate resource. For details see the `provisioning_issue` field.",
+                        "The certificate management is working, and a certificate has been provisioned."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ManagedIdentityCertificate": {
+            "description": "Configuration and state of a Managed Identity Certificate. Certificate Manager provisions and renews Managed Identity Certificates automatically, for as long as it's authorized to do so.",
+            "id": "ManagedIdentityCertificate",
+            "properties": {
+                "identity": {
+                    "description": "Required. Immutable. SPIFFE ID of the Managed Identity used for this certificate.",
+                    "type": "string"
+                },
+                "provisioningIssue": {
+                    "$ref": "ProvisioningIssue",
+                    "description": "Output only. Information about issues with provisioning a managed certificate.",
                     "readOnly": true
                 },
                 "state": {
@@ -2094,7 +2261,7 @@
                     "type": "string"
                 },
                 "requestedCancellation": {
-                    "description": "Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have google.longrunning.Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                     "type": "boolean"
                 },
                 "statusMessage": {
@@ -2144,11 +2311,11 @@
             "id": "SelfManagedCertificate",
             "properties": {
                 "pemCertificate": {
-                    "description": "Input only. The PEM-encoded certificate chain. Leaf certificate comes first, followed by intermediate ones if any.",
+                    "description": "Optional. Input only. The PEM-encoded certificate chain. Leaf certificate comes first, followed by intermediate ones if any.",
                     "type": "string"
                 },
                 "pemPrivateKey": {
-                    "description": "Input only. The PEM-encoded private key of the leaf certificate.",
+                    "description": "Optional. Input only. The PEM-encoded private key of the leaf certificate.",
                     "type": "string"
                 }
             },
@@ -2177,6 +2344,47 @@
                 "message": {
                     "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Troubleshooting": {
+            "description": "Troubleshooting information for the authorization attempt.",
+            "id": "Troubleshooting",
+            "properties": {
+                "cname": {
+                    "$ref": "CNAME",
+                    "description": "Output only. CNAME troubleshooting information.",
+                    "readOnly": true
+                },
+                "ips": {
+                    "$ref": "IPs",
+                    "description": "Output only. IPs troubleshooting information.",
+                    "readOnly": true
+                },
+                "issues": {
+                    "description": "Output only. The list of issues discovered during the authorization attempt.",
+                    "items": {
+                        "enum": [
+                            "ISSUE_UNSPECIFIED",
+                            "CNAME_MISMATCH",
+                            "RESOLVED_TO_NOT_SERVING",
+                            "RESOLVED_TO_SERVING_ON_ALT_PORTS",
+                            "NO_RESOLVED_IPS",
+                            "CERTIFICATE_NOT_ATTACHED"
+                        ],
+                        "enumDescriptions": [
+                            "Issue is unspecified.",
+                            "The resolved CNAME value doesn't match the expected CNAME.",
+                            "Domain has A/AAAA records that point to IPs, where the certificate is not attached.",
+                            "Domain has A/AAAA records that point to IPs, where the certificate is attached, but port 443 is not open.",
+                            "Domain doesn't have any A/AAAA records.",
+                            "Certificate is not configured to be served from any IPs (e.g. Certificate is not attached to any load balancer)."
+                        ],
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -2210,7 +2418,7 @@
                     "type": "string"
                 },
                 "description": {
-                    "description": "One or more paragraphs of text description of a TrustConfig.",
+                    "description": "Optional. One or more paragraphs of text description of a TrustConfig.",
                     "type": "string"
                 },
                 "etag": {
@@ -2221,15 +2429,22 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Set of labels associated with a TrustConfig.",
+                    "description": "Optional. Set of labels associated with a TrustConfig.",
                     "type": "object"
                 },
                 "name": {
-                    "description": "A user-defined name of the trust config. TrustConfig names must be unique globally and match pattern `projects/*/locations/*/trustConfigs/*`.",
+                    "description": "Identifier. A user-defined name of the trust config. TrustConfig names must be unique globally and match pattern `projects/*/locations/*/trustConfigs/*`.",
                     "type": "string"
                 },
+                "spiffeTrustStores": {
+                    "additionalProperties": {
+                        "$ref": "TrustStore"
+                    },
+                    "description": "Optional. Defines a mapping from a trust domain to a TrustStore. This is used for SPIFFE certificate validation.",
+                    "type": "object"
+                },
                 "trustStores": {
-                    "description": "Set of trust stores to perform validation against. This field is supported when TrustConfig is configured with Load Balancers, currently not supported for SPIFFE certificate validation. Only one TrustStore specified is currently allowed.",
+                    "description": "Optional. Set of trust stores to perform validation against. This field is supported when TrustConfig is configured with Load Balancers, currently not supported for SPIFFE certificate validation. Only one TrustStore specified is currently allowed.",
                     "items": {
                         "$ref": "TrustStore"
                     },
@@ -2249,18 +2464,30 @@
             "id": "TrustStore",
             "properties": {
                 "intermediateCas": {
-                    "description": "Set of intermediate CA certificates used for the path building phase of chain validation. The field is currently not supported if TrustConfig is used for the workload certificate feature.",
+                    "description": "Optional. Set of intermediate CA certificates used for the path building phase of chain validation. The field is currently not supported if TrustConfig is used for the workload certificate feature.",
                     "items": {
                         "$ref": "IntermediateCA"
                     },
                     "type": "array"
                 },
                 "trustAnchors": {
-                    "description": "List of Trust Anchors to be used while performing validation against a given TrustStore.",
+                    "description": "Optional. List of Trust Anchors to be used while performing validation against a given TrustStore.",
                     "items": {
                         "$ref": "TrustAnchor"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "UsedBy": {
+            "description": "Defines a resource that uses the certificate.",
+            "id": "UsedBy",
+            "properties": {
+                "name": {
+                    "description": "Output only. Full name of the resource https://google.aip.dev/122#full-resource-names, e.g. `//certificatemanager.googleapis.com/projects/*/locations/*/certificateMaps/*/certificateMapEntries/*` or `//compute.googleapis.com/projects/*/locations/*/targetHttpsProxies/*`.",
+                    "readOnly": true,
+                    "type": "string"
                 }
             },
             "type": "object"

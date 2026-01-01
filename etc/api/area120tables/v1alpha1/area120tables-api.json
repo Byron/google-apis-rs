@@ -586,7 +586,7 @@
             }
         }
     },
-    "revision": "20240625",
+    "revision": "20251222",
     "rootUrl": "https://area120tables.googleapis.com/",
     "schemas": {
         "BatchCreateRowsRequest": {

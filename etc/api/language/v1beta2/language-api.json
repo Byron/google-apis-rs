@@ -246,7 +246,7 @@
             }
         }
     },
-    "revision": "20240623",
+    "revision": "20251219",
     "rootUrl": "https://language.googleapis.com/",
     "schemas": {
         "AnalyzeEntitiesRequest": {
@@ -472,7 +472,7 @@
             "type": "object"
         },
         "AnnotateTextRequestFeatures": {
-            "description": "All available features for sentiment, syntax, and semantic analysis. Setting each one to true will enable that specific analysis for the input. Next ID: 12",
+            "description": "All available features for sentiment, syntax, and semantic analysis. Setting each one to true will enable that specific analysis for the input.",
             "id": "AnnotateTextRequestFeatures",
             "properties": {
                 "classificationModelOptions": {
@@ -690,12 +690,16 @@
                         "UNKNOWN_CPU_TYPE",
                         "A2",
                         "A3",
+                        "A4",
+                        "A4X",
                         "C2",
                         "C2D",
                         "CUSTOM",
                         "E2",
                         "G2",
+                        "G4",
                         "C3",
+                        "C4",
                         "M2",
                         "M1",
                         "N1",
@@ -707,11 +711,15 @@
                         "",
                         "GPU-based machine, skip quota reporting.",
                         "GPU-based machine, skip quota reporting.",
+                        "GPU-based machine, skip quota reporting.",
+                        "GPU-based machine, skip quota reporting.",
                         "COMPUTE_OPTIMIZED",
                         "",
                         "",
                         "",
                         "GPU-based machine, skip quota reporting.",
+                        "GPU-based machine, skip quota reporting.",
+                        "",
                         "",
                         "MEMORY_OPTIMIZED_UPGRADE_PREMIUM",
                         "MEMORY_OPTIMIZED",
@@ -756,7 +764,15 @@
                         "A2_ULTRAGPU_2G",
                         "A2_ULTRAGPU_4G",
                         "A2_ULTRAGPU_8G",
+                        "A3_HIGHGPU_1G",
+                        "A3_HIGHGPU_2G",
+                        "A3_HIGHGPU_4G",
                         "A3_HIGHGPU_8G",
+                        "A3_MEGAGPU_8G",
+                        "A3_ULTRAGPU_8G",
+                        "A3_EDGEGPU_8G",
+                        "A4_HIGHGPU_8G",
+                        "A4X_HIGHGPU_4G",
                         "E2_STANDARD_2",
                         "E2_STANDARD_4",
                         "E2_STANDARD_8",
@@ -865,6 +881,7 @@
                         "G2_STANDARD_32",
                         "G2_STANDARD_48",
                         "G2_STANDARD_96",
+                        "G4_STANDARD_48",
                         "C3_STANDARD_4",
                         "C3_STANDARD_8",
                         "C3_STANDARD_22",
@@ -882,9 +899,72 @@
                         "C3_HIGHMEM_22",
                         "C3_HIGHMEM_44",
                         "C3_HIGHMEM_88",
-                        "C3_HIGHMEM_176"
+                        "C3_HIGHMEM_176",
+                        "C4_STANDARD_8",
+                        "C4_STANDARD_16",
+                        "C4_STANDARD_24",
+                        "C4_STANDARD_32",
+                        "C4_STANDARD_48",
+                        "C4_STANDARD_96",
+                        "C4_STANDARD_144",
+                        "C4_STANDARD_192",
+                        "C4_STANDARD_288",
+                        "C4_HIGHCPU_8",
+                        "C4_HIGHCPU_16",
+                        "C4_HIGHCPU_24",
+                        "C4_HIGHCPU_32",
+                        "C4_HIGHCPU_48",
+                        "C4_HIGHCPU_96",
+                        "C4_HIGHCPU_144",
+                        "C4_HIGHCPU_192",
+                        "C4_HIGHCPU_288",
+                        "C4_HIGHMEM_8",
+                        "C4_HIGHMEM_16",
+                        "C4_HIGHMEM_24",
+                        "C4_HIGHMEM_32",
+                        "C4_HIGHMEM_48",
+                        "C4_HIGHMEM_96",
+                        "C4_HIGHMEM_144",
+                        "C4_HIGHMEM_192",
+                        "C4_HIGHMEM_288"
                     ],
                     "enumDescriptions": [
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
                         "",
                         "",
                         "",
@@ -1435,15 +1515,25 @@
                         "UNKNOWN_GPU_TYPE",
                         "NVIDIA_TESLA_A100",
                         "NVIDIA_A100_80GB",
+                        "NVIDIA_B200",
+                        "NVIDIA_GB200",
                         "NVIDIA_TESLA_K80",
                         "NVIDIA_L4",
                         "NVIDIA_TESLA_P100",
                         "NVIDIA_TESLA_P4",
                         "NVIDIA_TESLA_T4",
                         "NVIDIA_TESLA_V100",
-                        "NVIDIA_H100_80GB"
+                        "NVIDIA_H100_80GB",
+                        "NVIDIA_H100_MEGA_80GB",
+                        "NVIDIA_H200_141GB",
+                        "NVIDIA_RTX_PRO_6000"
                     ],
                     "enumDescriptions": [
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
                         "",
                         "",
                         "",
@@ -1491,7 +1581,15 @@
                         "A2_ULTRAGPU_2G",
                         "A2_ULTRAGPU_4G",
                         "A2_ULTRAGPU_8G",
+                        "A3_HIGHGPU_1G",
+                        "A3_HIGHGPU_2G",
+                        "A3_HIGHGPU_4G",
                         "A3_HIGHGPU_8G",
+                        "A3_MEGAGPU_8G",
+                        "A3_ULTRAGPU_8G",
+                        "A3_EDGEGPU_8G",
+                        "A4_HIGHGPU_8G",
+                        "A4X_HIGHGPU_4G",
                         "E2_STANDARD_2",
                         "E2_STANDARD_4",
                         "E2_STANDARD_8",
@@ -1600,6 +1698,7 @@
                         "G2_STANDARD_32",
                         "G2_STANDARD_48",
                         "G2_STANDARD_96",
+                        "G4_STANDARD_48",
                         "C3_STANDARD_4",
                         "C3_STANDARD_8",
                         "C3_STANDARD_22",
@@ -1617,9 +1716,72 @@
                         "C3_HIGHMEM_22",
                         "C3_HIGHMEM_44",
                         "C3_HIGHMEM_88",
-                        "C3_HIGHMEM_176"
+                        "C3_HIGHMEM_176",
+                        "C4_STANDARD_8",
+                        "C4_STANDARD_16",
+                        "C4_STANDARD_24",
+                        "C4_STANDARD_32",
+                        "C4_STANDARD_48",
+                        "C4_STANDARD_96",
+                        "C4_STANDARD_144",
+                        "C4_STANDARD_192",
+                        "C4_STANDARD_288",
+                        "C4_HIGHCPU_8",
+                        "C4_HIGHCPU_16",
+                        "C4_HIGHCPU_24",
+                        "C4_HIGHCPU_32",
+                        "C4_HIGHCPU_48",
+                        "C4_HIGHCPU_96",
+                        "C4_HIGHCPU_144",
+                        "C4_HIGHCPU_192",
+                        "C4_HIGHCPU_288",
+                        "C4_HIGHMEM_8",
+                        "C4_HIGHMEM_16",
+                        "C4_HIGHMEM_24",
+                        "C4_HIGHMEM_32",
+                        "C4_HIGHMEM_48",
+                        "C4_HIGHMEM_96",
+                        "C4_HIGHMEM_144",
+                        "C4_HIGHMEM_192",
+                        "C4_HIGHMEM_288"
                     ],
                     "enumDescriptions": [
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
                         "",
                         "",
                         "",
@@ -1792,7 +1954,7 @@
             "type": "object"
         },
         "InfraUsage": {
-            "description": "Infra Usage of billing metrics. Next ID: 6",
+            "description": "LINT: LEGACY_NAMES Infra Usage of billing metrics.",
             "id": "InfraUsage",
             "properties": {
                 "cpuMetrics": {
@@ -2167,7 +2329,15 @@
                         "A2_ULTRAGPU_2G",
                         "A2_ULTRAGPU_4G",
                         "A2_ULTRAGPU_8G",
+                        "A3_HIGHGPU_1G",
+                        "A3_HIGHGPU_2G",
+                        "A3_HIGHGPU_4G",
                         "A3_HIGHGPU_8G",
+                        "A3_MEGAGPU_8G",
+                        "A3_ULTRAGPU_8G",
+                        "A3_EDGEGPU_8G",
+                        "A4_HIGHGPU_8G",
+                        "A4X_HIGHGPU_4G",
                         "E2_STANDARD_2",
                         "E2_STANDARD_4",
                         "E2_STANDARD_8",
@@ -2276,6 +2446,7 @@
                         "G2_STANDARD_32",
                         "G2_STANDARD_48",
                         "G2_STANDARD_96",
+                        "G4_STANDARD_48",
                         "C3_STANDARD_4",
                         "C3_STANDARD_8",
                         "C3_STANDARD_22",
@@ -2293,9 +2464,72 @@
                         "C3_HIGHMEM_22",
                         "C3_HIGHMEM_44",
                         "C3_HIGHMEM_88",
-                        "C3_HIGHMEM_176"
+                        "C3_HIGHMEM_176",
+                        "C4_STANDARD_8",
+                        "C4_STANDARD_16",
+                        "C4_STANDARD_24",
+                        "C4_STANDARD_32",
+                        "C4_STANDARD_48",
+                        "C4_STANDARD_96",
+                        "C4_STANDARD_144",
+                        "C4_STANDARD_192",
+                        "C4_STANDARD_288",
+                        "C4_HIGHCPU_8",
+                        "C4_HIGHCPU_16",
+                        "C4_HIGHCPU_24",
+                        "C4_HIGHCPU_32",
+                        "C4_HIGHCPU_48",
+                        "C4_HIGHCPU_96",
+                        "C4_HIGHCPU_144",
+                        "C4_HIGHCPU_192",
+                        "C4_HIGHCPU_288",
+                        "C4_HIGHMEM_8",
+                        "C4_HIGHMEM_16",
+                        "C4_HIGHMEM_24",
+                        "C4_HIGHMEM_32",
+                        "C4_HIGHMEM_48",
+                        "C4_HIGHMEM_96",
+                        "C4_HIGHMEM_144",
+                        "C4_HIGHMEM_192",
+                        "C4_HIGHMEM_288"
                     ],
                     "enumDescriptions": [
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
                         "",
                         "",
                         "",
@@ -2468,11 +2702,15 @@
                         "UNKNOWN_RAM_TYPE",
                         "A2",
                         "A3",
+                        "A4",
+                        "A4X",
                         "C2",
                         "C2D",
                         "CUSTOM",
                         "E2",
                         "G2",
+                        "G4",
+                        "C4",
                         "C3",
                         "M2",
                         "M1",
@@ -2485,7 +2723,11 @@
                         "",
                         "",
                         "",
+                        "",
+                        "",
                         "COMPUTE_OPTIMIZED",
+                        "",
+                        "",
                         "",
                         "",
                         "",
@@ -2526,11 +2768,11 @@
             "type": "object"
         },
         "Sentiment": {
-            "description": "Represents the feeling associated with the entire text or entities in the text. Next ID: 6",
+            "description": "Represents the feeling associated with the entire text or entities in the text.",
             "id": "Sentiment",
             "properties": {
                 "magnitude": {
-                    "description": "A non-negative number in the [0, +inf) range, which represents the absolute magnitude of sentiment regardless of score (positive or negative).",
+                    "description": "A non-negative number in the [0, +inf] range, which represents the absolute magnitude of sentiment regardless of score (positive or negative).",
                     "format": "float",
                     "type": "number"
                 },
@@ -2883,7 +3125,6 @@
             "type": "object"
         },
         "XPSColumnSpecForecastingMetadata": {
-            "description": "=========================================================================== # The fields below are used exclusively for Forecasting.",
             "id": "XPSColumnSpecForecastingMetadata",
             "properties": {
                 "columnType": {
@@ -3376,11 +3617,11 @@
                     "type": "boolean"
                 },
                 "outputGcrUri": {
-                    "description": "The Google Contained Registry (GCR) path the exported files to be pushed to. This location is set if the exported format is DOCKDER.",
+                    "description": "The Google Contained Registry path the exported files to be pushed to. This location is set if the exported format is DOCKDER.",
                     "type": "string"
                 },
                 "outputGcsUri": {
-                    "description": "The Google Cloud Storage (GCS) directory where XPS will output the exported models and related files. Format: gs://bucket/directory",
+                    "description": "The Google Cloud Storage directory where XPS will output the exported models and related files. Format: gs://bucket/directory",
                     "type": "string"
                 },
                 "tfJsFormat": {
@@ -3396,7 +3637,7 @@
             "type": "object"
         },
         "XPSFileSpec": {
-            "description": "Spec of input and output files, on external file systems (CNS, GCS, etc).",
+            "description": "Spec of input and output files, on external file systems (for example, Colossus Namespace System or Google Cloud Storage).",
             "id": "XPSFileSpec",
             "properties": {
                 "directoryPath": {
@@ -3424,7 +3665,7 @@
                     "enumDescriptions": [
                         "",
                         "",
-                        "Internal format for parallel text data used by Google Translate. go/rkvtools",
+                        "Internal format for parallel text data used by Google Translate.",
                         "",
                         "Only the lexicographically first file described by the file_spec contains the header line.",
                         ""
@@ -3553,7 +3794,7 @@
             "id": "XPSImageExportModelSpec",
             "properties": {
                 "exportModelOutputConfig": {
-                    "description": "Contains the model format and internal location of the model files to be exported/downloaded. Use the GCS bucket name which is provided via TrainRequest.gcs_bucket_name to store the model files.",
+                    "description": "Contains the model format and internal location of the model files to be exported/downloaded. Use the Google Cloud Storage bucket name which is provided via TrainRequest.gcs_bucket_name to store the model files.",
                     "items": {
                         "$ref": "XPSExportModelOutputConfig"
                     },
@@ -3578,7 +3819,7 @@
                     "type": "array"
                 },
                 "labelGcsUri": {
-                    "description": "GCS uri of decoded labels file for model export 'dict.txt'.",
+                    "description": "Google Cloud Storage URI of decoded labels file for model export 'dict.txt'.",
                     "type": "string"
                 },
                 "servingArtifact": {
@@ -3586,11 +3827,11 @@
                     "description": "The default model binary file used for serving (e.g. online predict, batch predict) via public Cloud AI Platform API."
                 },
                 "tfJsBinaryGcsPrefix": {
-                    "description": "GCS uri prefix of Tensorflow JavaScript binary files 'groupX-shardXofX.bin' Deprecated.",
+                    "description": "Google Cloud Storage URI prefix of Tensorflow JavaScript binary files 'groupX-shardXofX.bin'. Deprecated.",
                     "type": "string"
                 },
                 "tfLiteMetadataGcsUri": {
-                    "description": "GCS uri of Tensorflow Lite metadata 'tflite_metadata.json'.",
+                    "description": "Google Cloud Storage URI of Tensorflow Lite metadata 'tflite_metadata.json'.",
                     "type": "string"
                 }
             },
@@ -3634,6 +3875,10 @@
                         "NVIDIA_A100_80GB",
                         "NVIDIA_L4",
                         "NVIDIA_H100_80GB",
+                        "NVIDIA_H100_MEGA_80GB",
+                        "NVIDIA_H200_141GB",
+                        "NVIDIA_B200",
+                        "NVIDIA_GB200",
                         "TPU_V2",
                         "TPU_V3",
                         "TPU_V4_POD",
@@ -3650,6 +3895,10 @@
                         "Nvidia A100 80GB GPU.",
                         "Nvidia L4 GPU.",
                         "Nvidia H100 80Gb GPU.",
+                        "Nvidia H100 80Gb GPU.",
+                        "Nvidia H200 141Gb GPU.",
+                        "Nvidia B200 GPU.",
+                        "Nvidia GB200 GPU.",
                         "TPU v2 (JellyFish).",
                         "TPU v3 (DragonFish).",
                         "TPU_v4 (PufferFish).",
@@ -3680,7 +3929,7 @@
                         "",
                         "The default partition.",
                         "It has significantly lower replication than partition-0 and is located in the US only. It also has a larger model size limit and higher default RAM quota than partition-0. Customers with batch traffic, US-based traffic, or very large models should use this partition. Capacity in this partition is significantly cheaper than partition-0.",
-                        "To be used by customers with Jellyfish-accelerated ops. See go/servomatic-jellyfish for details.",
+                        "To be used by customers with Jellyfish-accelerated ops.",
                         "The partition used by regionalized servomatic cloud regions.",
                         "The partition used for loading models from custom storage."
                     ],
@@ -3940,14 +4189,13 @@
                     "type": "string"
                 },
                 "gcsUri": {
-                    "description": "The Google Cloud Storage (GCS) uri that stores the model binary files.",
+                    "description": "The Google Cloud Storage URI that stores the model binary files.",
                     "type": "string"
                 }
             },
             "type": "object"
         },
         "XPSPreprocessResponse": {
-            "description": "Next ID: 8",
             "id": "XPSPreprocessResponse",
             "properties": {
                 "outputExampleSet": {
@@ -4121,7 +4369,7 @@
         },
         "XPSResponseExplanationSpec": {
             "deprecated": true,
-            "description": "Specification of Model explanation. Feature-based XAI in AutoML Vision ICN is deprecated, see b/288407203 for context.",
+            "description": "Specification of Model explanation. Feature-based XAI in AutoML Vision ICN is deprecated.",
             "id": "XPSResponseExplanationSpec",
             "properties": {
                 "explanationType": {
@@ -4577,7 +4825,7 @@
             "type": "object"
         },
         "XPSTablesDatasetMetadata": {
-            "description": "Metadata for a dataset used for AutoML Tables. Next ID: 6",
+            "description": "Metadata for a dataset used for AutoML Tables.",
             "id": "XPSTablesDatasetMetadata",
             "properties": {
                 "mlUseColumnId": {
@@ -4821,7 +5069,7 @@
             "type": "object"
         },
         "XPSTextComponentModel": {
-            "description": "Component model. Next ID: 10",
+            "description": "Component model.",
             "id": "XPSTextComponentModel",
             "properties": {
                 "batchPredictionModelGcsUri": {
@@ -4846,7 +5094,7 @@
                         "",
                         "The default partition.",
                         "It has significantly lower replication than partition-0 and is located in the US only. It also has a larger model size limit and higher default RAM quota than partition-0. Customers with batch traffic, US-based traffic, or very large models should use this partition. Capacity in this partition is significantly cheaper than partition-0.",
-                        "To be used by customers with Jellyfish-accelerated ops. See go/servomatic-jellyfish for details.",
+                        "To be used by customers with Jellyfish-accelerated ops.",
                         "The partition used by regionalized servomatic cloud regions.",
                         "The partition used for loading models from custom storage."
                     ],
@@ -4891,7 +5139,7 @@
                         "",
                         "Model type for entity extraction.",
                         "Model type for relationship extraction.",
-                        "A composite model represents a set of component models that have to be used together for prediction. A composite model appears to be a single model to the model user. It may contain only one component model. Please refer to go/cnl-composite-models for more information.",
+                        "A composite model represents a set of component models that have to be used together for prediction. A composite model appears to be a single model to the model user. It may contain only one component model.",
                         "Model type used to train default, MA, and ATC models in a single batch worker pipeline.",
                         "BERT pipeline needs a specific model type, since it uses a different TFX configuration compared with DEFAULT (despite sharing most of the code).",
                         "Model type for EncPaLM."
@@ -5126,7 +5374,6 @@
             "type": "object"
         },
         "XPSTrainResponse": {
-            "description": "Next ID: 18",
             "id": "XPSTrainResponse",
             "properties": {
                 "deployedModelSizeBytes": {
@@ -5403,7 +5650,7 @@
             "id": "XPSVideoExportModelSpec",
             "properties": {
                 "exportModelOutputConfig": {
-                    "description": "Contains the model format and internal location of the model files to be exported/downloaded. Use the GCS bucket name which is provided via TrainRequest.gcs_bucket_name to store the model files.",
+                    "description": "Contains the model format and internal location of the model files to be exported/downloaded. Use the Google Cloud Storage bucket name which is provided via TrainRequest.gcs_bucket_name to store the model files.",
                     "items": {
                         "$ref": "XPSExportModelOutputConfig"
                     },

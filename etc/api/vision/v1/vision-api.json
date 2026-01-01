@@ -229,7 +229,7 @@
         "operations": {
             "methods": {
                 "cancel": {
-                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                     "flatPath": "v1/operations/{operationsId}:cancel",
                     "httpMethod": "POST",
                     "id": "vision.operations.cancel",
@@ -340,6 +340,11 @@
                             "description": "The standard list page token.",
                             "location": "query",
                             "type": "string"
+                        },
+                        "returnPartialSuccess": {
+                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                            "location": "query",
+                            "type": "boolean"
                         }
                     },
                     "path": "v1/{+name}",
@@ -1282,7 +1287,7 @@
             }
         }
     },
-    "revision": "20240614",
+    "revision": "20251212",
     "rootUrl": "https://vision.googleapis.com/",
     "schemas": {
         "AddProductToProductSetRequest": {
@@ -2174,7 +2179,7 @@
                     "type": "integer"
                 },
                 "model": {
-                    "description": "Model to use for the feature. Supported values: \"builtin/stable\" (the default if unset) and \"builtin/latest\". `DOCUMENT_TEXT_DETECTION` and `TEXT_DETECTION` also support \"builtin/weekly\" for the bleeding edge release updated weekly.",
+                    "description": "Model to use for the feature. Supported values: \"builtin/stable\" (the default if unset) and \"builtin/latest\". `DOCUMENT_TEXT_DETECTION` and `TEXT_DETECTION` also support \"builtin/rc\" for the latest release candidate.",
                     "type": "string"
                 },
                 "type": {
@@ -2748,7 +2753,7 @@
             "type": "object"
         },
         "GoogleCloudVisionV1p1beta1FaceAnnotationLandmark": {
-            "description": "A face-specific landmark (for example, a face feature).",
+            "description": "A face-specific landmark (for example, a face feature). Landmark positions may fall outside the bounds of the image if the face is near one or more edges of the image. Therefore it is NOT guaranteed that `0 <= x < width` or `0 <= y < height`.",
             "id": "GoogleCloudVisionV1p1beta1FaceAnnotationLandmark",
             "properties": {
                 "position": {
@@ -4162,7 +4167,7 @@
             "type": "object"
         },
         "GoogleCloudVisionV1p2beta1FaceAnnotationLandmark": {
-            "description": "A face-specific landmark (for example, a face feature).",
+            "description": "A face-specific landmark (for example, a face feature). Landmark positions may fall outside the bounds of the image if the face is near one or more edges of the image. Therefore it is NOT guaranteed that `0 <= x < width` or `0 <= y < height`.",
             "id": "GoogleCloudVisionV1p2beta1FaceAnnotationLandmark",
             "properties": {
                 "position": {
@@ -5611,7 +5616,7 @@
             "type": "object"
         },
         "GoogleCloudVisionV1p3beta1FaceAnnotationLandmark": {
-            "description": "A face-specific landmark (for example, a face feature).",
+            "description": "A face-specific landmark (for example, a face feature). Landmark positions may fall outside the bounds of the image if the face is near one or more edges of the image. Therefore it is NOT guaranteed that `0 <= x < width` or `0 <= y < height`.",
             "id": "GoogleCloudVisionV1p3beta1FaceAnnotationLandmark",
             "properties": {
                 "position": {
@@ -7154,7 +7159,7 @@
             "type": "object"
         },
         "GoogleCloudVisionV1p4beta1FaceAnnotationLandmark": {
-            "description": "A face-specific landmark (for example, a face feature).",
+            "description": "A face-specific landmark (for example, a face feature). Landmark positions may fall outside the bounds of the image if the face is near one or more edges of the image. Therefore it is NOT guaranteed that `0 <= x < width` or `0 <= y < height`.",
             "id": "GoogleCloudVisionV1p4beta1FaceAnnotationLandmark",
             "properties": {
                 "position": {
@@ -8322,7 +8327,7 @@
             "type": "object"
         },
         "Landmark": {
-            "description": "A face-specific landmark (for example, a face feature).",
+            "description": "A face-specific landmark (for example, a face feature). Landmark positions may fall outside the bounds of the image if the face is near one or more edges of the image. Therefore it is NOT guaranteed that `0 <= x < width` or `0 <= y < height`.",
             "id": "Landmark",
             "properties": {
                 "position": {
@@ -8458,6 +8463,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }

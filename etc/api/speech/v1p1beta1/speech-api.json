@@ -15,6 +15,43 @@
     "description": "Converts audio to text by applying powerful neural network models.",
     "discoveryVersion": "v1",
     "documentationLink": "https://cloud.google.com/speech-to-text/docs/quickstart-protocol",
+    "endpoints": [
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://speech.us-central1.rep.googleapis.com/",
+            "location": "us-central1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://speech.us-west1.rep.googleapis.com/",
+            "location": "us-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://speech.me-west1.rep.googleapis.com/",
+            "location": "me-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://speech.europe-west1.rep.googleapis.com/",
+            "location": "europe-west1"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://speech.europe-west2.rep.googleapis.com/",
+            "location": "europe-west2"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://speech.europe-west3.rep.googleapis.com/",
+            "location": "europe-west3"
+        },
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://speech.europe-west4.rep.googleapis.com/",
+            "location": "europe-west4"
+        }
+    ],
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -159,6 +196,11 @@
                             "description": "The standard list page token.",
                             "location": "query",
                             "type": "string"
+                        },
+                        "returnPartialSuccess": {
+                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                            "location": "query",
+                            "type": "boolean"
                         }
                     },
                     "path": "v1p1beta1/operations",
@@ -524,7 +566,7 @@
             }
         }
     },
-    "revision": "20240625",
+    "revision": "20251201",
     "rootUrl": "https://speech.googleapis.com/",
     "schemas": {
         "ABNFGrammar": {
@@ -723,6 +765,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -1060,7 +1109,8 @@
                         "OGG_OPUS",
                         "SPEEX_WITH_HEADER_BYTE",
                         "MP3",
-                        "WEBM_OPUS"
+                        "WEBM_OPUS",
+                        "ALAW"
                     ],
                     "enumDescriptions": [
                         "Not specified.",
@@ -1072,7 +1122,8 @@
                         "Opus encoded audio frames in Ogg container ([OggOpus](https://wiki.xiph.org/OggOpus)). `sample_rate_hertz` must be one of 8000, 12000, 16000, 24000, or 48000.",
                         "Although the use of lossy encodings is not recommended, if a very low bitrate encoding is required, `OGG_OPUS` is highly preferred over Speex encoding. The [Speex](https://speex.org/) encoding supported by Cloud Speech API has a header byte in each block, as in MIME type `audio/x-speex-with-header-byte`. It is a variant of the RTP Speex encoding defined in [RFC 5574](https://tools.ietf.org/html/rfc5574). The stream is a sequence of blocks, one block per RTP packet. Each block starts with a byte containing the length of the block, in bytes, followed by one or more frames of Speex data, padded to an integral number of bytes (octets) as specified in RFC 5574. In other words, each RTP header is replaced with a single byte containing the block length. Only Speex wideband is supported. `sample_rate_hertz` must be 16000.",
                         "MP3 audio. MP3 encoding is a Beta feature and only available in v1p1beta1. Support all standard MP3 bitrates (which range from 32-320 kbps). When using this encoding, `sample_rate_hertz` has to match the sample rate of the file being used.",
-                        "Opus encoded audio frames in WebM container ([WebM](https://www.webmproject.org/docs/container/)). `sample_rate_hertz` must be one of 8000, 12000, 16000, 24000, or 48000."
+                        "Opus encoded audio frames in WebM container ([WebM](https://www.webmproject.org/docs/container/)). `sample_rate_hertz` must be one of 8000, 12000, 16000, 24000, or 48000.",
+                        "8-bit samples that compand 13-bit audio samples using G.711 PCMU/a-law."
                     ],
                     "type": "string"
                 },

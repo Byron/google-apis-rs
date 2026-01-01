@@ -143,6 +143,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -587,7 +593,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1beta1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "gkehub.projects.locations.operations.cancel",
@@ -695,6 +701,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1beta1/{+name}/operations",
@@ -712,7 +723,7 @@
             }
         }
     },
-    "revision": "20240614",
+    "revision": "20251212",
     "rootUrl": "https://gkehub.googleapis.com/",
     "schemas": {
         "ApplianceCluster": {
@@ -790,6 +801,16 @@
                 "oidcJwks": {
                     "description": "Optional. OIDC verification keys for this Membership in JWKS format (RFC 7517). When this field is set, OIDC discovery will NOT be performed on `issuer`, and instead OIDC tokens will be validated using this field.",
                     "format": "byte",
+                    "type": "string"
+                },
+                "scopeTenancyIdentityProvider": {
+                    "description": "Optional. Output only. The identity provider for the scope-tenancy workload identity pool.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "scopeTenancyWorkloadIdentityPool": {
+                    "description": "Optional. Output only. The name of the scope-tenancy workload identity pool. This pool is set in the fleet-level feature.",
+                    "readOnly": true,
                     "type": "string"
                 },
                 "workloadIdentityPool": {
@@ -1084,6 +1105,13 @@
                         "$ref": "Operation"
                     },
                     "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1172,12 +1200,25 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Optional. GCP labels for this membership.",
+                    "description": "Optional. GCP labels for this membership. These labels are not leveraged by multi-cluster features, instead, we prefer cluster labels, which can be set on GKE cluster or other cluster types.",
                     "type": "object"
                 },
                 "lastConnectionTime": {
                     "description": "Output only. For clusters using Connect, the timestamp of the most recent connection established with Google Cloud. This time is updated every several minutes, not continuously. For clusters that do not use GKE Connect, or that have never connected successfully, this field will be unset.",
                     "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "membershipType": {
+                    "description": "Output only. The type of the membership.",
+                    "enum": [
+                        "MEMBERSHIP_TYPE_UNSPECIFIED",
+                        "LIGHTWEIGHT"
+                    ],
+                    "enumDescriptions": [
+                        "The MembershipType is not set.",
+                        "The membership supports only lightweight compatible features."
+                    ],
                     "readOnly": true,
                     "type": "string"
                 },
@@ -1498,8 +1539,12 @@
                     "description": "Optional. The Connect agent version to use for connect_resources. Defaults to the latest GKE Connect version. The version must be a currently supported version, obsolete versions will be rejected.",
                     "type": "string"
                 },
+                "k8sGitVersion": {
+                    "description": "Optional. Git version of the Kubernetes cluster. This is only used to gate the Connect Agent migration to svc.id.goog on GDC-SO 1.33.100 patch and above.",
+                    "type": "string"
+                },
                 "k8sVersion": {
-                    "description": "Optional. Major version of the Kubernetes cluster. This is only used to determine which version to use for the CustomResourceDefinition resources, `apiextensions/v1beta1` or`apiextensions/v1`.",
+                    "description": "Optional. Major and minor version of the Kubernetes cluster. This is only used to determine which version to use for the CustomResourceDefinition resources, `apiextensions/v1beta1` or`apiextensions/v1`.",
                     "type": "string"
                 },
                 "v1beta1Crd": {

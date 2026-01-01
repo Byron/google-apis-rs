@@ -191,6 +191,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -315,6 +321,11 @@
                                             "pattern": "^projects/[^/]+/locations/[^/]+/features/[^/]+$",
                                             "required": true,
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "Optional. If set to true, the response will return partial results when some regions are unreachable and the unreachable field in Feature proto will be populated. If set to false, the request will fail when some regions are unreachable.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1beta/{+name}",
@@ -392,6 +403,11 @@
                                             "pattern": "^projects/[^/]+/locations/[^/]+$",
                                             "required": true,
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "Optional. If set to true, the response will return partial results when some regions are unreachable and the unreachable field in Feature proto will be populated. If set to false, the request will fail when some regions are unreachable.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1beta/{+parent}/features",
@@ -1339,7 +1355,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "gkehub.projects.locations.operations.cancel",
@@ -1447,11 +1463,248 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1beta/{+name}/operations",
                                     "response": {
                                         "$ref": "ListOperationsResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                }
+                            }
+                        },
+                        "rolloutSequences": {
+                            "methods": {
+                                "create": {
+                                    "description": "Create a new rollout sequence resource.",
+                                    "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/rolloutSequences",
+                                    "httpMethod": "POST",
+                                    "id": "gkehub.projects.locations.rolloutSequences.create",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "parent": {
+                                            "description": "Required. The parent resource where this rollout sequence will be created. projects/{project}/locations/{location}",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "rolloutSequenceId": {
+                                            "description": "Required. User provided identifier that is used as part of the resource name; must conform to RFC-1034 and additionally restrict to lower-cased letters. This comes out roughly to: /^a-z+[a-z0-9]$/",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1beta/{+parent}/rolloutSequences",
+                                    "request": {
+                                        "$ref": "RolloutSequence"
+                                    },
+                                    "response": {
+                                        "$ref": "Operation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "delete": {
+                                    "description": "Remove a RolloutSequence.",
+                                    "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/rolloutSequences/{rolloutSequencesId}",
+                                    "httpMethod": "DELETE",
+                                    "id": "gkehub.projects.locations.rolloutSequences.delete",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the rollout sequence to delete. projects/{project}/locations/{location}/rolloutSequences/{rollout_sequence}",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/rolloutSequences/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1beta/{+name}",
+                                    "response": {
+                                        "$ref": "Operation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "get": {
+                                    "description": "Retrieve a single rollout sequence.",
+                                    "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/rolloutSequences/{rolloutSequencesId}",
+                                    "httpMethod": "GET",
+                                    "id": "gkehub.projects.locations.rolloutSequences.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the rollout sequence to retrieve. projects/{project}/locations/{location}/rolloutSequences/{rollout_sequence}",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/rolloutSequences/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1beta/{+name}",
+                                    "response": {
+                                        "$ref": "RolloutSequence"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Retrieve the list of all rollout sequences.",
+                                    "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/rolloutSequences",
+                                    "httpMethod": "GET",
+                                    "id": "gkehub.projects.locations.rolloutSequences.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Lists Rollout Sequences that match the filter expression, following the syntax outlined in https://google.aip.dev/160.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "pageSize": {
+                                            "description": "Optional. The maximum number of rollout sequences to return. The service may return fewer than this value. If unspecified, at most 50 rollout sequences will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "Optional. A page token, received from a previous `ListRolloutSequences` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListRolloutSequences` must match the call that provided the page token.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The parent, which owns this collection of rollout sequences. Format: projects/{project}/locations/{location}",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1beta/{+parent}/rolloutSequences",
+                                    "response": {
+                                        "$ref": "ListRolloutSequencesResponse"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "patch": {
+                                    "description": "Update a rollout sequence.",
+                                    "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/rolloutSequences/{rolloutSequencesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "gkehub.projects.locations.rolloutSequences.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Identifier. Name of the rollout sequence in the format of: projects/{PROJECT_ID}/locations/global/rolloutSequences/{NAME}",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/rolloutSequences/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Optional. The list of fields to update.",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1beta/{+name}",
+                                    "request": {
+                                        "$ref": "RolloutSequence"
+                                    },
+                                    "response": {
+                                        "$ref": "Operation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                }
+                            }
+                        },
+                        "rollouts": {
+                            "methods": {
+                                "get": {
+                                    "description": "Retrieve a single rollout.",
+                                    "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/rollouts/{rolloutsId}",
+                                    "httpMethod": "GET",
+                                    "id": "gkehub.projects.locations.rollouts.get",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the rollout to retrieve. projects/{project}/locations/{location}/rollouts/{rollout}",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/rollouts/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1beta/{+name}",
+                                    "response": {
+                                        "$ref": "Rollout"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "list": {
+                                    "description": "Retrieve the list of all rollouts.",
+                                    "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/rollouts",
+                                    "httpMethod": "GET",
+                                    "id": "gkehub.projects.locations.rollouts.list",
+                                    "parameterOrder": [
+                                        "parent"
+                                    ],
+                                    "parameters": {
+                                        "filter": {
+                                            "description": "Optional. Lists Rollouts that match the filter expression, following the syntax outlined in https://google.aip.dev/160.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "pageSize": {
+                                            "description": "The maximum number of rollout to return. The service may return fewer than this value. If unspecified, at most 50 rollouts will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                                            "format": "int32",
+                                            "location": "query",
+                                            "type": "integer"
+                                        },
+                                        "pageToken": {
+                                            "description": "A page token, received from a previous `ListRollouts` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListRollouts` must match the call that provided the page token.",
+                                            "location": "query",
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "description": "Required. The parent, which owns this collection of rollout. Format: projects/{project}/locations/{location}",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1beta/{+parent}/rollouts",
+                                    "response": {
+                                        "$ref": "ListRolloutsResponse"
                                     },
                                     "scopes": [
                                         "https://www.googleapis.com/auth/cloud-platform"
@@ -2101,39 +2354,9 @@
             }
         }
     },
-    "revision": "20240623",
+    "revision": "20251212",
     "rootUrl": "https://gkehub.googleapis.com/",
     "schemas": {
-        "AnthosObservabilityFeatureSpec": {
-            "description": "**Anthos Observability**: Spec",
-            "id": "AnthosObservabilityFeatureSpec",
-            "properties": {
-                "defaultMembershipSpec": {
-                    "$ref": "AnthosObservabilityMembershipSpec",
-                    "description": "Default membership spec for unconfigured memberships"
-                }
-            },
-            "type": "object"
-        },
-        "AnthosObservabilityMembershipSpec": {
-            "description": "**Anthosobservability**: Per-Membership Feature spec.",
-            "id": "AnthosObservabilityMembershipSpec",
-            "properties": {
-                "doNotOptimizeMetrics": {
-                    "description": "Use full of metrics rather than optimized metrics. See https://cloud.google.com/anthos/clusters/docs/on-prem/1.8/concepts/logging-and-monitoring#optimized_metrics_default_metrics",
-                    "type": "boolean"
-                },
-                "enableStackdriverOnApplications": {
-                    "description": "Enable collecting and reporting metrics and logs from user apps.",
-                    "type": "boolean"
-                },
-                "version": {
-                    "description": "the version of stackdriver operator used by this feature",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "AppDevExperienceFeatureSpec": {
             "description": "Spec for App Dev Experience Feature.",
             "id": "AppDevExperienceFeatureSpec",
@@ -2228,6 +2451,16 @@
                     "format": "byte",
                     "type": "string"
                 },
+                "scopeTenancyIdentityProvider": {
+                    "description": "Optional. Output only. The identity provider for the scope-tenancy workload identity pool.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "scopeTenancyWorkloadIdentityPool": {
+                    "description": "Optional. Output only. The name of the scope-tenancy workload identity pool. This pool is set in the fleet-level feature.",
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "workloadIdentityPool": {
                     "description": "Output only. The name of the workload identity pool in which `issuer` will be recognized. There is a single Workload Identity Pool per Hub that is shared between all Memberships that belong to that Hub. For a Hub hosted in {PROJECT_ID}, the workload pool format is `{PROJECT_ID}.hub.id.goog`, although this is subject to change in newer versions of this API.",
                     "readOnly": true,
@@ -2290,6 +2523,17 @@
             "description": "The request message for Operations.CancelOperation.",
             "id": "CancelOperationRequest",
             "properties": {},
+            "type": "object"
+        },
+        "ClusterSelector": {
+            "description": "Selector for clusters.",
+            "id": "ClusterSelector",
+            "properties": {
+                "labelSelector": {
+                    "description": "The label selector must be a valid CEL (go/cel) expression which evaluates resource.labels.",
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "ClusterUpgradeFleetSpec": {
@@ -2540,13 +2784,9 @@
             "type": "object"
         },
         "CommonFeatureSpec": {
-            "description": "CommonFeatureSpec contains Hub-wide configuration information",
+            "description": "CommonFeatureSpec contains Fleet-wide configuration information",
             "id": "CommonFeatureSpec",
             "properties": {
-                "anthosobservability": {
-                    "$ref": "AnthosObservabilityFeatureSpec",
-                    "description": "Anthos Observability spec"
-                },
                 "appdevexperience": {
                     "$ref": "AppDevExperienceFeatureSpec",
                     "description": "Appdevexperience specific spec."
@@ -2566,12 +2806,16 @@
                 "multiclusteringress": {
                     "$ref": "MultiClusterIngressFeatureSpec",
                     "description": "Multicluster Ingress-specific spec."
+                },
+                "rbacrolebindingactuation": {
+                    "$ref": "RBACRoleBindingActuationFeatureSpec",
+                    "description": "RBAC Role Binding Actuation feature spec"
                 }
             },
             "type": "object"
         },
         "CommonFeatureState": {
-            "description": "CommonFeatureState contains Hub-wide Feature status information.",
+            "description": "CommonFeatureState contains Fleet-wide Feature status information.",
             "id": "CommonFeatureState",
             "properties": {
                 "appdevexperience": {
@@ -2586,9 +2830,13 @@
                     "$ref": "FleetObservabilityFeatureState",
                     "description": "FleetObservability feature state."
                 },
+                "rbacrolebindingactuation": {
+                    "$ref": "RBACRoleBindingActuationFeatureState",
+                    "description": "RBAC Role Binding Actuation feature state"
+                },
                 "state": {
                     "$ref": "FeatureState",
-                    "description": "Output only. The \"running state\" of the Feature in this Hub.",
+                    "description": "Output only. The \"running state\" of the Feature in this Fleet.",
                     "readOnly": true
                 }
             },
@@ -2613,6 +2861,44 @@
                 "policycontroller": {
                     "$ref": "PolicyControllerMembershipSpec",
                     "description": "Policy Controller spec."
+                }
+            },
+            "type": "object"
+        },
+        "CompliancePostureConfig": {
+            "description": "CompliancePostureConfig defines the settings needed to enable/disable features for the Compliance Posture.",
+            "id": "CompliancePostureConfig",
+            "properties": {
+                "complianceStandards": {
+                    "description": "List of enabled compliance standards.",
+                    "items": {
+                        "$ref": "ComplianceStandard"
+                    },
+                    "type": "array"
+                },
+                "mode": {
+                    "description": "Defines the enablement mode for Compliance Posture.",
+                    "enum": [
+                        "MODE_UNSPECIFIED",
+                        "DISABLED",
+                        "ENABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Default value not specified.",
+                        "Disables Compliance Posture features on the cluster.",
+                        "Enables Compliance Posture features on the cluster."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ComplianceStandard": {
+            "id": "ComplianceStandard",
+            "properties": {
+                "standard": {
+                    "description": "Name of the compliance standard.",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -2672,34 +2958,41 @@
             "description": "Configuration for Config Sync",
             "id": "ConfigManagementConfigSync",
             "properties": {
-                "allowVerticalScale": {
-                    "deprecated": true,
-                    "description": "Set to true to allow the vertical scaling. Defaults to false which disallows vertical scaling. This field is deprecated.",
-                    "type": "boolean"
+                "deploymentOverrides": {
+                    "description": "Optional. Configuration for deployment overrides.",
+                    "items": {
+                        "$ref": "ConfigManagementDeploymentOverride"
+                    },
+                    "type": "array"
                 },
                 "enabled": {
-                    "description": "Enables the installation of ConfigSync. If set to true, ConfigSync resources will be created and the other ConfigSync fields will be applied if exist. If set to false, all other ConfigSync fields will be ignored, ConfigSync resources will be deleted. If omitted, ConfigSync resources will be managed depends on the presence of the git or oci field.",
+                    "description": "Optional. Enables the installation of ConfigSync. If set to true, ConfigSync resources will be created and the other ConfigSync fields will be applied if exist. If set to false, all other ConfigSync fields will be ignored, ConfigSync resources will be deleted. If omitted, ConfigSync resources will be managed depends on the presence of the git or oci field.",
                     "type": "boolean"
                 },
                 "git": {
                     "$ref": "ConfigManagementGitConfig",
-                    "description": "Git repo configuration for the cluster."
+                    "description": "Optional. Git repo configuration for the cluster."
                 },
                 "metricsGcpServiceAccountEmail": {
-                    "description": "The Email of the Google Cloud Service Account (GSA) used for exporting Config Sync metrics to Cloud Monitoring and Cloud Monarch when Workload Identity is enabled. The GSA should have the Monitoring Metric Writer (roles/monitoring.metricWriter) IAM role. The Kubernetes ServiceAccount `default` in the namespace `config-management-monitoring` should be bound to the GSA.",
+                    "deprecated": true,
+                    "description": "Optional. The Email of the Google Cloud Service Account (GSA) used for exporting Config Sync metrics to Cloud Monitoring and Cloud Monarch when Workload Identity is enabled. The GSA should have the Monitoring Metric Writer (roles/monitoring.metricWriter) IAM role. The Kubernetes ServiceAccount `default` in the namespace `config-management-monitoring` should be bound to the GSA. Deprecated: If Workload Identity Federation for GKE is enabled, Google Cloud Service Account is no longer needed for exporting Config Sync metrics: https://cloud.google.com/kubernetes-engine/enterprise/config-sync/docs/how-to/monitor-config-sync-cloud-monitoring#custom-monitoring.",
                     "type": "string"
                 },
                 "oci": {
                     "$ref": "ConfigManagementOciConfig",
-                    "description": "OCI repo configuration for the cluster"
+                    "description": "Optional. OCI repo configuration for the cluster"
                 },
                 "preventDrift": {
-                    "description": "Set to true to enable the Config Sync admission webhook to prevent drifts. If set to `false`, disables the Config Sync admission webhook and does not prevent drifts.",
+                    "description": "Optional. Set to true to enable the Config Sync admission webhook to prevent drifts. If set to `false`, disables the Config Sync admission webhook and does not prevent drifts.",
                     "type": "boolean"
                 },
                 "sourceFormat": {
-                    "description": "Specifies whether the Config Sync Repo is in \"hierarchical\" or \"unstructured\" mode.",
+                    "description": "Optional. Specifies whether the Config Sync Repo is in \"hierarchical\" or \"unstructured\" mode.",
                     "type": "string"
+                },
+                "stopSyncing": {
+                    "description": "Optional. Set to true to stop syncing configs for a single cluster. Default to false.",
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -2780,8 +3073,44 @@
                     ],
                     "type": "string"
                 },
+                "otelCollector": {
+                    "description": "Deployment state of otel-collector",
+                    "enum": [
+                        "DEPLOYMENT_STATE_UNSPECIFIED",
+                        "NOT_INSTALLED",
+                        "INSTALLED",
+                        "ERROR",
+                        "PENDING"
+                    ],
+                    "enumDescriptions": [
+                        "Deployment's state cannot be determined",
+                        "Deployment is not installed",
+                        "Deployment is installed",
+                        "Deployment was attempted to be installed, but has errors",
+                        "Deployment is installing or terminating"
+                    ],
+                    "type": "string"
+                },
                 "reconcilerManager": {
                     "description": "Deployment state of reconciler-manager pod",
+                    "enum": [
+                        "DEPLOYMENT_STATE_UNSPECIFIED",
+                        "NOT_INSTALLED",
+                        "INSTALLED",
+                        "ERROR",
+                        "PENDING"
+                    ],
+                    "enumDescriptions": [
+                        "Deployment's state cannot be determined",
+                        "Deployment is not installed",
+                        "Deployment is installed",
+                        "Deployment was attempted to be installed, but has errors",
+                        "Deployment is installing or terminating"
+                    ],
+                    "type": "string"
+                },
+                "resourceGroupControllerManager": {
+                    "description": "Deployment state of resource-group-controller-manager",
                     "enum": [
                         "DEPLOYMENT_STATE_UNSPECIFIED",
                         "NOT_INSTALLED",
@@ -2852,19 +3181,44 @@
             "description": "State information for ConfigSync",
             "id": "ConfigManagementConfigSyncState",
             "properties": {
+                "clusterLevelStopSyncingState": {
+                    "description": "Output only. Whether syncing resources to the cluster is stopped at the cluster level.",
+                    "enum": [
+                        "STOP_SYNCING_STATE_UNSPECIFIED",
+                        "NOT_STOPPED",
+                        "PENDING",
+                        "STOPPED"
+                    ],
+                    "enumDescriptions": [
+                        "State cannot be determined",
+                        "Syncing resources to the cluster is not stopped at the cluster level.",
+                        "Some reconcilers stop syncing resources to the cluster, while others are still syncing.",
+                        "Syncing resources to the cluster is stopped at the cluster level."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "crCount": {
+                    "description": "Output only. The number of RootSync and RepoSync CRs in the cluster.",
+                    "format": "int32",
+                    "readOnly": true,
+                    "type": "integer"
+                },
                 "deploymentState": {
                     "$ref": "ConfigManagementConfigSyncDeploymentState",
-                    "description": "Information about the deployment of ConfigSync, including the version of the various Pods deployed"
+                    "description": "Output only. Information about the deployment of ConfigSync, including the version of the various Pods deployed",
+                    "readOnly": true
                 },
                 "errors": {
-                    "description": "Errors pertaining to the installation of Config Sync.",
+                    "description": "Output only. Errors pertaining to the installation of Config Sync.",
                     "items": {
                         "$ref": "ConfigManagementConfigSyncError"
                     },
+                    "readOnly": true,
                     "type": "array"
                 },
                 "reposyncCrd": {
-                    "description": "The state of the Reposync CRD",
+                    "description": "Output only. The state of the Reposync CRD",
                     "enum": [
                         "CRD_STATE_UNSPECIFIED",
                         "NOT_INSTALLED",
@@ -2879,10 +3233,11 @@
                         "CRD is terminating (i.e., it has been deleted and is cleaning up)",
                         "CRD is installing"
                     ],
+                    "readOnly": true,
                     "type": "string"
                 },
                 "rootsyncCrd": {
-                    "description": "The state of the RootSync CRD",
+                    "description": "Output only. The state of the RootSync CRD",
                     "enum": [
                         "CRD_STATE_UNSPECIFIED",
                         "NOT_INSTALLED",
@@ -2897,10 +3252,11 @@
                         "CRD is terminating (i.e., it has been deleted and is cleaning up)",
                         "CRD is installing"
                     ],
+                    "readOnly": true,
                     "type": "string"
                 },
                 "state": {
-                    "description": "The state of CS This field summarizes the other fields in this message.",
+                    "description": "Output only. The state of CS This field summarizes the other fields in this message.",
                     "enum": [
                         "STATE_UNSPECIFIED",
                         "CONFIG_SYNC_NOT_INSTALLED",
@@ -2915,15 +3271,18 @@
                         "CS encounters errors.",
                         "CS is installing or terminating."
                     ],
+                    "readOnly": true,
                     "type": "string"
                 },
                 "syncState": {
                     "$ref": "ConfigManagementSyncState",
-                    "description": "The state of ConfigSync's process to sync configs to a cluster"
+                    "description": "Output only. The state of ConfigSync's process to sync configs to a cluster",
+                    "readOnly": true
                 },
                 "version": {
                     "$ref": "ConfigManagementConfigSyncVersion",
-                    "description": "The version of ConfigSync deployed"
+                    "description": "Output only. The version of ConfigSync deployed",
+                    "readOnly": true
                 }
             },
             "type": "object"
@@ -2933,7 +3292,7 @@
             "id": "ConfigManagementConfigSyncVersion",
             "properties": {
                 "admissionWebhook": {
-                    "description": "Version of the deployed admission_webhook pod",
+                    "description": "Version of the deployed admission-webhook pod",
                     "type": "string"
                 },
                 "gitSync": {
@@ -2948,8 +3307,16 @@
                     "description": "Version of the deployed monitor pod",
                     "type": "string"
                 },
+                "otelCollector": {
+                    "description": "Version of the deployed otel-collector pod",
+                    "type": "string"
+                },
                 "reconcilerManager": {
                     "description": "Version of the deployed reconciler-manager pod",
+                    "type": "string"
+                },
+                "resourceGroupControllerManager": {
+                    "description": "Version of the deployed resource-group-controller-manager pod",
                     "type": "string"
                 },
                 "rootReconciler": {
@@ -2958,6 +3325,55 @@
                 },
                 "syncer": {
                     "description": "Version of the deployed syncer pod",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ConfigManagementContainerOverride": {
+            "description": "Configuration for a container override.",
+            "id": "ConfigManagementContainerOverride",
+            "properties": {
+                "containerName": {
+                    "description": "Required. The name of the container.",
+                    "type": "string"
+                },
+                "cpuLimit": {
+                    "description": "Optional. The cpu limit of the container.",
+                    "type": "string"
+                },
+                "cpuRequest": {
+                    "description": "Optional. The cpu request of the container.",
+                    "type": "string"
+                },
+                "memoryLimit": {
+                    "description": "Optional. The memory limit of the container.",
+                    "type": "string"
+                },
+                "memoryRequest": {
+                    "description": "Optional. The memory request of the container.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ConfigManagementDeploymentOverride": {
+            "description": "Configuration for a deployment override.",
+            "id": "ConfigManagementDeploymentOverride",
+            "properties": {
+                "containers": {
+                    "description": "Optional. The containers of the deployment resource to be overridden.",
+                    "items": {
+                        "$ref": "ConfigManagementContainerOverride"
+                    },
+                    "type": "array"
+                },
+                "deploymentName": {
+                    "description": "Required. The name of the deployment resource to be overridden.",
+                    "type": "string"
+                },
+                "deploymentNamespace": {
+                    "description": "Required. The namespace of the deployment resource to be overridden.",
                     "type": "string"
                 }
             },
@@ -3052,35 +3468,35 @@
             "id": "ConfigManagementGitConfig",
             "properties": {
                 "gcpServiceAccountEmail": {
-                    "description": "The Google Cloud Service Account Email used for auth when secret_type is gcpServiceAccount.",
+                    "description": "Optional. The Google Cloud Service Account Email used for auth when secret_type is gcpServiceAccount.",
                     "type": "string"
                 },
                 "httpsProxy": {
-                    "description": "URL for the HTTPS proxy to be used when communicating with the Git repo.",
+                    "description": "Optional. URL for the HTTPS proxy to be used when communicating with the Git repo.",
                     "type": "string"
                 },
                 "policyDir": {
-                    "description": "The path within the Git repository that represents the top level of the repo to sync. Default: the root directory of the repository.",
+                    "description": "Optional. The path within the Git repository that represents the top level of the repo to sync. Default: the root directory of the repository.",
                     "type": "string"
                 },
                 "secretType": {
-                    "description": "Type of secret configured for access to the Git repo. Must be one of ssh, cookiefile, gcenode, token, gcpserviceaccount or none. The validation of this is case-sensitive. Required.",
+                    "description": "Required. Type of secret configured for access to the Git repo. Must be one of ssh, cookiefile, gcenode, token, gcpserviceaccount, githubapp or none. The validation of this is case-sensitive.",
                     "type": "string"
                 },
                 "syncBranch": {
-                    "description": "The branch of the repository to sync from. Default: master.",
+                    "description": "Optional. The branch of the repository to sync from. Default: master.",
                     "type": "string"
                 },
                 "syncRepo": {
-                    "description": "The URL of the Git repository to use as the source of truth.",
+                    "description": "Required. The URL of the Git repository to use as the source of truth.",
                     "type": "string"
                 },
                 "syncRev": {
-                    "description": "Git revision (tag or hash) to check out. Default HEAD.",
+                    "description": "Optional. Git revision (tag or hash) to check out. Default HEAD.",
                     "type": "string"
                 },
                 "syncWaitSecs": {
-                    "description": "Period in seconds between consecutive syncs. Default: 15.",
+                    "description": "Optional. Period in seconds between consecutive syncs. Default: 15.",
                     "format": "int64",
                     "type": "string"
                 }
@@ -3216,22 +3632,23 @@
                 "binauthz": {
                     "$ref": "ConfigManagementBinauthzConfig",
                     "deprecated": true,
-                    "description": "Binauthz conifguration for the cluster. Deprecated: This field will be ignored and should not be set."
+                    "description": "Optional. Binauthz conifguration for the cluster. Deprecated: This field will be ignored and should not be set."
                 },
                 "cluster": {
-                    "description": "The user-specified cluster name used by Config Sync cluster-name-selector annotation or ClusterSelector, for applying configs to only a subset of clusters. Omit this field if the cluster's fleet membership name is used by Config Sync cluster-name-selector annotation or ClusterSelector. Set this field if a name different from the cluster's fleet membership name is used by Config Sync cluster-name-selector annotation or ClusterSelector.",
+                    "description": "Optional. The user-specified cluster name used by Config Sync cluster-name-selector annotation or ClusterSelector, for applying configs to only a subset of clusters. Omit this field if the cluster's fleet membership name is used by Config Sync cluster-name-selector annotation or ClusterSelector. Set this field if a name different from the cluster's fleet membership name is used by Config Sync cluster-name-selector annotation or ClusterSelector.",
                     "type": "string"
                 },
                 "configSync": {
                     "$ref": "ConfigManagementConfigSync",
-                    "description": "Config Sync configuration for the cluster."
+                    "description": "Optional. Config Sync configuration for the cluster."
                 },
                 "hierarchyController": {
                     "$ref": "ConfigManagementHierarchyControllerConfig",
-                    "description": "Hierarchy Controller configuration for the cluster."
+                    "deprecated": true,
+                    "description": "Optional. Hierarchy Controller configuration for the cluster. Deprecated: Configuring Hierarchy Controller through the configmanagement feature is no longer recommended. Use https://github.com/kubernetes-sigs/hierarchical-namespaces instead."
                 },
                 "management": {
-                    "description": "Enables automatic Feature management.",
+                    "description": "Optional. Enables automatic Feature management.",
                     "enum": [
                         "MANAGEMENT_UNSPECIFIED",
                         "MANAGEMENT_AUTOMATIC",
@@ -3246,10 +3663,11 @@
                 },
                 "policyController": {
                     "$ref": "ConfigManagementPolicyController",
-                    "description": "Policy Controller configuration for the cluster."
+                    "deprecated": true,
+                    "description": "Optional. Policy Controller configuration for the cluster. Deprecated: Configuring Policy Controller through the configmanagement feature is no longer recommended. Use the policycontroller feature instead."
                 },
                 "version": {
-                    "description": "Version of ACM installed.",
+                    "description": "Optional. Version of ACM installed.",
                     "type": "string"
                 }
             },
@@ -3261,31 +3679,43 @@
             "properties": {
                 "binauthzState": {
                     "$ref": "ConfigManagementBinauthzState",
-                    "description": "Binauthz status"
+                    "description": "Output only. Binauthz status",
+                    "readOnly": true
                 },
                 "clusterName": {
-                    "description": "This field is set to the `cluster_name` field of the Membership Spec if it is not empty. Otherwise, it is set to the cluster's fleet membership name.",
+                    "description": "Output only. This field is set to the `cluster_name` field of the Membership Spec if it is not empty. Otherwise, it is set to the cluster's fleet membership name.",
+                    "readOnly": true,
                     "type": "string"
                 },
                 "configSyncState": {
                     "$ref": "ConfigManagementConfigSyncState",
-                    "description": "Current sync status"
+                    "description": "Output only. Current sync status",
+                    "readOnly": true
                 },
                 "hierarchyControllerState": {
                     "$ref": "ConfigManagementHierarchyControllerState",
-                    "description": "Hierarchy Controller status"
+                    "description": "Output only. Hierarchy Controller status",
+                    "readOnly": true
+                },
+                "kubernetesApiServerVersion": {
+                    "description": "Output only. The Kubernetes API server version of the cluster.",
+                    "readOnly": true,
+                    "type": "string"
                 },
                 "membershipSpec": {
                     "$ref": "ConfigManagementMembershipSpec",
-                    "description": "Membership configuration in the cluster. This represents the actual state in the cluster, while the MembershipSpec in the FeatureSpec represents the intended state"
+                    "description": "Output only. Membership configuration in the cluster. This represents the actual state in the cluster, while the MembershipSpec in the FeatureSpec represents the intended state",
+                    "readOnly": true
                 },
                 "operatorState": {
                     "$ref": "ConfigManagementOperatorState",
-                    "description": "Current install status of ACM's Operator"
+                    "description": "Output only. Current install status of ACM's Operator",
+                    "readOnly": true
                 },
                 "policyControllerState": {
                     "$ref": "ConfigManagementPolicyControllerState",
-                    "description": "PolicyController status"
+                    "description": "Output only. PolicyController status",
+                    "readOnly": true
                 }
             },
             "type": "object"
@@ -3295,23 +3725,23 @@
             "id": "ConfigManagementOciConfig",
             "properties": {
                 "gcpServiceAccountEmail": {
-                    "description": "The Google Cloud Service Account Email used for auth when secret_type is gcpServiceAccount.",
+                    "description": "Optional. The Google Cloud Service Account Email used for auth when secret_type is gcpServiceAccount.",
                     "type": "string"
                 },
                 "policyDir": {
-                    "description": "The absolute path of the directory that contains the local resources. Default: the root directory of the image.",
+                    "description": "Optional. The absolute path of the directory that contains the local resources. Default: the root directory of the image.",
                     "type": "string"
                 },
                 "secretType": {
-                    "description": "Type of secret configured for access to the Git repo.",
+                    "description": "Required. Type of secret configured for access to the OCI repo. Must be one of gcenode, gcpserviceaccount, k8sserviceaccount or none. The validation of this is case-sensitive.",
                     "type": "string"
                 },
                 "syncRepo": {
-                    "description": "The OCI image repository URL for the package to sync from. e.g. `LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/PACKAGE_NAME`.",
+                    "description": "Required. The OCI image repository URL for the package to sync from. e.g. `LOCATION-docker.pkg.dev/PROJECT_ID/REPOSITORY_NAME/PACKAGE_NAME`.",
                     "type": "string"
                 },
                 "syncWaitSecs": {
-                    "description": "Period in seconds between consecutive syncs. Default: 15.",
+                    "description": "Optional. Period in seconds between consecutive syncs. Default: 15.",
                     "format": "int64",
                     "type": "string"
                 }
@@ -3599,6 +4029,10 @@
                     "$ref": "BinaryAuthorizationConfig",
                     "description": "Optional. Enable/Disable binary authorization features for the cluster."
                 },
+                "compliancePostureConfig": {
+                    "$ref": "CompliancePostureConfig",
+                    "description": "Optional. Enable/Disable Compliance Posture features for the cluster. Note that on UpdateFleet, only full replacement of this field is allowed. Users are not allowed for partial updates through field mask."
+                },
                 "securityPostureConfig": {
                     "$ref": "SecurityPostureConfig",
                     "description": "Enable/Disable Security Posture features for the cluster."
@@ -3621,6 +4055,35 @@
             "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
             "properties": {},
+            "type": "object"
+        },
+        "ExcludedCluster": {
+            "description": "An excluded cluster from the rollout.",
+            "id": "ExcludedCluster",
+            "properties": {
+                "membership": {
+                    "description": "Output only. The name of the fleet Membership resource associated to the excluded cluster.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "reason": {
+                    "description": "Output only. The reason for excluding the cluster from the rollout.",
+                    "enum": [
+                        "REASON_UNSPECIFIED",
+                        "EXCLUDED_BY_FILTER",
+                        "ALREADY_UPGRADED",
+                        "VERSION_TOO_OLD"
+                    ],
+                    "enumDescriptions": [
+                        "Default value.",
+                        "The cluster was excluded by the rollout filter.",
+                        "The cluster was already upgraded.",
+                        "The cluster version is too old."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "Expr": {
@@ -3647,7 +4110,7 @@
             "type": "object"
         },
         "Feature": {
-            "description": "Feature represents the settings and status of any Hub Feature.",
+            "description": "Feature represents the settings and status of any Fleet Feature.",
             "id": "Feature",
             "properties": {
                 "createTime": {
@@ -3715,12 +4178,20 @@
                 },
                 "spec": {
                     "$ref": "CommonFeatureSpec",
-                    "description": "Optional. Hub-wide Feature configuration. If this Feature does not support any Hub-wide configuration, this field may be unused."
+                    "description": "Optional. Fleet-wide Feature configuration. If this Feature does not support any Fleet-wide configuration, this field may be unused."
                 },
                 "state": {
                     "$ref": "CommonFeatureState",
-                    "description": "Output only. The Hub-wide Feature state.",
+                    "description": "Output only. The Fleet-wide Feature state.",
                     "readOnly": true
+                },
+                "unreachable": {
+                    "description": "Output only. List of locations that could not be reached while fetching this feature.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 },
                 "updateTime": {
                     "description": "Output only. When the Feature resource was last updated.",
@@ -3732,7 +4203,7 @@
             "type": "object"
         },
         "FeatureResourceState": {
-            "description": "FeatureResourceState describes the state of a Feature *resource* in the GkeHub API. See `FeatureState` for the \"running state\" of the Feature in the Hub and across Memberships.",
+            "description": "FeatureResourceState describes the state of a Feature *resource* in the GkeHub API. See `FeatureState` for the \"running state\" of the Feature in the Fleet and across Memberships.",
             "id": "FeatureResourceState",
             "properties": {
                 "state": {
@@ -3747,9 +4218,9 @@
                     ],
                     "enumDescriptions": [
                         "State is unknown or not set.",
-                        "The Feature is being enabled, and the Feature resource is being created. Once complete, the corresponding Feature will be enabled in this Hub.",
-                        "The Feature is enabled in this Hub, and the Feature resource is fully available.",
-                        "The Feature is being disabled in this Hub, and the Feature resource is being deleted.",
+                        "The Feature is being enabled, and the Feature resource is being created. Once complete, the corresponding Feature will be enabled in this Fleet.",
+                        "The Feature is enabled in this Fleet, and the Feature resource is fully available.",
+                        "The Feature is being disabled in this Fleet, and the Feature resource is being deleted.",
                         "The Feature resource is being updated.",
                         "The Feature resource is being updated by the Hub Service."
                     ],
@@ -3786,6 +4257,21 @@
                     "description": "The time this status and any related Feature-specific details were updated.",
                     "format": "google-datetime",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "FeatureUpdate": {
+            "description": "Feature config to use for Rollout.",
+            "id": "FeatureUpdate",
+            "properties": {
+                "binaryAuthorizationConfig": {
+                    "$ref": "BinaryAuthorizationConfig",
+                    "description": "Optional. Configuration for Binary Authorization."
+                },
+                "securityPostureConfig": {
+                    "$ref": "SecurityPostureConfig",
+                    "description": "Optional. Configuration for Security Posture."
                 }
             },
             "type": "object"
@@ -4154,6 +4640,22 @@
             },
             "type": "object"
         },
+        "IdentityServiceDiagnosticInterface": {
+            "description": "Configuration options for the AIS diagnostic interface.",
+            "id": "IdentityServiceDiagnosticInterface",
+            "properties": {
+                "enabled": {
+                    "description": "Determines whether to enable the diagnostic interface.",
+                    "type": "boolean"
+                },
+                "expirationTime": {
+                    "description": "Determines the expiration time of the diagnostic interface enablement. When reached, requests to the interface would be automatically rejected.",
+                    "format": "google-datetime",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "IdentityServiceGoogleConfig": {
             "description": "Configuration for the Google Plugin Auth flow.",
             "id": "IdentityServiceGoogleConfig",
@@ -4188,8 +4690,12 @@
             "description": "Holds non-protocol-related configuration options.",
             "id": "IdentityServiceIdentityServiceOptions",
             "properties": {
+                "diagnosticInterface": {
+                    "$ref": "IdentityServiceDiagnosticInterface",
+                    "description": "Configuration options for the AIS diagnostic interface."
+                },
                 "sessionDuration": {
-                    "description": "Optional. Determines the lifespan of STS tokens issued by Anthos Identity Service.",
+                    "description": "Determines the lifespan of STS tokens issued by Anthos Identity Service.",
                     "format": "google-duration",
                     "type": "string"
                 }
@@ -4695,6 +5201,13 @@
                         "$ref": "Operation"
                     },
                     "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -4711,6 +5224,42 @@
                     "description": "The list of permitted Scopes",
                     "items": {
                         "$ref": "Scope"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "ListRolloutSequencesResponse": {
+            "description": "Response message for listing rollout sequences.",
+            "id": "ListRolloutSequencesResponse",
+            "properties": {
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                },
+                "rolloutSequences": {
+                    "description": "The rollout sequences from the specified parent resource.",
+                    "items": {
+                        "$ref": "RolloutSequence"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "ListRolloutsResponse": {
+            "description": "Response message for listing rollouts.",
+            "id": "ListRolloutsResponse",
+            "properties": {
+                "nextPageToken": {
+                    "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+                    "type": "string"
+                },
+                "rollouts": {
+                    "description": "The rollouts from the specified parent resource.",
+                    "items": {
+                        "$ref": "Rollout"
                     },
                     "type": "array"
                 }
@@ -4813,6 +5362,21 @@
                     "$ref": "Authority",
                     "description": "Optional. How to identify workloads from this Membership. See the documentation on Workload Identity for more details: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity"
                 },
+                "clusterTier": {
+                    "description": "Output only. The tier of the cluster.",
+                    "enum": [
+                        "CLUSTER_TIER_UNSPECIFIED",
+                        "STANDARD",
+                        "ENTERPRISE"
+                    ],
+                    "enumDescriptions": [
+                        "The ClusterTier is not set.",
+                        "The ClusterTier is standard.",
+                        "The ClusterTier is enterprise."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "createTime": {
                     "description": "Output only. When the Membership was created.",
                     "format": "google-datetime",
@@ -4842,12 +5406,25 @@
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "description": "Optional. Labels for this membership.",
+                    "description": "Optional. Labels for this membership. These labels are not leveraged by multi-cluster features, instead, we prefer cluster labels, which can be set on GKE cluster or other cluster types.",
                     "type": "object"
                 },
                 "lastConnectionTime": {
                     "description": "Output only. For clusters using Connect, the timestamp of the most recent connection established with Google Cloud. This time is updated every several minutes, not continuously. For clusters that do not use GKE Connect, or that have never connected successfully, this field will be unset.",
                     "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "membershipType": {
+                    "description": "Output only. The type of the membership.",
+                    "enum": [
+                        "MEMBERSHIP_TYPE_UNSPECIFIED",
+                        "LIGHTWEIGHT"
+                    ],
+                    "enumDescriptions": [
+                        "The MembershipType is not set.",
+                        "The membership supports only lightweight compatible features."
+                    ],
                     "readOnly": true,
                     "type": "string"
                 },
@@ -4997,13 +5574,9 @@
             "type": "object"
         },
         "MembershipFeatureSpec": {
-            "description": "MembershipFeatureSpec contains configuration information for a single Membership. NOTE: Please use snake case in your feature name.",
+            "description": "MembershipFeatureSpec contains configuration information for a single Membership.",
             "id": "MembershipFeatureSpec",
             "properties": {
-                "anthosobservability": {
-                    "$ref": "AnthosObservabilityMembershipSpec",
-                    "description": "Anthos Observability-specific spec"
-                },
                 "cloudbuild": {
                     "$ref": "MembershipSpec",
                     "description": "Cloud Build-specific spec"
@@ -5383,7 +5956,7 @@
                     "type": "string"
                 },
                 "cancelRequested": {
-                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have google.longrunning.Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
                     "readOnly": true,
                     "type": "boolean"
                 },
@@ -5903,6 +6476,26 @@
             },
             "type": "object"
         },
+        "RBACRoleBindingActuationFeatureSpec": {
+            "description": "**RBAC RoleBinding Actuation**: The Hub-wide input for the RBACRoleBindingActuation feature.",
+            "id": "RBACRoleBindingActuationFeatureSpec",
+            "properties": {
+                "allowedCustomRoles": {
+                    "description": "The list of allowed custom roles (ClusterRoles). If a ClusterRole is not part of this list, it cannot be used in a Scope RBACRoleBinding. If a ClusterRole in this list is in use, it cannot be removed from the list.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "RBACRoleBindingActuationFeatureState": {
+            "description": "**RBAC RoleBinding Actuation**: An empty state left as an example Hub-wide Feature state.",
+            "id": "RBACRoleBindingActuationFeatureState",
+            "properties": {},
+            "type": "object"
+        },
         "RBACRoleBindingLifecycleState": {
             "description": "RBACRoleBindingLifecycleState describes the state of a RbacRoleBinding resource.",
             "id": "RBACRoleBindingLifecycleState",
@@ -5934,11 +6527,13 @@
             "id": "ResourceManifest",
             "properties": {
                 "clusterScoped": {
-                    "description": "Whether the resource provided in the manifest is `cluster_scoped`. If unset, the manifest is assumed to be namespace scoped. This field is used for REST mapping when applying the resource in a cluster.",
+                    "description": "Output only. Whether the resource provided in the manifest is `cluster_scoped`. If unset, the manifest is assumed to be namespace scoped. This field is used for REST mapping when applying the resource in a cluster.",
+                    "readOnly": true,
                     "type": "boolean"
                 },
                 "manifest": {
-                    "description": "YAML manifest of the resource.",
+                    "description": "Output only. YAML manifest of the resource.",
+                    "readOnly": true,
                     "type": "string"
                 }
             },
@@ -5952,8 +6547,12 @@
                     "description": "Optional. The Connect agent version to use for connect_resources. Defaults to the latest GKE Connect version. The version must be a currently supported version, obsolete versions will be rejected.",
                     "type": "string"
                 },
+                "k8sGitVersion": {
+                    "description": "Optional. Git version of the Kubernetes cluster. This is only used to gate the Connect Agent migration to svc.id.goog on GDC-SO 1.33.100 patch and above.",
+                    "type": "string"
+                },
                 "k8sVersion": {
-                    "description": "Optional. Major version of the Kubernetes cluster. This is only used to determine which version to use for the CustomResourceDefinition resources, `apiextensions/v1beta1` or`apiextensions/v1`.",
+                    "description": "Optional. Major and minor version of the Kubernetes cluster. This is only used to determine which version to use for the CustomResourceDefinition resources, `apiextensions/v1beta1` or`apiextensions/v1`.",
                     "type": "string"
                 },
                 "v1beta1Crd": {
@@ -5967,6 +6566,10 @@
             "description": "Role is the type for Kubernetes roles",
             "id": "Role",
             "properties": {
+                "customRole": {
+                    "description": "Optional. custom_role is the name of a custom KubernetesClusterRole to use.",
+                    "type": "string"
+                },
                 "predefinedRole": {
                     "description": "predefined_role is the Kubernetes default role to use",
                     "enum": [
@@ -5984,6 +6587,331 @@
                         "ANTHOS_SUPPORT gives Google Support read-only access to a number of cluster resources."
                     ],
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Rollout": {
+            "description": "Rollout contains the Rollout metadata and configuration.",
+            "id": "Rollout",
+            "properties": {
+                "completeTime": {
+                    "description": "Output only. The timestamp at which the Rollout was completed.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "createTime": {
+                    "description": "Output only. The timestamp at which the Rollout was created.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "deleteTime": {
+                    "description": "Output only. The timestamp at the Rollout was deleted.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "displayName": {
+                    "description": "Optional. Human readable display name of the Rollout.",
+                    "type": "string"
+                },
+                "etag": {
+                    "description": "Output only. etag of the Rollout Ex. abc1234",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "excludedClusters": {
+                    "description": "Optional. Output only. The excluded clusters from the rollout.",
+                    "items": {
+                        "$ref": "ExcludedCluster"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "feature": {
+                    "$ref": "FeatureUpdate",
+                    "description": "Optional. Feature config to use for Rollout."
+                },
+                "labels": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Labels for this Rollout.",
+                    "type": "object"
+                },
+                "membershipStates": {
+                    "additionalProperties": {
+                        "$ref": "RolloutMembershipState"
+                    },
+                    "description": "Output only. States of upgrading control plane or node pool targets of a single cluster (GKE Hub membership) that's part of this Rollout. The key is the membership name of the cluster. The value is the state of the cluster.",
+                    "readOnly": true,
+                    "type": "object"
+                },
+                "name": {
+                    "description": "Identifier. The full, unique resource name of this Rollout in the format of `projects/{project}/locations/global/rollouts/{rollout}`.",
+                    "type": "string"
+                },
+                "rolloutSequence": {
+                    "description": "Optional. Immutable. The full, unique resource name of the rollout sequence that initiatied this Rollout. In the format of `projects/{project}/locations/global/rolloutSequences/{rollout_sequence}`. Empty for user initiated rollouts.",
+                    "type": "string"
+                },
+                "schedule": {
+                    "$ref": "Schedule",
+                    "description": "Output only. The schedule of the Rollout.",
+                    "readOnly": true
+                },
+                "stages": {
+                    "description": "Output only. The stages of the Rollout. Note: this is only populated for google-initiated rollouts.",
+                    "items": {
+                        "$ref": "RolloutStage"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "state": {
+                    "description": "Output only. State specifies various states of the Rollout.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "RUNNING",
+                        "PAUSED",
+                        "CANCELLED",
+                        "COMPLETED",
+                        "SCHEDULED"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified state.",
+                        "The Rollout is running.",
+                        "The Rollout is paused.",
+                        "The Rollout is in a failure terminal state.",
+                        "The Rollout is in a terminal state.",
+                        "The Rollout is scheduled to start."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "stateReason": {
+                    "description": "Output only. A human-readable description explaining the reason for the current state.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "uid": {
+                    "description": "Output only. Google-generated UUID for this resource. This is unique across all Rollout resources. If a Rollout resource is deleted and another resource with the same name is created, it gets a different uid.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. The timestamp at which the Rollout was last updated.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "versionUpgrade": {
+                    "$ref": "VersionUpgrade",
+                    "description": "Optional. Config for version upgrade of clusters. Note: Currently for GDCE clusters only."
+                }
+            },
+            "type": "object"
+        },
+        "RolloutMembershipState": {
+            "description": "Metadata about single cluster (GKE Hub membership) that's part of this Rollout.",
+            "id": "RolloutMembershipState",
+            "properties": {
+                "lastUpdateTime": {
+                    "description": "Optional. Output only. The time this status and any related Rollout-specific details for the membership were updated.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "stageAssignment": {
+                    "description": "Output only. The stage assignment of this cluster in this rollout.",
+                    "format": "int32",
+                    "readOnly": true,
+                    "type": "integer"
+                },
+                "targets": {
+                    "description": "Output only. The targets of the rollout - clusters or node pools that are being upgraded. All targets belongs to the same cluster, identified by the membership name (key of membership_states map).",
+                    "items": {
+                        "$ref": "RolloutTarget"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "RolloutSequence": {
+            "description": "RolloutSequence defines the desired order of upgrades.",
+            "id": "RolloutSequence",
+            "properties": {
+                "createTime": {
+                    "description": "Output only. The timestamp at which the Rollout Sequence was created.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "deleteTime": {
+                    "description": "Output only. The timestamp at the Rollout Sequence was deleted.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "displayName": {
+                    "description": "Optional. Human readable display name of the Rollout Sequence.",
+                    "type": "string"
+                },
+                "etag": {
+                    "description": "Output only. etag of the Rollout Sequence Ex. abc1234",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "labels": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. Labels for this Rollout Sequence.",
+                    "type": "object"
+                },
+                "name": {
+                    "description": "Identifier. Name of the rollout sequence in the format of: projects/{PROJECT_ID}/locations/global/rolloutSequences/{NAME}",
+                    "type": "string"
+                },
+                "stages": {
+                    "description": "Required. Ordered list of stages that constitutes this Rollout.",
+                    "items": {
+                        "$ref": "Stage"
+                    },
+                    "type": "array"
+                },
+                "uid": {
+                    "description": "Output only. Google-generated UUID for this resource. This is unique across all Rollout Sequence resources. If a Rollout Sequence resource is deleted and another resource with the same name is created, it gets a different uid.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "updateTime": {
+                    "description": "Output only. The timestamp at which the Rollout Sequence was last updated.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "RolloutStage": {
+            "description": "Stage represents a single stage in the Rollout.",
+            "id": "RolloutStage",
+            "properties": {
+                "endTime": {
+                    "description": "Optional. Output only. The time at which the wave ended.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "soakDuration": {
+                    "description": "Optional. Duration to soak after this wave before starting the next wave.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
+                "stageNumber": {
+                    "description": "Output only. The wave number to which this status applies.",
+                    "format": "int32",
+                    "readOnly": true,
+                    "type": "integer"
+                },
+                "startTime": {
+                    "description": "Optional. Output only. The time at which the wave started.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Output only. The state of the wave.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "PENDING",
+                        "RUNNING",
+                        "SOAKING",
+                        "COMPLETED",
+                        "FORCED_SOAKING"
+                    ],
+                    "enumDescriptions": [
+                        "Default value.",
+                        "The wave is pending.",
+                        "The wave is running.",
+                        "The wave is soaking.",
+                        "The wave is completed.",
+                        "The wave is force soaking."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "RolloutTarget": {
+            "description": "Metadata about the status of targets (clusters or node pools) involved in the Rollout.",
+            "id": "RolloutTarget",
+            "properties": {
+                "cluster": {
+                    "description": "Optional. Output only. The resource link of the Cluster resource upgraded in this Rollout. It is formatted as: ///projects//locations//clusters/. I.e. for GKE clusters, it is formatted as: //container.googleapis.com/projects//locations//clusters/. For GDCE, it is formatted as: //edgecontainer.googleapis.com/projects//locations//clusters/.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "nodePool": {
+                    "description": "Optional. Output only. The resource link of the NodePool resource upgraded in this Rollout. It is formatted as: ///projects//locations//clusters//nodePools/.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "operation": {
+                    "description": "Optional. Output only. The operation resource name performing the mutation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "reason": {
+                    "description": "Optional. Output only. A human-readable description of the current status.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "state": {
+                    "description": "Output only. The high-level, machine-readable status of this Rollout for the target.",
+                    "enum": [
+                        "STATE_UNSPECIFIED",
+                        "PENDING",
+                        "RUNNING",
+                        "FAILED",
+                        "SUCCEEDED",
+                        "PAUSED",
+                        "REMOVED",
+                        "INELIGIBLE"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified state.",
+                        "The Rollout is pending for the target.",
+                        "The Rollout is running for the target.",
+                        "The Rollout failed for the target.",
+                        "The Rollout succeeded for the target.",
+                        "The Rollout is paused for the target.",
+                        "The target was removed from the Rollout.",
+                        "The target is ineligible for the Rollout."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Schedule": {
+            "description": "Schedule represents the schedule of the Rollout.",
+            "id": "Schedule",
+            "properties": {
+                "waves": {
+                    "description": "Output only. The schedule of each wave in the Rollout.",
+                    "items": {
+                        "$ref": "WaveSchedule"
+                    },
+                    "readOnly": true,
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -6133,13 +7061,18 @@
                     "enum": [
                         "CODE_UNSPECIFIED",
                         "MESH_IAM_PERMISSION_DENIED",
+                        "MESH_IAM_CROSS_PROJECT_PERMISSION_DENIED",
                         "CNI_CONFIG_UNSUPPORTED",
                         "GKE_SANDBOX_UNSUPPORTED",
                         "NODEPOOL_WORKLOAD_IDENTITY_FEDERATION_REQUIRED",
                         "CNI_INSTALLATION_FAILED",
                         "CNI_POD_UNSCHEDULABLE",
+                        "CLUSTER_HAS_ZERO_NODES",
+                        "CANONICAL_SERVICE_ERROR",
                         "UNSUPPORTED_MULTIPLE_CONTROL_PLANES",
                         "VPCSC_GA_SUPPORTED",
+                        "DEPRECATED_SPEC_CONTROL_PLANE_MANAGEMENT",
+                        "DEPRECATED_SPEC_CONTROL_PLANE_MANAGEMENT_SAFE",
                         "CONFIG_APPLY_INTERNAL_ERROR",
                         "CONFIG_VALIDATION_ERROR",
                         "CONFIG_VALIDATION_WARNING",
@@ -6157,18 +7090,44 @@
                         "QUOTA_EXCEEDED_SERVICE_LB_POLICIES",
                         "QUOTA_EXCEEDED_HTTP_FILTERS",
                         "QUOTA_EXCEEDED_TCP_FILTERS",
-                        "QUOTA_EXCEEDED_NETWORK_ENDPOINT_GROUPS"
+                        "QUOTA_EXCEEDED_NETWORK_ENDPOINT_GROUPS",
+                        "LEGACY_MC_SECRETS",
+                        "WORKLOAD_IDENTITY_REQUIRED",
+                        "NON_STANDARD_BINARY_USAGE",
+                        "UNSUPPORTED_GATEWAY_CLASS",
+                        "MANAGED_CNI_NOT_ENABLED",
+                        "MODERNIZATION_SCHEDULED",
+                        "MODERNIZATION_IN_PROGRESS",
+                        "MODERNIZATION_COMPLETED",
+                        "MODERNIZATION_ABORTED",
+                        "MODERNIZATION_PREPARING",
+                        "MODERNIZATION_STALLED",
+                        "MODERNIZATION_PREPARED",
+                        "MODERNIZATION_MIGRATING_WORKLOADS",
+                        "MODERNIZATION_ROLLING_BACK_CLUSTER",
+                        "MODERNIZATION_WILL_BE_SCHEDULED",
+                        "MODERNIZATION_MANUAL",
+                        "MODERNIZATION_ELIGIBLE",
+                        "MODERNIZATION_MODERNIZING",
+                        "MODERNIZATION_MODERNIZED_SOAKING",
+                        "MODERNIZATION_FINALIZED",
+                        "MODERNIZATION_ROLLING_BACK_FLEET"
                     ],
                     "enumDescriptions": [
                         "Default Unspecified code",
                         "Mesh IAM permission denied error code",
+                        "Permission denied error code for cross-project",
                         "CNI config unsupported error code",
                         "GKE sandbox unsupported error code",
                         "Nodepool workload identity federation required error code",
                         "CNI installation failed error code",
                         "CNI pod unschedulable error code",
+                        "Cluster has zero node code",
+                        "Failure to reconcile CanonicalServices",
                         "Multiple control planes unsupported error code",
                         "VPC-SC GA is supported for this control plane.",
+                        "User is using deprecated ControlPlaneManagement and they have not yet set Management.",
+                        "User is using deprecated ControlPlaneManagement and they have already set Management.",
                         "Configuration (Istio/k8s resources) failed to apply due to internal error.",
                         "Configuration failed to be applied due to being invalid.",
                         "Encountered configuration(s) with possible unintended behavior or invalid configuration. These configs may not have been applied.",
@@ -6186,7 +7145,28 @@
                         "ServiceLBPolicy quota exceeded error code.",
                         "HTTPFilter quota exceeded error code.",
                         "TCPFilter quota exceeded error code.",
-                        "NetworkEndpointGroup quota exceeded error code."
+                        "NetworkEndpointGroup quota exceeded error code.",
+                        "Legacy istio secrets found for multicluster error code",
+                        "Workload identity required error code",
+                        "Non-standard binary usage error code",
+                        "Unsupported gateway class error code",
+                        "Managed CNI not enabled error code",
+                        "Modernization is scheduled for a cluster.",
+                        "Modernization is in progress for a cluster.",
+                        "Modernization is completed for a cluster.",
+                        "Modernization is aborted for a cluster.",
+                        "Preparing cluster so that its workloads can be migrated.",
+                        "Modernization is stalled for a cluster.",
+                        "Cluster has been prepared for its workloads to be migrated.",
+                        "Migrating the cluster's workloads to the new implementation.",
+                        "Rollback is in progress for modernization of a cluster.",
+                        "Modernization will be scheduled for a fleet.",
+                        "Fleet is opted out from automated modernization.",
+                        "Fleet is eligible for modernization.",
+                        "Modernization of one or more clusters in a fleet is in progress.",
+                        "Modernization of all the fleet's clusters is complete. Soaking before finalizing the modernization.",
+                        "Modernization is finalized for all clusters in a fleet. Rollback is no longer allowed.",
+                        "Rollback is in progress for modernization of all clusters in a fleet."
                     ],
                     "type": "string"
                 },
@@ -6255,7 +7235,8 @@
                         "ACTIVE",
                         "STALLED",
                         "NEEDS_ATTENTION",
-                        "DEGRADED"
+                        "DEGRADED",
+                        "DEPROVISIONING"
                     ],
                     "enumDescriptions": [
                         "Unspecified",
@@ -6265,7 +7246,8 @@
                         "ACTIVE means that the component is ready for use.",
                         "STALLED means that provisioning could not be done.",
                         "NEEDS_ATTENTION means that the component is ready, but some user intervention is required. (For example that the user should migrate workloads to a new control plane revision.)",
-                        "DEGRADED means that the component is ready, but operating in a degraded state."
+                        "DEGRADED means that the component is ready, but operating in a degraded state.",
+                        "DEPROVISIONING means that deprovisioning is in progress."
                     ],
                     "type": "string"
                 }
@@ -6293,7 +7275,8 @@
                         "ACTIVE",
                         "STALLED",
                         "NEEDS_ATTENTION",
-                        "DEGRADED"
+                        "DEGRADED",
+                        "DEPROVISIONING"
                     ],
                     "enumDescriptions": [
                         "Unspecified",
@@ -6303,7 +7286,8 @@
                         "ACTIVE means that the component is ready for use.",
                         "STALLED means that provisioning could not be done.",
                         "NEEDS_ATTENTION means that the component is ready, but some user intervention is required. (For example that the user should migrate workloads to a new control plane revision.)",
-                        "DEGRADED means that the component is ready, but operating in a degraded state."
+                        "DEGRADED means that the component is ready, but operating in a degraded state.",
+                        "DEPROVISIONING means that deprovisioning is in progress."
                     ],
                     "type": "string"
                 }
@@ -6314,6 +7298,20 @@
             "description": "**Service Mesh**: Spec for a single Membership for the servicemesh feature",
             "id": "ServiceMeshMembershipSpec",
             "properties": {
+                "configApi": {
+                    "description": "Optional. Specifies the API that will be used for configuring the mesh workloads.",
+                    "enum": [
+                        "CONFIG_API_UNSPECIFIED",
+                        "CONFIG_API_ISTIO",
+                        "CONFIG_API_GATEWAY"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified",
+                        "Use the Istio API for configuration.",
+                        "Use the K8s Gateway API for configuration."
+                    ],
+                    "type": "string"
+                },
                 "controlPlane": {
                     "deprecated": true,
                     "description": "Deprecated: use `management` instead Enables automatic control plane management.",
@@ -6330,16 +7328,18 @@
                     "type": "string"
                 },
                 "management": {
-                    "description": "Enables automatic Service Mesh management.",
+                    "description": "Optional. Enables automatic Service Mesh management.",
                     "enum": [
                         "MANAGEMENT_UNSPECIFIED",
                         "MANAGEMENT_AUTOMATIC",
-                        "MANAGEMENT_MANUAL"
+                        "MANAGEMENT_MANUAL",
+                        "MANAGEMENT_NOT_INSTALLED"
                     ],
                     "enumDescriptions": [
                         "Unspecified",
                         "Google should manage my Service Mesh for the cluster.",
-                        "User will manually configure their service mesh components."
+                        "User will manually configure their service mesh components.",
+                        "Google should remove any managed Service Mesh components from this cluster and deprovision any resources."
                     ],
                     "type": "string"
                 }
@@ -6397,6 +7397,29 @@
                 "updateMask": {
                     "description": "OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only the fields in the mask will be modified. If no mask is provided, the following default mask is used: `paths: \"bindings, etag\"`",
                     "format": "google-fieldmask",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Stage": {
+            "description": "Rollout stage.",
+            "id": "Stage",
+            "properties": {
+                "clusterSelector": {
+                    "$ref": "ClusterSelector",
+                    "description": "Optional. Filter members of fleets (above) to a subset of clusters. If not specified, all clusters in the fleets are selected."
+                },
+                "fleetProjects": {
+                    "description": "Required. List of Fleet projects to select the clusters from. Expected format: projects/{project}",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "soakDuration": {
+                    "description": "Optional. Soak time after upgrading all the clusters in the stage.",
+                    "format": "google-duration",
                     "type": "string"
                 }
             },
@@ -6467,6 +7490,58 @@
                 },
                 "kind": {
                     "description": "Kind of the resource (e.g. Deployment).",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "VersionUpgrade": {
+            "description": "Config for version upgrade of clusters.",
+            "id": "VersionUpgrade",
+            "properties": {
+                "desiredVersion": {
+                    "description": "Optional. Desired version of the component.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Optional. Type of version upgrade specifies which component should be upgraded.",
+                    "enum": [
+                        "TYPE_UNSPECIFIED",
+                        "TYPE_CONTROL_PLANE",
+                        "TYPE_NODE_POOL",
+                        "TYPE_CONFIG_SYNC"
+                    ],
+                    "enumDescriptions": [
+                        "Default value.",
+                        "Control plane upgrade.",
+                        "Node pool upgrade.",
+                        "Config Sync upgrade."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "WaveSchedule": {
+            "description": "WaveSchedule represents the schedule of a single rollout wave.",
+            "id": "WaveSchedule",
+            "properties": {
+                "waveEndTime": {
+                    "description": "Output only. The time at which the wave ends.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "waveNumber": {
+                    "description": "Output only. The wave number to which this schedule applies.",
+                    "format": "int32",
+                    "readOnly": true,
+                    "type": "integer"
+                },
+                "waveStartTime": {
+                    "description": "Output only. The time at which the wave starts.",
+                    "format": "google-datetime",
+                    "readOnly": true,
                     "type": "string"
                 }
             },

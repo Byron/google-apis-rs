@@ -118,6 +118,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -210,6 +216,34 @@
                                         "https://www.googleapis.com/auth/cloud-platform"
                                     ]
                                 },
+                                "commitFunctionUpgradeAsGen2": {
+                                    "description": "Commits a function upgrade from GCF Gen1 to GCF Gen2. This action deletes the Gen1 function, leaving the Gen2 function active and manageable by the GCFv2 API.",
+                                    "flatPath": "v2alpha/projects/{projectsId}/locations/{locationsId}/functions/{functionsId}:commitFunctionUpgradeAsGen2",
+                                    "httpMethod": "POST",
+                                    "id": "cloudfunctions.projects.locations.functions.commitFunctionUpgradeAsGen2",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the function for which upgrade should be committed to Gen2.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/functions/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2alpha/{+name}:commitFunctionUpgradeAsGen2",
+                                    "request": {
+                                        "$ref": "CommitFunctionUpgradeAsGen2Request"
+                                    },
+                                    "response": {
+                                        "$ref": "Operation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
                                 "create": {
                                     "description": "Creates a new function. If a function with the given name already exists in the specified project, the long running operation will return `ALREADY_EXISTS` error.",
                                     "flatPath": "v2alpha/projects/{projectsId}/locations/{locationsId}/functions",
@@ -261,6 +295,34 @@
                                         }
                                     },
                                     "path": "v2alpha/{+name}",
+                                    "response": {
+                                        "$ref": "Operation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform"
+                                    ]
+                                },
+                                "detachFunction": {
+                                    "description": "Detaches 2nd Gen function to Cloud Run function.",
+                                    "flatPath": "v2alpha/projects/{projectsId}/locations/{locationsId}/functions/{functionsId}:detachFunction",
+                                    "httpMethod": "POST",
+                                    "id": "cloudfunctions.projects.locations.functions.detachFunction",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the function for which should be detached.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/locations/[^/]+/functions/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v2alpha/{+name}:detachFunction",
+                                    "request": {
+                                        "$ref": "DetachFunctionRequest"
+                                    },
                                     "response": {
                                         "$ref": "Operation"
                                     },
@@ -400,7 +462,7 @@
                                             "type": "string"
                                         },
                                         "orderBy": {
-                                            "description": "The sorting order of the resources returned. Value should be a comma separated list of fields. The default sorting oder is ascending. See https://google.aip.dev/132#ordering.",
+                                            "description": "The sorting order of the resources returned. Value should be a comma separated list of fields. The default sorting order is ascending. See https://google.aip.dev/132#ordering.",
                                             "location": "query",
                                             "type": "string"
                                         },
@@ -448,7 +510,7 @@
                                             "type": "string"
                                         },
                                         "updateMask": {
-                                            "description": "The list of fields to be updated. If no field mask is provided, all provided fields in the request will be updated.",
+                                            "description": "The list of fields to be updated. If no field mask is provided, all fields will be updated.",
                                             "format": "google-fieldmask",
                                             "location": "query",
                                             "type": "string"
@@ -665,6 +727,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v2alpha/{+name}/operations",
@@ -716,7 +783,7 @@
             }
         }
     },
-    "revision": "20240620",
+    "revision": "20251204",
     "rootUrl": "https://cloudfunctions.googleapis.com/",
     "schemas": {
         "AbortFunctionUpgradeRequest": {
@@ -814,7 +881,8 @@
                     "type": "string"
                 },
                 "dockerRegistry": {
-                    "description": "Docker Registry to use for this deployment. This configuration is only applicable to 1st Gen functions, 2nd Gen functions can only use Artifact Registry. If unspecified, it defaults to `ARTIFACT_REGISTRY`. If `docker_repository` field is specified, this field should either be left unspecified or set to `ARTIFACT_REGISTRY`.",
+                    "deprecated": true,
+                    "description": "Docker Registry to use for this deployment. This configuration is only applicable to 1st Gen functions, 2nd Gen functions can only use Artifact Registry. Deprecated: as of March 2025, `CONTAINER_REGISTRY` option is no longer available in response to Container Registry's deprecation: https://cloud.google.com/artifact-registry/docs/transition/transition-from-gcr Please use Artifact Registry instead, which is the default choice. If unspecified, it defaults to `ARTIFACT_REGISTRY`. If `docker_repository` field is specified, this field should either be left unspecified or set to `ARTIFACT_REGISTRY`.",
                     "enum": [
                         "DOCKER_REGISTRY_UNSPECIFIED",
                         "CONTAINER_REGISTRY",
@@ -828,7 +896,7 @@
                     "type": "string"
                 },
                 "dockerRepository": {
-                    "description": "Repository in Artifact Registry to which the function docker image will be pushed after it is built by Cloud Build. If specified by user, it is created and managed by user with a customer managed encryption key. Otherwise, GCF will create and use a repository named 'gcf-artifacts' for every deployed region. It must match the pattern `projects/{project}/locations/{location}/repositories/{repository}`. Cross-project repositories are not supported. Cross-location repositories are not supported. Repository format must be 'DOCKER'.",
+                    "description": "Repository in Artifact Registry to which the function docker image will be pushed after it is built by Cloud Build. If specified by user, it is created and managed by user with a customer managed encryption key. Otherwise, GCF will create and use a repository named 'gcf-artifacts' for every deployed region. It must match the pattern `projects/{project}/locations/{location}/repositories/{repository}`. Repository format must be 'DOCKER'.",
                     "type": "string"
                 },
                 "entryPoint": {
@@ -850,7 +918,7 @@
                     "type": "string"
                 },
                 "serviceAccount": {
-                    "description": "[Preview] Service account to be used for building the container",
+                    "description": "Service account to be used for building the container. The format of this field is `projects/{projectId}/serviceAccounts/{serviceAccountEmail}`.",
                     "type": "string"
                 },
                 "source": {
@@ -871,6 +939,12 @@
                     "type": "string"
                 }
             },
+            "type": "object"
+        },
+        "CommitFunctionUpgradeAsGen2Request": {
+            "description": "Request for the `CommitFunctionUpgradeAsGen2` method.",
+            "id": "CommitFunctionUpgradeAsGen2Request",
+            "properties": {},
             "type": "object"
         },
         "CommitFunctionUpgradeRequest": {
@@ -897,6 +971,34 @@
                     "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.",
                     "format": "int32",
                     "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "DetachFunctionRequest": {
+            "description": "Request for the `DetachFunction` method.",
+            "id": "DetachFunctionRequest",
+            "properties": {},
+            "type": "object"
+        },
+        "DirectVpcNetworkInterface": {
+            "description": "The Direct VPC network interface. This is mutually exclusive with VPC Connector.",
+            "id": "DirectVpcNetworkInterface",
+            "properties": {
+                "network": {
+                    "description": "Optional. The name of the VPC network to which the function will be connected. Specify either a VPC network or a subnet, or both. If you specify only a network, the subnet uses the same name as the network.",
+                    "type": "string"
+                },
+                "subnetwork": {
+                    "description": "Optional. The name of the VPC subnetwork that the Cloud Function resource will get IPs from. Specify either a VPC network or a subnet, or both. If both network and subnetwork are specified, the given VPC subnetwork must belong to the given VPC network. If subnetwork is not specified, the subnetwork with the same name with the network will be used.",
+                    "type": "string"
+                },
+                "tags": {
+                    "description": "Optional. Network tags applied to this Cloud Function resource.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -1037,7 +1139,7 @@
                     "description": "An Eventarc trigger managed by Google Cloud Functions that fires events in response to a condition in another service."
                 },
                 "kmsKeyName": {
-                    "description": "[Preview] Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources. It must match the pattern `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`.",
+                    "description": "Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources. It must match the pattern `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`.",
                     "type": "string"
                 },
                 "labels": {
@@ -1050,6 +1152,11 @@
                 "name": {
                     "description": "A user-defined name of the function. Function names must be unique globally and match pattern `projects/*/locations/*/functions/*`",
                     "type": "string"
+                },
+                "satisfiesPzi": {
+                    "description": "Output only. Reserved for future use.",
+                    "readOnly": true,
+                    "type": "boolean"
                 },
                 "satisfiesPzs": {
                     "description": "Output only. Reserved for future use.",
@@ -1068,7 +1175,9 @@
                         "FAILED",
                         "DEPLOYING",
                         "DELETING",
-                        "UNKNOWN"
+                        "UNKNOWN",
+                        "DETACHING",
+                        "DETACH_FAILED"
                     ],
                     "enumDescriptions": [
                         "Not specified. Invalid state.",
@@ -1076,7 +1185,9 @@
                         "Function deployment failed and the function is not serving.",
                         "Function is being created or updated.",
                         "Function is being deleted.",
-                        "Function deployment failed and the function serving state is undefined. The function should be updated or deleted to move it out of this state."
+                        "Function deployment failed and the function serving state is undefined. The function should be updated or deleted to move it out of this state.",
+                        "Function is being detached.",
+                        "Function detach failed and the function is still serving."
                     ],
                     "readOnly": true,
                     "type": "string"
@@ -1144,7 +1255,7 @@
                     "type": "string"
                 },
                 "kmsKeyName": {
-                    "description": "[Preview] Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function source code objects in intermediate Cloud Storage buckets. When you generate an upload url and upload your source code, it gets copied to an intermediate Cloud Storage bucket. The source code is then copied to a versioned directory in the sources bucket in the consumer project during the function deployment. It must match the pattern `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`. The Google Cloud Functions service account (service-{project_number}@gcf-admin-robot.iam.gserviceaccount.com) must be granted the role 'Cloud KMS CryptoKey Encrypter/Decrypter (roles/cloudkms.cryptoKeyEncrypterDecrypter)' on the Key/KeyRing/Project/Organization (least access preferred).",
+                    "description": "Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function source code objects in intermediate Cloud Storage buckets. When you generate an upload url and upload your source code, it gets copied to an intermediate Cloud Storage bucket. The source code is then copied to a versioned directory in the sources bucket in the consumer project during the function deployment. It must match the pattern `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`. The Google Cloud Functions service account (service-{project_number}@gcf-admin-robot.iam.gserviceaccount.com) must be granted the role 'Cloud KMS CryptoKey Encrypter/Decrypter (roles/cloudkms.cryptoKeyEncrypterDecrypter)' on the Key/KeyRing/Project/Organization (least access preferred).",
                     "type": "string"
                 }
             },
@@ -1160,207 +1271,6 @@
                 },
                 "uploadUrl": {
                     "description": "The generated Google Cloud Storage signed URL that should be used for a function source code upload. The uploaded file should be a zip archive which contains a function.",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleCloudFunctionsV2LocationMetadata": {
-            "description": "Extra GCF specific location information.",
-            "id": "GoogleCloudFunctionsV2LocationMetadata",
-            "properties": {
-                "environments": {
-                    "description": "The Cloud Function environments this location supports.",
-                    "items": {
-                        "enum": [
-                            "ENVIRONMENT_UNSPECIFIED",
-                            "GEN_1",
-                            "GEN_2"
-                        ],
-                        "enumDescriptions": [
-                            "Unspecified",
-                            "Gen 1",
-                            "Gen 2"
-                        ],
-                        "type": "string"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleCloudFunctionsV2OperationMetadata": {
-            "description": "Represents the metadata of the long-running operation.",
-            "id": "GoogleCloudFunctionsV2OperationMetadata",
-            "properties": {
-                "apiVersion": {
-                    "description": "API version used to start the operation.",
-                    "type": "string"
-                },
-                "cancelRequested": {
-                    "description": "Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have google.longrunning.Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
-                    "type": "boolean"
-                },
-                "createTime": {
-                    "description": "The time the operation was created.",
-                    "format": "google-datetime",
-                    "type": "string"
-                },
-                "endTime": {
-                    "description": "The time the operation finished running.",
-                    "format": "google-datetime",
-                    "type": "string"
-                },
-                "operationType": {
-                    "description": "The operation type.",
-                    "enum": [
-                        "OPERATIONTYPE_UNSPECIFIED",
-                        "CREATE_FUNCTION",
-                        "UPDATE_FUNCTION",
-                        "DELETE_FUNCTION",
-                        "REDIRECT_FUNCTION_UPGRADE_TRAFFIC",
-                        "ROLLBACK_FUNCTION_UPGRADE_TRAFFIC",
-                        "SETUP_FUNCTION_UPGRADE_CONFIG",
-                        "ABORT_FUNCTION_UPGRADE",
-                        "COMMIT_FUNCTION_UPGRADE"
-                    ],
-                    "enumDescriptions": [
-                        "Unspecified",
-                        "CreateFunction",
-                        "UpdateFunction",
-                        "DeleteFunction",
-                        "RedirectFunctionUpgradeTraffic",
-                        "RollbackFunctionUpgradeTraffic",
-                        "SetupFunctionUpgradeConfig",
-                        "AbortFunctionUpgrade",
-                        "CommitFunctionUpgrade"
-                    ],
-                    "type": "string"
-                },
-                "requestResource": {
-                    "additionalProperties": {
-                        "description": "Properties of the object. Contains field @type with type URL.",
-                        "type": "any"
-                    },
-                    "description": "The original request that started the operation.",
-                    "type": "object"
-                },
-                "sourceToken": {
-                    "description": "An identifier for Firebase function sources. Disclaimer: This field is only supported for Firebase function deployments.",
-                    "type": "string"
-                },
-                "stages": {
-                    "description": "Mechanism for reporting in-progress stages",
-                    "items": {
-                        "$ref": "GoogleCloudFunctionsV2Stage"
-                    },
-                    "type": "array"
-                },
-                "statusDetail": {
-                    "description": "Human-readable status of the operation, if any.",
-                    "type": "string"
-                },
-                "target": {
-                    "description": "Server-defined resource path for the target of the operation.",
-                    "type": "string"
-                },
-                "verb": {
-                    "description": "Name of the verb executed by the operation.",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleCloudFunctionsV2Stage": {
-            "description": "Each Stage of the deployment process",
-            "id": "GoogleCloudFunctionsV2Stage",
-            "properties": {
-                "message": {
-                    "description": "Message describing the Stage",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "Name of the Stage. This will be unique for each Stage.",
-                    "enum": [
-                        "NAME_UNSPECIFIED",
-                        "ARTIFACT_REGISTRY",
-                        "BUILD",
-                        "SERVICE",
-                        "TRIGGER",
-                        "SERVICE_ROLLBACK",
-                        "TRIGGER_ROLLBACK"
-                    ],
-                    "enumDescriptions": [
-                        "Not specified. Invalid name.",
-                        "Artifact Regsitry Stage",
-                        "Build Stage",
-                        "Service Stage",
-                        "Trigger Stage",
-                        "Service Rollback Stage",
-                        "Trigger Rollback Stage"
-                    ],
-                    "type": "string"
-                },
-                "resource": {
-                    "description": "Resource of the Stage",
-                    "type": "string"
-                },
-                "resourceUri": {
-                    "description": "Link to the current Stage resource",
-                    "type": "string"
-                },
-                "state": {
-                    "description": "Current state of the Stage",
-                    "enum": [
-                        "STATE_UNSPECIFIED",
-                        "NOT_STARTED",
-                        "IN_PROGRESS",
-                        "COMPLETE"
-                    ],
-                    "enumDescriptions": [
-                        "Not specified. Invalid state.",
-                        "Stage has not started.",
-                        "Stage is in progress.",
-                        "Stage has completed."
-                    ],
-                    "type": "string"
-                },
-                "stateMessages": {
-                    "description": "State messages from the current Stage.",
-                    "items": {
-                        "$ref": "GoogleCloudFunctionsV2StateMessage"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleCloudFunctionsV2StateMessage": {
-            "description": "Informational messages about the state of the Cloud Function or Operation.",
-            "id": "GoogleCloudFunctionsV2StateMessage",
-            "properties": {
-                "message": {
-                    "description": "The message.",
-                    "type": "string"
-                },
-                "severity": {
-                    "description": "Severity of the state message.",
-                    "enum": [
-                        "SEVERITY_UNSPECIFIED",
-                        "ERROR",
-                        "WARNING",
-                        "INFO"
-                    ],
-                    "enumDescriptions": [
-                        "Not specified. Invalid severity.",
-                        "ERROR-level severity.",
-                        "WARNING-level severity.",
-                        "INFO-level severity."
-                    ],
-                    "type": "string"
-                },
-                "type": {
-                    "description": "One-word CamelCase type of the state message.",
                     "type": "string"
                 }
             },
@@ -1398,6 +1308,10 @@
                     "description": "API version used to start the operation.",
                     "type": "string"
                 },
+                "buildName": {
+                    "description": "The build name of the function for create and update operations.",
+                    "type": "string"
+                },
                 "cancelRequested": {
                     "description": "Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have google.longrunning.Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
                     "type": "boolean"
@@ -1406,6 +1320,11 @@
                     "description": "The time the operation was created.",
                     "format": "google-datetime",
                     "type": "string"
+                },
+                "customIamRoleDetected": {
+                    "description": "Output only. Whether a custom IAM role binding was detected during the upgrade.",
+                    "readOnly": true,
+                    "type": "boolean"
                 },
                 "endTime": {
                     "description": "The time the operation finished running.",
@@ -1423,7 +1342,9 @@
                         "ROLLBACK_FUNCTION_UPGRADE_TRAFFIC",
                         "SETUP_FUNCTION_UPGRADE_CONFIG",
                         "ABORT_FUNCTION_UPGRADE",
-                        "COMMIT_FUNCTION_UPGRADE"
+                        "COMMIT_FUNCTION_UPGRADE",
+                        "DETACH_FUNCTION",
+                        "COMMIT_FUNCTION_UPGRADE_AS_GEN2"
                     ],
                     "enumDescriptions": [
                         "Unspecified",
@@ -1434,7 +1355,9 @@
                         "RollbackFunctionUpgradeTraffic",
                         "SetupFunctionUpgradeConfig",
                         "AbortFunctionUpgrade",
-                        "CommitFunctionUpgrade"
+                        "CommitFunctionUpgrade",
+                        "DetachFunction",
+                        "CommitFunctionUpgradeAsGen2"
                     ],
                     "type": "string"
                 },
@@ -1493,7 +1416,7 @@
                     ],
                     "enumDescriptions": [
                         "Not specified. Invalid name.",
-                        "Artifact Regsitry Stage",
+                        "Artifact Registry Stage",
                         "Build Stage",
                         "Service Stage",
                         "Trigger Stage",
@@ -1539,207 +1462,6 @@
         "GoogleCloudFunctionsV2alphaStateMessage": {
             "description": "Informational messages about the state of the Cloud Function or Operation.",
             "id": "GoogleCloudFunctionsV2alphaStateMessage",
-            "properties": {
-                "message": {
-                    "description": "The message.",
-                    "type": "string"
-                },
-                "severity": {
-                    "description": "Severity of the state message.",
-                    "enum": [
-                        "SEVERITY_UNSPECIFIED",
-                        "ERROR",
-                        "WARNING",
-                        "INFO"
-                    ],
-                    "enumDescriptions": [
-                        "Not specified. Invalid severity.",
-                        "ERROR-level severity.",
-                        "WARNING-level severity.",
-                        "INFO-level severity."
-                    ],
-                    "type": "string"
-                },
-                "type": {
-                    "description": "One-word CamelCase type of the state message.",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleCloudFunctionsV2betaLocationMetadata": {
-            "description": "Extra GCF specific location information.",
-            "id": "GoogleCloudFunctionsV2betaLocationMetadata",
-            "properties": {
-                "environments": {
-                    "description": "The Cloud Function environments this location supports.",
-                    "items": {
-                        "enum": [
-                            "ENVIRONMENT_UNSPECIFIED",
-                            "GEN_1",
-                            "GEN_2"
-                        ],
-                        "enumDescriptions": [
-                            "Unspecified",
-                            "Gen 1",
-                            "Gen 2"
-                        ],
-                        "type": "string"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleCloudFunctionsV2betaOperationMetadata": {
-            "description": "Represents the metadata of the long-running operation.",
-            "id": "GoogleCloudFunctionsV2betaOperationMetadata",
-            "properties": {
-                "apiVersion": {
-                    "description": "API version used to start the operation.",
-                    "type": "string"
-                },
-                "cancelRequested": {
-                    "description": "Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have google.longrunning.Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
-                    "type": "boolean"
-                },
-                "createTime": {
-                    "description": "The time the operation was created.",
-                    "format": "google-datetime",
-                    "type": "string"
-                },
-                "endTime": {
-                    "description": "The time the operation finished running.",
-                    "format": "google-datetime",
-                    "type": "string"
-                },
-                "operationType": {
-                    "description": "The operation type.",
-                    "enum": [
-                        "OPERATIONTYPE_UNSPECIFIED",
-                        "CREATE_FUNCTION",
-                        "UPDATE_FUNCTION",
-                        "DELETE_FUNCTION",
-                        "REDIRECT_FUNCTION_UPGRADE_TRAFFIC",
-                        "ROLLBACK_FUNCTION_UPGRADE_TRAFFIC",
-                        "SETUP_FUNCTION_UPGRADE_CONFIG",
-                        "ABORT_FUNCTION_UPGRADE",
-                        "COMMIT_FUNCTION_UPGRADE"
-                    ],
-                    "enumDescriptions": [
-                        "Unspecified",
-                        "CreateFunction",
-                        "UpdateFunction",
-                        "DeleteFunction",
-                        "RedirectFunctionUpgradeTraffic",
-                        "RollbackFunctionUpgradeTraffic",
-                        "SetupFunctionUpgradeConfig",
-                        "AbortFunctionUpgrade",
-                        "CommitFunctionUpgrade"
-                    ],
-                    "type": "string"
-                },
-                "requestResource": {
-                    "additionalProperties": {
-                        "description": "Properties of the object. Contains field @type with type URL.",
-                        "type": "any"
-                    },
-                    "description": "The original request that started the operation.",
-                    "type": "object"
-                },
-                "sourceToken": {
-                    "description": "An identifier for Firebase function sources. Disclaimer: This field is only supported for Firebase function deployments.",
-                    "type": "string"
-                },
-                "stages": {
-                    "description": "Mechanism for reporting in-progress stages",
-                    "items": {
-                        "$ref": "GoogleCloudFunctionsV2betaStage"
-                    },
-                    "type": "array"
-                },
-                "statusDetail": {
-                    "description": "Human-readable status of the operation, if any.",
-                    "type": "string"
-                },
-                "target": {
-                    "description": "Server-defined resource path for the target of the operation.",
-                    "type": "string"
-                },
-                "verb": {
-                    "description": "Name of the verb executed by the operation.",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleCloudFunctionsV2betaStage": {
-            "description": "Each Stage of the deployment process",
-            "id": "GoogleCloudFunctionsV2betaStage",
-            "properties": {
-                "message": {
-                    "description": "Message describing the Stage",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "Name of the Stage. This will be unique for each Stage.",
-                    "enum": [
-                        "NAME_UNSPECIFIED",
-                        "ARTIFACT_REGISTRY",
-                        "BUILD",
-                        "SERVICE",
-                        "TRIGGER",
-                        "SERVICE_ROLLBACK",
-                        "TRIGGER_ROLLBACK"
-                    ],
-                    "enumDescriptions": [
-                        "Not specified. Invalid name.",
-                        "Artifact Regsitry Stage",
-                        "Build Stage",
-                        "Service Stage",
-                        "Trigger Stage",
-                        "Service Rollback Stage",
-                        "Trigger Rollback Stage"
-                    ],
-                    "type": "string"
-                },
-                "resource": {
-                    "description": "Resource of the Stage",
-                    "type": "string"
-                },
-                "resourceUri": {
-                    "description": "Link to the current Stage resource",
-                    "type": "string"
-                },
-                "state": {
-                    "description": "Current state of the Stage",
-                    "enum": [
-                        "STATE_UNSPECIFIED",
-                        "NOT_STARTED",
-                        "IN_PROGRESS",
-                        "COMPLETE"
-                    ],
-                    "enumDescriptions": [
-                        "Not specified. Invalid state.",
-                        "Stage has not started.",
-                        "Stage is in progress.",
-                        "Stage has completed."
-                    ],
-                    "type": "string"
-                },
-                "stateMessages": {
-                    "description": "State messages from the current Stage.",
-                    "items": {
-                        "$ref": "GoogleCloudFunctionsV2betaStateMessage"
-                    },
-                    "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "GoogleCloudFunctionsV2betaStateMessage": {
-            "description": "Informational messages about the state of the Cloud Function or Operation.",
-            "id": "GoogleCloudFunctionsV2betaStateMessage",
             "properties": {
                 "message": {
                     "description": "The message.",
@@ -1823,6 +1545,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -2205,6 +1934,27 @@
                     "description": "Optional. The binary authorization policy to be checked when deploying the Cloud Run service.",
                     "type": "string"
                 },
+                "directVpcEgress": {
+                    "description": "Optional. Egress settings for direct VPC. If not provided, it defaults to VPC_EGRESS_PRIVATE_RANGES_ONLY.",
+                    "enum": [
+                        "DIRECT_VPC_EGRESS_UNSPECIFIED",
+                        "VPC_EGRESS_PRIVATE_RANGES_ONLY",
+                        "VPC_EGRESS_ALL_TRAFFIC"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified.",
+                        "Sends only traffic to internal addresses through the VPC network.",
+                        "Sends all outbound traffic through the VPC network."
+                    ],
+                    "type": "string"
+                },
+                "directVpcNetworkInterface": {
+                    "description": "Optional. The Direct VPC network interface for the Cloud Function. Currently only a single Direct VPC is supported.",
+                    "items": {
+                        "$ref": "DirectVpcNetworkInterface"
+                    },
+                    "type": "array"
+                },
                 "environmentVariables": {
                     "additionalProperties": {
                         "type": "string"
@@ -2335,7 +2085,12 @@
         "SetupFunctionUpgradeConfigRequest": {
             "description": "Request for the `SetupFunctionUpgradeConfig` method.",
             "id": "SetupFunctionUpgradeConfigRequest",
-            "properties": {},
+            "properties": {
+                "triggerServiceAccount": {
+                    "description": "Optional. The trigger's service account. The service account must have permission to invoke Cloud Run services, the permission is `run.routes.invoke`. If empty, defaults to the Compute Engine default service account: `{project_number}-compute@developer.gserviceaccount.com`.",
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "Source": {
@@ -2456,7 +2211,7 @@
             "type": "object"
         },
         "UpgradeInfo": {
-            "description": "Information related to: * A function's eligibility for 1st Gen to 2nd Gen migration * Current state of migration for function undergoing migration.",
+            "description": "Information related to: * A function's eligibility for 1st Gen to 2nd Gen migration. * Current state of migration for function undergoing migration.",
             "id": "UpgradeInfo",
             "properties": {
                 "buildConfig": {
@@ -2476,6 +2231,7 @@
                     "enum": [
                         "UPGRADE_STATE_UNSPECIFIED",
                         "ELIGIBLE_FOR_2ND_GEN_UPGRADE",
+                        "INELIGIBLE_FOR_UPGRADE_UNTIL_REDEPLOYMENT",
                         "UPGRADE_OPERATION_IN_PROGRESS",
                         "SETUP_FUNCTION_UPGRADE_CONFIG_SUCCESSFUL",
                         "SETUP_FUNCTION_UPGRADE_CONFIG_ERROR",
@@ -2483,11 +2239,13 @@
                         "REDIRECT_FUNCTION_UPGRADE_TRAFFIC_SUCCESSFUL",
                         "REDIRECT_FUNCTION_UPGRADE_TRAFFIC_ERROR",
                         "ROLLBACK_FUNCTION_UPGRADE_TRAFFIC_ERROR",
-                        "COMMIT_FUNCTION_UPGRADE_ERROR"
+                        "COMMIT_FUNCTION_UPGRADE_ERROR",
+                        "COMMIT_FUNCTION_UPGRADE_ERROR_ROLLBACK_SAFE"
                     ],
                     "enumDescriptions": [
                         "Unspecified state. Most functions are in this upgrade state.",
-                        "Functions in this state are eligible for 1st Gen -> 2nd Gen upgrade.",
+                        "Functions in this state are eligible for 1st Gen upgrade.",
+                        "Functions in this state are ineligible for 1st Gen upgrade until redeployment with newer runtime.",
                         "An upgrade related operation is in progress.",
                         "SetupFunctionUpgradeConfig API was successful and a 2nd Gen function has been created based on 1st Gen function instance.",
                         "SetupFunctionUpgradeConfig API was un-successful.",
@@ -2495,7 +2253,8 @@
                         "RedirectFunctionUpgradeTraffic API was successful and traffic is served by 2nd Gen function stack.",
                         "RedirectFunctionUpgradeTraffic API was un-successful.",
                         "RollbackFunctionUpgradeTraffic API was un-successful.",
-                        "CommitFunctionUpgrade API was un-successful."
+                        "CommitFunctionUpgrade API was un-successful and 1st gen function might have broken.",
+                        "CommitFunctionUpgrade API was un-successful but safe to rollback traffic or abort."
                     ],
                     "type": "string"
                 }

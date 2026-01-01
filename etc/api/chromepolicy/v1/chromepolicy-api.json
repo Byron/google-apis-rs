@@ -3,10 +3,10 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/chrome.management.policy": {
-                    "description": "See, edit, create or delete policies applied to Chrome OS and Chrome Browsers managed within your organization"
+                    "description": "See, edit, create or delete policies applied to ChromeOS and Chrome Browsers managed within your organization"
                 },
                 "https://www.googleapis.com/auth/chrome.management.policy.readonly": {
-                    "description": "See policies applied to Chrome OS and Chrome Browsers managed within your organization"
+                    "description": "See policies applied to ChromeOS and Chrome Browsers managed within your organization"
                 }
             }
         }
@@ -557,7 +557,7 @@
             }
         }
     },
-    "revision": "20240625",
+    "revision": "20251217",
     "rootUrl": "https://chromepolicy.googleapis.com/",
     "schemas": {
         "GoogleChromePolicyVersionsV1AdditionalTargetKeyName": {
@@ -893,7 +893,7 @@
             "type": "object"
         },
         "GoogleChromePolicyVersionsV1NetworkSetting": {
-            "description": "A network setting contains network configurations.",
+            "description": "A network setting contains network configurations. It adheres to the PolicyAPI formats defined under the namespace chrome.networks.{wifi/ethernet/cellular/vpn}.Details",
             "id": "GoogleChromePolicyVersionsV1NetworkSetting",
             "properties": {
                 "policySchema": {
@@ -966,7 +966,7 @@
                     "type": "string"
                 },
                 "scheduledToDeprecatePolicies": {
-                    "description": "Corresponding to deprecated_in_favor_of, the fully qualified namespace(s) of the old policies that will be deprecated because of introduction of this policy. This field should not be manually set but will be set and exposed through PolicyAPI automatically.",
+                    "description": "Corresponding to deprecated_in_favor_of, the fully qualified namespace(s) of the old policies that will be deprecated because of introduction of this policy.",
                     "items": {
                         "type": "string"
                     },
@@ -1629,6 +1629,20 @@
                         "$ref": "Proto2OneofDescriptorProto"
                     },
                     "type": "array"
+                },
+                "visibility": {
+                    "description": "Support for `export` and `local` keywords on enums.",
+                    "enum": [
+                        "VISIBILITY_UNSET",
+                        "VISIBILITY_LOCAL",
+                        "VISIBILITY_EXPORT"
+                    ],
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1645,6 +1659,20 @@
                         "$ref": "Proto2EnumValueDescriptorProto"
                     },
                     "type": "array"
+                },
+                "visibility": {
+                    "description": "Support for `export` and `local` keywords on enums.",
+                    "enum": [
+                        "VISIBILITY_UNSET",
+                        "VISIBILITY_LOCAL",
+                        "VISIBILITY_EXPORT"
+                    ],
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -1761,7 +1789,7 @@
             "properties": {
                 "editionDeprecated": {
                     "deprecated": true,
-                    "description": "BEGIN GOOGLE-INTERNAL TODO(b/297898292) Deprecate and remove this field in favor of enums. END GOOGLE-INTERNAL",
+                    "description": "copybara:strip_begin TODO(b/297898292) Deprecate and remove this field in favor of enums. copybara:strip_end",
                     "type": "string"
                 },
                 "enumType": {
@@ -1781,12 +1809,19 @@
                     "description": "file name, relative to root of source tree",
                     "type": "string"
                 },
+                "optionDependency": {
+                    "description": "Names of files imported by this file purely for the purpose of providing option extensions. These are excluded from the dependency list above.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
                 "package": {
                     "description": "e.g. \"foo\", \"foo.bar\", etc.",
                     "type": "string"
                 },
                 "syntax": {
-                    "description": "The syntax of the proto file. The supported values are \"proto2\", \"proto3\", and \"editions\". If `edition` is present, this value must be \"editions\".",
+                    "description": "The syntax of the proto file. The supported values are \"proto2\", \"proto3\", and \"editions\". If `edition` is present, this value must be \"editions\". WARNING: This field should only be used by protobuf plugins or special cases like the proto compiler. Other uses are discouraged and developers should rely on the protoreflect APIs for their client language.",
                     "type": "string"
                 }
             },

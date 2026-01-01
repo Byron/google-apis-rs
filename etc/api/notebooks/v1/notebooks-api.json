@@ -143,6 +143,12 @@
                                 "name"
                             ],
                             "parameters": {
+                                "extraLocationTypes": {
+                                    "description": "Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.",
+                                    "location": "query",
+                                    "repeated": true,
+                                    "type": "string"
+                                },
                                 "filter": {
                                     "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                                     "location": "query",
@@ -1201,7 +1207,7 @@
                         "operations": {
                             "methods": {
                                 "cancel": {
-                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                                     "httpMethod": "POST",
                                     "id": "notebooks.projects.locations.operations.cancel",
@@ -1309,6 +1315,11 @@
                                             "description": "The standard list page token.",
                                             "location": "query",
                                             "type": "string"
+                                        },
+                                        "returnPartialSuccess": {
+                                            "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                                            "location": "query",
+                                            "type": "boolean"
                                         }
                                     },
                                     "path": "v1/{+name}/operations",
@@ -2008,7 +2019,7 @@
             }
         }
     },
-    "revision": "20240613",
+    "revision": "20251203",
     "rootUrl": "https://notebooks.googleapis.com/",
     "schemas": {
         "AcceleratorConfig": {
@@ -2035,6 +2046,8 @@
                         "NVIDIA_TESLA_T4_VWS",
                         "NVIDIA_TESLA_P100_VWS",
                         "NVIDIA_TESLA_P4_VWS",
+                        "NVIDIA_H100_80GB",
+                        "NVIDIA_H100_MEGA_80GB",
                         "TPU_V2",
                         "TPU_V3"
                     ],
@@ -2051,6 +2064,8 @@
                         "Accelerator type is NVIDIA Tesla T4 Virtual Workstations.",
                         "Accelerator type is NVIDIA Tesla P100 Virtual Workstations.",
                         "Accelerator type is NVIDIA Tesla P4 Virtual Workstations.",
+                        "Accelerator type is NVIDIA H100 80GB.",
+                        "Accelerator type is NVIDIA H100 Mega 80GB.",
                         "(Coming soon) Accelerator type is TPU V2.",
                         "(Coming soon) Accelerator type is TPU V3."
                     ],
@@ -2128,7 +2143,7 @@
                     "description": "Required. Defines flags that are used to run the diagnostic tool"
                 },
                 "timeoutMinutes": {
-                    "description": "Optional. Maxmium amount of time in minutes before the operation times out.",
+                    "description": "Optional. Maximum amount of time in minutes before the operation times out.",
                     "format": "int32",
                     "type": "integer"
                 }
@@ -2144,7 +2159,7 @@
                     "description": "Required. Defines flags that are used to run the diagnostic tool"
                 },
                 "timeoutMinutes": {
-                    "description": "Optional. Maxmium amount of time in minutes before the operation times out.",
+                    "description": "Optional. Maximum amount of time in minutes before the operation times out.",
                     "format": "int32",
                     "type": "integer"
                 }
@@ -2702,7 +2717,7 @@
                     "type": "object"
                 },
                 "machineType": {
-                    "description": "Required. The [Compute Engine machine type](https://cloud.google.com/compute/docs/machine-types) of this instance.",
+                    "description": "Required. The [Compute Engine machine type](https://cloud.google.com/compute/docs/machine-resource) of this instance.",
                     "type": "string"
                 },
                 "metadata": {
@@ -2818,7 +2833,7 @@
                     "type": "string"
                 },
                 "tags": {
-                    "description": "Optional. The Compute Engine tags to add to runtime (see [Tagging instances](https://cloud.google.com/compute/docs/label-or-tag-resources#tags)).",
+                    "description": "Optional. The Compute Engine network tags to add to runtime (see [Add network tags](https://cloud.google.com/vpc/docs/add-remove-network-tags)).",
                     "items": {
                         "type": "string"
                     },
@@ -3036,6 +3051,13 @@
                     "description": "A list of operations that matches the specified filter in the request.",
                     "items": {
                         "$ref": "Operation"
+                    },
+                    "type": "array"
+                },
+                "unreachable": {
+                    "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+                    "items": {
+                        "type": "string"
                     },
                     "type": "array"
                 }
@@ -3356,7 +3378,7 @@
                     "type": "string"
                 },
                 "requestedCancellation": {
-                    "description": "Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "description": "Identifies whether the user has requested cancellation of the operation. Operations that have successfully been cancelled have google.longrunning.Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                     "type": "boolean"
                 },
                 "statusMessage": {
@@ -3964,9 +3986,9 @@
                     "enumDescriptions": [
                         "Unspecified state.",
                         "The job is executing normally.",
-                        "The job is paused by the user. It will not execute. A user can intentionally pause the job using PauseJobRequest.",
+                        "The job is paused by the user. It will not execute. A user can intentionally pause the job using [Cloud Scheduler](https://cloud.google.com/scheduler/docs/creating#pause).",
                         "The job is disabled by the system due to error. The user cannot directly set a job to be disabled.",
-                        "The job state resulting from a failed CloudScheduler.UpdateJob operation. To recover a job from this state, retry CloudScheduler.UpdateJob until a successful response is received.",
+                        "The job state resulting from a failed [CloudScheduler.UpdateJob](https://cloud.google.com/scheduler/docs/creating#edit) operation. To recover a job from this state, retry [CloudScheduler.UpdateJob](https://cloud.google.com/scheduler/docs/creating#edit) until a successful response is received.",
                         "The schedule resource is being created.",
                         "The schedule resource is being deleted."
                     ],
@@ -4058,6 +4080,8 @@
                         "NVIDIA_TESLA_T4_VWS",
                         "NVIDIA_TESLA_P100_VWS",
                         "NVIDIA_TESLA_P4_VWS",
+                        "NVIDIA_H100_80GB",
+                        "NVIDIA_H100_MEGA_80GB",
                         "TPU_V2",
                         "TPU_V3"
                     ],
@@ -4074,6 +4098,8 @@
                         "Accelerator type is NVIDIA Tesla T4 Virtual Workstations.",
                         "Accelerator type is NVIDIA Tesla P100 Virtual Workstations.",
                         "Accelerator type is NVIDIA Tesla P4 Virtual Workstations.",
+                        "Accelerator type is NVIDIA H100 80GB.",
+                        "Accelerator type is NVIDIA H100 Mega 80GB.",
                         "(Coming soon) Accelerator type is TPU V2.",
                         "(Coming soon) Accelerator type is TPU V3."
                     ],
@@ -4101,7 +4127,7 @@
             "id": "SetInstanceMachineTypeRequest",
             "properties": {
                 "machineType": {
-                    "description": "Required. The [Compute Engine machine type](https://cloud.google.com/compute/docs/machine-types).",
+                    "description": "Required. The [Compute Engine machine type](https://cloud.google.com/compute/docs/machine-resource).",
                     "type": "string"
                 }
             },
@@ -4553,7 +4579,7 @@
                     "type": "string"
                 },
                 "tags": {
-                    "description": "Optional. The Compute Engine tags to add to runtime (see [Tagging instances](https://cloud.google.com/compute/docs/label-or-tag-resources#tags)).",
+                    "description": "Optional. The Compute Engine network tags to add to runtime (see [Add network tags](https://cloud.google.com/vpc/docs/add-remove-network-tags)).",
                     "items": {
                         "type": "string"
                     },

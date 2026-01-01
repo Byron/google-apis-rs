@@ -636,7 +636,7 @@
                                 "operations": {
                                     "methods": {
                                         "cancel": {
-                                            "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                            "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
                                             "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/osPolicyAssignments/{osPolicyAssignmentsId}/operations/{operationsId}:cancel",
                                             "httpMethod": "POST",
                                             "id": "osconfig.projects.locations.osPolicyAssignments.operations.cancel",
@@ -1083,7 +1083,7 @@
             }
         }
     },
-    "revision": "20240623",
+    "revision": "20251213",
     "rootUrl": "https://osconfig.googleapis.com/",
     "schemas": {
         "AptSettings": {
@@ -1495,6 +1495,94 @@
             },
             "type": "object"
         },
+        "GoogleCloudOsconfigV2__OperationMetadata": {
+            "description": "Represents the metadata of the long-running operation.",
+            "id": "GoogleCloudOsconfigV2__OperationMetadata",
+            "properties": {
+                "apiVersion": {
+                    "description": "Output only. API version used to start the operation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "createTime": {
+                    "description": "Output only. The time the operation was created.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "Output only. The time the operation finished running.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "requestedCancellation": {
+                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "statusMessage": {
+                    "description": "Output only. Human-readable status of the operation, if any.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "target": {
+                    "description": "Output only. Server-defined resource path for the target of the operation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "verb": {
+                    "description": "Output only. Name of the verb executed by the operation.",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudOsconfigV2beta__OperationMetadata": {
+            "description": "Represents the metadata of the long-running operation.",
+            "id": "GoogleCloudOsconfigV2beta__OperationMetadata",
+            "properties": {
+                "apiVersion": {
+                    "description": "Output only. API version used to start the operation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "createTime": {
+                    "description": "Output only. The time the operation was created.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "Output only. The time the operation finished running.",
+                    "format": "google-datetime",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "requestedCancellation": {
+                    "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                    "readOnly": true,
+                    "type": "boolean"
+                },
+                "statusMessage": {
+                    "description": "Output only. Human-readable status of the operation, if any.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "target": {
+                    "description": "Output only. Server-defined resource path for the target of the operation.",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "verb": {
+                    "description": "Output only. Name of the verb executed by the operation.",
+                    "readOnly": true,
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Inventory": {
             "description": "This API resource represents the available inventory data for a Compute Engine virtual machine (VM) instance at a given point in time. You can use this API resource to determine the inventory data of your VM. For more information, see [Information provided by OS inventory management](https://cloud.google.com/compute/docs/instances/os-inventory-management#data-collected).",
             "id": "Inventory",
@@ -1565,7 +1653,7 @@
                         "AVAILABLE_PACKAGE"
                     ],
                     "enumDescriptions": [
-                        "Invalid. An type must be specified.",
+                        "Invalid. A type must be specified.",
                         "This represents a package that is installed on the VM.",
                         "This represents an update that is available for a package."
                     ],
@@ -1965,6 +2053,13 @@
                     "type": "array"
                 }
             },
+            "type": "object"
+        },
+        "MessageSet": {
+            "deprecated": true,
+            "description": "This is proto2's version of MessageSet. DEPRECATED: DO NOT USE FOR NEW FIELDS. If you are using editions or proto2, please make your own extendable messages for your use case. If you are using proto3, please use `Any` instead. MessageSet was the implementation of extensions for proto1. When proto2 was introduced, extensions were implemented as a first-class feature. This schema for MessageSet was meant to be a \"bridge\" solution to migrate MessageSet-bearing messages from proto1 to proto2. This schema has been open-sourced only to facilitate the migration of Google products with MessageSet-bearing messages to open-source environments.",
+            "id": "MessageSet",
+            "properties": {},
             "type": "object"
         },
         "MonthlySchedule": {
@@ -2480,7 +2575,7 @@
                     "type": "string"
                 },
                 "outputFilePath": {
-                    "description": "Only recorded for enforce Exec. Path to an output file (that is created by this Exec) whose content will be recorded in OSPolicyResourceCompliance after a successful run. Absence or failure to read this file will result in this ExecResource being non-compliant. Output file size is limited to 100K bytes.",
+                    "description": "Only recorded for enforce Exec. Path to an output file (that is created by this Exec) whose content will be recorded in OSPolicyResourceCompliance after a successful run. Absence or failure to read this file will result in this ExecResource being non-compliant. Output file size is limited to 500K bytes.",
                     "type": "string"
                 },
                 "script": {
@@ -2966,6 +3061,10 @@
                     ],
                     "type": "string"
                 },
+                "skipUnpatchableVms": {
+                    "description": "Optional. Enables enhanced reporting for the patch job: 1. Allows the patch job to skip unpatchable instances, reporting them as `SKIPPED`. An instance can be unpatchable for two reasons: 1. The instance runs Container-Optimized OS (COS), which cannot be patched. 2. The instance is part of a managed instance group (MIG), and patching MIG instances is disabled in the patch job's configuration (PatchConfig.migInstancesAllowed is `false`). 2. Reports the patch job as `SUCCEEDED` if it completes without errors, even if some instances were `SKIPPED`. 3. Reports the patch job as `COMPLETED_WITH_INACTIVE_VMS` if it completes without errors, but some instances were `INACTIVE` and were not patched.",
+                    "type": "boolean"
+                },
                 "windowsUpdate": {
                     "$ref": "WindowsUpdateSettings",
                     "description": "Windows update settings. Use this override the default windows patch rules."
@@ -3175,6 +3274,7 @@
                         "INSTANCE_LOOKUP",
                         "PATCHING",
                         "SUCCEEDED",
+                        "COMPLETED_WITH_INACTIVE_VMS",
                         "COMPLETED_WITH_ERRORS",
                         "CANCELED",
                         "TIMED_OUT"
@@ -3185,6 +3285,7 @@
                         "The patch job is looking up instances to run the patch on.",
                         "Instances are being patched.",
                         "Patch job completed successfully.",
+                        "The patch job completed without errors, but some instances were inactive and therefore not patched.",
                         "Patch job completed but there were errors.",
                         "The patch job was canceled.",
                         "The patch job timed out."
@@ -3238,7 +3339,8 @@
                         "TIMED_OUT",
                         "RUNNING_PRE_PATCH_STEP",
                         "RUNNING_POST_PATCH_STEP",
-                        "NO_AGENT_DETECTED"
+                        "NO_AGENT_DETECTED",
+                        "SKIPPED"
                     ],
                     "enumDescriptions": [
                         "Unspecified.",
@@ -3256,7 +3358,8 @@
                         "The instance exceeded the time out while applying the patch.",
                         "The instance is running the pre-patch step.",
                         "The instance is running the post-patch step.",
-                        "The service could not detect the presence of the agent. Check to ensure that the agent is installed, running, and able to communicate with the service."
+                        "The service could not detect the presence of the agent. Check to ensure that the agent is installed, running, and able to communicate with the service.",
+                        "The instance was skipped during patching due to one of two reasons: 1. The instance runs Container-Optimized OS (COS), which cannot be patched. 2. The patch job's configuration prohibits patching on Managed Instance Groups (MIGs), and the instance is part of one."
                     ],
                     "type": "string"
                 }
@@ -3319,6 +3422,11 @@
                 },
                 "rebootingInstanceCount": {
                     "description": "Number of instances rebooting.",
+                    "format": "int64",
+                    "type": "string"
+                },
+                "skippedInstanceCount": {
+                    "description": "Number of instances that were skipped during patching.",
                     "format": "int64",
                     "type": "string"
                 },
@@ -3495,27 +3603,56 @@
             },
             "type": "object"
         },
+        "StatusProto": {
+            "description": "Wire-format for a Status object",
+            "id": "StatusProto",
+            "properties": {
+                "canonicalCode": {
+                    "description": "copybara:strip_begin(b/383363683) copybara:strip_end_and_replace optional int32 canonical_code = 6;",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "code": {
+                    "description": "Numeric code drawn from the space specified below. Often, this is the canonical error space, and code is drawn from google3/util/task/codes.proto copybara:strip_begin(b/383363683) copybara:strip_end_and_replace optional int32 code = 1;",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "message": {
+                    "description": "Detail message copybara:strip_begin(b/383363683) copybara:strip_end_and_replace optional string message = 3;",
+                    "type": "string"
+                },
+                "messageSet": {
+                    "$ref": "MessageSet",
+                    "description": "message_set associates an arbitrary proto message with the status. copybara:strip_begin(b/383363683) copybara:strip_end_and_replace optional proto2.bridge.MessageSet message_set = 5;"
+                },
+                "space": {
+                    "description": "copybara:strip_begin(b/383363683) Space to which this status belongs copybara:strip_end_and_replace optional string space = 2; // Space to which this status belongs",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "TimeOfDay": {
             "description": "Represents a time of day. The date and time zone are either not significant or are specified elsewhere. An API may choose to allow leap seconds. Related types are google.type.Date and `google.protobuf.Timestamp`.",
             "id": "TimeOfDay",
             "properties": {
                 "hours": {
-                    "description": "Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+                    "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "minutes": {
-                    "description": "Minutes of hour of day. Must be from 0 to 59.",
+                    "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "nanos": {
-                    "description": "Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.",
+                    "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "seconds": {
-                    "description": "Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.",
+                    "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
                     "format": "int32",
                     "type": "integer"
                 }
@@ -3527,11 +3664,11 @@
             "id": "TimeZone",
             "properties": {
                 "id": {
-                    "description": "IANA Time Zone Database time zone, e.g. \"America/New_York\".",
+                    "description": "IANA Time Zone Database time zone. For example \"America/New_York\".",
                     "type": "string"
                 },
                 "version": {
-                    "description": "Optional. IANA Time Zone Database version number, e.g. \"2019a\".",
+                    "description": "Optional. IANA Time Zone Database version number. For example \"2019a\".",
                     "type": "string"
                 }
             },
@@ -3541,6 +3678,29 @@
             "description": "This API resource represents the vulnerability report for a specified Compute Engine virtual machine (VM) instance at a given point in time. For more information, see [Vulnerability reports](https://cloud.google.com/compute/docs/instances/os-inventory-management#vulnerability-reports).",
             "id": "VulnerabilityReport",
             "properties": {
+                "highestUpgradableCveSeverity": {
+                    "description": "Output only. Highest level of severity among all the upgradable vulnerabilities with CVEs attached.",
+                    "enum": [
+                        "VULNERABILITY_SEVERITY_LEVEL_UNSPECIFIED",
+                        "NONE",
+                        "MINIMAL",
+                        "LOW",
+                        "MEDIUM",
+                        "HIGH",
+                        "CRITICAL"
+                    ],
+                    "enumDescriptions": [
+                        "Default SeverityLevel. This value is unused.",
+                        "Vulnerability has no severity level.",
+                        "Vulnerability severity level is minimal. This is level below the low severity level.",
+                        "Vulnerability severity level is low. This is level below the medium severity level.",
+                        "Vulnerability severity level is medium. This is level below the high severity level.",
+                        "Vulnerability severity level is high. This is level below the critical severity level.",
+                        "Vulnerability severity level is critical. This is the highest severity level."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "name": {
                     "description": "Output only. The `vulnerabilityReport` API resource name. Format: `projects/{project_number}/locations/{location}/instances/{instance_id}/vulnerabilityReport`",
                     "readOnly": true,

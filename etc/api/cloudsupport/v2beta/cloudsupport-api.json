@@ -333,7 +333,7 @@
                     ],
                     "parameters": {
                         "name": {
-                            "description": "The resource name for the case.",
+                            "description": "Identifier. The resource name for the case.",
                             "location": "path",
                             "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
                             "required": true,
@@ -439,6 +439,31 @@
             "resources": {
                 "attachments": {
                     "methods": {
+                        "get": {
+                            "description": "Retrieve an attachment associated with a support case. EXAMPLES: cURL: ```shell attachment=\"projects/some-project/cases/23598314/attachments/0684M00000P3h1fQAB\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2/$attachment\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .attachments() .get(name=\"projects/some-project/cases/43595344/attachments/0684M00000P3h1fQAB\") ) print(request.execute()) ```",
+                            "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments/{attachmentsId}",
+                            "httpMethod": "GET",
+                            "id": "cloudsupport.cases.attachments.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the attachment to get.",
+                                    "location": "path",
+                                    "pattern": "^[^/]+/[^/]+/cases/[^/]+/attachments/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v2beta/{+name}",
+                            "response": {
+                                "$ref": "Attachment"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
                         "list": {
                             "description": "List all the attachments associated with a support case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/23598314\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2/$case/attachments\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .attachments() .list(parent=\"projects/some-project/cases/43595344\") ) print(request.execute()) ```",
                             "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments",
@@ -449,7 +474,7 @@
                             ],
                             "parameters": {
                                 "pageSize": {
-                                    "description": "The maximum number of attachments fetched with each request. If not provided, the default is 10. The maximum page size that will be returned is 100.",
+                                    "description": "The maximum number of attachments fetched with each request. If not provided, the default is 10. The maximum page size that will be returned is 100. The size of each page can be smaller than the requested page size and can include zero. For example, you could request 100 attachments on one page, receive 0, and then on the next page, receive 90.",
                                     "format": "int32",
                                     "location": "query",
                                     "type": "integer"
@@ -507,6 +532,31 @@
                                 "https://www.googleapis.com/auth/cloud-platform"
                             ]
                         },
+                        "get": {
+                            "description": "Retrieve a comment. EXAMPLES: cURL: ```shell comment=\"projects/some-project/cases/43595344/comments/234567890\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2/$comment\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().comments().get( name=\"projects/some-project/cases/43595344/comments/234567890\", ) print(request.execute()) ```",
+                            "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/comments/{commentsId}",
+                            "httpMethod": "GET",
+                            "id": "cloudsupport.cases.comments.get",
+                            "parameterOrder": [
+                                "name"
+                            ],
+                            "parameters": {
+                                "name": {
+                                    "description": "Required. The name of the comment to retrieve.",
+                                    "location": "path",
+                                    "pattern": "^[^/]+/[^/]+/cases/[^/]+/comments/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v2beta/{+name}",
+                            "response": {
+                                "$ref": "Comment"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
                         "list": {
                             "description": "List all the comments associated with a case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43595344\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2/$case/comments\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .comments() .list(parent=\"projects/some-project/cases/43595344\") ) print(request.execute()) ```",
                             "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/comments",
@@ -550,7 +600,7 @@
         "media": {
             "methods": {
                 "download": {
-                    "description": "Download a file attached to a case. Note: HTTP requests must append \"?alt=media\" to the URL. EXAMPLES: cURL: ```shell name=\"projects/some-project/cases/43594844/attachments/0674M00000WijAnZAJ\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2/$name:download?alt=media\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.media().download( name=\"projects/some-project/cases/43595344/attachments/0684M00000Pw6pHQAR\" ) request.uri = request.uri.split(\"?\")[0] + \"?alt=media\" print(request.execute()) ```",
+                    "description": "Download a file attached to a case. When this endpoint is called, no \"response body\" will be returned. Instead, the attachment's blob will be returned. Note: HTTP requests must append \"?alt=media\" to the URL. EXAMPLES: cURL: ```shell name=\"projects/some-project/cases/43594844/attachments/0674M00000WijAnZAJ\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2/$name:download?alt=media\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.media().download( name=\"projects/some-project/cases/43595344/attachments/0684M00000Pw6pHQAR\" ) request.uri = request.uri.split(\"?\")[0] + \"?alt=media\" print(request.execute()) ```",
                     "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments/{attachmentsId}:download",
                     "httpMethod": "GET",
                     "id": "cloudsupport.media.download",
@@ -619,7 +669,7 @@
             }
         }
     },
-    "revision": "20240624",
+    "revision": "20251216",
     "rootUrl": "https://cloudsupport.googleapis.com/",
     "schemas": {
         "Actor": {
@@ -632,7 +682,7 @@
                 },
                 "email": {
                     "deprecated": true,
-                    "description": "The email address of the actor. If not provided, it is inferred from the credentials supplied during case creation. When a name is provided, an email must also be provided. If the user is a Google Support agent, this is obfuscated. This field is deprecated. Use **username** field instead.",
+                    "description": "The email address of the actor. If not provided, it is inferred from the credentials supplied during case creation. When a name is provided, an email must also be provided. If the user is a Google Support agent, this is obfuscated. This field is deprecated. Use `username` instead.",
                     "type": "string"
                 },
                 "googleSupport": {
@@ -673,7 +723,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "Output only. The resource name of the attachment.",
+                    "description": "Output only. Identifier. The resource name of the attachment.",
                     "readOnly": true,
                     "type": "string"
                 },
@@ -697,6 +747,11 @@
                 },
                 "blobId": {
                     "description": "# gdata.* are outside protos with mising documentation",
+                    "type": "string"
+                },
+                "downloadExternalReadToken": {
+                    "description": "# gdata.* are outside protos with mising documentation",
+                    "format": "byte",
                     "type": "string"
                 },
                 "downloadReadHandle": {
@@ -755,7 +810,7 @@
                     "type": "string"
                 },
                 "name": {
-                    "description": "The resource name for the case.",
+                    "description": "Identifier. The resource name for the case.",
                     "type": "string"
                 },
                 "priority": {
@@ -1566,47 +1621,6 @@
             "properties": {
                 "plainText": {
                     "description": "Content in this field should be rendered and interpreted as-is.",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "WorkflowOperationMetadata": {
-            "description": "Metadata about the operation. Used to lookup the current status.",
-            "id": "WorkflowOperationMetadata",
-            "properties": {
-                "namespace": {
-                    "description": "The namespace that the job was scheduled in. Must be included in the workflow metadata so the workflow status can be retrieved.",
-                    "type": "string"
-                },
-                "operationAction": {
-                    "description": "The type of action the operation is classified as.",
-                    "enum": [
-                        "OPERATION_ACTION_UNSPECIFIED",
-                        "CREATE_SUPPORT_ACCOUNT",
-                        "UPDATE_SUPPORT_ACCOUNT",
-                        "PURCHASE_SUPPORT_ACCOUNT"
-                    ],
-                    "enumDescriptions": [
-                        "Operation action is not specified.",
-                        "Operation pertains to the creation of a new support account.",
-                        "Operation pertains to the updating of an existing support account.",
-                        "Operation pertains to the purchasing of a support plan that may either create or update a support account."
-                    ],
-                    "type": "string"
-                },
-                "workflowOperationType": {
-                    "description": "Which version of the workflow service this operation came from.",
-                    "enum": [
-                        "UNKNOWN_OPERATION_TYPE",
-                        "WORKFLOWS_V1",
-                        "WORKFLOWS_V2"
-                    ],
-                    "enumDescriptions": [
-                        "Unknown version.",
-                        "Version 1.",
-                        "Version 2."
-                    ],
                     "type": "string"
                 }
             },

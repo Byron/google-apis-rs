@@ -3,7 +3,7 @@
         "oauth2": {
             "scopes": {
                 "https://www.googleapis.com/auth/apps.licensing": {
-                    "description": "View and manage G Suite licenses for your domain"
+                    "description": "View and manage Google Workspace licenses for your domain"
                 }
             }
         }
@@ -13,7 +13,7 @@
     "batchPath": "batch",
     "description": "The Google Enterprise License Manager API lets you manage Google Workspace and related licenses for all users of a customer that you manage.",
     "discoveryVersion": "v1",
-    "documentationLink": "https://developers.google.com/admin-sdk/licensing/",
+    "documentationLink": "https://developers.google.com/workspace/admin/licensing/",
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -400,7 +400,7 @@
             }
         }
     },
-    "revision": "20240624",
+    "revision": "20251215",
     "rootUrl": "https://licensing.googleapis.com/",
     "schemas": {
         "Empty": {
